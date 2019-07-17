@@ -3,10 +3,11 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rygg is to ...
+Pakken rygg inneholder R-kode for å generere figurer, tabeller, dokumenter og analyser til 
+Kvalitetsregister for Ryggkirurgi - Degenerativ Rygg.
 
 ## Installasjon
-Pakken kan lastes direkte i din R-studio sesjon på følgende måte:
+Pakken kan lastes direkte i en R-studiosesjon på følgende måte:
 
 
 ``` r
