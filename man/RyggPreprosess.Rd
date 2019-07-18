@@ -6,6 +6,9 @@
 \usage{
 RyggPreprosess(RegData = RegData)
 }
+\arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+}
 \description{
 Denne funksjonen definerer og formaterer variabler
 }

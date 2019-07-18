@@ -12,6 +12,10 @@ RyggFigAndelerGrVarAar(RegData, valgtVar, datoFra = "2007-01-01",
   AKjust = 0, outfile = "")
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
+\item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
 \item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
@@ -43,6 +47,14 @@ RyggFigAndelerGrVarAar(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
+
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
 
 \item{grVar}{Tekstvariabel som angir hva skal resultatene grupperes på.
@@ -50,6 +62,9 @@ ShNavn-sykehus/avdeling
 Fylke- Pasienten bor i det akutelle fylket
 BoHF - Pasienten bor i boområdene til det angitte HF.
 BoRHF - Pasienten bor i boområdene til det angitte RHF.}
+
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
 
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
 
@@ -61,6 +76,8 @@ BoRHF - Pasienten bor i boområdene til det angitte RHF.}
 
 \item{AKjust}{Alders-og kjønnsjustering når grVar er boområder. Basert på 3 aldersgrupper gruppert ut fra alderskvartilene.
 0:ikke juster, 1:juster for alder og kjønn}
+
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
 }
 \value{
 Figur med...
@@ -78,15 +95,15 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \item Alder: Pasienter over 75år
 \item Antibiotika: Er det gitt antibiotikaprofylakse?
 \item ArbstatusPre: Mottar sykepenger, før operasjon?
-\item Arbstatus: Mottar sykepenger, 3 mnd etter operasjon?    \link{ENDRET fra Arbstatus3mnd, Arbstatus12mnd}
+\item Arbstatus: Mottar sykepenger, 3 mnd etter operasjon?    (ENDRET fra Arbstatus3mnd, Arbstatus12mnd)
 \item ASA: ASA-grad > II
 \item BMI: Pasienter med fedme (BMI>30)
 \item ErstatningPre: Søkt/planlegger å søke erstatning?
-\item Fornoyd: Fornøyde pasienter \link{ENDRET fra Fornoyd3mnd, Fornoyd12mnd  }
+\item Fornoyd: Fornøyde pasienter (ENDRET fra Fornoyd3mnd, Fornoyd12mnd  )
 \item Kp3Mnd: Pasientrapporterte komplikasjoner
-\item Misfornoyd:  Andel med Misfornøyd/litt misfornøyd \link{ENDRET fra Misfor3mnd, Misfor12mnd}
-\item Nytte: Klart bedre    \link{ENDRET fra Nytte3mnd, Nytte12mnd}
-\item OswEndr30pst: Mer enn 30% forbedring i Oswestry-skår, 3 mnd. \link{ENDRET fra Osw30_3mnd, Osw30_12mnd}
+\item Misfornoyd:  Andel med Misfornøyd/litt misfornøyd (ENDRET fra Misfor3mnd, Misfor12mnd)
+\item Nytte: Klart bedre    (ENDRET fra Nytte3mnd, Nytte12mnd)
+\item OswEndr30pst: Mer enn 30% forbedring i Oswestry-skår, 3 mnd. (ENDRET fra Osw30_3mnd, Osw30_12mnd)
 \item PeropKomp: Komplikasjon ved operasjon
 \item PeropKompDura: Komplikasjon ved operasjon: Durarift
 \item Roker: Røyker du?
@@ -96,7 +113,7 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \item SympVarighUtstr: Varighet av utstrålende smerter > 1 år
 \item UforetrygdPre: Søkt eller planlegger å søke uføretrygd før operasjon?
 \item Utd: Andel høyskole-/universitetsutdannede
-\item Verre Mye verre/verre enn noen gang, 3 mnd. \link{ENDRET fra Verre3mnd, Verre12mnd}
+\item Verre Mye verre/verre enn noen gang, 3 mnd. (ENDRET fra Verre3mnd, Verre12mnd)
 \item ..
 \item BeinsmLavPre: Pasienter med preop. beinsmerte < 2.5 og ikke parese.
 \item BeinsmEndrLav: Forbedring av beinsmerter under 1.5 poeng

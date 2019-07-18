@@ -12,6 +12,10 @@ RyggFigAndelTid(RegData, valgtVar, datoFra = "2011-01-01",
   lagFig = 1, offData = 0)
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
+\item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
 \item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
@@ -39,6 +43,9 @@ RyggFigAndelTid(RegData, valgtVar, datoFra = "2011-01-01",
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
+
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 
 \item{maxald}{Alder, til og med (Standardverdi: 130)}
@@ -49,9 +56,19 @@ RyggFigAndelTid(RegData, valgtVar, datoFra = "2011-01-01",
 
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
 
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
+
 \item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
+
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
 }
 \value{
 Figur som viser tidstrend, dvs. andel av valgt variabel for hvert år.

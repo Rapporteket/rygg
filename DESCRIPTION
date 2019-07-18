@@ -1,22 +1,23 @@
 Package: rygg
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Degenerativ Rygg, figurer, tabeller, analyser
+Version: 1.9.0.1
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Lena Ringstad",
+           family = "Olsen",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "lena.olsen@skde.no",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: Figurer, tabeller, rapporter og analyser for Degenerativ Rygg. De fleste
+    benyttes på Rapporteket.
 License: What license it uses
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    zoo,
-    knitr,
-    xtable,
     kableExtra,
-    testthat (>= 2.1.0)
+    knitr,
+    testthat (>= 2.1.0),
+    xtable,
+    zoo,
 Imports: 
     rapbase (>= 1.8.0)
 Remotes: 

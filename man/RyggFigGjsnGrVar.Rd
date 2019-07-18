@@ -12,6 +12,10 @@ RyggFigGjsnGrVar(RegData, valgtVar, valgtMaal = "Gjsn",
   Ngrense = 10, medKI = 1, reshID = 0, outfile = "")
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
+\item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
 \item{valgtMaal}{'Med' = median. Alt annet gir gjennomsnitt
 
 Argumentet \emph{valgtVar} har følgende valgmuligheter:
@@ -58,6 +62,14 @@ Detajer: Her bør man liste opp hvilke variable funksjonen benytter.}
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
+
 \item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
@@ -68,9 +80,14 @@ Fylke- Pasienten bor i det akutelle fylket
 BoHF - Pasienten bor i boområdene til det angitte HF.
 BoRHF - Pasienten bor i boområdene til det angitte RHF.}
 
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
+
 \item{Ngrense}{Minste antall registreringer for at ei gruppe skal bli vist}
 
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
+
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
 }
 \value{
 Søylediagram med gjennomsnitt/median av valgt variabel for hvert sykehus

@@ -41,13 +41,11 @@
 #' Videreutvikling: Ikke vis søyler (år) som har < 10 registreringer.
 #'
 #' @export
-#'
 RyggFigAndelStabelTid <- function(RegData, outfile, valgtVar, hovedkat=99, preprosess=0, hentData=0,
                                   minald=0, maxald=130,
-                               erMann=99, ktr=1, tidlOp=0, aar=0, enhetsUtvalg=0, tittel=1, reshID=0) 
-      {
-      
-if (hentData == 1) {		
+                               erMann=99, ktr=1, tidlOp=0, aar=0, enhetsUtvalg=0, tittel=1, reshID=0) {
+
+if (hentData == 1) {
   RegData <- RyggRegDataSQL()       #(datoFra, datoTil)
 }
 
@@ -59,7 +57,7 @@ if (preprosess == 1){
 
 ktrtxt <- NULL
 
-#Når bare skal sammenlikne med sykehusgruppe eller region, eller ikke sammenlikne, 
+#Når bare skal sammenlikne med sykehusgruppe eller region, eller ikke sammenlikne,
 #trengs ikke data for hele landet:
 reshID <- as.numeric(reshID)
 
@@ -69,7 +67,7 @@ reshID <- as.numeric(reshID)
 		if (ktr==2) {RegData$Var <- RegData$Fornoyd12mnd}
 		ktrtxt <- paste0(c(3,12)[ktr], ' mnd etter operasjon')
 		RegData <- RegData[which(RegData$Var %in% 1:5),]
-		RegData$Var <- factor(RegData$Var, levels=1:5)	
+		RegData$Var <- factor(RegData$Var, levels=1:5)
 		Skala <- c('Fornøyd', 'Litt fornøyd', 'Verken eller', 'Litt misfornøyd', 'Misfornøyd')
 		}
 	if (valgtVar=='Nytte') {
@@ -89,19 +87,19 @@ reshID <- as.numeric(reshID)
 		RegData$Var <- RegData$TidlOpr
 		RegData <- RegData[which(RegData$Var %in% 1:4),]
 		RegData$Var[RegData$Var == 4] <- 0
-		RegData$Var <- factor(RegData$Var, levels=0:3)	
+		RegData$Var <- factor(RegData$Var, levels=0:3)
 		t1 <- 'Tidligere operert? '
-		Skala <- c('Primæroperasjon', 'Samme nivå', 'Annet nivå', 
+		Skala <- c('Primæroperasjon', 'Samme nivå', 'Annet nivå',
 					'Annet og sm. nivå')
 	}
 
 #Gjør utvalg
-RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, #datoFra=datoFra, datoTil=datoTil, 
-                            minald=minald, maxald=maxald, erMann=erMann, aar=aar, 
-                            hovedkat = hovedkat, tidlOp=tidlOp, 
+RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, #datoFra=datoFra, datoTil=datoTil,
+                            minald=minald, maxald=maxald, erMann=erMann, aar=aar,
+                            hovedkat = hovedkat, tidlOp=tidlOp,
                             enhetsUtvalg=enhetsUtvalg) #, grType=grType
 smltxt <- RyggUtvalg$smltxt
-medSml <- RyggUtvalg$medSml 
+medSml <- RyggUtvalg$medSml
 utvalgTxt <- RyggUtvalg$utvalgTxt
 ind <- RyggUtvalg$ind
 RegData <- RyggUtvalg$RegData
@@ -109,10 +107,10 @@ hovedgrTxt <- RyggUtvalg$hovedgrTxt
 
 RegData$OpAar <- factor(RegData$OpAar)
 
-		
+
 
 TittelUt <- c(t1, ktrtxt)
-if (tittel==0) {Tittel<-''} else {Tittel <- TittelUt} 
+if (tittel==0) {Tittel<-''} else {Tittel <- TittelUt}
 
 
 
@@ -155,7 +153,7 @@ NutvTxt <- length(utvalgTxt)
 par('fig'=c(0, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
 
 koord <- barplot(AndelerHoved, beside=F, las=1, main=Tittel, #names.arg=Aartxt, cex.names=0.95,
-        col=farger, ylab="Andel (%)", ylim=c(0,132),	 #xlim=c(0, length(Aartxt)*1.2), 
+        col=farger, ylab="Andel (%)", ylim=c(0,132),	 #xlim=c(0, length(Aartxt)*1.2),
 	cex.main=1, font.main=1, axes=F, cex.axis=.9, cex.lab=.95, space=.25, border=NA)
 axis(side=2, at=c(0,20,40,60,80,100))
 legend('top', legend=rev(Skala), bty='n', cex=.8, 	#max(koord+0.5)*1.35, y=80,
@@ -163,17 +161,17 @@ legend('top', legend=rev(Skala), bty='n', cex=.8, 	#max(koord+0.5)*1.35, y=80,
 text(koord, 102.7, NAar, cex=0.75)
 mtext(at=koord, cex=0.9, side=1, line=0, adj=0.5, Aartxt)	#
 mtext(side=1, line=1,'Operasjonsår', cex=0.9)
-mtext(at=min(koord)-0.5, cex=0.8, side=1, line=2, adj=0, paste0('Tall over søylene angir antall operasjoner i ', hovedgrTxt)) 
+mtext(at=min(koord)-0.5, cex=0.8, side=1, line=2, adj=0, paste0('Tall over søylene angir antall operasjoner i ', hovedgrTxt))
 if (medSml==1) {
 	points(koord, AndelerRest[1,], cex=1.2, lwd=1, col='white', bg='white', pch=21)
-	mtext(at=min(koord)-0.5, cex=0.8, side=1, line=3, adj=0, 
+	mtext(at=min(koord)-0.5, cex=0.8, side=1, line=3, adj=0,
 		paste('Hvitt merke: Andel "', Skala[1], '", resten av landet', sep=''))
 	}
-	
+
 #Tekst som angir hvilket utvalg som er gjort
 mtext(utvalgTxt, side=3, las=1, cex=0.9, adj=0, col=farger[4], line=c(3-(1-tittel)+0.8*((NutvTxt-1):0)))
 
-par('fig'=c(0, 1, 0, 1)) 
+par('fig'=c(0, 1, 0, 1))
 if ( outfile != '') {dev.off()}
 }
 #------------------------------------------------------------------------------

@@ -11,6 +11,12 @@ RyggFigGjsnBox(RegData, outfile, valgtVar, tidlOp = "", erMann = "",
   enhetsUtvalg = 0, hentData = 0, preprosess = 1, reshID = 0)
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
+
+\item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
 \item{erMann}{Kjønn, standard: alt annet enn 0/1 gir begge kjønn
@@ -44,6 +50,9 @@ RyggFigGjsnBox(RegData, outfile, valgtVar, tidlOp = "", erMann = "",
 
 \item{ktr}{Hvilken oppfølging man ønsker å se på. Valg: 3mnd - 3 mnd kontroll(standard), 12mnd - 12 mnd kontroll}
 
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
+
 \item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
@@ -52,6 +61,14 @@ RyggFigGjsnBox(RegData, outfile, valgtVar, tidlOp = "", erMann = "",
 'Med': gir median}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
+
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
 }

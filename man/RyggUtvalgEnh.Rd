@@ -10,6 +10,8 @@ RyggUtvalgEnh(RegData, datoFra = "2009-01-01", datoTil = "3000-01-01",
   reshID = 0, fargepalett = "BlaaOff")
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
 \item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
@@ -51,6 +53,9 @@ RyggUtvalgEnh(RegData, datoFra = "2009-01-01", datoTil = "3000-01-01",
 
 \item{fargepalett}{Velge fargepalett, standard:BlaaOff ("offentliggjøringsfargene")}
 }
+\value{
+Returnerer filtrert versjon av RegData
+}
 \description{
 Funksjon som gjør utvalg i datagrunnlaget til registreringene for Nakke
 }
@@ -70,7 +75,4 @@ Argumentet \emph{enhetsUtvalg} har følgende valgmuligheter:
 \item 7: Egen region
 \item 8: Egen region mot resten
 }
-}
-\examples{
-Kommer
 }

@@ -11,8 +11,6 @@
 #'
 #' @return Justerte p-verdier for test av endring i andeler
 #' @export
-#'
-#' @examples
 PverdiAndelsDiff <- function(n, N, konfnivaa=0.95, justMetode='fdr')
 {
 

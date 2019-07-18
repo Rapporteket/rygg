@@ -11,6 +11,10 @@ RyggFigAndelerGrVar(RegData, valgtVar, datoFra = "2007-01-01",
   tittel = 1, ktr = 0, Ngrense = 10, reshID = 0, outfile = "")
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
+\item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
 \item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
@@ -44,6 +48,14 @@ RyggFigAndelerGrVar(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
+
 \item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
@@ -54,9 +66,14 @@ Fylke- Pasienten bor i det akutelle fylket
 BoHF - Pasienten bor i boområdene til det angitte HF.
 BoRHF - Pasienten bor i boområdene til det angitte RHF.}
 
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
+
 \item{Ngrense}{Minste antall registreringer for at ei gruppe skal bli vist}
 
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
+
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
 }
 \value{
 Figur med...

@@ -11,6 +11,10 @@ RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
   reshID = 0, enhetsUtvalg = 0)
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
+\item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
 \item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
@@ -18,6 +22,14 @@ RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
 \item{aar}{\itemize{
 \item Operasjonsår
 }}
+
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 
@@ -46,9 +58,14 @@ RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
+
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
+
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
 }
 \description{
 Denne funksjonen lager et horisontalt eller vertikalt søylediagram som viser andeler (fordeling)
@@ -62,23 +79,23 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \item Antibiotika: Er det gitt antibiotikaprofylakse?
 \item AntNivOpr: Antall nivå operert'
 \item ArbstatusPre: Arbeidsstatus før operasjon'
-\item Arbstatus3mnd: Arbeidsstatus 3 mnd. etter operasjon
-\item Arbstatus12mnd: Arbeidsstatus 12 mnd. etter operasjon
+\item -Arbstatus3mnd: Arbeidsstatus 3 mnd. etter operasjon
+\item -Arbstatus12mnd: Arbeidsstatus 12 mnd. etter operasjon
 \item ASA: ASA-grad
 \item BMI: Pasientenes BMI (Body Mass Index)
 \item EqangstPre: Helsetilstand: Angst
 \item EqgangePre: Helsetilstand: Gange
 \item ErstatningPre: Har pasienten søkt erstatning?
-\item Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon
-\item Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon
+\item -Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon
+\item -Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon
 \item HovedInngrep: Hovedinngrep
 \item Komorbiditet: Komorbiditet
 \item KomplPer: Peroperative komplikasjoner
 \item KomplPost: Pasientrapporterte komplikasjoner
 \item Liggedogn: Liggetid ved operasjon
 \item Morsmal: Morsmål
-\item Nytte3mnd: Hvilken nytte har du hatt av operasjonen? (svar 3 måneder etter)
-\item Nytte12mnd: Hvilken nytte har du hatt av operasjonen? (svar 12 måneder etter)
+\item -Nytte3mnd: Hvilken nytte har du hatt av operasjonen? (svar 3 måneder etter)
+\item -Nytte12mnd: Hvilken nytte har du hatt av operasjonen? (svar 12 måneder etter)
 \item OpInd: Operasjonsindikasjon
 \item OpIndPareseGrad: Operasjonsindikasjon, paresegrad
 \item OpIndSmeType: Operasjonsindikasjon, smertetype

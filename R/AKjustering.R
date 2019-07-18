@@ -11,8 +11,6 @@
 #'
 #' @return Funksjon som alders- og kjønnsstandardiserer data basert på en valgt standardpopulasjon.
 #' @export
-#'
-#' @examples
 StandAlderKjonn  <- function(RegData, stdPop, antAldgr, katVariable) {
       #Må ha kategorivariable som input...
       #katVariable <- c('OpAar', 'grVar')

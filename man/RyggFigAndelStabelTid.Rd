@@ -10,6 +10,12 @@ RyggFigAndelStabelTid(RegData, outfile, valgtVar, hovedkat = 99,
   tittel = 1, reshID = 0)
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
+
+\item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
 \item{hovedkat}{Hvilken type hovedinngrep, numerisk 0-9, standard: 99, dvs. alle. Valgmuligheter:
 \itemize{
 \item 0:'Operasjonskategori: "ukjent"',    #hkat=0
@@ -24,6 +30,14 @@ RyggFigAndelStabelTid(RegData, outfile, valgtVar, hovedkat = 99,
 \item 9:'Degen. spondylolistese'
 \item 99: Alle
 }}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
+
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 
@@ -42,6 +56,9 @@ RyggFigAndelStabelTid(RegData, outfile, valgtVar, hovedkat = 99,
 }}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
+
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
 
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
 }

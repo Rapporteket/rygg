@@ -11,6 +11,8 @@ RyggFigAndelerGrVarAarVarKval(RegData, valgtVar, datoFra = "2007-01-01",
   outfile = "", AKjust = 0)
 }
 \arguments{
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
+
 \item{valgtVar}{Variabelen det skal vises resultat for. Se \strong{Details} for oversikt.}
 
 \item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
@@ -44,11 +46,24 @@ RyggFigAndelerGrVarAarVarKval(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
+
+return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+
+export}
+
+\item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
+
 \item{grVar}{Tekstvariabel som angir hva skal resultatene grupperes på.
 ShNavn-sykehus/avdeling
 Fylke- Pasienten bor i det akutelle fylket
 BoHF - Pasienten bor i boområdene til det angitte HF.
 BoRHF - Pasienten bor i boområdene til det angitte RHF.}
+
+\item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
+hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
+
+\item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
 
 \item{AKjust}{Alders-og kjønnsjustering når grVar er boområder. Basert på 3 aldersgrupper gruppert ut fra alderskvartilene.
 0:ikke juster, 1:juster for alder og kjønn}
