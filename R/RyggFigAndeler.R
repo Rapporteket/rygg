@@ -79,9 +79,9 @@
  #' @param preprosess Preprosesser data 0: Nei, 1: Ja (Standard)
  #' @param hentData Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
  #'
- #' return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
+ #' @return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
  #'
- #' export
+ #' @export
 
 RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil = '2999-12-31',
                             aar = 0, hentData = 0, preprosess = 1,minald = 0, maxald = 130, erMann = '',

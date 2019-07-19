@@ -33,11 +33,7 @@ RyggFigAndelStabelTid(RegData, outfile, valgtVar, hovedkat = 99,
 
 \item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 
-\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
-
-return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
-
-export}
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 

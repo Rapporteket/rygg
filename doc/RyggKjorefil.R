@@ -20,11 +20,16 @@ setwd('C:/ResultattjenesteGIT/nkr')
 
 reshID <- 601161 #Haukeland nevr.kir: 105588, NIMI:  104279, Unn: 601161, St Olav: 105783 Namsos:105899,
 #fil <- 'A:/Rygg/NKR2010-2017aarsrapp'
-dato <- '2019-07-08'
-RegData <- read.table(paste0(fil, '.csv'), sep=';', header=T, encoding = 'UTF-8') #, stringsAsFactors = FALSE, na.strings = "NULL",
-SkjemaOversikt <- read.table(paste0('A:/Rygg/SkjemaOversikt2',dato,'.csv'),
+dato <- '2019-07-18'
+#RegData <- read.table(paste0(fil, '.csv'), sep=';', header=T, encoding = 'UTF-8') #, stringsAsFactors = FALSE, na.strings = "NULL",
+SkjemaOversikt <- read.table(paste0('A:/Rygg/SkjemaOversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
-
+usethis::use_data(SkjemaOversikt, internal = TRUE, overwrite = TRUE)
+ForlopsOversikt <- read.table(paste0('A:/Rygg/ForlopsOversikt',dato,'.csv'),
+                             sep=';', header=T, encoding = 'UTF-8')
+RegData <- read.table(paste0('A:/Rygg/AlleVarNum',dato,'.csv'),
+                             sep=';', header=T, encoding = 'UTF-8')
+#RegData$Kjonn <- 0
 
 #save(RegData, file=paste0(fil, '.Rdata'))
 load(file=paste0(fil, '.Rdata'))
@@ -75,6 +80,30 @@ table(SkjemaOversikt$MndAar)
 indPasientskjema <- which(SkjemaOversikt$SkjemaRekkeflg==5)
 table(SkjemaOversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")]) # ,
 
+
+#----------- Teste valgtVar for nye data -----------------------------
+#Benytter AlleVarNum som RegData
+#Tester Andeler, AndelTid, AndelGrVar, GjsnBox og GjsnGrVar
+#Oppfølgingsskjema har ikke fått selvvalgte navn. Variable fra oppfølgingsskjema sjekkes IKKE
+
+rm(list=ls())
+outfile <- ''
+tidsenhet <- 'Mnd'
+valgtVar <- 'EQgangePre'
+RegData <- read.table('A:/Rygg/AlleVarNum2019-07-18.csv',
+                      sep=';', header=T, encoding = 'UTF-8')
+RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, outfile=outfile)
+RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData,outfile=outfile)
+RyggFigAndelTid(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidsenhet = tidsenhet)
+RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar,tidsenhet = tidsenhet) #aar=aar,
+RyggFigGjsnGrVar(RegData=RegData, outfile=outfile, valgtVar=valgtVar)
+
+#---Status per 19.juli 2019
+#valgtVarOK:  alder, alder70, arbstatus, ASA, beinsmLavPre, BMI, degSponSSSten, EQ5DPre, OswTotPre,
+#   SmBePre, SmRyPre, EQangstPre, EQgangePre
+
+#valgtVarIKKE ok: antNivOpr, beinsmEndrLav, degSponFusj, EQ5DEndr, EQ5DEndrPre, OswEndr, OswEndrPre,
+#   SmBeinEndr, SmBeinEndrPre, SmRyggEndr, SmRyggEndrPre
 
 #_________________________________________________________________________________________
 #
@@ -156,6 +185,7 @@ outfile <- ''#paste0(valgtVar,enhetsUtvalg, '.png')	#paste0(valgtVar,enhetsUtval
 utdata <- RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidlOp=tidlOp, erMann=erMann, opKat = opKat,
 		hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal=valgtMaal,
 		datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=enhetsUtvalg, tidsenhet = tidsenhet, reshID=reshID) #aar=aar,
+
 #RyggFigGjsnBox
 #RegData=0, outfile=outfile, valgtVar=valgtVar,valgtMaal=valgtMaal, enhetsUtvalg=enhetsUtvalg,
 #datoFra=datoFra, datoTil=datoTil, hovedkat=hovedkat, tidlOp=tidlOp,  ktr=ktr, erMann=erMann,

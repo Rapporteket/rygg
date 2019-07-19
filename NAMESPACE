@@ -3,6 +3,7 @@
 export(PverdiAndelsDiff)
 export(RyggFigAndelStabelTid)
 export(RyggFigAndelTid)
+export(RyggFigAndeler)
 export(RyggFigAndelerGrVar)
 export(RyggFigAndelerGrVarAar)
 export(RyggFigAndelerGrVarAarVarKval)

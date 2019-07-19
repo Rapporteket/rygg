@@ -10,31 +10,34 @@ RyggPreprosess <- function(RegData=RegData)
 {
   #Kun ferdigstilte registreringer: Det skal kun leveres ferdigstilte skjema til RapportUttrekk
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
-	RegData$ErMann <- RegData$Kjonn
-	RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
+  #Mangler:	 RegData$ErMann <- RegData$Kjonn
+  #Mangler:	 RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
 
 	#Riktig datoformat og hoveddato
-	RegData$InnDato <- as.POSIXlt(RegData$OpDato, format="%d.%m.%Y")
-	
+	RegData$InnDato <- as.POSIXlt(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
+	RegData$Aar <- lubridate::year(RegData$InnDato)
+
 	#Endre variabelnavn:
-	names(RegData)[which(names(RegData) == 'OpAar')] <- 'Aar'
+	#names(RegData)[which(names(RegData) == 'OpAar')] <- 'Aar'
+	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
+
 
 	# Nye variable:
+	#Trenger kanskje ikke disse siden legger på tidsenhet når bruk for det.
 	RegData$MndNum <- RegData$InnDato$mon +1
 	RegData$MndAar <- format(RegData$InnDato, '%b%y')
 	RegData$Kvartal <- ceiling(RegData$MndNum/3)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
-	#RegData$Aar <- 1900 + RegData$InnDato$year #strptime(RegData$InnDato, format="%Y")$year
-	
+
 	#Variabel som identifiserer avdelingas resh
-	names(RegData)[which(names(RegData) == 'AvdReshID')] <- 'ReshId'
-	names(RegData)[which(names(RegData) == 'AvdNavn')] <- 'ShNavn'
+	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
+	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
 	class(RegData$ReshId) <- 'numeric'
-	
+
 	#Formatering
 	RegData$Morsmal <- factor(RegData$Morsmal, levels=1:3)
-	RegData$HovedInngrep <- factor(RegData$HovedInngrep, levels=0:7)
-	RegData$Inngrep <- factor(RegData$Inngrep, levels=0:19)
+#Mangler:	RegData$HovedInngrep <- factor(RegData$HovedInngrep, levels=0:7)
+#Mangler:		RegData$Inngrep <- factor(RegData$Inngrep, levels=0:19)
 	RegData$SivilStatus <- factor(RegData$SivilStatus, levels=1:3)
 	#RegData$ASA <- factor(RegData$ASA, levels=1:4)
 	RegData$Utd <- factor(RegData$Utd, levels=1:5)
@@ -45,12 +48,12 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$SympVarighUtstr <- factor(RegData$SympVarighUtstr, levels=1:5)
 	RegData$OpKat <- factor(RegData$OpKat, levels=1:3)
 
-	
+
 #Legge til underkategori for hovedkategori.
 #	if (is.na(match("Inngrep", names(opdata))) != 'TRUE') {	#Hvis har variabelen Inngrep
 #	      #if (match("Inngrep", names(opdata))) {	#Hvis har variabelen Inngrep
-#	      
-#	      #Dataramme av hovedkategorier og underkategorier			
+#
+#	      #Dataramme av hovedkategorier og underkategorier
 #	      gr_nr <- c(0:19)
 #	      txt <- c('Annet','Mikro','Makro','Tubekirurgi','Udefinert','Mikro','Makro','Tubekirurgi',
 #	               'Udefinert','Laminektomi', 'Interspinøst impl.','PLF','PLIF','TLIF','ALIF',
@@ -60,7 +63,7 @@ RyggPreprosess <- function(RegData=RegData)
 #	      kat <- data.frame(hgr, hkatnavn[hgr+1], gr_nr, txt)
 #	      underkattxt <- ''
 #	      underkat_num <- ''
-#	      
+#
 #	      #Velge ut riktige underkategorier:
 #	      if (hovedkat != 99) {
 #	            underkat_num <- kat$gr_nr[kat$hgr==hovedkat]
@@ -69,9 +72,9 @@ RyggPreprosess <- function(RegData=RegData)
 #	            underkattxt <- as.character(kat$txt[underkat_num+1])
 #	      }
 #	      names(kat) <- c('Hnr', 'Hnavn', 'Unr', 'Unavn')
-#	      utdata <- list(opdata, hkattxt, underkattxt, underkat_num, kat) 
+#	      utdata <- list(opdata, hkattxt, underkattxt, underkat_num, kat)
 #	      names(utdata) <- c('data','txt','ukattxt','underkat', 'inngrHinngr')
-	      
+
 
   return(invisible(RegData))
 }

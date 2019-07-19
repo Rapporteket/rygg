@@ -48,11 +48,7 @@ RyggFigAndelerGrVar(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
-\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
-
-return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
-
-export}
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
 
 \item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 

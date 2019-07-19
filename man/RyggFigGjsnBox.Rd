@@ -62,11 +62,7 @@ hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
 
-\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
-
-return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
-
-export}
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
 
 \item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 

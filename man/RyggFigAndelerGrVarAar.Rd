@@ -47,11 +47,7 @@ RyggFigAndelerGrVarAar(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
-\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
-
-return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
-
-export}
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
 
 \item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 

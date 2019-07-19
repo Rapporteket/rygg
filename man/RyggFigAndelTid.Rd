@@ -6,7 +6,7 @@
 \usage{
 RyggFigAndelTid(RegData, valgtVar, datoFra = "2011-01-01",
   datoTil = "3000-12-31", aar = 0, tidsenhet = "Aar",
-  hovedkat = 99, ktr = 2, tidlOp = 99, tittel = 1, minald = 0,
+  hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1, minald = 0,
   maxald = 130, erMann = 99, reshID = 0, outfile = "",
   opKat = 99, enhetsUtvalg = 0, preprosess = 1, hentData = 0,
   lagFig = 1, offData = 0)
@@ -64,11 +64,7 @@ hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
 
 \item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 
-\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
-
-return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
-
-export}
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
 }
 \value{
 Figur som viser tidstrend, dvs. andel av valgt variabel for hvert år.

@@ -20,11 +20,10 @@ if (context == "TEST" | context == "QA" | context == "PRODUCTION") {
     HovedSkjema <- RyggRegDataSQL() #datoFra = datoFra, datoTil = datoTil)
 } #hente data på server
 
-reshID <- 8 #110734
 #     if (!exists('RegData')) {
 #data('RyggTulledata', package = 'rygg')
-reshID <- 8
-dato <- '2019-07-08'
+reshID <- 601161
+dato <- '2019-07-18'
 SkjemaOversikt <- read.table(paste0('A:/Rygg/SkjemaOversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
 

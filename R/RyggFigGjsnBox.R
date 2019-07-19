@@ -38,28 +38,28 @@
 #' @return Linjediagram som viser utvikling over tid for valgt variabel
 #'
 #' @export
-RyggFigGjsnBox <- function(RegData, outfile, valgtVar, tidlOp='', erMann='', hovedkat=99, aar=0, 
-                           tidsenhet = 'Mnd', opKat=99, minald=0, maxald=130, ktr=0, tittel=1, 
-                           datoFra='2007-01-01', datoTil='3000-01-01', 
+RyggFigGjsnBox <- function(RegData, outfile, valgtVar, tidlOp='', erMann='', hovedkat=99, aar=0,
+                           tidsenhet = 'Mnd', opKat=99, minald=0, maxald=130, ktr=0, tittel=1,
+                           datoFra='2007-01-01', datoTil='3000-01-01',
                            valgtMaal='Gjsn',enhetsUtvalg=0, hentData=0, preprosess=1, reshID=0){
-      
-      if (hentData == 1) {		
+
+      if (hentData == 1) {
             RegData <- RyggRegDataSQL()   #(datoFra, datoTil)
       }
-      
+
       # Hvis RegData ikke har blitt preprosessert. (I samledokument gjøre dette i samledokumentet)
       if (preprosess == 1){
             RegData <- RyggPreprosess(RegData=RegData)
       }
-      
+
 
   #--------------- Definere variable ------------------------------
-  
-  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype='gjsnGrVar')
+
+  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype='gjsnBox')
   RegData <- RyggVarSpes$RegData
   KIekstrem <- RyggVarSpes$KIekstrem
-  
-  
+
+
   RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                               hovedkat=hovedkat, opKat=opKat, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg) #overfPas = overfPas,
@@ -75,7 +75,7 @@ RyggFigGjsnBox <- function(RegData, outfile, valgtVar, tidlOp='', erMann='', hov
             RegDataFunk <- SorterOgNavngiTidsEnhet(RegData=RegData, tidsenhet = tidsenhet)
             RegData <- RegDataFunk$RegData
             tidNum <- min(RegData$TidsEnhetSort, na.rm=T):max(RegData$TidsEnhetSort, na.rm = T) #as.numeric(levels(RegData$TidsEnhetSort))
-            
+
 #--------------- Gjøre beregninger ------------------------------
 
 
@@ -90,17 +90,17 @@ if (valgtMaal=='Med') {
 	#j <- ceiling(N/2 - 1.96*sqrt(N/4))
 	#k <- ceiling(N/2 + 1.96*sqrt(N/4))
 	#KIHele <- sort(RegData$Variabel)[c(j,k)]
-#The notches (if requested) extend to +/-1.58 IQR/sqrt(n). (Chambers et al. (1983, p. 62), given in McGill et al. (1978, p. 16).) 
-#They are based on asymptotic normality of the median and roughly equal sample sizes for the two medians being compared, 
-#and are said to be rather insensitive to the underlying distributions of the samples. The idea appears to be to give 
-#roughly a 95% confidence interval for the difference in two medians. 	
+#The notches (if requested) extend to +/-1.58 IQR/sqrt(n). (Chambers et al. (1983, p. 62), given in McGill et al. (1978, p. 16).)
+#They are based on asymptotic normality of the median and roughly equal sample sizes for the two medians being compared,
+#and are said to be rather insensitive to the underlying distributions of the samples. The idea appears to be to give
+#roughly a 95% confidence interval for the difference in two medians.
 } else {	#Gjennomsnitt blir standard.
 	Midt <- tapply(RegData[ind$Hoved ,'Variabel'], RegData[ind$Hoved, 'TidsEnhet'], mean, na.rm=T)
 	SD <- tapply(RegData[ind$Hoved ,'Variabel'], RegData[ind$Hoved, 'TidsEnhet'], sd, na.rm=T)
 	Konf <- rbind(Midt - 2*SD/sqrt(Ngr$Hoved), Midt + 2*SD/sqrt(Ngr$Hoved))
 }
 
-            
+
 if (length(KIekstrem) == 0) {	#Hvis ikke KIekstrem definert i variabeldefinisjonen
 	KIekstrem <- c(0,max(RegData$Variabel, na.rm=T))
 }
@@ -128,31 +128,31 @@ Ngr$Rest <- tapply(RegData[ind$Rest ,'Variabel'], RegData[ind$Rest, 'TidsEnhet']
 t1 <- switch(valgtMaal,
              Med = 'Median ',
              Gjsn = 'Gjennomsnittlig ')
-tittel <- paste0(t1, RyggVarSpes$tittel) 
+tittel <- paste0(t1, RyggVarSpes$tittel)
 
 if (valgtMaal=='Med') {maaltxt <- 'Median ' } else {maaltxt <- 'Gjennomsnitt '}
 
 ResData <- round(rbind(Midt, Konf, MidtRest, KonfRest), 1)
-rownames(ResData) <- c(maaltxt, 'KImin', 'KImaks', 
+rownames(ResData) <- c(maaltxt, 'KImin', 'KImaks',
                        paste0(maaltxt, 'Resten'), 'KImin, Resten', 'KImaks, Resten')[1:(3*(medSml+1))]
 #UtData <- list(paste0(toString(RyggVarSpes$tittel),'.'), ResData )
 #names(UtData) <- c('tittel', 'Data')
 
-FigDataParam <- list(AggVerdier=ResData, 
-                     N=N, 
-                     Ngr=Ngr,	
+FigDataParam <- list(AggVerdier=ResData,
+                     N=N,
+                     Ngr=Ngr,
                      #KImaal <- KImaal,
                      #KImaaltxt <- KImaaltxt,
                      #soyletxt=soyletxt,
                      grtxt=levels(RegData$TidsEnhet),
-                     #grtxt2=grtxt2, 
+                     #grtxt2=grtxt2,
                      #varTxt=varTxt,
                      #tidtxt=tidtxt, #RyggVarSpes$grtxt,
-                     tittel=RyggVarSpes$tittel, 
+                     tittel=RyggVarSpes$tittel,
                     # xAkseTxt=xAkseTxt,
                      #yAkseTxt=yAkseTxt,
-                     utvalgTxt=utvalgTxt, 
-                     fargepalett=RyggUtvalg$fargepalett, 
+                     utvalgTxt=utvalgTxt,
+                     fargepalett=RyggUtvalg$fargepalett,
                      medSml=medSml,
                      hovedgrTxt=RyggUtvalg$hovedgrTxt,
                      smltxt=RyggUtvalg$smltxt)
@@ -181,24 +181,24 @@ ytxt <- maaltxt #paste0(maaltxt, ytxt1, sep='')
 FigTypUt <- figtype(outfile, fargepalett=RyggUtvalg$fargepalett)
 #Tilpasse marger for å kunne skrive utvalgsteksten
 NutvTxt <- length(utvalgTxt)
-par('fig'=c(0, 1, 0, 1-0.02*(max((NutvTxt-1),0))))	
-	
+par('fig'=c(0, 1, 0, 1-0.02*(max((NutvTxt-1),0))))
+
 farger <- FigTypUt$farger
 fargeHovedRes <- farger[1]
 fargeRestRes <- farger[4]
-# 
+#
 plot(tidNum,Midt, xlim= c(xmin, xmax), ylim=c(ymin, ymax), type='n', frame.plot=FALSE, #ylim=c(ymin-0.05*ymax, ymax),
-		#cex=0.8, cex.lab=0.9, cex.axis=0.9,	
-		ylab=c(ytxt,'med 95% konfidensintervall'), 
-		xlab='Operasjonstidspunkt', xaxt='n', 
+		#cex=0.8, cex.lab=0.9, cex.axis=0.9,
+		ylab=c(ytxt,'med 95% konfidensintervall'),
+		xlab='Operasjonstidspunkt', xaxt='n',
 		sub='(Tall i boksene angir antall operasjoner)', cex.sub=cexgr)	#, axes=F)
-axis(side=1, at = tidNum, labels = levels(RegData$TidsEnhet))	
+axis(side=1, at = tidNum, labels = levels(RegData$TidsEnhet))
 #Sammenlikning:
 if (medSml==1) {
       AntTidsenh <- max(which(!is.na(KonfRest[1,])))
-      polygon( c(tidNum[1]-0.01,tidNum[1:AntTidsenh], tidNum[AntTidsenh]+0.012, 
-				tidNum[AntTidsenh]+0.012, tidNum[AntTidsenh:1], tidNum[1]-0.01), 
-		c(KonfRest[1,c(1,1:AntTidsenh, AntTidsenh)], KonfRest[2,c(AntTidsenh,AntTidsenh:1,1)]), 
+      polygon( c(tidNum[1]-0.01,tidNum[1:AntTidsenh], tidNum[AntTidsenh]+0.012,
+				tidNum[AntTidsenh]+0.012, tidNum[AntTidsenh:1], tidNum[1]-0.01),
+		c(KonfRest[1,c(1,1:AntTidsenh, AntTidsenh)], KonfRest[2,c(AntTidsenh,AntTidsenh:1,1)]),
 			col=fargeRestRes, border=NA)
 	legend('top', bty='n', fill=fargeRestRes, border=fargeRestRes, cex=cexgr,
 		paste0('95% konfidensintervall for ', RyggUtvalg$smltxt, ', N=', N$Rest)) #sum(Ngr$Rest, na.rm=T)
@@ -206,14 +206,14 @@ if (medSml==1) {
 h <- strheight(1, cex=cexgr)*0.7	#,  units='figure',
 b <- 1.1*strwidth(max(c(Ngr$Hoved, Ngr$Rest), na.rm=T), cex=cexgr)/2	#length(tidNum)/30
 rect(tidNum-b, Midt-h, tidNum+b, Midt+h, border = fargeHovedRes, lwd=1)	#border=farger[4], col=farger[4]
-text(tidNum, Midt, Ngr$Hoved, col=fargeHovedRes, cex=cexgr) 	
+text(tidNum, Midt, Ngr$Hoved, col=fargeHovedRes, cex=cexgr)
 
 #Konfidensintervall:
 indKonf <- which(Konf[1, ] > Midt-h) #Konfidensintervall som er tilnærmet 0
 options('warn'=-1)
-arrows(x0=tidNum, y0=Midt-h, x1=tidNum, length=0.08, code=2, angle=90, 
+arrows(x0=tidNum, y0=Midt-h, x1=tidNum, length=0.08, code=2, angle=90,
 		y1=replace(Konf[1, ], indKonf, Midt[indKonf]-h), col=fargeHovedRes, lwd=1.5)
-arrows(x0=tidNum, y0=Midt+h, x1=tidNum, y1=replace(Konf[2, ], indKonf, Midt[indKonf]+h), 
+arrows(x0=tidNum, y0=Midt+h, x1=tidNum, y1=replace(Konf[2, ], indKonf, Midt[indKonf]+h),
 		length=0.08, code=2, angle=90, col=fargeHovedRes, lwd=1.5)
 
 title(main=c(tittel, RyggUtvalg$hovedgrTxt), font.main=1, line=1)

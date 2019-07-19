@@ -23,11 +23,7 @@ RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
 \item Operasjonsår
 }}
 
-\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja
-
-return Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
-
-export}
+\item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
 
 \item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 
@@ -66,6 +62,9 @@ export}
 
 \item{tittel}{Vise tittel i figuren eller ikke (0/1). standard:1
 hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
+}
+\value{
+Søylediagram (fordeling) av valgt variabel. De enkelte verdiene kan også sendes med.
 }
 \description{
 Denne funksjonen lager et horisontalt eller vertikalt søylediagram som viser andeler (fordeling)

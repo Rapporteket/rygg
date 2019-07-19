@@ -4,13 +4,15 @@
 \alias{RyggVarTilrettelegg}
 \title{Funksjon for å tilrettelegge variable for beregning.}
 \usage{
-RyggVarTilrettelegg(RegData = NULL, valgtVar, ktr = 0, hovedkat = 99,
-  figurtype = "andeler")
+RyggVarTilrettelegg(RegData = NULL, valgtVar, ktr = 0,
+  datoTil = Sys.Date(), hovedkat = 99, figurtype = "andeler")
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
 
 \item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
+
+\item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{hovedkat}{Hvilken type hovedinngrep, numerisk 0-9, standard: 99, dvs. alle. Valgmuligheter:
 \itemize{
