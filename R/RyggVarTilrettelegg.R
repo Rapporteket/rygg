@@ -360,19 +360,21 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
            subtxt <- 'problemer med gange'
       }
       if (valgtVar == 'erstatningPre') { #fordeling, AndelGrVar, #AndelTid
-            #Pasientskjema. Andel med ErstatningPre 1 el 3
-            #Kode 1:4,9: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
-            grtxt <- c('Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent')
-            RegData$VariabelGr <- 9
-            indDum <- which(RegData$ErstatningPre %in% 1:4)
-            RegData$VariabelGr[indDum] <- RegData$ErstatningPre[indDum]
-            RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(1:4,9))
+            #Pasientskjema. Andel med ErstatningPre
+            #V2: Kode 1:4,9: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
+            #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger","Innvilget","Ikke utfylt"]
+
+            grtxt <- c('Nei', 'Ja', 'Planlegger', 'Innvilget', 'Ikke utfylt')
+            #RegData$VariabelGr <- 9
+            #indDum <- which(RegData$ErstatningPre %in% 1:4)
+            #RegData$VariabelGr[indDum] <- RegData$ErstatningPre[indDum]
+            RegData$VariabelGr <- factor(RegData$ErstatningPre, levels = c(0:3,9))
             tittel <- 'Har pasienten søkt erstatning?'
-            if (figurtype %in% c('andelerGrVar', 'andelTid')) {
-                  RegData <- RegData[which(RegData$ErstatningPre %in% 1:4), ]
-                  RegData$Variabel[which(RegData[ ,valgtVar] %in% c(1,3))] <- 1
+            if (figurtype %in% c('andelGrVar', 'andelTid')) {
+                  RegData <- RegData[which(RegData$ErstatningPre %in% 0:3), ]
+                  RegData$Variabel[which(RegData$ErstatningPre %in% c(1,2))] <- 1
                   tittel <- 'Pasienten har søkt/planlegger å søke erstatning'
-                  varTxt <- 'søkt erstatning'
+                  varTxt <- 'som har søkt erstatning'
                   sortAvtagende <- FALSE}
       }
 
@@ -408,17 +410,15 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:7)
             retn <- 'H'
       }
-      if (valgtVar=='komplPer') {
+      if (valgtVar=='komplPer') { #fordeling
             tittel <- 'Peroperative komplikasjoner'
             retn <- 'H'
             flerevar <- 1
-            #RegData <- RegData[which(dato > as.POSIXlt('2009-12-31')), ]
             #NB <- '(Komplikasjoner rapporteres kun f.o.m. 2010)'
             variable <- c('PeropKompDura', 'PeropKompFeilnivSide', 'PeropKompNerve', 'PeropKompTransfuBlodning',
                           'PeropKompKardio','PeropKompFeilplassImp','PeropKompResp','PeropKompAnafy')
             grtxt <- c('Durarift', 'Operert feil nivå/side', 'Nerveskade', 'Transfusjonskrevende blødning',
                        'Kardiovaskulær komplikasjon', 'Feilplassert implantat', 'Respiratorisk komplikasjon', 'Anafylaksi')
-            #RegData$Variabel <- rowSums(RegData[ ,variable], na.rm=T)
       }
 
       if (valgtVar=='komplPost') {
@@ -490,16 +490,12 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             sortAvtagende <- FALSE
       }
       if (valgtVar == 'morsmal') { #fordeling AndelGrVar, AndelTid
-            #           Kode 1:3:'Norsk', 'Samisk', 'Annet'
-            grtxt <- c('Norsk', 'Samisk', 'Annet', 'Ukjent')
+            grtxt <- c('Norsk', 'Samisk', 'Annet', 'Ikke utfylt')
             tittel <- 'Morsmål'
-            RegData$VariabelGr <- 9
-            indDum <- which(RegData$Morsmal %in% 1:3)
-            RegData$VariabelGr[indDum] <- RegData$Morsmal[indDum]
-            RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(1:3,9))
+            RegData$VariabelGr <- factor(RegData$MorsmalV3, levels = c(1:3,9))
             if (figurtype %in% c('andelTid', 'andelGrVar')) {
-                  RegData <- RegData[which(RegData$Morsmal %in% 1:3), ]
-                  RegData$Variabel[which(RegData$Morsmal %in% 2:3)] <- 1
+                  RegData <- RegData[which(RegData$MorsmalV3 %in% 1:3), ]
+                  RegData$Variabel[which(RegData$MorsmalV3 %in% 2:3)] <- 1
                   tittel <- 'Fremmedspråklige (ikke norsk som morsmål)'
                   varTxt <- 'fremmedspråklige'
                   sortAvtagende <- F}
@@ -556,10 +552,10 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       if (valgtVar == 'opKat') { #fordeling
             #retn <- 'H'
             tittel <- 'Operasjonskategori'
-            grtxt <- c('Elektiv', 'Akutt', '1/2-Akutt', 'Ukjent')
-            indDum <- which(RegData$OpKat %in% 1:3)
-            RegData$VariabelGr <- 9
-            RegData$VariabelGr[indDum] <- RegData$OpKat[indDum]
+            grtxt <- c('Elektiv', 'Akutt', '1/2-Akutt', 'Ikke utfylt')
+            #indDum <- which(RegData$OpKat %in% 1:3)
+            #RegData$VariabelGr <- 9
+            #RegData$VariabelGr[indDum] <- RegData$OpKat[indDum]
             RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(1:3,9))
       }
 
@@ -629,6 +625,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             #Kode 1:Ja,  tomme:Nei
             RegData$Variabel[which(RegData$PeropKomp == 1)] <- 1
             tittel <- 'Komplikasjoner ved operasjon'
+            varTxt <- 'med komplikasjoner'
             sortAvtagende <- FALSE
       }
       if (valgtVar=='PeropKompDura') { #AndelGrVar
@@ -638,11 +635,12 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             tittel <- 'Komplikasjon ved operasjon: Durarift'
             sortAvtagende <- FALSE
             xAkseTxt <- 'Andel durarift (%)'
+            varTxt <- 'med durarift'
             #KImaalRetn <- 'lav'
             if (hovedkat == 1) {KImaalGrenser <- c(0,2)}
             if (hovedkat == 8) {KImaalGrenser <- c(0,3)}
       }
-      if (valgtVar=='radUnders') {
+      if (valgtVar=='radUnders') { #fordeling
             tittel <- 'Radiologisk undersøkelse'
             retn <- 'H'
             flerevar <- 1
@@ -652,16 +650,14 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       if (valgtVar=='roker') { #AndelGrVar, #AndelTid
             #PasientSkjema. Andel med Roker=1
             #Kode 0,1,tom: Nei, Ja Ukjent
+            #V3: [0,1,2,9] ["Nei","Ja","Har røkt tidligere","Ikke utfylt"]
             tittel <- 'Røyker du?'
-            grtxt <- c('Nei', 'Ja', 'Ukjent')
-            RegData$VariabelGr <- 9
-            indDum <- RegData$Roker %in% 0:1
-            RegData$VariabelGr[indDum] <- RegData$Roker[indDum]
-            RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(0,1,9))
+            grtxt <- c("Nei","Ja","Har røkt tidligere","Ikke utfylt")
+            RegData$VariabelGr <- factor(RegData$RokerV3, levels = c(0:2,9))
 
             if (figurtype %in% c('andelGrVar', 'andelTid')){
-                  RegData <- RegData[which(RegData$Roker %in% 0:1), ]
-                  RegData$Variabel <- RegData$Roker
+                  RegData <- RegData[which(RegData$RokerV3 %in% 0:2), ]
+                  RegData$Variabel[RegData$RokerV3==1] <- 1
                   tittel <- 'Røykere'
                   varTxt <- 'røykere'
                   sortAvtagende <- FALSE}
@@ -671,12 +667,10 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       if (valgtVar == 'saardren') { #AndelGrVar
             #LegeSkjema. Andel med Saardren=1
             #Kode 0,1,tom: Nei, Ja Ukjent
-            grtxt <- c('Nei', 'Ja', 'Ukjent')
-            RegData$VariabelGr <- 9
-            indDum <- which(RegData$Saardren %in% 0:1)
-            RegData$VariabelGr[indDum] <- RegData$Saardren[indDum]
-            RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(0:1,9))
+            grtxt <- c('Nei', 'Ja', 'Ikke utfylt')
+            RegData$VariabelGr <- factor(RegData$Saardren, levels = c(0:1,9))
             tittel <- 'Sårdren'
+            sortAvtagende <- F
             if (figurtype %in% c('andelGrVar', 'andelTid')){
                   RegData <- RegData[which(RegData$Saardren %in% 0:1), ]
                   RegData$Variabel <- RegData$Saardren

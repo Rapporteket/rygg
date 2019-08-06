@@ -86,10 +86,11 @@ table(SkjemaOversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")
 #Tester Andeler, AndelTid, AndelGrVar, GjsnBox og GjsnGrVar
 #Oppfølgingsskjema har ikke fått selvvalgte navn. Variable fra oppfølgingsskjema sjekkes IKKE
 
+library(rygg)
 rm(list=ls())
 outfile <- ''
 tidsenhet <- 'Mnd'
-valgtVar <- 'EQgangePre'
+valgtVar <- 'saardren'
 RegData <- read.table('A:/Rygg/AlleVarNum2019-07-18.csv',
                       sep=';', header=T, encoding = 'UTF-8')
 RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, outfile=outfile)
@@ -100,10 +101,15 @@ RyggFigGjsnGrVar(RegData=RegData, outfile=outfile, valgtVar=valgtVar)
 
 #---Status per 19.juli 2019
 #valgtVarOK:  alder, alder70, arbstatus, ASA, beinsmLavPre, BMI, degSponSSSten, EQ5DPre, OswTotPre,
-#   SmBePre, SmRyPre, EQangstPre, EQgangePre
+#   SmBePre, SmRyPre, EQangstPre, EQgangePre, erstatningPre, komplPer, morsmal, opIndPareseGrad, opKat
+#   PeropKomp, roker, saardren
+
 
 #valgtVarIKKE ok: antNivOpr, beinsmEndrLav, degSponFusj, EQ5DEndr, EQ5DEndrPre, OswEndr, OswEndrPre,
-#   SmBeinEndr, SmBeinEndrPre, SmRyggEndr, SmRyggEndrPre
+#   OswEndrLav, OswEndr20, OswEndr30pst, Osw22, Osw48, SmBeinEndr, SmBeinEndrPre, SmRyggEndr, SmRyggEndrPre
+# fornoydhet, hovedInngrep (ikke def.), komplPost, Kp3Mnd, KpInf3Mnd, liggedogn, Misfornoyd, nytte,
+#  opInd og opIndSmeType (mangler varnavn OpIndSme/-Type),  radUnders (mangler varnavn),
+
 
 #_________________________________________________________________________________________
 #
