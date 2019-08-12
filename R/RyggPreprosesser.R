@@ -30,8 +30,8 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 
 	#Variabel som identifiserer avdelingas resh
-	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
+	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 	class(RegData$ReshId) <- 'numeric'
 
 	#Formatering

@@ -20,11 +20,11 @@ setwd('C:/ResultattjenesteGIT/nkr')
 
 reshID <- 601161 #Haukeland nevr.kir: 105588, NIMI:  104279, Unn: 601161, St Olav: 105783 Namsos:105899,
 #fil <- 'A:/Rygg/NKR2010-2017aarsrapp'
-dato <- '2019-07-18'
+dato <- '2019-08-06'
 #RegData <- read.table(paste0(fil, '.csv'), sep=';', header=T, encoding = 'UTF-8') #, stringsAsFactors = FALSE, na.strings = "NULL",
 SkjemaOversikt <- read.table(paste0('A:/Rygg/SkjemaOversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
-usethis::use_data(SkjemaOversikt, internal = TRUE, overwrite = TRUE)
+#usethis::use_data(SkjemaOversikt, internal = TRUE, overwrite = TRUE)
 ForlopsOversikt <- read.table(paste0('A:/Rygg/ForlopsOversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8')
 RegData <- read.table(paste0('A:/Rygg/AlleVarNum',dato,'.csv'),
@@ -53,7 +53,7 @@ maxald <- 130	#alder, til og med
 erMann <- 99			#kjønn, 1-menn, 0-kvinner, standard: '' (alt annet enn 0 og 1), dvs. begge
 hovedkat <- 99		#HovedInngrep, 0-7, Standard: 99, dvs alle op
 opKat <- 1 #Elektivt/Akutt, 1-2
-enhetsUtvalg <- 0 #	0: hele landet, 1:egen enhet-resten, 2:egen enhet, 3:egen-egen shgr,
+enhetsUtvalg <- 1 #	0: hele landet, 1:egen enhet-resten, 2:egen enhet, 3:egen-egen shgr,
     #4:egen shusgr, 5:egen shgr-resten, 6:egen enhet- egen region, 7:egen region, 8:egen reg - resten
 ktr <- 2			#1. el 2. kontroll. '3mnd' - 3mnd kontroll, '12mnd' - 12 mnd kontroll
 tittel <- 1
@@ -90,10 +90,10 @@ library(rygg)
 rm(list=ls())
 outfile <- ''
 tidsenhet <- 'Mnd'
-valgtVar <- 'opKat'
-RegData <- read.table('A:/Rygg/AlleVarNum2019-07-18.csv',
+valgtVar <- 'arbstatus'
+RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
                       sep=';', header=T, encoding = 'UTF-8')
-RyggFigAndeler(RegData=RegData, valgtVar=valgtVar) #, outfile='test.pdf')
+RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, enhetsUtvalg = 1, reshID = reshID) #, outfile='test.pdf')
 RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData,outfile=outfile)
 RyggFigAndelTid(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidsenhet = tidsenhet)
 RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar,tidsenhet = tidsenhet) #aar=aar,

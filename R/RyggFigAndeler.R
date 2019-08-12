@@ -86,12 +86,13 @@
 RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil = '2999-12-31',
                             aar = 0, hentData = 0, preprosess = 1,minald = 0, maxald = 130, erMann = '',
                             hovedkat = 99, opKat = 99, tidlOp = '', ktr = 0, tittelMed = 1, outfile = '',
-                            reshID = 0, enhetsUtvalg = 0){
+                            reshID = 0, enhetsUtvalg = 0, lagFig=1){
 
 #  Legg til:
     #
     # @examples Kan ha eksempel på data ut.
 
+  if (reshID==0){stopifnot(enhetsUtvalg ==0 )}
 
   if (hentData == 1) {
     RegData <- RyggRegDataSQL()       #(datoFra, datoTil)
@@ -118,10 +119,9 @@ RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil =
   grtxt <- RyggVarSpes$grtxt
   retn <- RyggVarSpes$retn
   subtxt <- RyggVarSpes$subtxt
+  antDes <- RyggVarSpes$antDes
 
-
-
-  #-----Gjør utvalg
+#-----Gjør utvalg
   RyggUtvalg <- RyggUtvalgEnh(RegData = RegData, reshID = reshID, datoFra = datoFra, datoTil = datoTil,
                               minald = minald, maxald = maxald, erMann = erMann, aar = aar,
                               hovedkat = hovedkat, opKat = opKat, tidlOp = tidlOp,enhetsUtvalg = enhetsUtvalg)
@@ -163,111 +163,271 @@ RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil =
     AggVerdier$Rest <- 100*AntRest/N$Rest
   }
 
-  FigDataParam <- list(AggVerdier = AggVerdier,
-                       # N = Nfig,
-                       # Ngr = Nfig,
-                       # Nvar = Ngr,
-                       #KImaal <- RyggVarSpes$KImaal,
-                       #grtxt2 = grtxt2,
-                       grtxt = grtxt,
-                       #grTypeTxt = grTypeTxt,
-                       tittel =  RyggVarSpes$tittel,
-                       retn = retn,
+  Nfig <- N
+  # FigDataParam <- list(AggVerdier = AggVerdier,
+  #                      # N = Nfig,
+  #                      # Ngr = Nfig,
+  #                      # Nvar = Ngr,
+  #                      #KImaal <- RyggVarSpes$KImaal,
+  #                      #grtxt2 = grtxt2,
+  #                      grtxt = grtxt,
+  #                      #grTypeTxt = grTypeTxt,
+  #                      tittel =  RyggVarSpes$tittel,
+  #                      retn = retn,
+  #                      subtxt = subtxt,
+  #                      #yAkseTxt = yAkseTxt,
+  #                      utvalgTxt = utvalgTxt,
+  #                      fargepalett = RyggUtvalg$fargepalett,
+  #                      medSml = medSml,
+  #                      hovedgrTxt = hovedgrTxt,
+  #                      smltxt = smltxt)
+
+#   #Denne må håndteres i Shiny:
+#   if (valgtVar=='Underkat' & all(hovedkat != c(1,2,5,7))) {
+#     text(0.5, 0.6, 'Velg Hovedkategori:
+# 			Prolapskirurgi, Foramenotomi, Fusjonskirurgi eller
+# 		Fjerning/rev. av implantat for å se på inngrepstyper', cex = 1.2)}
+
+  FigDataParam <- list(AggVerdier=AggVerdier,
+                       N=Nfig,
+                       #Ngr=Ngr,
+                       #KImaal <- RyggUtvalg$KImaal,
+                       grtxt2=grtxt2,
+                       grtxt=grtxt,
+                       #grTypeTxt=grTypeTxt,
+                       tittel=tittel,
+                       retn=retn,
                        subtxt = subtxt,
-                       #yAkseTxt = yAkseTxt,
-                       utvalgTxt = utvalgTxt,
-                       fargepalett = RyggUtvalg$fargepalett,
-                       medSml = medSml,
-                       hovedgrTxt = hovedgrTxt,
-                       smltxt = smltxt)
+                       #xAkseTxt=xAkseTxt,
+                       #yAkseTxt=yAkseTxt,
+                       utvalgTxt=utvalgTxt,
+                       fargepalett=RyggUtvalg$fargepalett,
+                       medSml=medSml,
+                       hovedgrTxt=hovedgrTxt,
+                       smltxt=smltxt)
+  fargepalett=RyggUtvalg$fargepalett
 
-  #-----------Figur---------------------------------------
-  #Hvis for få observasjoner..
-  #if (dim(RegData)[1] < 10 | (length(which(RegData$ReshId == reshID))<5 & egenavd==1)) {
-  if ((valgtVar=='Underkat' & all(hovedkat != c(1,2,5,7))) | N$Hoved < 10 |
-      (medSml == 1 & N$Rest<10)) {
-    FigTypUt <- rapbase::figtype(outfile, fargepalett = RyggUtvalg$fargepalett)
-    farger <- FigTypUt$farger
-    plot.new()
-    title(tittel)	#, line = -6)
-    legend('topleft',utvalgTxt, bty = 'n', cex = 0.9, text.col = farger[1])
-    if (valgtVar=='Underkat' & all(hovedkat != c(1,2,5,7))) {
-      text(0.5, 0.6, 'Velg Hovedkategori:
-			Prolapskirurgi, Foramenotomi, Fusjonskirurgi eller
-		Fjerning/rev. av implantat for å se på inngrepstyper', cex = 1.2)} else {
-		  text(0.5, 0.6, 'Færre enn 5 registreringer i egen- eller sammenlikningsgruppa', cex = 1.2)}
-    if ( outfile != '') {dev.off()}
-
-  } else {
-
-    #-----------Figur---------------------------------------
-    #Innparametre: subtxt, grtxt, grtxt2, tittel, Andeler, utvalgTxt, retn, cexgr
+   if (lagFig == 1) {
+#     cexgr <- 1-ifelse(length(grtxt)>20, 0.25*length(grtxt)/60, 0)
+#     FigFordeling(AggVerdier, tittel=tittel, hovedgrTxt=hovedgrTxt,
+#                  smltxt=smltxt, grTypeTxt=grTypeTxt, N=Nfig, retn=retn, utvalgTxt=utvalgTxt,
+# 				 grtxt=grtxt, grtxt2=grtxt2,
+#                  medSml=medSml, xAkseTxt=xAkseTxt, yAkseTxt=yAkseTxt,
+#                  outfile=outfile)
+#
+#     FigFordeling <- function(AggVerdier, tittel='mangler tittel', smltxt='', N, retn='H',
+#                              yAkseTxt='', utvalgTxt='', grTypeTxt='', soyletxt='', grtxt, grtxt2='', hovedgrTxt='',
+#                              grVar='', medSml=0, fargepalett='BlaaOff', xAkseTxt='', outfile=''
+#                              #medKI=0, KImaal = NA, KImaaltxt = '', Ngr, cexgr=1, antDes=1,
+#                              ) {
 
 
-    #Plottspesifikke parametre:
-    FigTypUt <- rapbase::figtype(outfile, fargepalett = RyggUtvalg$fargepalett)
-    #Tilpasse marger for å kunne skrive utvalgsteksten
-    NutvTxt <- length(utvalgTxt)
-    antDesTxt <- paste0('%.', antDes, 'f')
-    grtxtpst <-
-      paste0(rev(grtxt), ifelse(length(grtxt) < 11, ' \n(', ' ('), rev(sprintf(antDesTxt, AggVerdier$Hoved)), '%)')
-    vmarg <- switch(retn, V = 0, H = max(0, strwidth(grtxtpst, units = 'figure', cex = cexgr)*0.7))
-    #vmarg <- max(0, strwidth(grtxtpst, units = 'figure', cex = cexgr)*0.7)
-    par('fig' = c(vmarg, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
+    #Hvis for få observasjoner..
 
-    farger <- FigTypUt$farger
-    fargeHoved <- farger[1]
-    fargeRest <- farger[3]
-    antGr <- length(grtxt)
-    lwdRest <- 3	#tykkelse på linja som repr. landet
-    cexleg <- 1	#Størrelse på legendtekst
+    if ((N$Hoved < 5) | (sum(N$Hoved+N$Rest)<11)){
+      #-----------Figur---------------------------------------
+      FigTypUt <-figtype(outfile)  #FigTypUt <- figtype(outfile)
+      farger <- FigTypUt$farger
+      plot.new()
+      title(tittel)	#, line=-6)
+      legend('topleft',legend=utvalgTxt, bty='n', cex=0.9, text.col=farger[1])
+      tekst <- 'For få registreringer i egen eller sammenligningsgruppe'
+      text(0.5, 0.6, tekst, cex=1.2)
+      if ( outfile != '') {dev.off()}
 
-    #Horisontale søyler
-    if (retn == 'H') {
-      xmax <- max(c(AggVerdier$Hoved, AggVerdier$Rest),na.rm = T)*1.15
-      pos <- barplot(rev(as.numeric(AggVerdier$Hoved)), horiz = TRUE, beside = TRUE, las = 1, xlab = "Andel pasienter (%)", #main = tittel,
-                     col = fargeHoved, border = 'white', font.main = 1, xlim = c(0, xmax), ylim = c(0.05,1.4)*antGr)	#
-      mtext(at = pos+0.05, text = grtxtpst, side = 2, las = 1, cex = cexgr, adj = 1, line = 0.25)
+    } else {
 
-      if (medSml == 1) {
-        points(as.numeric(rev(AggVerdier$Rest)), pos, col = fargeRest,  cex = 2, pch = 18) #c("p","b","o"),
-        legend('top', c(paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
-                        paste0(smltxt, ' (N=', N$Rest,')')),
-               border = c(fargeHoved,NA), col = c(fargeHoved,fargeRest), bty = 'n', pch = c(15,18), pt.cex = 2,
-               lwd = lwdRest,	lty = NA, ncol = 1, cex = cexleg)
-      } else {
-        legend('top', paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
-               border = NA, fill = fargeHoved, bty = 'n', ncol = 1, cex = cexleg)
+
+      #Plottspesifikke parametre:
+      #Høyde må avhenge av antall grupper
+      hoyde <- ifelse(length(AggVerdier$Hoved)>20, 3*800, 3*600)
+      FigTypUt <- figtype(outfile, height=hoyde, fargepalett=fargepalett)
+      #Tilpasse marger for å kunne skrive utvalgsteksten
+      NutvTxt <- length(utvalgTxt)
+      vmarg <- switch(retn, V=0.05, H=min(1,max(0, strwidth(grtxt, units='figure', cex=cexgr)*0.75)))
+      #NB: strwidth oppfører seg ulikt avh. av device...
+      par('fig'=c(vmarg, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
+
+
+      farger <- FigTypUt$farger
+      fargeHoved <- farger[1]
+      fargeRest <- farger[3]
+      graa <- c('#4D4D4D','#737373','#A6A6A6','#DADADA')  #Mørk til lys          																# Fire graatoner
+      antGr <- length(grtxt)
+      lwdRest <- 3	#tykkelse på linja som repr. landet
+      cexleg <- 0.9	#Størrelse på legendtekst
+      antDesTxt <- paste0('%.', antDes, 'f')
+
+
+
+      #Horisontale søyler
+      if (retn == 'H') {
+        #Definerer disse i beregningsfunksjonen?
+        xmax <- max(c(AggVerdier$Hoved, AggVerdier$Rest),na.rm=T)*1.2
+        xmax <- min(xmax, 100)
+        ymin <- 0.3 #0.5/cexgr^4	#0.05*antGr #Fordi avstand til x-aksen av en eller annen grunn øker når antall sykehus øker
+        ymax <- 0.4+1.25*length(AggVerdier$Hoved) #c(0.3/xkr^4,  0.3+1.25*length(Midt)), 0.2+1.2*length(AggVerdier$Hoved)
+
+        pos <- rev(barplot(rev(as.numeric(AggVerdier$Hoved)), xlim=c(0,xmax), ylim=c(ymin, ymax), #, plot=FALSE)
+                           xlab="Andel pasienter (%)", horiz=T, border=NA, col=fargeHoved)) #, col.axis='white', col='white'))
+        indOK <- which(AggVerdier$Hoved>=0)
+        posOK <- pos[indOK]
+        posOver <- max(pos)+0.35*log(max(pos))
+        posDiff <- 1.2*(pos[1]-pos[2])
+        posOK <- pos[indOK]
+        minpos <- min(posOK)-0.7
+        maxpos <- max(posOK)+0.7
+
+        if (medSml == 1) { #Legge på prikker for sammenlikning
+          legend(xmax/4, posOver+0.6*posDiff,
+                 c(paste0(hovedgrTxt, ' (N=', Nfig$Hoved,')'), paste0(smltxt, ' (N=', N$Rest,')')),
+                 border=c(fargeHoved,NA), col=c(fargeHoved,fargeRest), bty='n', pch=c(15,18),
+                 pt.cex=2, lwd=lwdRest, lty=NA, ncol=1)
+        } else {
+          legend(xmax/4, posOver+0.6*posDiff, paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
+                 border=NA, fill=fargeHoved, bty='n', ncol=1)
+        }
+
+        #Legge på gruppe/søylenavn
+        #grtxt <- paste(grtxt, grtxt2, sep='\n')
+        grtxt <- paste0(grtxt, ifelse(length(grtxt) < 11, ' \n(', ' ('),
+                        sprintf(antDesTxt, AggVerdier$Hoved), '%)')
+        mtext(at=pos+0.05, text=grtxt, side=2, las=1, cex=cexgr, adj=1, line=0.25)
+
+
+        #Fordelingsfigurer:
+        if (medSml == 1) { #Legge på prikker for sammenlikning
+          points(as.numeric(AggVerdier$Rest), pos, col=fargeRest,  cex=2, pch=18) #c("p","b","o"),
+        }
+      }		#Slutt horisontale søyler
+
+
+
+      if (retn == 'V' ) {
+        #Vertikale søyler. Det er bare andeler som har vertikale søyler.
+        ymax <- min(max(c(AggVerdier$Hoved, AggVerdier$Rest),na.rm=T)*1.25, 115)
+        pos <- barplot(as.numeric(AggVerdier$Hoved), beside=TRUE, las=1, ylab="Andel pasienter (%)",
+                       sub=subtxt,	col=fargeHoved, border='white', ylim=c(0, ymax))
+        mtext(at=pos, grtxt, side=1, las=1, cex=cexgr, adj=0.5, line=0.5)
+
+        mtext(at=pos, paste0(sprintf(paste0('%.', antDes, 'f'), AggVerdier$Hoved), '%'),
+              side=1, las=1, cex=0.8*cexgr, adj=0.5, line=1.5, col=graa[2])
+        mtext(at=0,  paste0(hovedgrTxt,': '), side=1, cex=0.8*cexgr, adj=0.9, line=1.5, col=graa[2])
+
+        if (medSml == 1) {
+          mtext(at=pos, paste0(sprintf(paste0('%.', antDes, 'f'), AggVerdier$Rest), '%'),
+                side=1, las=1, cex=0.8*cexgr, adj=0.5, line=2.5, col=graa[2])
+          mtext(at=0,  paste0(smltxt,': '), side=1, cex=0.8*cexgr, adj=0.9, line=2.5, col=graa[2])
+          points(pos, as.numeric(AggVerdier$Rest), col=fargeRest,  cex=2, pch=18) #c("p","b","o"),
+          legend('top', legend=c(paste0(hovedgrTxt, ' (N=', N$Hoved,')'), paste0(smltxt, ' (N=', N$Rest,')')),
+                 border=c(fargeHoved,NA), col=c(fargeHoved,fargeRest), bty='n', pch=c(15,18), pt.cex=2, lty=c(NA,NA),
+                 lwd=lwdRest, ncol=2, cex=cexleg)
+        } else {
+          legend('top', legend=paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
+                 border=NA, fill=fargeHoved, bty='n', ncol=1, cex=cexleg)
+        }
       }
-    }
 
-    if (retn == 'V' ) {
-      #Vertikale søyler eller linje
-      if (length(grtxt2) == 0) {grtxt2 <- paste0('(', sprintf(antDesTxt, AggVerdier$Hoved), '%)')}
-      ymax <- max(c(AggVerdier$Hoved, AggVerdier$Rest), na.rm = T) * 1.15
-      pos <- barplot(as.numeric(AggVerdier$Hoved), beside = TRUE, las = 1, ylab = "Andel pasienter (%)",
-                     xlab = subtxt, col = fargeHoved, border = 'white', ylim = c(0, ymax))	#sub=subtxt,
-      mtext(at = pos, grtxt, side = 1, las = 1, cex = cexgr, adj = 0.5, line = 0.5)
-      mtext(at = pos, grtxt2, side = 1, las = 1, cex = cexgr, adj = 0.5, line = 1.5)
-      if (medSml == 1) {
-        points(pos, as.numeric(AggVerdier$Rest), col = fargeRest,  cex = 2, pch = 18) #c("p","b","o"),
-        legend('top', c(paste0(hovedgrTxt, ' (N=', N$Hoved,')'), paste0(smltxt, ' (N=', N$Rest,')')),
-               border = c(fargeHoved,NA), col = c(fargeHoved,fargeRest), bty = 'n', pch = c(15,18), pt.cex = 2,
-               lty = c(NA,NA), lwd = lwdRest, ncol = 2, cex = cexleg)
-      } else {
-        legend('top', paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
-               border = NA, fill = fargeHoved, bty = 'n', ncol = 1, cex = cexleg)
-      }
-    }
+      title(tittel, line=1.5) #cex.main=1.3)
 
-    if (tittelMed==1) {title(tittel, line = 1, font.main = 1)}
+      #Tekst som angir hvilket utvalg som er gjort
+      mtext(utvalgTxt, side=3, las=1, cex=0.9, adj=0, col=farger[1], line=c(3+0.8*((NutvTxt-1):0)))
 
-    #Tekst som angir hvilket utvalg som er gjort
-    mtext(utvalgTxt, side = 3, las = 1, cex = 0.9, adj = 0, col = farger[1], line = c(3-(1-tittelMed)+0.8*((NutvTxt-1):0)))
+      par('fig'=c(0, 1, 0, 1))
+      if ( outfile != '') {dev.off()}
+    } #Nok observasjoner
+  }  #Figur
 
-    par('fig' = c(0, 1, 0, 1))
-    if ( outfile != '') {dev.off()}
-  }
+#
+#
+#   #-----------Figur---------------------------------------
+#   #Hvis for få observasjoner..
+#   #if (dim(RegData)[1] < 10 | (length(which(RegData$ReshId == reshID))<5 & egenavd==1)) {
+#   if ((valgtVar=='Underkat' & all(hovedkat != c(1,2,5,7))) | N$Hoved < 10 |
+#       (medSml == 1 & N$Rest<10)) {
+#     FigTypUt <- rapbase::figtype(outfile, fargepalett = RyggUtvalg$fargepalett)
+#     farger <- FigTypUt$farger
+#     plot.new()
+#     title(tittel)	#, line = -6)
+#     legend('topleft',utvalgTxt, bty = 'n', cex = 0.9, text.col = farger[1])
+#     #Må heller gi denne som feilmelding før kommer til figur:
+#     if (valgtVar=='Underkat' & all(hovedkat != c(1,2,5,7))) {
+#       text(0.5, 0.6, 'Velg Hovedkategori:
+# 			Prolapskirurgi, Foramenotomi, Fusjonskirurgi eller
+# 		Fjerning/rev. av implantat for å se på inngrepstyper', cex = 1.2)} else {
+# 		  text(0.5, 0.6, 'Færre enn 5 registreringer i egen- eller sammenlikningsgruppa', cex = 1.2)}
+#     if ( outfile != '') {dev.off()}
+#
+#   } else {
+#
+#     #-----------Figur---------------------------------------
+#     #Innparametre: subtxt, grtxt, grtxt2, tittel, Andeler, utvalgTxt, retn, cexgr
+#
+# #function(AggVerdier, subtxt, grtxt, grtxt2, tittel, Andeler, utvalgTxt, retn, cexgr)
+#     #Plottspesifikke parametre:
+#     FigTypUt <- rapbase::figtype(outfile, fargepalett = RyggUtvalg$fargepalett)
+#     #Tilpasse marger for å kunne skrive utvalgsteksten
+#     NutvTxt <- length(utvalgTxt)
+#     antDesTxt <- paste0('%.', antDes, 'f')
+#     grtxtpst <-
+#       paste0(rev(grtxt), ifelse(length(grtxt) < 11, ' \n(', ' ('), rev(sprintf(antDesTxt, AggVerdier$Hoved)), '%)')
+#     vmarg <- switch(retn, V = 0, H = max(0, strwidth(grtxtpst, units = 'figure', cex = cexgr)*0.7))
+#     #vmarg <- max(0, strwidth(grtxtpst, units = 'figure', cex = cexgr)*0.7)
+#     par('fig' = c(vmarg, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
+#
+#     farger <- FigTypUt$farger
+#     fargeHoved <- farger[1]
+#     fargeRest <- farger[3]
+#     antGr <- length(grtxt)
+#     lwdRest <- 3	#tykkelse på linja som repr. landet
+#     cexleg <- 1	#Størrelse på legendtekst
+#
+#     #Horisontale søyler
+#     if (retn == 'H') {
+#       xmax <- max(c(AggVerdier$Hoved, AggVerdier$Rest),na.rm = T)*1.15
+#       pos <- barplot(rev(as.numeric(AggVerdier$Hoved)), horiz = TRUE, beside = TRUE, las = 1, xlab = "Andel pasienter (%)", #main = tittel,
+#                      col = fargeHoved, border = 'white', font.main = 1, xlim = c(0, xmax), ylim = c(0.05,1.4)*antGr)	#
+#       mtext(at = pos+0.05, text = grtxtpst, side = 2, las = 1, cex = cexgr, adj = 1, line = 0.25)
+#
+#       if (medSml == 1) {
+#         points(as.numeric(rev(AggVerdier$Rest)), pos, col = fargeRest,  cex = 2, pch = 18) #c("p","b","o"),
+#         legend('top', c(paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
+#                         paste0(smltxt, ' (N=', N$Rest,')')),
+#                border = c(fargeHoved,NA), col = c(fargeHoved,fargeRest), bty = 'n', pch = c(15,18), pt.cex = 2,
+#                lwd = lwdRest,	lty = NA, ncol = 1, cex = cexleg)
+#       } else {
+#         legend('top', paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
+#                border = NA, fill = fargeHoved, bty = 'n', ncol = 1, cex = cexleg)
+#       }
+#     }
+#
+#     if (retn == 'V' ) {
+#       #Vertikale søyler eller linje
+#       if (length(grtxt2) == 0) {grtxt2 <- paste0('(', sprintf(antDesTxt, AggVerdier$Hoved), '%)')}
+#       ymax <- max(c(AggVerdier$Hoved, AggVerdier$Rest), na.rm = T) * 1.15
+#       pos <- barplot(as.numeric(AggVerdier$Hoved), beside = TRUE, las = 1, ylab = "Andel pasienter (%)",
+#                      xlab = subtxt, col = fargeHoved, border = 'white', ylim = c(0, ymax))	#sub=subtxt,
+#       mtext(at = pos, grtxt, side = 1, las = 1, cex = cexgr, adj = 0.5, line = 0.5)
+#       mtext(at = pos, grtxt2, side = 1, las = 1, cex = cexgr, adj = 0.5, line = 1.5)
+#       if (medSml == 1) {
+#         points(pos, as.numeric(AggVerdier$Rest), col = fargeRest,  cex = 2, pch = 18) #c("p","b","o"),
+#         legend('top', c(paste0(hovedgrTxt, ' (N=', N$Hoved,')'), paste0(smltxt, ' (N=', N$Rest,')')),
+#                border = c(fargeHoved,NA), col = c(fargeHoved,fargeRest), bty = 'n', pch = c(15,18), pt.cex = 2,
+#                lty = c(NA,NA), lwd = lwdRest, ncol = 2, cex = cexleg)
+#       } else {
+#         legend('top', paste0(hovedgrTxt, ' (N=', N$Hoved,')'),
+#                border = NA, fill = fargeHoved, bty = 'n', ncol = 1, cex = cexleg)
+#       }
+#     }
+#
+#     if (tittelMed==1) {title(tittel, line = 1, font.main = 1)}
+#
+#     #Tekst som angir hvilket utvalg som er gjort
+#     mtext(utvalgTxt, side = 3, las = 1, cex = 0.9, adj = 0, col = farger[1], line = c(3-(1-tittelMed)+0.8*((NutvTxt-1):0)))
+#
+#     par('fig' = c(0, 1, 0, 1))
+#     if ( outfile != '') {dev.off()}
+#   }
 
   return(invisible(FigDataParam))
 

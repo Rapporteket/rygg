@@ -38,10 +38,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       varTxt <- ''
       xAkseTxt <- ''	#Benevning
       subtxt <- ''
+      antDes <- 1
       if (figurtype == 'andelGrVar') {xAkseTxt <- 'Andel operasjoner (%)'}
-      # yAkseTxt <- ''
-      # pktTxt <- '' #(evt. søyletekst)
-      # strIfig <- ''		#cex
       sortAvtagende <- TRUE  #Sortering av resultater
       KImaalGrenser <- NA
       tittel <- 'Mangler tittel' # ? I AndelerGrVar og GjsnGrVar genereres tittel i beregningsfunksjonen
@@ -883,7 +881,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
 
       UtData <- list(RegData=RegData, grtxt=grtxt, cexgr=cexgr, varTxt=varTxt, xAkseTxt=xAkseTxt,
                      KImaalGrenser=KImaalGrenser, KIekstrem=KIekstrem, #KImaal=KImaalRetn,
-                     retn=retn, subtxt=subtxt, tittel=tittel,
+                     retn=retn, subtxt=subtxt, tittel=tittel, antDes=antDes,
                      flerevar=flerevar, variable=variable, sortAvtagende=sortAvtagende)
       #RegData inneholder nå variablene 'Variabel' og 'VariabelGr'
       return(invisible(UtData))
