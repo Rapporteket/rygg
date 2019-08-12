@@ -15,12 +15,14 @@ LazyData: true
 Suggests: 
     kableExtra,
     knitr,
+    rapsodi,
     testthat (>= 2.1.0),
     xtable,
     zoo,
 Imports: 
     rapbase (>= 1.8.0)
 Remotes: 
-    Rapporteket/rapbase
+    Rapporteket/rapbase,
+    Rapporteket/rapsodi
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1

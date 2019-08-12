@@ -35,18 +35,18 @@ RyggPreprosess <- function(RegData=RegData)
 	class(RegData$ReshId) <- 'numeric'
 
 	#Formatering
-	RegData$Morsmal <- factor(RegData$Morsmal, levels=1:3)
+#	RegData$Morsmal <- factor(RegData$Morsmal, levels=1:3)
 #Mangler:	RegData$HovedInngrep <- factor(RegData$HovedInngrep, levels=0:7)
 #Mangler:		RegData$Inngrep <- factor(RegData$Inngrep, levels=0:19)
-	RegData$SivilStatus <- factor(RegData$SivilStatus, levels=1:3)
+	#RegData$SivilStatus <- factor(RegData$SivilStatus, levels=1:3)
 	#RegData$ASA <- factor(RegData$ASA, levels=1:4)
-	RegData$Utd <- factor(RegData$Utd, levels=1:5)
-	RegData$ArbstatusPre <- factor(RegData$ArbstatusPre, levels=1:10)
-	RegData$UforetrygdPre <- factor(RegData$UforetrygdPre, levels=1:4)
+#	RegData$Utd <- factor(RegData$Utd, levels=1:5)
+	#RegData$ArbstatusPre <- factor(RegData$ArbstatusPre, levels=1:10)
+#	RegData$UforetrygdPre <- factor(RegData$UforetrygdPre, levels=1:4)
 	#RegData$ErstatningPre <- factor(RegData$ErstatningPre, levels=c(0:3,9)
-	RegData$SymptVarighRyggHof <- factor(RegData$SymptVarighRyggHof, levels=1:5)
-	RegData$SympVarighUtstr <- factor(RegData$SympVarighUtstr, levels=1:5)
-	RegData$OpKat <- factor(RegData$OpKat, levels=1:3)
+	# RegData$SymptVarighRyggHof <- factor(RegData$SymptVarighRyggHof, levels=c(1:5,9))
+	# RegData$SympVarighUtstr <- factor(RegData$SympVarighUtstr, levels=c(1:5,9))
+	# RegData$OpKat <- factor(RegData$OpKat, levels=c(1:3,9))
 
 
 #Legge til underkategori for hovedkategori.
