@@ -35,6 +35,7 @@ RyggPreprosess <- function(RegData=RegData)
 	class(RegData$ReshId) <- 'numeric'
 
 	#Formatering
+	RegData$ShNavn <- as.character(RegData$ShNavn)
 #	RegData$Morsmal <- factor(RegData$Morsmal, levels=1:3)
 #Mangler:	RegData$HovedInngrep <- factor(RegData$HovedInngrep, levels=0:7)
 #Mangler:		RegData$Inngrep <- factor(RegData$Inngrep, levels=0:19)

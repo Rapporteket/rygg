@@ -4,16 +4,12 @@
 \alias{hjelpeFunksjoner}
 \alias{SorterOgNavngiTidsEnhet}
 \alias{lageTulleData}
-\alias{leggTilIntervensjon}
 \alias{delTekst}
 \title{Hjelpefunksjoner. Group of functions page title}
 \usage{
 SorterOgNavngiTidsEnhet(RegData, tidsenhet = "Aar", tab = 0)
 
 lageTulleData(RegData, varBort = "", antSh = 26, antObs = 20000)
-
-leggTilIntervensjon(RegData, startDatoIntervensjon = "2016-10-01",
-  sluttDatoIntervensjon = Sys.Date())
 
 delTekst(x, len)
 }
@@ -50,10 +46,6 @@ see the information flow.
 }
 
 \section{Lage tulledata (simulerte data)}{
-NA
-}
-
-\section{Legge til indikator for intervensjon, pårørendeoppfølging}{
 NA
 }
 

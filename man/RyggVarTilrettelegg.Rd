@@ -41,4 +41,10 @@ Videre bruk kan eksempelvis være beregning av AggVerdier eller gjennomsnitt.
 Funksjonen gjør også filtreringer som å fjerne ugyldige verdier for den valgte variabelen, samt ta høyde for avhengigheter med
 andre variable. Det er også her man angir aksetekster og titler for den valgte variabelen.
 Her kan mye hentes til analysebok
+Når ei fordeling består av flere variable, settes flerevar=1. Vi omdefinerer variablene slik at
+alle gyldige registreringer (dvs. alle registreringer som skal telles med) er 0 eller 1.
+De som har oppfylt spørsmålet
+er 1, mens ugyldige registreringer er NA. Det betyr at hvis vi skal ta bort registreringer
+som i kategorier av typen "Ukjent" kodes disse som NA, mens hvis de skal være med kodes de som 0.
+Vi sender tilbake alle variable som indikatorvariable, dvs. med 0,1,NA
 }

@@ -42,7 +42,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       if (figurtype == 'andelGrVar') {xAkseTxt <- 'Andel operasjoner (%)'}
       sortAvtagende <- TRUE  #Sortering av resultater
       KImaalGrenser <- NA
-      tittel <- 'Mangler tittel' # ? I AndelerGrVar og GjsnGrVar genereres tittel i beregningsfunksjonen
+      tittel <- 'Variabelvalg (valgtVar) feil angitt' # ? I AndelerGrVar og GjsnGrVar genereres tittel i beregningsfunksjonen
       variable <- 'Ingen'
       #deltittel <- ''
       if (!is.null(RegData)) {RegData$Variabel <- 0}
@@ -87,6 +87,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             RegData$Variabel <- RegData$Alder  	#GjsnTid, GjsnGrVar
             xAkseTxt <- 'alder (år)'
             tittel <- 'Alder ved innleggelse'
+            subtxt <- 'Aldersgrupper (år)'
             if (figurtype %in% c('gjsnGrVar', 'gjsnTid')) {
                   tittel <- 'alder ved innleggelse'}
             if (figurtype == 'andeler') {	#Fordelingsfigur
@@ -684,6 +685,33 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             variable <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
             grtxt <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diag.blokade', 'Rtg.LS-columna', 'Fleks./Ekst.')
       }
+      if (valgtVar == 'regForsinkelse') { #fordeling AndelGrVar, AndelTid
+         RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$FistTimeClosed, format="%Y-%m-%d")) -
+                                       as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d")))
+         RegData <- RegData[!is.na(RegData$Diff), ]
+         #RegData[which(RegData$Diff>180), c('InnDato', 'UtskrivelseDato', 'FistTimeClosed')]
+         # RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d")) -
+         #                               as.Date(as.POSIXct(RegData$InnDato, format="%Y-%m-%d")))
+         # RegData[which(RegData$Diff<0), c('PasientID', "ShNavn", 'InnDato', 'UtskrivelseDato')] #, 'FistTimeClosed')]
+         # RegData[1:10, c('Diff', 'InnDato', 'UtskrivelseDato')]
+
+         tittel <- 'Registreringsforsinkelse'
+
+         if (figurtype == 'andeler') {	#Fordelingsfigur
+            gr <- c(seq(0,98,7), 2000)
+            RegData$VariabelGr <- cut(RegData$Diff, breaks=gr, include.lowest=TRUE, right=FALSE)
+            plot(RegData$VariabelGr)
+            grtxt <- c(1:14, '>3 mnd.')
+            subtxt <- 'innen gitte uker etter utskriving'
+         }
+
+         if (figurtype %in% c('andelTid', 'andelGrVar')) {
+            RegData$Variabel[which(RegData$Diff >90)] <- 1
+            tittel <- 'Registrert for sent for 3 mnd. oppfølging'
+            varTxt <- 'for sent registrert'
+            sortAvtagende <- F}
+      }
+
       if (valgtVar=='roker') { #AndelGrVar, #AndelTid
             #PasientSkjema. Andel med Roker=1
             #Kode 0,1,tom: Nei, Ja Ukjent

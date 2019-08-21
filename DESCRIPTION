@@ -23,6 +23,7 @@ Imports:
     rapbase (>= 1.8.0)
 Remotes: 
     Rapporteket/rapbase,
+    Rapporteket/rapFigurer,
     Rapporteket/rapsodi
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1

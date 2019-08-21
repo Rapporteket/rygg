@@ -20,7 +20,7 @@ setwd('C:/ResultattjenesteGIT/nkr')
 
 reshID <- 601161 #Haukeland nevr.kir: 105588, NIMI:  104279, Unn: 601161, St Olav: 105783 Namsos:105899,
 #fil <- 'A:/Rygg/NKR2010-2017aarsrapp'
-dato <- '2019-08-06'
+dato <- '2019-08-21'
 #RegData <- read.table(paste0(fil, '.csv'), sep=';', header=T, encoding = 'UTF-8') #, stringsAsFactors = FALSE, na.strings = "NULL",
 SkjemaOversikt <- read.table(paste0('A:/Rygg/SkjemaOversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
@@ -29,15 +29,18 @@ ForlopsOversikt <- read.table(paste0('A:/Rygg/ForlopsOversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8')
 RegData <- read.table(paste0('A:/Rygg/AlleVarNum',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8')
+save(SkjemaOversikt, ForlopsOversikt, RegData, file = 'A:/Rygg/RyggData.RData')
 #RegData$Kjonn <- 0
 
 #save(RegData, file=paste0(fil, '.Rdata'))
 load(file=paste0(fil, '.Rdata'))
+#load('a:/Rygg/Rygg2010-2018aarsrapp.Rdata')
 
 #Versjon 3
-
 #Lage tulledata:
 #RegData <- RegData[sample(1:dim(RegData)[1],10000), ]
+load('A:/Rygg/RyggData.RData')
+
 
 #----------------------------- Parametre-------------
 library(nkr)
@@ -55,7 +58,7 @@ hovedkat <- 99		#HovedInngrep, 0-7, Standard: 99, dvs alle op
 opKat <- 1 #Elektivt/Akutt, 1-2
 enhetsUtvalg <- 1 #	0: hele landet, 1:egen enhet-resten, 2:egen enhet, 3:egen-egen shgr,
     #4:egen shusgr, 5:egen shgr-resten, 6:egen enhet- egen region, 7:egen region, 8:egen reg - resten
-ktr <- 2			#1. el 2. kontroll. '3mnd' - 3mnd kontroll, '12mnd' - 12 mnd kontroll
+ktr <- 0			#1. el 2. kontroll. '3mnd' - 3mnd kontroll, '12mnd' - 12 mnd kontroll
 tittel <- 1
 tidlOp <- 0		#Tidl.operert: 1-sm, 2-annet, 3, sm+annet, 4-primær, Standard: 0, dvs. alle operasjoner
 grVar <- 'ShNavn'  #ShNavn, Fylke, BoHF, BoRHF
@@ -65,6 +68,7 @@ tidsenhet <- 'Aar' #'Halvaar', 'Kvartal','Mnd'
 offData <- 0
 Ngrense <- 10
 medKI <- 1
+outfile <- ''
 
 
 #_________________________________________________________________________________________
@@ -87,15 +91,16 @@ table(SkjemaOversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")
 #Oppfølgingsskjema har ikke fått selvvalgte navn. Variable fra oppfølgingsskjema sjekkes IKKE
 
 library(rygg)
+library(rapbase)
 rm(list=ls())
 outfile <- ''
 tidsenhet <- 'Mnd'
-valgtVar <- 'arbstatus'
+valgtVar <- 'regForsinkelse'
 RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
                       sep=';', header=T, encoding = 'UTF-8')
 RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, enhetsUtvalg = 1, reshID = reshID) #, outfile='test.pdf')
-RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData,outfile=outfile)
-RyggFigAndelTid(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidsenhet = tidsenhet)
+RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData) #,outfile=outfile)
+RyggFigAndelTid(RegData=RegData, valgtVar=valgtVar, tidsenhet = tidsenhet) #, outfile=outfile
 RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar,tidsenhet = tidsenhet) #aar=aar,
 RyggFigGjsnGrVar(RegData=RegData, outfile=outfile, valgtVar=valgtVar)
 
@@ -229,7 +234,7 @@ RyggFigGjsnGrVar(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidlOp=tid
                          hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal='Gjsn',
                          datoFra=datoFra, datoTil=datoTil, aar=aar, enhetsUtvalg=enhetsUtvalg)
 setwd('C:/ResultattjenesteGIT/nkr/test/')
-variable <- c('alder', 'Liggedogn', 'OswEndr', 'SmBeinEndr', 'SmRyggEndr')
+variable <- c('alder', 'Liggedogn', 'OswEndr', 'SmBeinEndr', 'SmRyggEndr')()
 for (var in variable) {
       outfile <- paste0(var, 'GjsnSh.png')
       RyggFigGjsnGrVar(valgtVar=var, RegData=RegData, datoFra='2016-01-01', ktr=1, outfile=outfile)
@@ -242,10 +247,15 @@ valgtMaal <- 'Med'
 #----------------------------------------------------------------------------------------------------------------
 valgtVar <- 'SympVarighUtstr'
 outfile <- '' #paste0(valgtVar, 'Sh.pdf')
+RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
+                      sep=';', header=T, encoding = 'UTF-8')
+
 RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData, hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, opKat=opKat,
                     datoFra='2017-01-01', ktr=1, outfile=outfile)
 
-variable <- c('alder70', 'Antibiotika', 'ArbstatusPre', 'Arbstatus', 'ASA', 'BeinsmLavPre',
+library(rygg)
+
+variable <- c('alder70', 'antibiotika', 'arbstatus', 'ASA', 'beinsmLavPre',
               'BeinsmEndrLav', 'BMI', 'degSponFusj', 'degSponSSSten', 'ErstatningPre', 'Fornoyd',
               'KpInf3Mnd', 'Kp3Mnd', 'Misfornoyd', 'Nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
               'Osw22', 'Osw48', 'PeropKompDura', 'Roker', 'Saardren', 'SmStiPre', 'SymptVarighRyggHof',
@@ -254,6 +264,18 @@ for (var in variable) {
       outfile <- paste0(var, 'Sh.png')
       RyggFigAndelerGrVar(valgtVar=var, RegData=RegData, datoFra='2016-01-01', ktr=1, outfile=outfile)
 }
+
+#---------Traktplott------
+library(rapFigurer)
+library(qicharts2)
+RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
+                      sep=';', header=T, encoding = 'UTF-8')
+AndelGrVarData <- RyggFigAndelerGrVar(valgtVar='uforetrygdPre', RegData=RegData, Ngrense = 20,
+                                      datoFra='2019-01-01', outfile='')
+with(AndelGrVarData, rapFigurer::FigTraktplott(sykehus = grtxt, andel = as.numeric(AggVerdier/100),
+                                               nevner = as.numeric(Ngr),
+                                               tittel = tittel, undertittel = utvalgTxt, sort = 'andel'))
+
 
 #----------------------------------------------------------------------------------------------------------------
 #-------- Andel per sykehus eller annen gr.variabel (AndelGrVar), samt siste 3 år-----------------------------------------

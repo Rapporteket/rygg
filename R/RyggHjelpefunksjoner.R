@@ -77,18 +77,6 @@ lageTulleData <- function(RegData, varBort='', antSh=26, antObs=20000) {
   return(RegData)
 }
 
-#' @section Legge til indikator for intervensjon, pårørendeoppfølging
-#' @rdname hjelpeFunksjoner
-#' @export
-leggTilIntervensjon <- function(RegData, #startDatoPre='2011-01-01', sluttDatoPre='2016-10-01',
-                                startDatoIntervensjon='2016-10-01', sluttDatoIntervensjon=Sys.Date()){
-  RegData$Intervensjon <- 0
-  RegData$Intervensjon[intersect(which(RegData$InnDato >= as.Date(startDatoIntervensjon)),
-                                 which(RegData$InnDato <= as.Date(sluttDatoIntervensjon)))] <- 1
-  return(RegData)
-}
-
-
 #' @section Automatisk linjebryting av lange tekstetiketter
 #' @param x En tekststreng eller vektor av tekststrenger
 #' @param len Lengden strengen skal brytes ved
