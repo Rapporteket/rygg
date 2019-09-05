@@ -19,13 +19,8 @@ Hvis du jobber gjennom proxy, kan kommandoen over feile. I så fall er det være
 å kjøre følgende før installasjonen:
 
 ``` r
-library(httr)
-  set_config(
-    use_proxy(url="18.91.12.23", port=8080, username="user",password="passwd")
-  )
-# ELLER:
-Sys.setenv(http_proxy="www-proxy.helsenord.no:8080")
-Sys.setenv(https_proxy="www-proxy.helsenord.no:8080")
+Sys.setenv(http_proxy="DIN PROXY")
+Sys.setenv(https_proxy="DIN PROXY")
 ```
 NB: Husk å bytte ut de oppgitte parametrene med de som er aktuelle for systemet de installeres på.
 
