@@ -57,7 +57,7 @@
 #' @export
 
 RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil='3000-12-31',
-                                   minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', opKat=99,
+                                   minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', hastegrad=99,
                                    hentData=0, preprosess=1,enhetsUtvalg=0, grVar='ShNavn', tittel=1,
                                    ktr=0, reshID=0, aar=0,tidlAar=0,  Ngrense=10, AKjust=0, outfile='') {
 
@@ -91,7 +91,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
       if (reshID==0) {enhetsUtvalg <- 0}
       RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                                   minald=minald, maxald=maxald, erMann=erMann, aar=as.numeric(c(tidlAar, aar)),
-                                  hovedkat=hovedkat, opKat=opKat, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg)
+                                  hovedkat=hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg)
 
       smltxt <- RyggUtvalg$smltxt
       medSml <- RyggUtvalg$medSml

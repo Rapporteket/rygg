@@ -1,33 +1,18 @@
-# Må det kanskje komme en overornet tittel her?
-#---------------------------------------------
-
 #' Hjelpefunksjoner. Group of functions page title
 #'
 #' Fil med div hjelpefunksjoner.Group of functions Description section
 #'
 #' Detaljer. kommer senereGroup of functions Details paragraph.
 #'
-#' @section Finne reinnleggelser After function section:
-#' Despite its location, this actually comes after the function section.
-#' Fil som inneholder hjelpefunksjoner.
-#' FinnReinnleggelser beregner reinnleggelser fra DateAdmittedIntensive og DateDischargedIntensive
-#' SorterOgNavngiTidsEnhet Legger til tidsenhetene Aar, Halvaar, Mnd og Kvartal
 #'
 #'
-#' @param RegData data
-#' @param PasientID Variabelen som angir pasientidentifikasjon
-# @inheritParams NIRFigAndeler
-#' @return Div hjelpefunksjoner
-#' @name hjelpeFunksjoner
-NULL
-#' @rdname hjelpeFunksjoner
-#' @export
 
-
-#' @section Tilrettelegge tidsenhetvariabel:
-#' Probably better if all sections come first, uless have one section per function. Makes it easier to
-#' see the information flow.
-#' @rdname hjelpeFunksjoner
+#' Tilrettelegge tidsenhetvariabel:
+#'
+#' @param RegData registerdata
+#' @param tidsenhet 'AAr', 'Halvaar', 'Kvartal' eller 'Mnd'
+#' @param tab ? hmm...
+#'
 #' @export
 SorterOgNavngiTidsEnhet <- function(RegData, tidsenhet='Aar', tab=0) {
   #Lager sorteringsvariabel for tidsenhet:
@@ -59,9 +44,14 @@ SorterOgNavngiTidsEnhet <- function(RegData, tidsenhet='Aar', tab=0) {
   UtData <- list('RegData'=RegData, 'tidtxt'=tidtxt)
   return(UtData)
 }
-#' @section Lage tulledata (simulerte data)
-# Probably better if all sections come first, uless have one section per function(?)
-#' @rdname hjelpeFunksjoner
+
+#' Lage tulledata (simulerte data)
+#'
+#' @param RegData Ekte data som skal rotes til
+#' @param varBort variable som finnes i begge filer
+#' @param antSh antall sykehus
+#' @param antObs antall observasjoner
+#'
 #' @export
 lageTulleData <- function(RegData, varBort='', antSh=26, antObs=20000) {
   library(synthpop)
@@ -77,12 +67,60 @@ lageTulleData <- function(RegData, varBort='', antSh=26, antObs=20000) {
   return(RegData)
 }
 
-#' @section Automatisk linjebryting av lange tekstetiketter
+#' Automatisk linjebryting av lange tekstetiketter
+#'
 #' @param x En tekststreng eller vektor av tekststrenger
 #' @param len Lengden strengen skal brytes ved
-#' @rdname hjelpeFunksjoner
+#' @return automatisk linjebryting
 #' @export
 delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Lengden strengen skal brytes ved
 {sapply(x, function(y) paste(strwrap(y, len), collapse = "\n"),
         USE.NAMES = FALSE)
 }
+
+
+#' Generere data til Resultatportalen
+#'
+#' @param filUt tilnavn for utdatatabell (fjern?)
+#' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr
+#' @inheritParams RyggFigAndeler
+#' @inheritParams RyggUtvalgEnh
+#' @return Datafil til Resultatportalen
+#' @export
+
+dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0,
+                                    hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
+
+#2019-09-11: hovedkategori er ikke definert! Inntil videre
+  #   if (valgtVar=='symptVarighUtstr_pro') {
+  #   valgtVar <- 'sympVarighUtstr'
+  #   hovedkat <- 1}
+  # if (valgtVar=='beinsmLavPre_pro') {
+  #   valgtVar <- 'beinsmLavPre'
+  #   hovedkat <- 1}
+  # if (valgtVar=='kpInf3Mnd_pro') {
+  #   valgtVar <- 'kpInf3Mnd'
+  #   hovedkat <- 1}
+  # if (valgtVar=='kpInf3Mnd_SS') {
+  #   valgtVar <- 'kpInf3Mnd'
+  #   hovedkat <- 8}
+  # if (valgtVar=='peropKompDura_proPrimElek') {
+  #   valgtVar <- 'peropKompDura'
+  #   hovedkat <- 1
+  #   tidlOp <- 4
+  #   hastegrad <- 1}
+  # if (valgtVar=='peropKompDura_SSPrimElek') {
+  #   valgtVar <- 'peropKompDura'
+  #   hovedkat <- 8}
+
+  filUt <- paste0('RyggTilOff', ifelse(filUt=='dummy',  valgtVar, filUt), '.csv')
+  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, figurtype = 'andelGrVar')
+  RyggUtvalg <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad, tidlOp=tidlOp) #datoFra = datoFra) #, hovedkat=hovedkat) # #, datoTil=datoTil)
+  RegData <- RyggUtvalg$RegData
+  RyggTilOffvalgtVar <- RegData[,c('Aar', "ShNavn", "ReshId", "Variabel")]
+  info <- c(RyggVarSpes$tittel, RyggUtvalg$utvalgTxt)
+  RyggTilOffvalgtVar$info <- c(info, rep(NA, dim(RyggTilOffvalgtVar)[1]-length(info)))
+  #write.table(RyggTilOffvalgtVar, file = paste0('A:/Resultatportalen/', filUt), sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
+  return(invisible(RyggTilOffvalgtVar))
+}
+

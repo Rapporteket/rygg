@@ -47,8 +47,7 @@ RyggPreprosess <- function(RegData=RegData)
 	#RegData$ErstatningPre <- factor(RegData$ErstatningPre, levels=c(0:3,9)
 	# RegData$SymptVarighRyggHof <- factor(RegData$SymptVarighRyggHof, levels=c(1:5,9))
 	# RegData$SympVarighUtstr <- factor(RegData$SympVarighUtstr, levels=c(1:5,9))
-	# RegData$OpKat <- factor(RegData$OpKat, levels=c(1:3,9))
-
+	
 
 #Legge til underkategori for hovedkategori.
 #	if (is.na(match("Inngrep", names(opdata))) != 'TRUE') {	#Hvis har variabelen Inngrep

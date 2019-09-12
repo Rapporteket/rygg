@@ -39,7 +39,7 @@
 #'
 #' @export
 RyggFigGjsnBox <- function(RegData, outfile, valgtVar, tidlOp='', erMann='', hovedkat=99, aar=0,
-                           tidsenhet = 'Mnd', opKat=99, minald=0, maxald=130, ktr=0, tittel=1,
+                           tidsenhet = 'Mnd', hastegrad=99, minald=0, maxald=130, ktr=0, tittel=1,
                            datoFra='2007-01-01', datoTil='3000-01-01',
                            valgtMaal='Gjsn',enhetsUtvalg=0, hentData=0, preprosess=1, reshID=0){
 
@@ -62,7 +62,7 @@ RyggFigGjsnBox <- function(RegData, outfile, valgtVar, tidlOp='', erMann='', hov
 
   RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
-                              hovedkat=hovedkat, opKat=opKat, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg) #overfPas = overfPas,
+                              hovedkat=hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg) #overfPas = overfPas,
   RegData <- RyggUtvalg$RegData
   utvalgTxt <- RyggUtvalg$utvalgTxt
   medSml <- RyggUtvalg$medSml

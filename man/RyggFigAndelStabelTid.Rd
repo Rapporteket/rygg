@@ -48,7 +48,7 @@ RyggFigAndelStabelTid(RegData, outfile, valgtVar, hovedkat = 99,
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
 \item{aar}{\itemize{
-\item Operasjonsår
+\item Operasjonsår. Kan velge flere
 }}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}

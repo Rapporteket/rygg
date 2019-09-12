@@ -56,7 +56,7 @@
 #' @export
 
 RyggFigAndelerGrVarAarVarKval <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil='3000-12-31',
-                                          minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', opKat=99, hentData=0,
+                                          minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', hastegrad=99, hentData=0,
                                           preprosess=1,grVar='ShNavn', tittel=1, ktr=0, outfile='',
                                           AKjust=0) {
 
@@ -91,7 +91,7 @@ RyggFigAndelerGrVarAarVarKval <- function(RegData, valgtVar, datoFra='2007-01-01
 
       #Erstatte med test for datoTil vs år. Eller legg på sjekk når beregner AarMax
       RyggUtvalg <- RyggUtvalg(RegData=RegData, datoFra=datoFra, datoTil=datoTil, minald=minald, maxald=maxald,
-                               erMann=erMann, hovedkat=hovedkat, tidlOp=tidlOp, opKat=opKat)
+                               erMann=erMann, hovedkat=hovedkat, tidlOp=tidlOp, hastegrad=hastegrad)
       RegData <- RyggUtvalg$RegData
 
       AarMax <- max(RegData$OpAar)	#Siste år
@@ -99,7 +99,7 @@ RyggFigAndelerGrVarAarVarKval <- function(RegData, valgtVar, datoFra='2007-01-01
       RegData <- RegData[which(RegData$OpAar %in% c((AarMax-2):AarMax)), ]
 
       RyggUtvalg <- RyggUtvalg(RegData=RegData, datoFra=datoFra, datoTil=datoTil, minald=minald, maxald=maxald,
-                               erMann=erMann, hovedkat=hovedkat, tidlOp=tidlOp, opKat=opKat)
+                               erMann=erMann, hovedkat=hovedkat, tidlOp=tidlOp, hastegrad=hastegrad)
       RegData <- RyggUtvalg$RegData
       utvalgTxt <- RyggUtvalg$utvalgTxt
       #SJEKK:

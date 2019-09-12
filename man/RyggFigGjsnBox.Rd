@@ -5,7 +5,7 @@
 \title{Utvikling over tid eller som funksjon av variabelen for gjennomsnitt/median av valgt variabel}
 \usage{
 RyggFigGjsnBox(RegData, outfile, valgtVar, tidlOp = "", erMann = "",
-  hovedkat = 99, aar = 0, tidsenhet = "Mnd", opKat = 99,
+  hovedkat = 99, aar = 0, tidsenhet = "Mnd", hastegrad = 99,
   minald = 0, maxald = 130, ktr = 0, tittel = 1,
   datoFra = "2007-01-01", datoTil = "3000-01-01", valgtMaal = "Gjsn",
   enhetsUtvalg = 0, hentData = 0, preprosess = 1, reshID = 0)
@@ -39,10 +39,10 @@ RyggFigGjsnBox(RegData, outfile, valgtVar, tidlOp = "", erMann = "",
 }}
 
 \item{aar}{\itemize{
-\item Operasjonsår
+\item Operasjonsår. Kan velge flere
 }}
 
-\item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
+\item{hastegrad}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 

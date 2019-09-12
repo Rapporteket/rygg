@@ -20,7 +20,7 @@
 #' @export
 RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil='3000-12-31', aar=0,
                             tidsenhet='Aar', hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1,
-                        minald=0, maxald=130, erMann=99, reshID=0, outfile='', opKat=99,
+                        minald=0, maxald=130, erMann=99, reshID=0, outfile='', hastegrad=99,
                         enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, offData=0) {
 
       if (hentData == 1) {
@@ -62,7 +62,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil='30
             if (reshID==0) {enhetsUtvalg <- 0}
             RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                                       minald=minald, maxald=maxald, erMann=erMann, aar=aar,
-                                      hovedkat = hovedkat, opKat=opKat, tidlOp=tidlOp,
+                                      hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
                                       enhetsUtvalg=enhetsUtvalg) #, grType=grType
             smltxt <- RyggUtvalg$smltxt
             medSml <- RyggUtvalg$medSml

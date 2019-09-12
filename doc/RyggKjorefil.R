@@ -55,7 +55,7 @@ minald <- 0		#alder, fra og med
 maxald <- 130	#alder, til og med
 erMann <- 99			#kjønn, 1-menn, 0-kvinner, standard: '' (alt annet enn 0 og 1), dvs. begge
 hovedkat <- 99		#HovedInngrep, 0-7, Standard: 99, dvs alle op
-opKat <- 1 #Elektivt/Akutt, 1-2
+hastegrad <- 1 #Elektivt/Akutt, 1-2
 enhetsUtvalg <- 1 #	0: hele landet, 1:egen enhet-resten, 2:egen enhet, 3:egen-egen shgr,
     #4:egen shusgr, 5:egen shgr-resten, 6:egen enhet- egen region, 7:egen region, 8:egen reg - resten
 ktr <- 0			#1. el 2. kontroll. '3mnd' - 3mnd kontroll, '12mnd' - 12 mnd kontroll
@@ -106,12 +106,12 @@ RyggFigGjsnGrVar(RegData=RegData, outfile=outfile, valgtVar=valgtVar)
 
 #---Status per 19.juli 2019
 #valgtVarOK:  alder, alder70, arbstatus, ASA, beinsmLavPre, BMI, degSponSSSten, EQ5DPre, OswTotPre,
-#   smBePre, smRyPre, EQangstPre, EQgangePre, erstatningPre, komplPer, morsmal, opIndPareseGrad, opKat
+#   smBePre, smRyPre, EQangstPre, EQgangePre, erstatningPre, komplPer, morsmal, opIndPareseGrad, hastegrad
 #   peropKomp, roker, saardren, sivilStatus, smStiPre, smStiPreHypp, symptVarighRyggHof, sympVarighUtstr,
 #   uforetrygdPre, utd
 variable <- c('alder', 'alder70', 'arbstatus', 'ASA', 'beinsmLavPre', 'BMI', 'degSponSSSten',
               'EQ5DPre', 'OswTotPre', 'smBePre', 'smRyPre', 'EQangstPre', 'EQgangePre',
-              'erstatningPre', 'komplPer', 'morsmal', 'opIndPareseGrad', 'opKat', 'peropKomp',
+              'erstatningPre', 'komplPer', 'morsmal', 'opIndPareseGrad', 'hastegrad', 'peropKomp',
               'roker', 'saardren', 'sivilStatus', 'smStiPre', 'smStiPreHypp', 'symptVarighRyggHof',
               'sympVarighUtstr', 'uforetrygdPre', 'utd')
 
@@ -184,7 +184,7 @@ FordUt <- RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, datoFra=datoFra, da
  variable <- c('alder', 'antibiotika', 'antNivOpr', 'arbstatus', #'Arbstatus3mnd', 'Arbstatus12mnd',
                'ASA', 'BMI', 'EQangstPre', 'EQgangePre', 'erstatningPre', 'fornoydhet',  'hovedInngrep',
               'komorbiditet', 'komplPer', 'komplPost', 'liggedogn', 'morsmal', 'nytte', #3mnd', 'Nytte12mnd',
-              'opIndPareseGrad', 'opInd', 'opIndSmeType', 'opKat','radUnders',
+              'opIndPareseGrad', 'opInd', 'opIndSmeType', 'hastegrad','radUnders',
               'roker', 'sivilStatus','smStiPre', 'smStiPreHypp', 'SymptVarighRyggHof',
               'SympVarighUtstr', 'saardren', 'tidlOpr', 'tidlOprAntall','uforetrygdPre', 'utd', 'underkat')
  variable <- c('SympVarighUtstr', 'SymptVarighRyggHof','saardren' )
@@ -203,7 +203,7 @@ for (valgtVar in variable) {
 valgtVar <- 'EQ5DPre' #
 outfile <- ''#paste0(valgtVar,enhetsUtvalg, '.png')	#paste0(valgtVar,enhetsUtvalg, '.pdf')
 
-utdata <- RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidlOp=tidlOp, erMann=erMann, opKat = opKat,
+utdata <- RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidlOp=tidlOp, erMann=erMann, hastegrad = hastegrad,
 		hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal=valgtMaal,
 		datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=enhetsUtvalg, tidsenhet = tidsenhet, reshID=reshID) #aar=aar,
 
@@ -250,7 +250,7 @@ outfile <- '' #paste0(valgtVar, 'Sh.pdf')
 RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
                       sep=';', header=T, encoding = 'UTF-8')
 
-RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData, hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, opKat=opKat,
+RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData, hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
                     datoFra='2017-01-01', ktr=1, outfile=outfile)
 
 library(rygg)

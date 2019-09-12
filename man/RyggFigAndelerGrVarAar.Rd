@@ -6,7 +6,7 @@
 \usage{
 RyggFigAndelerGrVarAar(RegData, valgtVar, datoFra = "2007-01-01",
   datoTil = "3000-12-31", minald = 0, maxald = 130, erMann = "",
-  hovedkat = 99, tidlOp = "", opKat = 99, hentData = 0,
+  hovedkat = 99, tidlOp = "", hastegrad = 99, hentData = 0,
   preprosess = 1, enhetsUtvalg = 0, grVar = "ShNavn", tittel = 1,
   ktr = 0, reshID = 0, aar = 0, tidlAar = 0, Ngrense = 10,
   AKjust = 0, outfile = "")
@@ -45,7 +45,7 @@ RyggFigAndelerGrVarAar(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
-\item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
+\item{hastegrad}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
 
@@ -65,7 +65,7 @@ hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
 \item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
 
 \item{aar}{\itemize{
-\item Operasjonsår
+\item Operasjonsår. Kan velge flere
 }}
 
 \item{tidlAar}{0:Viser resultatat for hele perioden samlet, 1: Viser resultat for siste år og forrige}

@@ -8,7 +8,7 @@ RyggFigAndelTid(RegData, valgtVar, datoFra = "2011-01-01",
   datoTil = "3000-12-31", aar = 0, tidsenhet = "Aar",
   hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1, minald = 0,
   maxald = 130, erMann = 99, reshID = 0, outfile = "",
-  opKat = 99, enhetsUtvalg = 0, preprosess = 1, hentData = 0,
+  hastegrad = 99, enhetsUtvalg = 0, preprosess = 1, hentData = 0,
   lagFig = 1, offData = 0)
 }
 \arguments{
@@ -21,7 +21,7 @@ RyggFigAndelTid(RegData, valgtVar, datoFra = "2011-01-01",
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{aar}{\itemize{
-\item Operasjonsår
+\item Operasjonsår. Kan velge flere
 }}
 
 \item{tidsenhet}{Oppløsning på tidsaksen. Verdier: 'Aar' (standard), 'Halvaar', 'Kvartal','Mnd'}
@@ -58,7 +58,7 @@ hvilken enhet i spesialisthelsetjenesten brukeren tilhører}
 
 \item{outfile}{Navn på fil figuren skrives til. Standard: '' (Figur skrives}
 
-\item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
+\item{hastegrad}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
 

@@ -41,8 +41,8 @@
 #'     \item 9:'Degen. spondylolistese'
 #'     \item 99: Alle
 #'   }
-#' @param aar - Operasjonsår
-#' @param opKat Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig
+#' @param aar - Operasjonsår. Kan velge flere
+#' @param hastegrad Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig
 #' @param tidlOp tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon
 #' @param enhetsUtvalg Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.
 #' @param reshID Parameter følger fra innlogging helseregister.no og angir
@@ -51,12 +51,13 @@
 #' @return Returnerer filtrert versjon av RegData
 #' @export
 RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil='3000-01-01', minald=0, maxald=130,
-                          erMann='', hovedkat=99, aar=0, opKat=99, tidlOp='', hastegrad='',
+                          erMann='', hovedkat=99, aar=0, tidlOp=99, hastegrad=99, #hastegrad=99,
                           enhetsUtvalg=0, reshID=0, fargepalett='BlaaOff') {
 
 # Definer intersect-operator
       "%i%" <- intersect
-
+# Hovedinngrep ikke definert:
+      hovedkat <- 99
 
 #Når bare skal sammenlikne med sykehusgruppe eller region, eller ikke sammenlikne,
 #trengs ikke data for hele landet:
@@ -95,10 +96,10 @@ indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1
       if (!(hovedkat %in% 0:9)) {indHovedInngr <- 1:Ninn}
 
 indTidlOp <- if (tidlOp %in% 1:4) {which(RegData$TidlOpr==tidlOp)} else {indTidlOp <- 1:Ninn}
-indOpKat <- if (opKat %in% 1:2) {
+indhastegrad <- if (hastegrad %in% 1:2) {
       RegData$OpKat[RegData$OpKat==3] <- 1
-      which(RegData$OpKat == opKat)} else {1:Ninn}
-indMed <- indAld %i% indDato %i% indAar  %i% indKj %i% indHovedInngr %i% indTidlOp %i% indOpKat
+      which(RegData$OpKat == hastegrad)} else {1:Ninn}
+indMed <- indAld %i% indDato %i% indAar  %i% indKj %i% indHovedInngr %i% indTidlOp %i% indhastegrad
 RegData <- RegData[indMed,]
 
 #Definifjon av spinal stenose:
@@ -120,7 +121,7 @@ hkatnavn <- c( #0:9
 	'Degen. spondylolistese')
 
 TidlOprtxt <-	c('Tidl. operert samme nivå', 'Tidl. operert annet nivå', 'Tidl. operert annet og sm. nivå', 'Primæroperasjon')
-OpKatTxt <- paste0('Operasjonskategori: ', c('Elektiv', 'Akutt')) #, '1/2-Akutt'))
+hastegradTxt <- paste0('Operasjonskategori: ', c('Elektiv', 'Akutt')) #, '1/2-Akutt'))
 
 N <- dim(RegData)[1]
 
@@ -134,7 +135,7 @@ utvalgTxt <- c(paste0('Operasjonsdato: ', if (N>0) {min(RegData$InnDato, na.rm=T
 						' til ', if (N>0) {max(RegData$Alder, na.rm=T)} else {maxald}, ' år')},
 	if (erMann %in% 0:1) {paste0('Kjønn: ', c('Kvinner', 'Menn')[erMann+1])},
 	if (hovedkat[1] %in% 0:9) {paste0('Hovedinngrep: ', paste(hkatnavn[as.numeric(hovedkat)+1], collapse=','))},
-      if (opKat %in% 1:2) {OpKatTxt[opKat]},
+      if (hastegrad %in% 1:2) {hastegradTxt[hastegrad]},
       if (tidlOp %in% 1:4) {TidlOprtxt[tidlOp]}
 	)
 

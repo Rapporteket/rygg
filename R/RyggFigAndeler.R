@@ -85,7 +85,7 @@
 
 RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil = '2999-12-31',
                             aar = 0, hentData = 0, preprosess = 1,minald = 0, maxald = 130, erMann = '',
-                            hovedkat = 99, opKat = 99, tidlOp = '', ktr = 0, tittelMed = 1, outfile = '',
+                            hovedkat = 99, hastegrad = 99, tidlOp = '', ktr = 0, tittelMed = 1, outfile = '',
                             reshID = 0, enhetsUtvalg = 0, lagFig=1){
 
 #  Legg til:
@@ -121,7 +121,7 @@ RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil =
 #-----Gjør utvalg
   RyggUtvalg <- RyggUtvalgEnh(RegData = RegData, reshID = reshID, datoFra = datoFra, datoTil = datoTil,
                               minald = minald, maxald = maxald, erMann = erMann, aar = aar,
-                              hovedkat = hovedkat, opKat = opKat, tidlOp = tidlOp,enhetsUtvalg = enhetsUtvalg)
+                              hovedkat = hovedkat, hastegrad = hastegrad, tidlOp = tidlOp,enhetsUtvalg = enhetsUtvalg)
   RegData <- RyggUtvalg$RegData
   utvalgTxt <- RyggUtvalg$utvalgTxt
   ind <- RyggUtvalg$ind

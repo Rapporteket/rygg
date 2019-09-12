@@ -7,8 +7,8 @@
 RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
   datoTil = "2999-12-31", aar = 0, hentData = 0, preprosess = 1,
   minald = 0, maxald = 130, erMann = "", hovedkat = 99,
-  opKat = 99, tidlOp = "", ktr = 0, tittelMed = 1, outfile = "",
-  reshID = 0, enhetsUtvalg = 0, lagFig = 1)
+  hastegrad = 99, tidlOp = "", ktr = 0, tittelMed = 1,
+  outfile = "", reshID = 0, enhetsUtvalg = 0, lagFig = 1)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
@@ -20,7 +20,7 @@ RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{aar}{\itemize{
-\item Operasjonsår
+\item Operasjonsår. Kan velge flere
 }}
 
 \item{hentData}{Gjøre spørring mot database? 0: Nei, bruke RegData (Standard), 1: Ja}
@@ -50,7 +50,7 @@ RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
 \item 99: Alle
 }}
 
-\item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
+\item{hastegrad}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 

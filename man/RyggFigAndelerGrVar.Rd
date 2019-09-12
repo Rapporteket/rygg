@@ -7,8 +7,9 @@
 RyggFigAndelerGrVar(RegData, valgtVar, datoFra = "2007-01-01",
   datoTil = "3000-12-31", aar = 0, minald = 0, maxald = 130,
   erMann = "", hovedkat = 99, tidlOp = "", hentData = 0,
-  preprosess = 1, opKat = 99, enhetsUtvalg = 0, grVar = "ShNavn",
-  tittel = 1, ktr = 0, Ngrense = 10, reshID = 0, outfile = "")
+  preprosess = 1, hastegrad = 99, enhetsUtvalg = 0,
+  grVar = "ShNavn", tittel = 1, ktr = 0, Ngrense = 10,
+  reshID = 0, outfile = "")
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
@@ -20,7 +21,7 @@ RyggFigAndelerGrVar(RegData, valgtVar, datoFra = "2007-01-01",
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{aar}{\itemize{
-\item Operasjonsår
+\item Operasjonsår. Kan velge flere
 }}
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
@@ -52,7 +53,7 @@ RyggFigAndelerGrVar(RegData, valgtVar, datoFra = "2007-01-01",
 
 \item{preprosess}{Preprosesser data 0: Nei, 1: Ja (Standard)}
 
-\item{opKat}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
+\item{hastegrad}{Hastegrad av operasjon 1: Elektivt, 2: Akutt, 3: Halvøyeblikkelig}
 
 \item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
 

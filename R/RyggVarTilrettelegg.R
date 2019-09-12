@@ -591,9 +591,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             #retn <- 'H'
             tittel <- 'Operasjonskategori'
             grtxt <- c('Elektiv', 'Akutt', '1/2-Akutt', 'Ikke utfylt')
-            #indDum <- which(RegData$OpKat %in% 1:3)
-            #RegData$VariabelGr <- 9
-            #RegData$VariabelGr[indDum] <- RegData$OpKat[indDum]
             RegData$VariabelGr <- factor(RegData$OpKat, levels = c(1:3,9))
       }
 
@@ -690,10 +687,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                                        as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d")))
          RegData <- RegData[!is.na(RegData$Diff), ]
          #RegData[which(RegData$Diff>180), c('InnDato', 'UtskrivelseDato', 'FistTimeClosed')]
-         # RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d")) -
-         #                               as.Date(as.POSIXct(RegData$InnDato, format="%Y-%m-%d")))
-         # RegData[which(RegData$Diff<0), c('PasientID', "ShNavn", 'InnDato', 'UtskrivelseDato')] #, 'FistTimeClosed')]
-         # RegData[1:10, c('Diff', 'InnDato', 'UtskrivelseDato')]
+         # RegData$Diff <- as.numeric(as.Date(RegData$UtskrivelseDato) - as.Date(RegData$InnDato))
+         # TidlUt <- RegData[which(RegData$Diff<0), c('PasientID', "ShNavn", 'InnDato', 'UtskrivelseDato', 'Diff')] #, 'FistTimeClosed')]
 
          tittel <- 'Registreringsforsinkelse'
 
