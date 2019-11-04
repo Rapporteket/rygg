@@ -70,45 +70,22 @@ ui <- navbarPage( title = div(img(src="rap/logo.svg", alt="Rapporteket", height=
   #theme = "rap/bootstrap.css",
 
   #------------ Startside -----------------
-  tabPanel(p("Startside", title='Oversikt over registreringer og resultater'),
+  tabPanel(p("Startside", title='REGISTRATORS Oversikt over registreringer og resultater'),
            h2('Velkommen til ny versjon av Rapporteket for NKR, Rygg!', align='center'),
-           sidebarPanel(
-           h4('På Rapporteket kan man finne visualiseringer og oppsummeringer av de fleste variable som registreres
+           h4('Oppdatere og legge i "gardin som kan åpnes": På Rapporteket kan man finne visualiseringer og oppsummeringer av de fleste variable som registreres
                   i registeret. I hver fane kan man velge hvilken variabel man vil se resultat for og om man vil gjøre
                 filtreringer. Hold musepekeren over fanen for å se hvilke variable/tema som er visualisert i fanen.
                 Fanene er i hovedsak organisert ut fra hvordan resultatene er visualisert. F.eks.
                 finner man under "Andeler" resultater av typen "andel under 80 år" og
                 "andel som fikk komplikasjon". Under "gjennomsnitt" finner man eksempelvis beregninger av
                 "gjennomsnittsalder" eller gjennomsnittlig knivtid.'),
+           h5('Flytte teksten'),
+           sidebarPanel(
+          h4('Laste ned månedsrapport'),
+          br(),
+          h4('Annet?'),
            br(),
-           br(),
-           br(),
-
-           h3('Egen side for registeradministratorer?'),
-           h5('Hva skal den inneholde?'),
-           br(),
-           h4('F.eks. nedlasting av data til Resultatportalen:'),
-
-           selectInput(inputId = "valgtVarRes", label="Velg variabel",
-                       choices = c('Lite beinsmerte før operasjon' = 'beinsmLavPre',
-                                   'Durarift' = 'peropKompDura',
-                                   'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
-           ),
-           selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
-                       choices = hastegradvalg
-           ),
-           selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
-                       choices = tidlOprvalg
-           ),
-           # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
-           #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
-           #                ),
-           sliderInput(inputId="aarRes", label = "Operasjonsår", min = as.numeric(2016),
-                       max = as.numeric(year(idag)), value = c(2018, year(idag), step=1, sep="")
-           ),
-           br(),
-           downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data')
-
+           br()
            ),
            mainPanel(
              br(),
@@ -129,23 +106,22 @@ ui <- navbarPage( title = div(img(src="rap/logo.svg", alt="Rapporteket", height=
              ),
              column(4,
                     h4('Registreringsforsinkelse'),
-                    h5('Andel/antall registrert for sent for 3månederskontroll: ...'),
-             h5('Andel/antall registrert for sent for 12månederskontroll: ...'))
+                    h5('Andel/antall registrert/ferdigstilt for sent for 3månederskontroll: ...'),
+             h5('Andel/antall registrert/ferdigstilt for sent for 12månederskontroll: ...'))
              ),
-             fluidRow(h3('Hva mer skal med her...?'),
-                      tags$div(
-                        tags$li("Andel ikke besvart 3 mnd. "),
-                        tags$li("Andel ikke besvart 12 mnd."),
-                        tags$li("Andel purringer 3 mnd."),
-                        tags$li("Andel purringer 12 mnd."),
-                        tags$p("Hvilken – tidsperiode og inndeling ønskes for disse?
-                               Hva er formålet? - til info eller at de skal gjøre noe med det?
-                               HVem er hovedmottager registerkoordinator eller registrator?")
-                      ))
-           )
+
+             fluidRow(h4('tabell med resultat Per måned siste år'),
+                      tags$div(tags$li('Andel over 70 år'),
+                                tags$li('Gjennomsnittsalder'),
+                  tags$li('Andel kvinner'),
+                       tags$li('Fornøyd med behandlingen, 3 mnd. etter'),
+                               tags$li('Helt restituert/mye bedre, 3 mnd. etter'),
+                                       tags$li('Verre 3 mnd. etter')
+           ))
+           )#main
   ), #tab
 
-  # #------------- Tabeller (vise antall)--------------------
+  # #------------- Registreringsoversikter (vise antall)--------------------
 
   tabPanel(p('Registreringsoversikter',title="Tabeller med registreringsoversikter"),
            sidebarPanel(width=3,
@@ -193,7 +169,61 @@ ui <- navbarPage( title = div(img(src="rap/logo.svg", alt="Rapporteket", height=
                                            # p(em("Velg tidsperiode ved å velge sluttdato i menyen til venstre")),
                                            # tableOutput("tabAvdSkjema12"))
              )))
-           ) #tab
+           ), #tab
+
+  #----------------Kvalitetsindikatorer----------------------------------
+  tabPanel(p("Kvalitetsindikatorer", title='Kval.ind.: Per sykehus og utvikling over tid'),
+           h2('Side som bare viser kvalitetsindikatorer', align='center'),
+
+           sidebarPanel(
+           h4('Kan gjøre utvalg på: tidsperiode og tidsenhet')),
+           mainPanel(h4('Viser to figurer/tabeller per indikator: Utvikling over tid og per sykehus')
+                     )
+  ), #tab, KI
+
+
+  tabPanel(p("Registeradministrasjon", title='Bare synlig for SC-bruker'),
+           h3('Egen side for registeradministratorer? (Bare synlig for SC-bruker'),
+           h4('Alternativt kan vi ha elementer på startsida og/eller registreringsoversiktsida som bare er synlig for SC'),
+           br(),
+           h5('Hva ønsker man skal være synlig kun for SC-bruker?'),
+           br(),
+           br(),
+           sidebarPanel(
+             h4('F.eks. nedlasting av data til Resultatportalen:'),
+
+             selectInput(inputId = "valgtVarRes", label="Velg variabel",
+                         choices = c('Lite beinsmerte før operasjon' = 'beinsmLavPre',
+                                     'Durarift' = 'peropKompDura',
+                                     'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
+             ),
+             selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
+                         choices = hastegradvalg
+             ),
+             selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
+                         choices = tidlOprvalg
+             ),
+             # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
+             #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
+             #                ),
+             sliderInput(inputId="aarRes", label = "Operasjonsår", min = as.numeric(2016),
+                         max = as.numeric(year(idag)), value = c(2018, year(idag), step=1, sep="")
+             ),
+             br(),
+             downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data')),
+
+           fluidRow(h3('Hva mer skal med her...?'),
+                    tags$div(
+                      tags$li("Andel ikke besvart 3 mnd. "),
+                      tags$li("Andel ikke besvart 12 mnd."),
+                      tags$li("Andel purringer 3 mnd."),
+                      tags$li("Andel purringer 12 mnd.")
+                    ))
+  ), #tab SC
+
+tabPanel('Fordelinger'),
+tabPanel('Resultater, prosentvise'),
+tabPanel('Resultater, gjennomsnitt')
 
 ) #fluidpage, dvs. alt som vises på skjermen
 

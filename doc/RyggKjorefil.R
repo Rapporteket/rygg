@@ -75,7 +75,7 @@ outfile <- ''
 #Registreringsoversikter for 2019-data
 #_________________________________________________________________________________________
 
-SkjemaOversikt <- read.table('A:/Rygg/SkjemaOversikt2019-07-18.csv',
+SkjemaOversikt <- read.table('A:/Rygg/SkjemaOversikt2019-11-04.csv',
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
 #SkjemaOversikt$Skjemanavn <- SkjemaOversikt$X.U.FEFF.Skjemanavn
 SkjemaOversikt$MndAar <- format(as.Date(SkjemaOversikt$HovedDato), '%y.%m')
