@@ -1,16 +1,35 @@
-library(shiny)
 #library(magrittr)
 library(kableExtra)
 library(knitr)
 library(lubridate)
 #ibrary(shinyBS) # Additional Bootstrap Controls
-library(lubridate)
+library(rapbase)
 library(rygg)
-library(tools)
+library(rapFigurer)
+library(shiny)
+library(shinyjs)
+#library(tools)
 library(zoo)
 
+idag <- Sys.Date()
+startDato <- startDato <- paste0(as.numeric(format(idag-50, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
+sluttDato <- idag
+datoTil <- as.POSIXlt(idag)
+datofra12 <- lubridate::floor_date(as.Date(datoTil)- months(12, abbreviate = T), unit='month')
+idag <- Sys.Date()
+
+# gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
+addResourcePath('rap', system.file('www', package='rapbase'))
+
+
+
 context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
-if (context == "TEST" | context == "QA" | context == "PRODUCTION") {
+paaServer <- (context %in% c("DEV", "TEST", "QA", "PRODUCTION")) #rapbase::isRapContext()
+regTitle = ifelse(paaServer,'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data',
+                  'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
+
+
+if (context %in% paaServer) {
   registryName <- "rygg"
   dbType <- "mysql"
   query <- paste0('SELECT  ...')
@@ -20,15 +39,9 @@ if (context == "TEST" | context == "QA" | context == "PRODUCTION") {
 }
 
 # Parametre:
-reshIDdummy <- 601161
-reshID <- reshIDdummy
+#reshIDdummy <- 601161
+#reshID <- reshIDdummy
 egetShnavn <- as.character(RegData$ShNavn[match(reshID, RegData$ReshId)])
-indEget <- which(RegData$ReshId == reshID)
-datoTil <- as.POSIXlt(Sys.Date())
-datofra12 <- lubridate::floor_date(as.Date(datoTil)- months(12, abbreviate = T), unit='month')
-startDato <- '2019-01-01' #Sys.Date()-364
-idag <- Sys.Date()
-sluttDato <- idag
 
 RegData <- RyggPreprosess(RegData = RegData)
 SkjemaOversikt <- dplyr::rename(.data=SkjemaOversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
@@ -43,11 +56,6 @@ names(tabKladd) <- c('Pasientskjema','Legeskjema.')
 
 
 
-# gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
-addResourcePath('rap', system.file('www', package='rapbase'))
-
-regTitle = 'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data'
-
 #Definere innhold i felles rullegardinmenyer:
 kjonn <- c("Begge"=2, "Menn"=1, "Kvinner"=0)
 enhetsUtvalg <- c("Egen mot resten av landet"=1,
@@ -61,37 +69,65 @@ hastegradvalg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 
 
 # Define UI for application
-#fluidPage( #"Hoved"Layout for alt som vises på skjermen
-ui <- navbarPage( title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
+ui <- navbarPage(
+  title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
   theme = "bootstrap.css",
   # sett inn tittel også i browser-vindu
   windowTitle = regTitle,
-  # velg css (foreløpig den eneste bortsett fra "naken" utgave)
-  #theme = "rap/bootstrap.css",
+  theme = "rap/bootstrap.css",
 
   #------------ Startside -----------------
-  tabPanel(p("Startside", title='REGISTRATORS Oversikt over registreringer og resultater'),
-           h2('Velkommen til ny versjon av Rapporteket for NKR, Rygg!', align='center'),
-           h4('Oppdatere og legge i "gardin som kan åpnes": På Rapporteket kan man finne visualiseringer og oppsummeringer av de fleste variable som registreres
+  tabPanel(p("Startside", title='Registrators oversikt over registreringer og resultater'),
+           shinyjs::useShinyjs(),
+           tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color#fluidRow(
+           #column(width=5,
+           h2('Velkommen til Rapporteket for NKR, Rygg!', align='center'),
+
+
+
+
+           sidebarPanel(
+             h3('Her vil det komme nedlastbare dokumenter med samling av resultater'),
+          br()
+           ),
+           mainPanel(
+             tags$head(tags$link(rel="shortcut icon", href="rap/favicon.ico")),
+             rapbase::appNavbarUserWidget(user = uiOutput("appUserName"),
+                                          organization = uiOutput("appOrgName")
+                                          , addUserInfo = TRUE
+             ),
+             br(),
+             br(),
+             h4('Oppdatere : På Rapporteket kan man finne visualiseringer og oppsummeringer av de fleste variable som registreres
                   i registeret. I hver fane kan man velge hvilken variabel man vil se resultat for og om man vil gjøre
                 filtreringer. Hold musepekeren over fanen for å se hvilke variable/tema som er visualisert i fanen.
                 Fanene er i hovedsak organisert ut fra hvordan resultatene er visualisert. F.eks.
                 finner man under "Andeler" resultater av typen "andel under 80 år" og
                 "andel som fikk komplikasjon". Under "gjennomsnitt" finner man eksempelvis beregninger av
-                "gjennomsnittsalder" eller gjennomsnittlig knivtid.'),
-           h5('Flytte teksten'),
-           sidebarPanel(
-          h4('Laste ned månedsrapport'),
-          br(),
-          h4('Annet?'),
-           br(),
-           br()
-           ),
-           mainPanel(
+                "gjennomsnittsalder" eller gjennomsnittlig knivtid.'),             h4('Du er nå inne på Rapporteket for NGER. Rapporteket er registerets resultattjeneste.
+                            Disse sidene inneholder en samling av figurer og tabeller som viser resultater fra registeret.
+                            På hver av sidene kan man gjøre utvalg i menyene til venstre. Alle resultater er basert
+                            på ferdigstilte registreringer. Merk at data er hentet direkte fra registerets database.
+                            Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
+             h4('Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
+                              mot landet for øvrig. Resultatene som vises er
+                              basert på operasjonsdato. Alle figurer og
+                            tabeller kan lastes ned.'),
+             br(),
+             h4(tags$b(tags$u('Innhold i de ulike fanene:'))),
+             h4('I feltet til venstre på hver side kan man velge hvilken variabel man ønsker å se
+                            resultater for. Der kan man også gjøre ulike filtreringer/utvalg av data.'),
+             h4(tags$b('Registreringsoversikter '), 'viser aktivitet i registeret.'),
+             h4(tags$b('Kvalitetsindikatorer '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
+             h4(tags$b('Fordelinger '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
+             h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) en per sykehus og utvikling over tid.
+                            Man kan velge hvilken tidsskala man vi se på.'),
+             h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
+                            Man kan velge om man vil se gjennomsnitt eller median.'),
+             h4('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
+                            innhold på Rapporteket'),
              br(),
              br(),
-             br(),
-
              h2(paste("Drift og resultater,", egetShnavn)), #, align='center' ),
              fluidRow(
                h5('Registreringer siste år:'),
@@ -231,10 +267,32 @@ tabPanel('Resultater, gjennomsnitt')
 
 
 #----------------- Define server logic required  -----------------------
-server <- function(input, output) {
+server <- function(input, output,session) {
+
+  raplog::appLogger(session, msg = 'Starter Rapporteket-Rygg')
+  #reshID <- reactive({ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)),
+  #                           601161)})
+  reshID <- ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)), 601161)
+  #rolle <- reactive({ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'SC')})
+  rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
+  brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
 
 
-#------ Dæsjbord ---------------------
+  # widget
+  if (paaServer) {
+    output$appUserName <- renderText(rapbase::getUserFullName(session))
+    output$appOrgName <- renderText(paste0('rolle: ', rolle(), '<br> ReshID: ', reshID) )}
+
+  # User info in widget
+  userInfo <- rapbase::howWeDealWithPersonalData(session)
+  observeEvent(input$userInfo, {
+    shinyalert::shinyalert("Dette vet Rapporteket om deg:", userInfo,
+                           type = "", imageUrl = "rap/logo.svg",
+                           closeOnEsc = TRUE, closeOnClickOutside = TRUE,
+                           html = TRUE, confirmButtonText = rapbase::noOptOutOk())
+  })
+
+  #------ Dæsjbord ---------------------
 
 
   observe({

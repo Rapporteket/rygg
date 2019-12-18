@@ -4,12 +4,28 @@
 \alias{RyggFigAndelerGrVar}
 \title{Søylediagram med andeler for hver grupperingsenhet (sykehus, RHF, ...)}
 \usage{
-RyggFigAndelerGrVar(RegData, valgtVar, datoFra = "2007-01-01",
-  datoTil = "3000-12-31", aar = 0, minald = 0, maxald = 130,
-  erMann = "", hovedkat = 99, tidlOp = "", hentData = 0,
-  preprosess = 1, hastegrad = 99, enhetsUtvalg = 0,
-  grVar = "ShNavn", tittel = 1, ktr = 0, Ngrense = 10,
-  reshID = 0, outfile = "")
+RyggFigAndelerGrVar(
+  RegData,
+  valgtVar,
+  datoFra = "2007-01-01",
+  datoTil = "3000-12-31",
+  aar = 0,
+  minald = 0,
+  maxald = 130,
+  erMann = "",
+  hovedkat = 99,
+  tidlOp = "",
+  hentData = 0,
+  preprosess = 1,
+  hastegrad = 99,
+  enhetsUtvalg = 0,
+  grVar = "ShNavn",
+  tittel = 1,
+  ktr = 0,
+  Ngrense = 10,
+  reshID = 0,
+  outfile = ""
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
@@ -105,7 +121,7 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \item Nytte: Klart bedre
 \item OswEndrLav: Forbedring av Oswestry-skår < 13 poeng
 \item OswEndr20: Forbedring av Oswestry-skår > 20 poeng
-\item OswEndr30pst: Mer enn 30% forbedring i Oswestry-skår
+\item OswEndr30pst: Mer enn 30\% forbedring i Oswestry-skår
 \item Osw22: Oswestry-skår < 22 poeng
 \item Osw48: Oswestry-skår > 48 poeng
 \item PeropKomp: Komplikasjon ved operasjon

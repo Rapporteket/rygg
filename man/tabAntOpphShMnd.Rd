@@ -4,8 +4,7 @@
 \alias{tabAntOpphShMnd}
 \title{Tabell som viser antall operasjoner per måned og sykehus siste x måneder}
 \usage{
-tabAntOpphShMnd(RegData, datoTil = Sys.Date(), antMnd = 6,
-  reshID = 0)
+tabAntOpphShMnd(RegData, datoTil = Sys.Date(), antMnd = 6, reshID = 0)
 }
 \arguments{
 \item{RegData}{data}

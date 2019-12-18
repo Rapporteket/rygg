@@ -4,8 +4,14 @@
 \alias{RyggVarTilrettelegg}
 \title{Funksjon for å tilrettelegge variable for beregning.}
 \usage{
-RyggVarTilrettelegg(RegData = NULL, valgtVar, ktr = 0,
-  datoTil = Sys.Date(), hovedkat = 99, figurtype = "andeler")
+RyggVarTilrettelegg(
+  RegData = NULL,
+  valgtVar,
+  ktr = 0,
+  datoTil = Sys.Date(),
+  hovedkat = 99,
+  figurtype = "andeler"
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}

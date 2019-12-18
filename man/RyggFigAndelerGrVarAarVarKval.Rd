@@ -4,11 +4,25 @@
 \alias{RyggFigAndelerGrVarAarVarKval}
 \title{Søylediagram med andeler for hver grupperingsenhet (sykehus, RHF, ...)}
 \usage{
-RyggFigAndelerGrVarAarVarKval(RegData, valgtVar, datoFra = "2007-01-01",
-  datoTil = "3000-12-31", minald = 0, maxald = 130, erMann = "",
-  hovedkat = 99, tidlOp = "", hastegrad = 99, hentData = 0,
-  preprosess = 1, grVar = "ShNavn", tittel = 1, ktr = 0,
-  outfile = "", AKjust = 0)
+RyggFigAndelerGrVarAarVarKval(
+  RegData,
+  valgtVar,
+  datoFra = "2007-01-01",
+  datoTil = "3000-12-31",
+  minald = 0,
+  maxald = 130,
+  erMann = "",
+  hovedkat = 99,
+  tidlOp = "",
+  hastegrad = 99,
+  hentData = 0,
+  preprosess = 1,
+  grVar = "ShNavn",
+  tittel = 1,
+  ktr = 0,
+  outfile = "",
+  AKjust = 0
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
@@ -87,7 +101,7 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \item Kp3Mnd: Pasientrapporterte komplikasjoner
 \item Misfornoyd:  Andel med Misfornøyd/litt misfornøyd (ENDRET fra Misfor3mnd, Misfor12mnd)
 \item Nytte: Klart bedre    (ENDRET fra Nytte3mnd, Nytte12mnd)
-\item OswEndr30pst: Mer enn 30% forbedring i Oswestry-skår, 3 mnd. (ENDRET fra Osw30_3mnd, Osw30_12mnd)
+\item OswEndr30pst: Mer enn 30\% forbedring i Oswestry-skår, 3 mnd. (ENDRET fra Osw30_3mnd, Osw30_12mnd)
 \item PeropKomp: Komplikasjon ved operasjon
 \item PeropKompDura: Komplikasjon ved operasjon: Durarift
 \item Roker: Røyker du?

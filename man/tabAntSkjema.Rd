@@ -4,8 +4,12 @@
 \alias{tabAntSkjema}
 \title{Hvor mange skjema av hver type (lege, pasient, oppfølging)}
 \usage{
-tabAntSkjema(SkjemaOversikt, datoFra = "2019-01-01",
-  datoTil = Sys.Date(), skjemastatus = 1)
+tabAntSkjema(
+  SkjemaOversikt,
+  datoFra = "2019-01-01",
+  datoTil = Sys.Date(),
+  skjemastatus = 1
+)
 }
 \arguments{
 \item{SkjemaOversikt}{Tabellen skjemaoversikt}

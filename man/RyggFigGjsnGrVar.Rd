@@ -4,12 +4,30 @@
 \alias{RyggFigGjsnGrVar}
 \title{Søylediagram med gjennomsnitt/median for hver grupperingsenhet (sykehus, RHF, ...)}
 \usage{
-RyggFigGjsnGrVar(RegData, valgtVar, valgtMaal = "Gjsn",
-  datoFra = "2007-01-01", datoTil = "3000-12-31", aar = 0,
-  minald = 0, maxald = 130, erMann = 99, hovedkat = 99,
-  tidlOp = "", hentData = 0, preprosess = 1, hastegrad = 99,
-  enhetsUtvalg = 0, grVar = "ShNavn", tittel = 1, ktr = 0,
-  Ngrense = 10, medKI = 1, reshID = 0, outfile = "")
+RyggFigGjsnGrVar(
+  RegData,
+  valgtVar,
+  valgtMaal = "Gjsn",
+  datoFra = "2007-01-01",
+  datoTil = "3000-12-31",
+  aar = 0,
+  minald = 0,
+  maxald = 130,
+  erMann = 99,
+  hovedkat = 99,
+  tidlOp = "",
+  hentData = 0,
+  preprosess = 1,
+  hastegrad = 99,
+  enhetsUtvalg = 0,
+  grVar = "ShNavn",
+  tittel = 1,
+  ktr = 0,
+  Ngrense = 10,
+  medKI = 1,
+  reshID = 0,
+  outfile = ""
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}

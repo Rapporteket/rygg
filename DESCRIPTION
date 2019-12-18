@@ -1,6 +1,7 @@
 Package: rygg
 Title: Degenerativ Rygg, figurer, tabeller, analyser
-Version: 1.9.0.1
+Version: 1.9.5
+Date: 2019-12-18
 Authors@R: 
     person(given = "Lena Ringstad",
            family = "Olsen",
@@ -12,18 +13,20 @@ Description: Figurer, tabeller, rapporter og analyser for Degenerativ Rygg. De f
 License: What license it uses
 Encoding: UTF-8
 LazyData: true
-Suggests: 
-    kableExtra,
-    knitr,
-    rapsodi,
-    testthat (>= 2.1.0),
-    xtable,
-    zoo,
-Imports: 
-    rapbase (>= 1.8.0)
 Remotes: 
     Rapporteket/rapbase,
     Rapporteket/rapFigurer,
+    Rapporteket/raplog,
     Rapporteket/rapsodi
+Imports: 
+    kableExtra,
+    knitr,
+    lubridate,
+    rapbase,
+    raplog,
+    rapsodi,
+    testthat,
+    xtable,
+    zoo
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

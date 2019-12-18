@@ -4,12 +4,29 @@
 \alias{RyggFigAndelTid}
 \title{Tidstrend av andel opphold}
 \usage{
-RyggFigAndelTid(RegData, valgtVar, datoFra = "2011-01-01",
-  datoTil = "3000-12-31", aar = 0, tidsenhet = "Aar",
-  hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1, minald = 0,
-  maxald = 130, erMann = 99, reshID = 0, outfile = "",
-  hastegrad = 99, enhetsUtvalg = 0, preprosess = 1, hentData = 0,
-  lagFig = 1, offData = 0)
+RyggFigAndelTid(
+  RegData,
+  valgtVar,
+  datoFra = "2011-01-01",
+  datoTil = "3000-12-31",
+  aar = 0,
+  tidsenhet = "Aar",
+  hovedkat = 99,
+  ktr = 0,
+  tidlOp = 99,
+  tittel = 1,
+  minald = 0,
+  maxald = 130,
+  erMann = 99,
+  reshID = 0,
+  outfile = "",
+  hastegrad = 99,
+  enhetsUtvalg = 0,
+  preprosess = 1,
+  hentData = 0,
+  lagFig = 1,
+  offData = 0
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}

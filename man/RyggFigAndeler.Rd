@@ -4,11 +4,27 @@
 \alias{RyggFigAndeler}
 \title{Søylediagram som viser andeler av ulike variabler}
 \usage{
-RyggFigAndeler(RegData, valgtVar, datoFra = "2007-01-01",
-  datoTil = "2999-12-31", aar = 0, hentData = 0, preprosess = 1,
-  minald = 0, maxald = 130, erMann = "", hovedkat = 99,
-  hastegrad = 99, tidlOp = "", ktr = 0, tittelMed = 1,
-  outfile = "", reshID = 0, enhetsUtvalg = 0, lagFig = 1)
+RyggFigAndeler(
+  RegData,
+  valgtVar,
+  datoFra = "2007-01-01",
+  datoTil = "2999-12-31",
+  aar = 0,
+  hentData = 0,
+  preprosess = 1,
+  minald = 0,
+  maxald = 130,
+  erMann = "",
+  hovedkat = 99,
+  hastegrad = 99,
+  tidlOp = "",
+  ktr = 0,
+  tittelMed = 1,
+  outfile = "",
+  reshID = 0,
+  enhetsUtvalg = 0,
+  lagFig = 1
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}

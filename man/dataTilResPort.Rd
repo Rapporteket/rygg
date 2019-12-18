@@ -4,9 +4,16 @@
 \alias{dataTilResPort}
 \title{Generere data til Resultatportalen}
 \usage{
-dataTilResPort(RegData = RegData, valgtVar, datoFra = "2011-01-01",
-  aar = 0, hovedkat = 99, hastegrad = 99, tidlOp = "",
-  filUt = "dummy")
+dataTilResPort(
+  RegData = RegData,
+  valgtVar,
+  datoFra = "2011-01-01",
+  aar = 0,
+  hovedkat = 99,
+  hastegrad = 99,
+  tidlOp = "",
+  filUt = "dummy"
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}

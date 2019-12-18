@@ -4,10 +4,21 @@
 \alias{RyggUtvalgEnh}
 \title{Title}
 \usage{
-RyggUtvalgEnh(RegData, datoFra = "2009-01-01", datoTil = "3000-01-01",
-  minald = 0, maxald = 130, erMann = "", hovedkat = 99, aar = 0,
-  tidlOp = 99, hastegrad = 99, enhetsUtvalg = 0, reshID = 0,
-  fargepalett = "BlaaOff")
+RyggUtvalgEnh(
+  RegData,
+  datoFra = "2009-01-01",
+  datoTil = "3000-01-01",
+  minald = 0,
+  maxald = 130,
+  erMann = "",
+  hovedkat = 99,
+  aar = 0,
+  tidlOp = 99,
+  hastegrad = 99,
+  enhetsUtvalg = 0,
+  reshID = 0,
+  fargepalett = "BlaaOff"
+)
 }
 \arguments{
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
