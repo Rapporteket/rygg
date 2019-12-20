@@ -25,33 +25,20 @@ addResourcePath('rap', system.file('www', package='rapbase'))
 
 context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
 paaServer <- (context %in% c("DEV", "TEST", "QA", "PRODUCTION")) #rapbase::isRapContext()
-regTitle = ifelse(paaServer,'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data',
+regTitle = ifelse(paaServer, 'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data',
                   'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
 
 
-if (context %in% paaServer) {
-  registryName <- "rygg"
-  dbType <- "mysql"
-  query <- paste0('SELECT  ...')
-  RegData <- rapbase::LoadRegData(registryName, query, dbType)
+if (paaServer) {
+  RegData <- RyggRegDataSQL()
+  qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
+  SkjemaOversikt <- rapbase::LoadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
 } else {
-  load(file = 'A:/Rygg/RyggData.RData')
+  print('Data ikke tilgjengelig')
 }
-
-# Parametre:
-#reshIDdummy <- 601161
-#reshID <- reshIDdummy
-egetShnavn <- as.character(RegData$ShNavn[match(reshID, RegData$ReshId)])
 
 RegData <- RyggPreprosess(RegData = RegData)
 SkjemaOversikt <- dplyr::rename(.data=SkjemaOversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
-
-vec <- factor(SkjemaOversikt$SkjemaRekkeflg, levels= c(5,10))
-tabKladd <- table(vec[Reduce(intersect, list(which(as.Date(SkjemaOversikt$InnDato) >= datofra12),
-                                             which(SkjemaOversikt$SkjemaStatus==0),
-                                             which(SkjemaOversikt$AvdRESH == reshID)))]) #, indSkjema
-names(tabKladd) <- c('Pasientskjema','Legeskjema.')
-
 
 
 
@@ -71,7 +58,6 @@ hastegradvalg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 # Define UI for application
 ui <- navbarPage(
   title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
-  theme = "bootstrap.css",
   # sett inn tittel også i browser-vindu
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
@@ -128,7 +114,7 @@ ui <- navbarPage(
                             innhold på Rapporteket'),
              br(),
              br(),
-             h2(paste("Drift og resultater,", egetShnavn)), #, align='center' ),
+             h2(paste("Drift og resultater, egen avdeling")), #, uiOutput("egetShnavn"))), #, align='center' ),
              fluidRow(
                h5('Registreringer siste år:'),
                tableOutput("tabAntOpphEget")
@@ -137,8 +123,10 @@ ui <- navbarPage(
              fluidRow(
                column(4,
                h4('Antall skjema i kladd:'),
-               h5(paste('Pasientskjema:', tabKladd[1])),
-               h5(paste('Lengeskjema:', tabKladd[2]))
+               uiOutput("iKladdPas"),
+               uiOutput("iKladdLege")
+               #h5(paste('Pasientskjema:', uiOutput("iKladdPas"))),
+               #h5(paste('Lengeskjema:', uiOutput("iKladdLege")))
              ),
              column(4,
                     h4('Registreringsforsinkelse'),
@@ -276,12 +264,13 @@ server <- function(input, output,session) {
   #rolle <- reactive({ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'SC')})
   rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
   brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
+  output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(reshID, RegData$ReshId)]))
 
 
   # widget
   if (paaServer) {
     output$appUserName <- renderText(rapbase::getUserFullName(session))
-    output$appOrgName <- renderText(paste0('rolle: ', rolle(), '<br> ReshID: ', reshID) )}
+    output$appOrgName <- renderText(paste0('rolle: ', rolle, '<br> ReshID: ', reshID) )}
 
   # User info in widget
   userInfo <- rapbase::howWeDealWithPersonalData(session)
@@ -293,6 +282,17 @@ server <- function(input, output,session) {
   })
 
   #------ Dæsjbord ---------------------
+
+  # output$... <- renderTable()
+  vec <- factor(SkjemaOversikt$SkjemaRekkeflg, levels= c(5,10))
+  iKladd <- table(vec[Reduce(intersect, list(#which(as.Date(SkjemaOversikt$InnDato) >= datofra12),
+                                               which(SkjemaOversikt$SkjemaStatus==0)
+                                             ,which(SkjemaOversikt$AvdRESH == reshID)
+                                             ))]) #, indSkjema
+  names(iKladd) <- c('Pasientskjema','Legeskjema')
+
+  output$iKladdPas <- renderText(paste('Pasientskjema: ', iKladd[1]))
+  output$iKladdLege <- renderPrint(iKladd[2])
 
 
   observe({

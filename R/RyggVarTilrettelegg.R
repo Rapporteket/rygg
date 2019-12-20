@@ -438,12 +438,13 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                          'SykdCerebrovaskular', 'SykdDepresjonAngst', 'SykdHjertekar', 'SykdHoftekneartose',
                          'SykdHypertensjon', 'SykdKreft', 'SykdKroniskLunge', 'SykdKroniskNevrologisk',
                          'SykdOsteoporose', 'SykDprebetesMellitus',                   #'SykdKroniskSmerterMuskelSkjelettsyst',
-                         'SykdReumatoidartritt', 'SykdVaskularClaudicatio', 'Sykd')
+                         'SykdReumatoidartritt', 'SykdVaskularClaudicatio', 'SykdGeneralisertSmSyndr',
+                       'Sykd')
          grtxt <- c('Bechterew', 'Endokrin', 'Reumatisk',
                     'Cerebrovaskulær', 'Depresjon/Angst', 'Hjerte-kar', 'Hoftekneartose',
                     'Hypertensjon', 'Kreft', 'Lungesykd.', 'Nevrologisk sykd.',
                     'Osteoporose', 'Diabetes Mell.',                         #'Muskel-/skjelettsm.',
-                    'Reumatoid artritt', 'Vask. Claudicatio', 'Tot. Komorb.')
+                    'Reumatoid artritt', 'Vask. Claudicatio', 'Gen.smertesyndrom', 'Tot. Komorb.')
 
          cexgr <- 0.9	#Kan endres for enkeltvariable
       }
