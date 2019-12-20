@@ -25,7 +25,7 @@ addResourcePath('rap', system.file('www', package='rapbase'))
 
 context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
 paaServer <- (context %in% c("DEV", "TEST", "QA", "PRODUCTION")) #rapbase::isRapContext()
-regTitle = ifelse(paaServer, 'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data',
+regTitle = ifelse(paaServer, 'NKR: Norsk Kvalitetsregister for Ryggkirurgi',
                   'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
 
 
@@ -83,22 +83,13 @@ ui <- navbarPage(
                                           , addUserInfo = TRUE
              ),
              br(),
-             br(),
-             h4('Oppdatere : På Rapporteket kan man finne visualiseringer og oppsummeringer av de fleste variable som registreres
-                  i registeret. I hver fane kan man velge hvilken variabel man vil se resultat for og om man vil gjøre
-                filtreringer. Hold musepekeren over fanen for å se hvilke variable/tema som er visualisert i fanen.
-                Fanene er i hovedsak organisert ut fra hvordan resultatene er visualisert. F.eks.
-                finner man under "Andeler" resultater av typen "andel under 80 år" og
-                "andel som fikk komplikasjon". Under "gjennomsnitt" finner man eksempelvis beregninger av
-                "gjennomsnittsalder" eller gjennomsnittlig knivtid.'),             h4('Du er nå inne på Rapporteket for NGER. Rapporteket er registerets resultattjeneste.
-                            Disse sidene inneholder en samling av figurer og tabeller som viser resultater fra registeret.
-                            På hver av sidene kan man gjøre utvalg i menyene til venstre. Alle resultater er basert
-                            på ferdigstilte registreringer. Merk at data er hentet direkte fra registerets database.
-                            Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
-             h4('Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
+             h4('Du er nå inne på Rapporteket for NKR, Degenerativ Rygg.
+             Disse sidene inneholder en samling av figurer og tabeller som viser resultater fra registeret.
+                            Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
                               mot landet for øvrig. Resultatene som vises er
-                              basert på operasjonsdato. Alle figurer og
-                            tabeller kan lastes ned.'),
+                              basert på operasjonsdato.
+                              Alle resultater er basert på ferdigstilte registreringer. Merk at data er hentet direkte fra registerets database.
+                            Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
              br(),
              h4(tags$b(tags$u('Innhold i de ulike fanene:'))),
              h4('I feltet til venstre på hver side kan man velge hvilken variabel man ønsker å se
@@ -130,17 +121,17 @@ ui <- navbarPage(
              ),
              column(4,
                     h4('Registreringsforsinkelse'),
-                    h5('Andel/antall registrert/ferdigstilt for sent for 3månederskontroll: ...'),
-             h5('Andel/antall registrert/ferdigstilt for sent for 12månederskontroll: ...'))
+                    h5('Andel/antall registrert/ferdigstilt for sent for 3månederskontroll:  - mangler variabel'),
+             h5('Andel/antall registrert/ferdigstilt for sent for 12månederskontroll:  - mangler variabel'))
              ),
 
              fluidRow(h4('tabell med resultat Per måned siste år'),
                       tags$div(tags$li('Andel over 70 år'),
                                 tags$li('Gjennomsnittsalder'),
                   tags$li('Andel kvinner'),
-                       tags$li('Fornøyd med behandlingen, 3 mnd. etter'),
-                               tags$li('Helt restituert/mye bedre, 3 mnd. etter'),
-                                       tags$li('Verre 3 mnd. etter')
+                       tags$li('Fornøyd med behandlingen, 3 mnd. etter  - mangler variabel'),
+                               tags$li('Helt restituert/mye bedre, 3 mnd. etter - mangler variabel'),
+                                       tags$li('Verre 3 mnd. etter - mangler variabel')
            ))
            )#main
   ), #tab
@@ -210,7 +201,7 @@ ui <- navbarPage(
            h3('Egen side for registeradministratorer? (Bare synlig for SC-bruker'),
            h4('Alternativt kan vi ha elementer på startsida og/eller registreringsoversiktsida som bare er synlig for SC'),
            br(),
-           h5('Hva ønsker man skal være synlig kun for SC-bruker?'),
+           h3('Hva ønsker man skal være synlig kun for SC-bruker?'),
            br(),
            br(),
            sidebarPanel(
@@ -238,10 +229,10 @@ ui <- navbarPage(
 
            fluidRow(h3('Hva mer skal med her...?'),
                     tags$div(
-                      tags$li("Andel ikke besvart 3 mnd. "),
-                      tags$li("Andel ikke besvart 12 mnd."),
-                      tags$li("Andel purringer 3 mnd."),
-                      tags$li("Andel purringer 12 mnd.")
+                      tags$li("Andel ikke besvart 3 mnd. - mangler variabel"),
+                      tags$li("Andel ikke besvart 12 mnd. - mangler variabel"),
+                      tags$li("Andel purringer 3 mnd. - mangler variabel"),
+                      tags$li("Andel purringer 12 mnd. - mangler variabel")
                     ))
   ), #tab SC
 
