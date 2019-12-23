@@ -680,8 +680,10 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             tittel <- 'Radiologisk undersøkelse'
             retn <- 'H'
             flerevar <- 1
-            variable <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
-            grtxt <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diag.blokade', 'Rtg.LS-columna', 'Fleks./Ekst.')
+            variable <- c('RvCt', 'RvMr',  'RvRtgLscol', 'RvFunksjo') #'RvRadigr', 'RvDiscogr', 'RvDpregblok',
+            grtxt <- c('CT', 'MR', 'Rtg.LS-columna', 'Fleks./Ekst.') #'Radikulografi', 'Diskografi', 'Diag.blokade',
+            #variable <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
+            #grtxt <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diag.blokade', 'Rtg.LS-columna', 'Fleks./Ekst.')
       }
       if (valgtVar == 'regForsinkelse') { #fordeling AndelGrVar, AndelTid
          RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$FistTimeClosed, format="%Y-%m-%d")) -
@@ -692,7 +694,29 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          # TidlUt <- RegData[which(RegData$Diff<0), c('PasientID', "ShNavn", 'InnDato', 'UtskrivelseDato', 'Diff')] #, 'FistTimeClosed')]
 
          tittel <- 'Registreringsforsinkelse'
-
+      }
+      if (valgtVar == 'regForsinkelse') {  #Andeler, GjsnGrVar
+         #Verdier: 0-3402
+         RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$FirstTimeClosed, format="%Y-%m-%d")) -
+                                       as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d"))) #difftime(RegData$InnDato, RegData$Leveringsdato) #
+         RegData$Diff <- difftime(as.Date(RegData$FistTimeClosed), RegData$UtskrivelseDato) #
+         #RegData[,c('InnDato', "FirstTimeClosed", "DischgDt", 'Diff')]
+         #           RegData$InnDato <- as.Date(RegData$AdmitDt, format="%Y-%m-%d") #as.Date(RegData$AdmitDt, format="%Y-%m-%d")
+         #          RegData$Test <- as.Date(RegData$FirstTimeClosed, format="%Y-%m-%d")
+         RegData <- RegData[which(RegData$Diff > -1), ]
+         tittel <- switch(figurtype,
+                          andeler='Tid fra utskriving til ferdigstilt registrering',
+                          andelGrVar = 'Mer enn 30 dager fra utskriving til ferdig registrering') #
+         #RegData$Variabel[RegData$Diff > 2*7] <- 1
+         RegData$Variabel <- RegData$Diff
+         subtxt <- 'døgn'
+         gr <- c(0,1,7,14,30,90,365,5000) #gr <- c(seq(0, 90, 10), 1000)
+         RegData$VariabelGr <- cut(RegData$Diff, breaks = gr, include.lowest = TRUE, right = TRUE)
+         grtxt <- c('1', '(1-7]', '(7-14]', '(14-30]', '(30-90]', '(90-365]', '>365')
+         cexgr <- 0.9
+         xAkseTxt <- 'dager'
+         sortAvtagende <- FALSE
+      }
          if (figurtype == 'andeler') {	#Fordelingsfigur
             gr <- c(seq(0,98,7), 2000)
             RegData$VariabelGr <- cut(RegData$Diff, breaks=gr, include.lowest=TRUE, right=FALSE)

@@ -83,14 +83,15 @@
  #'
  #' @export
 
-RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil = '2999-12-31',
-                            aar = 0, hentData = 0, preprosess = 1,minald = 0, maxald = 130, erMann = '',
+RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', datoTil = '2999-12-31',
+                            aar = 0, hentData = 0, preprosess = 1,minald = 0, maxald = 110, erMann = '',
                             hovedkat = 99, hastegrad = 99, tidlOp = '', ktr = 0, tittelMed = 1, outfile = '',
-                            reshID = 0, enhetsUtvalg = 0, lagFig=1){
+                            reshID = 0, enhetsUtvalg = 0, lagFig=1, ...){
 
-#  Legg til:
-    #
-    # @examples Kan ha eksempel på data ut.
+
+  if ("session" %in% names(list(...))) {
+    raplog::repLogger(session = list(...)[["session"]], msg = paste0('Fordelingsfigur: ',valgtVar))
+  }
 
   if (reshID==0){stopifnot(enhetsUtvalg ==0 )}
 
@@ -171,7 +172,8 @@ RyggFigAndeler  <- function(RegData, valgtVar, datoFra = '2007-01-01', datoTil =
 
   FigDataParam <- list(AggVerdier=AggVerdier,
                        N=Nfig,
-                       #Ngr=Ngr,
+                       Nvar=AntHend,
+                       Ngr=Nfig,
                        #KImaal <- RyggUtvalg$KImaal,
                        grtxt=grtxt,
                        grtxt2=grtxt2,

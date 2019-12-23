@@ -8,6 +8,8 @@
 #' @inheritParams RyggFigAndeler
 #' @return Antall operasjoner per måned og sykehus.
 #' @export
+#'
+#'
 tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       #RegData må inneholde ..
   if (reshID!=0){RegData <- RegData[which(RegData$ReshId==reshID), ]}
@@ -153,8 +155,6 @@ tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUt
   RegData <- SorterOgNavngiTidsEnhet(RegData, tidsenhet=tidsenhet, tab=1)$RegData
   #NB: sjekk riktige utvalg!!!
   indLigget <- which(RegData$liggetid>0)
-  indRespt <- which(RegData$respiratortid>0)
-  indSAPS <- which(RegData$SAPSII > 0)
   indNEMS <- which( (RegData$liggetid>=1) & (RegData$NEMS>1))
   RegDataReinn <- NIRVarTilrettelegg(RegData=RegData, valgtVar = 'reinn', figurtype = 'andelGrVar')$RegData
   #RegData <- FinnReinnleggelser(RegData=RegData, PasientID = 'PasientID')
@@ -193,3 +193,4 @@ tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUt
 
   return(tabNokkeltall)
 }
+

@@ -23,7 +23,7 @@
 #' @param datoFra Tidligste operasjonsdato i utvalget (vises alltid i figuren).
 #' @param datoTil Seneste operasjonsdato i utvalget (vises alltid i figuren).
 #' @param minald Alder, fra og med (Standardverdi: 0)
-#' @param maxald Alder, til og med (Standardverdi: 130)
+#' @param maxald Alder, til og med (Standardverdi: 110)
 #' @param erMann Kjønn, standard: alt annet enn 0/1 gir begge kjønn
 #'          0: Kvinner
 #'          1: Menn
@@ -50,7 +50,7 @@
 #'
 #' @return Returnerer filtrert versjon av RegData
 #' @export
-RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil='3000-01-01', minald=0, maxald=130,
+RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil='3000-01-01', minald=0, maxald=110,
                           erMann='', hovedkat=99, aar=0, tidlOp=99, hastegrad=99, #hastegrad=99,
                           enhetsUtvalg=0, reshID=0, fargepalett='BlaaOff') {
 
@@ -131,7 +131,7 @@ utvalgTxt <- c(paste0('Operasjonsdato: ', if (N>0) {min(RegData$InnDato, na.rm=T
 #	if (aar[1] > 2000 ){
 #	      AarMed <- min(RegData$Aar, na.rm=T):max(RegData$Aar, na.rm=T)
 #	      if (length(AarMed)>1) {paste0('År: ', AarMed[1], ':', max(AarMed))} else {paste0('År: ', AarMed)}},
-	if ((minald>0) | (maxald<130)) {paste0('Pasienter fra ', if (N>0) {min(RegData$Alder, na.rm=T)} else {minald},
+	if ((minald>0) | (maxald<110)) {paste0('Pasienter fra ', if (N>0) {min(RegData$Alder, na.rm=T)} else {minald},
 						' til ', if (N>0) {max(RegData$Alder, na.rm=T)} else {maxald}, ' år')},
 	if (erMann %in% 0:1) {paste0('Kjønn: ', c('Kvinner', 'Menn')[erMann+1])},
 	if (hovedkat[1] %in% 0:9) {paste0('Hovedinngrep: ', paste(hkatnavn[as.numeric(hovedkat)+1], collapse=','))},

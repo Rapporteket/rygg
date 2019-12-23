@@ -36,6 +36,7 @@ ArbstatusPreV3,
 	-- Eqgange3mnd,
 	EqgangePreV3,
 	ErstatningPre,
+	FistTimeClosed,
 	-- Fornoyd12mnd,
 	-- Fornoyd3mnd,
 	-- HFNavn,
@@ -46,7 +47,7 @@ ArbstatusPreV3,
 	Kjonn,
 	-- KnivtidTot,
 	KommuneNr,
-	KommuneNavn
+	KommuneNavn,
 --	Kp3Mnd,
 --	KpBlod3Mnd,
 --	KpDVT3Mnd,
@@ -147,14 +148,15 @@ ArbstatusPreV3,
 	Utd,
 	-- Utfylt12Mnd,
 	-- Utfylt3Mnd,
+	UtskrivelseDato,
 	Vekt
 FROM AlleVarNum')
                   #FROM Uttrekk_Rapport ')
 
-  queryALLE <- 'SELECT * FROM AlleVarNum'
 
 RegData <- rapbase::LoadRegData(registryName="rygg", query=query, dbType="mysql")
-
+#RegDataALLE <- rapbase::LoadRegData(registryName="rygg",
+#                                    query='SELECT * FROM AlleVarNum', dbType="mysql")
 return(RegData)
 }
 

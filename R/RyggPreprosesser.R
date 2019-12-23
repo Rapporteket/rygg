@@ -10,8 +10,8 @@ RyggPreprosess <- function(RegData=RegData)
 {
   #Kun ferdigstilte registreringer: Det skal kun leveres ferdigstilte skjema til RapportUttrekk
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
-  #Mangler:	 RegData$ErMann <- RegData$Kjonn
-  #Mangler:	 RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
+  RegData$ErMann <- RegData$Kjonn
+  RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.POSIXlt(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
@@ -32,7 +32,8 @@ RyggPreprosess <- function(RegData=RegData)
 	#Variabel som identifiserer avdelingas resh
 	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
-	class(RegData$ReshId) <- 'numeric'
+	dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')
+	#class(RegData$ReshId) <- 'numeric'
 
 	#Formatering
 	RegData$ShNavn <- as.character(RegData$ShNavn)
@@ -47,7 +48,7 @@ RyggPreprosess <- function(RegData=RegData)
 	#RegData$ErstatningPre <- factor(RegData$ErstatningPre, levels=c(0:3,9)
 	# RegData$SymptVarighRyggHof <- factor(RegData$SymptVarighRyggHof, levels=c(1:5,9))
 	# RegData$SympVarighUtstr <- factor(RegData$SympVarighUtstr, levels=c(1:5,9))
-	
+
 
 #Legge til underkategori for hovedkategori.
 #	if (is.na(match("Inngrep", names(opdata))) != 'TRUE') {	#Hvis har variabelen Inngrep

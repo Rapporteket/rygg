@@ -48,6 +48,15 @@ kjonn <- c("Begge"=2, "Menn"=1, "Kvinner"=0)
 enhetsUtvalg <- c("Egen mot resten av landet"=1,
                   "Hele landet"=0,
                   "Egen enhet"=2)
+# c("Egen mot resten av landet"=1,
+#   "Hele landet"=0,
+#   "Egen enhet"=2,
+#   "Egen enhet mot egen sykehustype" = 3,
+#   "Egen sykehustype" = 4,
+#   "Egen sykehustype mot resten av landet" = 5,
+#   "Egen enhet mot egen region" = 6,
+#   "Egen region" = 7,
+#   "Egen region mot resten" = 8)
 tidsenhetValg <- rev(c('År'= 'Aar', 'Halvår' = 'Halvaar',
                        'Kvartal'='Kvartal', 'Måned'='Mnd'))
 tidlOprvalg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet nivå'=2,
@@ -73,7 +82,7 @@ ui <- navbarPage(
 
 
            sidebarPanel(
-             h3('Her vil det komme nedlastbare dokumenter med samling av resultater'),
+             h3('Her Kan det komme nedlastbare dokumenter med samling av resultater'),
           br()
            ),
            mainPanel(
@@ -131,7 +140,7 @@ ui <- navbarPage(
                   tags$li('Andel kvinner'),
                        tags$li('Fornøyd med behandlingen, 3 mnd. etter  - mangler variabel'),
                                tags$li('Helt restituert/mye bedre, 3 mnd. etter - mangler variabel'),
-                                       tags$li('Verre 3 mnd. etter - mangler variabel')
+                                       tags$li('Verre 3 mnd. etter')
            ))
            )#main
   ), #tab
@@ -205,7 +214,7 @@ ui <- navbarPage(
            br(),
            br(),
            sidebarPanel(
-             h4('F.eks. nedlasting av data til Resultatportalen:'),
+             h4('Nedlasting av data til Resultatportalen:'),
 
              selectInput(inputId = "valgtVarRes", label="Velg variabel",
                          choices = c('Lite beinsmerte før operasjon' = 'beinsmLavPre',
@@ -215,7 +224,7 @@ ui <- navbarPage(
              selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
                          choices = hastegradvalg
              ),
-             selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
+             selectInput(inputId = 'tidlOpRes', label='Tidligere operert? VIRKER IKKE. MANGLER VARIABEL',
                          choices = tidlOprvalg
              ),
              # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
@@ -236,9 +245,94 @@ ui <- navbarPage(
                     ))
   ), #tab SC
 
-tabPanel('Fordelinger'),
-tabPanel('Resultater, prosentvise'),
-tabPanel('Resultater, gjennomsnitt')
+#-------------Fordelinger---------------------
+tabPanel(p('Fordelinger',
+                    title='Alder, Innkomstmåte,... '),
+                  sidebarPanel(
+                    width = 3,
+                    h4('Her kan man velge hvilken variabel man ønsker å se resultater for og gjøre ulike filtreringer.'),
+                    br(),
+                    selectInput(
+                      inputId = "valgtVar", label="Velg variabel",
+                      choices = c('Alder' = 'alder',
+                                  #'Liggetid' = 'antDagerInnl',
+                                    'Antibiotikaprofylakse?' = 'antibiotika',
+                                  #Antall nivå operert' = antNivOpr:
+                                  'Arbeidsstatus' = 'arbstatus', #Velger skjema separat
+                                  #'Arbeidsstatus, 3 mnd. etter' = 'arbstatus3mnd',
+                                  #'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',
+                                  'ASA-grad' = 'ASA',
+                                  'BMI (Body Mass Index)' = 'BMI',
+                                  'Helsetilstand: Angst' = 'EQangstPre',
+                                  'Helsetilstand: Gange' = 'EQgangePre',
+                                  'Har pasienten søkt erstatning?' = 'erstatningPre',
+                                  #Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon
+                                  #Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon
+                                  #Hovedinngrep = HovedInngrep
+                                  'Komorbiditet' = 'komorbiditet',
+                                  'Komplikasjoner, perop. ' = 'komplPer' ,
+                                  #'komplikasjoner, pasientrapp. ' = 'komplPost',
+                                  #'Liggetid ved operasjon' = 'liggedogn',
+                                  'Morsmål' = 'morsmal',
+                                  #Nytte3mnd: Hvilken nytte har du hatt av operasjonen? (svar 3 måneder etter)
+                                  #Nytte12mnd: Hvilken nytte har du hatt av operasjonen? (svar 12 måneder etter)
+                                  #'Operasjonsindikasjon' = 'opInd',
+                                  'Operasjonsindikasjon, paresegrad' = 'opIndPareseGrad',
+                                  #'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
+                                  'Operasjonskategori' = 'opKat',
+                                  'Radiologisk undersøkelse' = 'radUnders',
+                                  'Registreringsforsinkelse' = 'regForsinkelse',
+                                  'Røyker du?' = 'roker',
+                                  'Sårdren' = 'saardren',
+                                  'Sivilstatus' = 'sivilStatus',
+                                  'Smertestillende, bruk preop.' = 'smStiPre',
+                                  'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
+                                  'Varighet av rygg-/hoftesmerter' = 'symptVarighRyggHof',
+                                  'Varighet av utstrålende smerter' = 'sympVarighUtstr',
+                                  #'Tidligere ryggoperert?' = 'tidlOpr',
+                                  #'Tidligere operasjoner, antall' = 'tidlOprAntall',
+                                  'Har pasienten søkt uføretrygd?' = 'uforetrygdPre',
+                                  #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
+                                  'Utdanning (høyeste fullførte)' = 'utd'
+                      )
+                    ),
+                    dateRangeInput(inputId = 'datovalg', start = startDato, end = idag,
+                                   label = "Tidsperiode", separator="t.o.m.", language="nb"),
+                    selectInput(inputId = "erMann", label="Kjønn",
+                                choices = kjonn
+                    ),
+                    sliderInput(inputId="alder", label = "Alder", min = 0,
+                                max = 110, value = c(0, 110)
+                    ),
+                    selectInput(inputId = 'hastegrad', label='Operasjonskategori (hastegrad)',
+                                choices = hastegradvalg
+                    ),
+                    selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
+                                choices = enhetsUtvalg,
+                    )
+                    #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
+                    #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
+                  ),
+                  mainPanel(
+                    tabsetPanel(
+                      tabPanel(
+                        'Figur',
+                        h3('Fordelingsfigurer'),
+                        h5('Høyreklikk på figuren for å laste den ned'),
+                        plotOutput('fordelinger')),
+                      tabPanel(
+                        'Tabell',
+                        uiOutput("tittelFord"),
+                        tableOutput('fordelingTab'),
+                        downloadButton(outputId = 'lastNed_tabFord', label='Last ned tabell') #, class = "butt")
+                      )
+                    )
+                  )
+         ), #tab Fordelinger
+
+#------------------Resultater, prosentvise--------------
+tabPanel('Resultater, prosentvise'), #tab, andeler
+tabPanel('Resultater, gjennomsnitt') #tab, gjennomsnitt
 
 ) #fluidpage, dvs. alt som vises på skjermen
 
@@ -341,6 +435,92 @@ server <- function(input, output,session) {
 
   # #Velge ferdigstillelse og tidsintervall.
   # output$tabAntSkjema <- renderTable({})
+
+  #------------Fordelinger---------------------
+
+  observeEvent(input$reset, {
+    shinyjs::reset("enhetsUtvalg")
+    shinyjs::reset("datovalg")
+    shinyjs::reset("hastegrad")
+    shinyjs::reset("erMann")
+    shinyjs::reset("alder")
+  })
+  output$fordelinger <- renderPlot({
+    RyggFigAndeler(RegData=RegData, preprosess = 0,
+                   valgtVar=input$valgtVar,
+                  reshID=reshID,
+                  enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                  datoFra=input$datovalg[1], datoTil=input$datovalg[2],
+                  minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
+                  erMann=as.numeric(input$erMann),
+                  hastegrad = as.numeric(input$hastegrad),
+                  session = session)
+  }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
+  )
+
+  observe({
+    UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0, valgtVar=input$valgtVar,
+                                reshID=reshID, enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                                datoFra=input$datovalg[1], datoTil=input$datovalg[2],
+                                minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
+                                erMann=as.numeric(input$erMann),
+                                hastegrad = as.numeric(input$hastegrad),
+                                lagFig = 0, session = session)
+
+    tabFord <- lagTabavFig(UtDataFraFig = UtDataFord)
+
+    output$tittelFord <- renderUI({
+      tagList(
+        h3(UtDataFord$tittel),
+        h5(HTML(paste0(UtDataFord$utvalgTxt, '<br />')))
+      )}) #, align='center'
+    # output$fordelingTab <- function() { #gr1=UtDataFord$hovedgrTxt, gr2=UtDataFord$smltxt renderTable(
+    #
+    #   #       kable_styling("hover", full_width = F)
+    #   antKol <- ncol(tab)
+    #   print(antKol)
+    #   print(tab)
+    #   kableExtra::kable(tab, format = 'html'
+    #                     , full_width=F
+    #                     , digits = c(0,1,0,1)[1:antKol]
+    #   ) %>%
+    #     add_header_above(c(" "=1, 'Egen enhet/gruppe' = 2, 'Resten' = 2)[1:(antKol/2+1)]) %>%
+    #     column_spec(column = 1, width_min = '7em') %>%
+    #     column_spec(column = 2:(ncol(tab)+1), width = '7em') %>%
+    #     row_spec(0, bold = T)
+    # }
+
+    kolGruppering <- c(1,3,3)
+    names(kolGruppering) <- c(' ', UtDataFord$hovedgrTxt, UtDataFord$smltxt)
+    output$fordelingTab <- function() { #gr1=UtDataFord$hovedgrTxt, gr2=UtDataFord$smltxt renderTable(
+      antKol <- ncol(tabFord)
+      kableExtra::kable(tabFord, format = 'html'
+                        , full_width=F
+                        , digits = c(0,0,1,0,0,1)[1:antKol]
+      ) %>%
+        add_header_above(kolGruppering[1:(2+UtDataFord$medSml)]) %>%
+        #add_header_above(c(" "=1, tittelKolGr[1] = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
+        column_spec(column = 1, width='5em') %>% #width_min = '3em', width_max = '10em') %>%
+        column_spec(column = 2:(ncol(tabFord)+1), width = '7em') %>%
+        row_spec(0, bold = T)
+    }
+
+    output$lastNed_tabFord <- downloadHandler(
+      filename = function(){
+        paste0(input$valgtVar, '_fordeling.csv')
+      },
+      content = function(file, filename){
+        write.csv2(tab, file, row.names = F, na = '')
+      })
+  }) #observe
+
+
+
+
+
+
+
+
 
 } #server
 # Run the application
