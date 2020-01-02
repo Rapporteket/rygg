@@ -33,6 +33,9 @@ if (paaServer) {
   RegData <- RyggRegDataSQL()
   qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
   SkjemaOversikt <- rapbase::LoadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
+  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
+  RegOversikt <- rapbase::LoadRegData(registryName="rygg", query=qForlop, dbType="mysql")
+
 } else {
   print('Data ikke tilgjengelig')
 }
@@ -63,6 +66,11 @@ tidlOprvalg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet 
                    'Tidl. operert annet og sm. nivå'=3, 'Primæroperasjon'=4)
 hastegradvalg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 
+sykehusNavn <- sort(unique(RegData$ShNavn), index.return=T)
+sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
+sykehusValg <- c(0,sykehusValg)
+names(sykehusValg) <- c(' ',sykehusNavn$x)
+
 
 # Define UI for application
 ui <- navbarPage(
@@ -70,6 +78,7 @@ ui <- navbarPage(
   # sett inn tittel også i browser-vindu
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
+
 
   #------------ Startside -----------------
   tabPanel(p("Startside", title='Registrators oversikt over registreringer og resultater'),
@@ -100,6 +109,9 @@ ui <- navbarPage(
                               Alle resultater er basert på ferdigstilte registreringer. Merk at data er hentet direkte fra registerets database.
                             Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
              br(),
+             h4('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
+                hovedkategorier og data fra oppfølgingsskjema.'),
+             br(),
              h4(tags$b(tags$u('Innhold i de ulike fanene:'))),
              h4('I feltet til venstre på hver side kan man velge hvilken variabel man ønsker å se
                             resultater for. Der kan man også gjøre ulike filtreringer/utvalg av data.'),
@@ -114,7 +126,9 @@ ui <- navbarPage(
                             innhold på Rapporteket'),
              br(),
              br(),
-             h2(paste("Drift og resultater, egen avdeling")), #, uiOutput("egetShnavn"))), #, align='center' ),
+             h2(paste("Drift og resultater, egen avdeling")), #,
+             h2("Drift og resultater", uiOutput("egetShnavn")), #)), #, align='center' ),
+             #print(uiOutput("egetShnavn")),
              fluidRow(
                h5('Registreringer siste år:'),
                tableOutput("tabAntOpphEget")
@@ -167,7 +181,19 @@ ui <- navbarPage(
                                                   "Kladd"=0,
                                                   "Åpen"=-1)
                           )
-                        )
+                        ),
+
+                        br(),
+                        br(),
+                        br(),
+                        helpText('Last ned egne data for å kontrollere registrering'),
+                        dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
+                                       label = "Tidsperiode", separator="t.o.m.", language="nb"),
+                        selectInput(inputId = 'velgReshReg', label='Velg sykehus',
+                                    selected = 0,
+                                    choices = sykehusValg),
+                        downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned data')
+
            ),
 
            mainPanel(
@@ -205,12 +231,11 @@ ui <- navbarPage(
                      )
   ), #tab, KI
 
+#-------Registeradministrasjon----------
 
   tabPanel(p("Registeradministrasjon", title='Bare synlig for SC-bruker'),
            h3('Egen side for registeradministratorer? (Bare synlig for SC-bruker'),
            h4('Alternativt kan vi ha elementer på startsida og/eller registreringsoversiktsida som bare er synlig for SC'),
-           br(),
-           h3('Hva ønsker man skal være synlig kun for SC-bruker?'),
            br(),
            br(),
            sidebarPanel(
@@ -351,6 +376,12 @@ server <- function(input, output,session) {
   brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
   output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(reshID, RegData$ReshId)]))
 
+  observe({if (rolle != 'SC') { #
+    shinyjs::hide(id = 'velgReshReg')
+    #shinyjs::hide(id = 'velgReshKval')
+    #hideTab(inputId = "tabs_andeler", target = "Figur, sykehusvisning")
+  }
+  })
 
   # widget
   if (paaServer) {
@@ -400,7 +431,6 @@ server <- function(input, output,session) {
   })
 
 
-
 #------Registreringsoversikter---------------------
   observe({
     tabAntOpphSh <- switch(input$tidsenhetReg,
@@ -436,6 +466,22 @@ server <- function(input, output,session) {
   # #Velge ferdigstillelse og tidsintervall.
   # output$tabAntSkjema <- renderTable({})
 
+# Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
+  observe({
+    RegOversikt <- dplyr::filter(RegOversikt,
+                                 as.Date(HovedDato) >= input$datovalgRegKtr[1],
+                                 as.Date(HovedDato) <= input$datovalgRegKtr[2])
+  tabDataRegKtr <- if (rolle == 'SC') {
+    valgtResh <- as.numeric(input$velgReshReg)
+    ind <- if (valgtResh == 0) {1:dim(RegOversikt)[1]
+      } else {which(as.numeric(RegOversikt$AvdRESH) %in% as.numeric(valgtResh))}
+    RegOversikt <- RegOversikt[ind,]
+      } else {RegOversikt[which(RegOversikt$AvdRESH == reshID), ]}
+
+  output$lastNed_dataTilRegKtr <- downloadHandler(
+    filename = function(){'dataTilKtr.csv'},
+    content = function(file, filename){write.csv2(tabDataRegKtr, file, row.names = T, na = '')})
+  })
   #------------Fordelinger---------------------
 
   observeEvent(input$reset, {
