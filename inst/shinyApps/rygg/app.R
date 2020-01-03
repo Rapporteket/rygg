@@ -226,7 +226,10 @@ ui <- navbarPage(
 
            sidebarPanel(
            h4('Kan gjøre utvalg på: tidsperiode og tidsenhet')),
-           mainPanel(h4('Viser to figurer/tabeller per indikator: Utvikling over tid og per sykehus')
+           mainPanel(
+             h4('Viser to figurer/tabeller per indikator: Utvikling over tid og per sykehus'),
+             br(),
+             h2('På vent til hovedkategorier er definert')
                      )
   ), #tab, KI
 
@@ -481,7 +484,7 @@ server <- function(input, output,session) {
 
   output$lastNed_dataTilRegKtr <- downloadHandler(
     filename = function(){'dataTilKtr.csv'},
-    content = function(file, filename){write.csv2(tabDataRegKtr, file, row.names = T, na = '')})
+    content = function(file, filename){write.csv2(tabDataRegKtr, file, row.names = F, na = '')})
   })
   #------------Fordelinger---------------------
 
