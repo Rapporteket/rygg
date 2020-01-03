@@ -35,7 +35,7 @@ if (paaServer) {
   SkjemaOversikt <- rapbase::LoadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
   qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
   RegOversikt <- rapbase::LoadRegData(registryName="rygg", query=qForlop, dbType="mysql")
-
+  RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
 } else {
   print('Data ikke tilgjengelig')
 }
@@ -191,7 +191,9 @@ ui <- navbarPage(
                         selectInput(inputId = 'velgReshReg', label='Velg sykehus',
                                     selected = 0,
                                     choices = sykehusValg),
-                        downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned data')
+                        downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
+                        br(),
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
 
            ),
 
@@ -382,7 +384,7 @@ server <- function(input, output,session) {
 
   observe({if (rolle != 'SC') { #
     shinyjs::hide(id = 'velgReshReg')
-    #shinyjs::hide(id = 'velgReshKval')
+    shinyjs::hide(id = 'lastNed_dataDump')
     #hideTab(inputId = "tabs_andeler", target = "Figur, sykehusvisning")
   }
   })
@@ -471,20 +473,58 @@ server <- function(input, output,session) {
   # output$tabAntSkjema <- renderTable({})
 
 # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
+  tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
+    data <- dplyr::filter(data,
+                          # InnDato >= datovalg[1],
+                          # InnDato <= datovalg[2])
+                          as.Date(InnDato) >= datovalg[1],
+                          as.Date(InnDato) <= datovalg[2])
+    if (rolle == 'SC') {
+      valgtResh <- as.numeric(reshID)
+      ind <- if (valgtResh == 0) {1:dim(data)[1]
+      } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
+      data <- data[ind,]
+    } else {data[which(data$ReshId == reshID), ]}
+  }
+
   observe({
-    RegOversikt <- dplyr::filter(RegOversikt,
-                                 as.Date(HovedDato) >= input$datovalgRegKtr[1],
-                                 as.Date(HovedDato) <= input$datovalgRegKtr[2])
-  tabDataRegKtr <- if (rolle == 'SC') {
-    valgtResh <- as.numeric(input$velgReshReg)
-    ind <- if (valgtResh == 0) {1:dim(RegOversikt)[1]
-      } else {which(as.numeric(RegOversikt$AvdRESH) %in% as.numeric(valgtResh))}
-    RegOversikt <- RegOversikt[ind,]
-      } else {RegOversikt[which(RegOversikt$AvdRESH == reshID), ]}
+    dataRegKtr <- tilretteleggDataDumper(data=RegOversikt, datovalg = input$datovalg,
+                                         reshID=input$velgReshReg, rolle = rolle)
+  #   RegOversikt <- dplyr::filter(RegOversikt,
+  #                                as.Date(HovedDato) >= input$datovalgRegKtr[1],
+  #                                as.Date(HovedDato) <= input$datovalgRegKtr[2])
+  # tabDataRegKtr <- if (rolle == 'SC') {
+  #   valgtResh <- as.numeric(input$velgReshReg)
+  #   ind <- if (valgtResh == 0) {1:dim(RegOversikt)[1]
+  #     } else {which(as.numeric(RegOversikt$AvdRESH) %in% as.numeric(valgtResh))}
+  #   RegOversikt <- RegOversikt[ind,]
+  #     } else {RegOversikt[which(RegOversikt$AvdRESH == reshID), ]}
+
 
   output$lastNed_dataTilRegKtr <- downloadHandler(
     filename = function(){'dataTilKtr.csv'},
-    content = function(file, filename){write.csv2(tabDataRegKtr, file, row.names = F, na = '')})
+    content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, na = '')})
+
+
+  variablePRM <- 'variable som skal fjernes hvis lastes ned av avdeling'
+  #Foreløpig ikke def siden oppf.skjema ikke med i dump. Dump bare for SC.
+  # observe({
+  #   DataDump <- dplyr::filter(RegData,
+  #                             as.Date(HovedDato) >= input$datovalgRegKtr[1],
+  #                             as.Date(HovedDato) <= input$datovalgRegKtr[2])
+  #   tabDataDump <- if (rolle == 'SC') {
+  #     valgtResh <- as.numeric(input$velgReshReg)
+  #     ind <- if (valgtResh == 0) {1:dim(DataDump)[1]
+  #     } else {which(as.numeric(DataDump$ReshId) %in% as.numeric(valgtResh))}
+  #     DataDump[ind,]
+  #   } #else {
+  #     #DataDump[which(DataDump$ReshId == reshID), -variablePRM]} #Tar bort PROM/PREM til egen avdeling
+
+  dataDump <- tilretteleggDataDumper(data=RegData, datovalg = input$datovalg,
+                                     reshID=input$velgReshReg, rolle = rolle)
+  output$lastNed_dataDump <- downloadHandler(
+      filename = function(){'dataDump.csv'},
+      content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
   })
   #------------Fordelinger---------------------
 

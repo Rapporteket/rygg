@@ -685,21 +685,11 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             #variable <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
             #grtxt <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diag.blokade', 'Rtg.LS-columna', 'Fleks./Ekst.')
       }
-      if (valgtVar == 'regForsinkelse') { #fordeling AndelGrVar, AndelTid
-         RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$FistTimeClosed, format="%Y-%m-%d")) -
-                                       as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d")))
-         RegData <- RegData[!is.na(RegData$Diff), ]
-         #RegData[which(RegData$Diff>180), c('InnDato', 'UtskrivelseDato', 'FistTimeClosed')]
-         # RegData$Diff <- as.numeric(as.Date(RegData$UtskrivelseDato) - as.Date(RegData$InnDato))
-         # TidlUt <- RegData[which(RegData$Diff<0), c('PasientID', "ShNavn", 'InnDato', 'UtskrivelseDato', 'Diff')] #, 'FistTimeClosed')]
-
-         tittel <- 'Registreringsforsinkelse'
-      }
-      if (valgtVar == 'regForsinkelse') {  #Andeler, GjsnGrVar
+       if (valgtVar == 'regForsinkelse') {  #Andeler, GjsnGrVar
          #Verdier: 0-3402
-         RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$FirstTimeClosed, format="%Y-%m-%d")) -
-                                       as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d"))) #difftime(RegData$InnDato, RegData$Leveringsdato) #
-         RegData$Diff <- difftime(as.Date(RegData$FistTimeClosed), RegData$UtskrivelseDato) #
+         #RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$FirstTimeClosed, format="%Y-%m-%d")) -
+         #                              as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d"))) #difftime(RegData$InnDato, RegData$Leveringsdato) #
+         RegData$Diff <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed), RegData$UtskrivelseDato,units = 'days')) #
          #RegData[,c('InnDato', "FirstTimeClosed", "DischgDt", 'Diff')]
          #           RegData$InnDato <- as.Date(RegData$AdmitDt, format="%Y-%m-%d") #as.Date(RegData$AdmitDt, format="%Y-%m-%d")
          #          RegData$Test <- as.Date(RegData$FirstTimeClosed, format="%Y-%m-%d")
@@ -716,7 +706,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          cexgr <- 0.9
          xAkseTxt <- 'dager'
          sortAvtagende <- FALSE
-      }
+
          if (figurtype == 'andeler') {	#Fordelingsfigur
             gr <- c(seq(0,98,7), 2000)
             RegData$VariabelGr <- cut(RegData$Diff, breaks=gr, include.lowest=TRUE, right=FALSE)
