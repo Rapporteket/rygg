@@ -126,9 +126,8 @@ ui <- navbarPage(
                             innhold på Rapporteket'),
              br(),
              br(),
-             h2(paste("Drift og resultater, egen avdeling")), #,
-             h2("Drift og resultater", uiOutput("egetShnavn")), #)), #, align='center' ),
-             #print(uiOutput("egetShnavn")),
+             #h2(paste("Drift og resultater, egen avdeling")), #,
+             h2((uiOutput("egetShTxt"))),
              fluidRow(
                h5('Registreringer siste år:'),
                tableOutput("tabAntOpphEget")
@@ -375,6 +374,8 @@ server <- function(input, output,session) {
   rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
   brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
   output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(reshID, RegData$ReshId)]))
+  output$egetShTxt <- renderText(paste('Drift og resultater, ',
+                                       as.character(RegData$ShNavn[match(reshID, RegData$ReshId)])))
 
   observe({if (rolle != 'SC') { #
     shinyjs::hide(id = 'velgReshReg')
