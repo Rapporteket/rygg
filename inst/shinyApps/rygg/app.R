@@ -70,7 +70,7 @@ hastegradvalg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 sykehusNavn <- sort(unique(RegData$ShNavn), index.return=T)
 sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
 sykehusValg <- c(0,sykehusValg)
-names(sykehusValg) <- c(' ',sykehusNavn$x)
+names(sykehusValg) <- c('Alle',sykehusNavn$x)
 
 
 # Define UI for application
@@ -194,7 +194,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         br(),
                         br(),
                         br(),
-                        helpText('Last ned egne data for å kontrollere registrering'),
+                        h4('Last ned egne data for kontroll'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
                         selectInput(inputId = 'velgReshReg', label='Velg sykehus',

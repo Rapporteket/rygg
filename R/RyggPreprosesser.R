@@ -33,7 +33,8 @@ RyggPreprosess <- function(RegData=RegData)
 	#Variabel som identifiserer avdelingas resh
 	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
-	RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')
+	if ('FistTimeClosed' %in% names(RegData)) {
+	RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
 	#class(RegData$ReshId) <- 'numeric'
 
 	#Formatering
