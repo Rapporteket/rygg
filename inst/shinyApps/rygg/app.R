@@ -73,17 +73,17 @@ names(sykehusValg) <- c(' ',sykehusNavn$x)
 
 
 # Define UI for application
-ui <- navbarPage(
+ui <- navbarPage(id = "tab1nivaa",
   #title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
   title = div(a(includeHTML(system.file('www/logo.svg', package='rapbase'))),
               regTitle),# sett inn tittel også i browser-vindu
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
-  id = "tab1nivaa",
+
 
 
   #------------ Startside -----------------
-  tabPanel(p("Startside", title='Registrators oversikt over registreringer og resultater'),
+  tabPanel(p("Startside", title='Oversikt over registreringer og resultater'),
            shinyjs::useShinyjs(),
            tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color#fluidRow(
            #column(width=5,
@@ -192,6 +192,7 @@ ui <- navbarPage(
                         br(),
                         br(),
                         br(),
+                        br(),
                         helpText('Last ned egne data for å kontrollere registrering'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
@@ -199,6 +200,7 @@ ui <- navbarPage(
                                     selected = 0,
                                     choices = sykehusValg),
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
+                        br(),
                         br(),
                         downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
 
@@ -243,10 +245,11 @@ ui <- navbarPage(
   # ), #tab, KI
 
 #-------Registeradministrasjon----------
-
-  tabPanel(p("Registeradministrasjon", title='Bare synlig for SC-bruker'),
-           h3('Egen side for registeradministratorer? (Bare synlig for SC-bruker'),
-           h4('Alternativt kan vi ha elementer på startsida og/eller registreringsoversiktsida som bare er synlig for SC'),
+    tabPanel("Registeradministrasjon",
+      #p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
+             h3('Egen side for registeradministratorer? (Bare synlig for SC-bruker'),
+             #uiOutput('rolle'),
+             h4('Alternativt kan vi ha elementer på startsida og/eller registreringsoversiktsida som bare er synlig for SC'),
            br(),
            br(),
            sidebarPanel(
@@ -384,6 +387,7 @@ server <- function(input, output,session) {
   reshID <- ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)), 601161)
   #rolle <- reactive({ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'SC')})
   rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
+  output$rolle <- renderText(rolle)
   brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
   output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(reshID, RegData$ReshId)]))
   output$egetShTxt <- renderText(paste('Drift og resultater, ',
@@ -393,10 +397,11 @@ server <- function(input, output,session) {
     shinyjs::hide(id = 'velgReshReg')
     shinyjs::hide(id = 'lastNed_dataDump')
     #hideTab(inputId = "tabs", target = "Foo")
-    hideTab(inputId = "tab1nivaa", target = "Registeradministrasjon")
+    shiny::hideTab(inputId = "tab1nivaa",
+                   target = 'Registeradministrasjon') #
   }
   })
-
+#print(dim(RegData)[1])
   # widget
   if (paaServer) {
     output$appUserName <- renderText(rapbase::getUserFullName(session))
@@ -425,24 +430,12 @@ server <- function(input, output,session) {
   output$iKladdLege <- renderPrint(iKladd[2])
 
 
-  observe({
+
     output$tabAntOpphEget <- renderTable(
       tabAntOpphShMnd(RegData=RegData, datoTil=datoTil, reshID = reshID, antMnd=12)
       ,rownames = T, digits=0, spacing="xs" )
 
-     tabdataTilResPort <- dataTilResPort(RegData=RegData, valgtVar = input$valgtVarRes,
-                                        aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
-                                        hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
-                                        #datoFra = input$datoFraRes, hovedkat = hovedkatRes,
 
-   # fil <- dataTilResPort(RegData=RegData, valgtVar = 'beinsmLavPre', aar)
-
-
-    output$lastNed_dataTilResPort <- downloadHandler(
-      filename = function(){'dataTilResPort.csv'},
-      content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, na = '')})
-
-  })
 
 
 #------Registreringsoversikter---------------------
@@ -534,6 +527,19 @@ server <- function(input, output,session) {
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
   })
+  #-----------Registeradministrasjon-----------
+
+  if (rolle=='SC') {
+  observe({
+    tabdataTilResPort <- dataTilResPort(RegData=RegData, valgtVar = input$valgtVarRes,
+                                        aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
+                                        hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
+
+    output$lastNed_dataTilResPort <- downloadHandler(
+      filename = function(){'dataTilResPort.csv'},
+      content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, na = '')})
+  })
+}
   #------------Fordelinger---------------------
 
   observeEvent(input$reset, {
