@@ -74,8 +74,9 @@ names(sykehusValg) <- c(' ',sykehusNavn$x)
 
 # Define UI for application
 ui <- navbarPage(
-  title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
-  # sett inn tittel også i browser-vindu
+  #title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
+  title = div(a(includeHTML(system.file('www/logo.svg', package='rapbase'))),
+              regTitle),# sett inn tittel også i browser-vindu
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
 
@@ -91,7 +92,23 @@ ui <- navbarPage(
 
 
            sidebarPanel(
-             h3('Her Kan det komme nedlastbare dokumenter med samling av resultater'),
+             h4(tags$b(tags$u('Innhold i de ulike fanene:'))),
+             h4('I feltet til venstre på hver side kan man velge hvilken variabel man ønsker å se
+                            resultater for. Der kan man også gjøre ulike filtreringer/utvalg av data.'),
+             h4(tags$b('Registreringsoversikter '), 'viser aktivitet i registeret.'),
+             #h4(tags$b('Kvalitetsindikatorer '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
+             h4(tags$b('Fordelinger '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
+             h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) en per sykehus og utvikling over tid.
+                            Man kan velge hvilken tidsskala man vi se på.'),
+             h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
+                            Man kan velge om man vil se gjennomsnitt eller median.'),
+             h4('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
+                            innhold på Rapporteket'),
+             br(),
+             br(),
+             #br(),
+             #br(),
+             #h4('Her Kan det komme nedlastbare dokumenter med samling av resultater'),
           br()
            ),
            mainPanel(
@@ -111,19 +128,6 @@ ui <- navbarPage(
              br(),
              h4('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
                 hovedkategorier og data fra oppfølgingsskjema.'),
-             br(),
-             h4(tags$b(tags$u('Innhold i de ulike fanene:'))),
-             h4('I feltet til venstre på hver side kan man velge hvilken variabel man ønsker å se
-                            resultater for. Der kan man også gjøre ulike filtreringer/utvalg av data.'),
-             h4(tags$b('Registreringsoversikter '), 'viser aktivitet i registeret.'),
-             h4(tags$b('Kvalitetsindikatorer '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
-             h4(tags$b('Fordelinger '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
-             h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) en per sykehus og utvikling over tid.
-                            Man kan velge hvilken tidsskala man vi se på.'),
-             h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
-                            Man kan velge om man vil se gjennomsnitt eller median.'),
-             h4('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
-                            innhold på Rapporteket'),
              br(),
              br(),
              #h2(paste("Drift og resultater, egen avdeling")), #,
@@ -223,17 +227,17 @@ ui <- navbarPage(
            ), #tab
 
   #----------------Kvalitetsindikatorer----------------------------------
-  tabPanel(p("Kvalitetsindikatorer", title='Kval.ind.: Per sykehus og utvikling over tid'),
-           h2('Side som bare viser kvalitetsindikatorer', align='center'),
-
-           sidebarPanel(
-           h4('Kan gjøre utvalg på: tidsperiode og tidsenhet')),
-           mainPanel(
-             h4('Viser to figurer/tabeller per indikator: Utvikling over tid og per sykehus'),
-             br(),
-             h2('På vent til hovedkategorier er definert')
-                     )
-  ), #tab, KI
+  # tabPanel(p("Kvalitetsindikatorer", title='Kval.ind.: Per sykehus og utvikling over tid'),
+  #          h2('Side som bare viser kvalitetsindikatorer', align='center'),
+  #
+  #          sidebarPanel(
+  #          h4('Kan gjøre utvalg på: tidsperiode og tidsenhet')),
+  #          mainPanel(
+  #            h4('Viser to figurer/tabeller per indikator: Utvikling over tid og per sykehus'),
+  #            br(),
+  #            h2('På vent til hovedkategorier er definert')
+  #                    )
+  # ), #tab, KI
 
 #-------Registeradministrasjon----------
 
