@@ -150,12 +150,12 @@ ui <- navbarPage(id = "tab1nivaa",
              ),
              column(4,
                     h4('Registreringsforsinkelse'),
-                    h5('Andel/antall registrert/ferdigstilt for sent for 3månederskontroll:  - mangler variabel'),
-             h5('Andel/antall registrert/ferdigstilt for sent for 12månederskontroll:  - mangler variabel'))
+                    h5('Andel/antall registrert/ferdigstilt for sent for 3månederskontroll:  KOMMER'),
+             h5('Andel/antall registrert/ferdigstilt for sent for 12månederskontroll:  - KOMMER'))
              ),
 
              fluidRow(h4('tabell med resultat Per måned siste år.'),
-                      h5('(Denne tenker jeg å ha på plass før vi går i prod.)'),
+                      h5('KOMMER'),
                       tags$div(tags$li('Andel over 70 år'),
                                 tags$li('Gjennomsnittsalder'),
                   tags$li('Andel kvinner'),
