@@ -1,4 +1,5 @@
 #library(magrittr)
+library(dplyr)
 library(kableExtra)
 library(knitr)
 library(lubridate)
