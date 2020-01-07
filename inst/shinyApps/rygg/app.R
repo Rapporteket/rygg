@@ -79,6 +79,7 @@ ui <- navbarPage(
               regTitle),# sett inn tittel også i browser-vindu
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
+  id = "tab1nivaa",
 
 
   #------------ Startside -----------------
@@ -102,6 +103,7 @@ ui <- navbarPage(
                             Man kan velge hvilken tidsskala man vi se på.'),
              h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
                             Man kan velge om man vil se gjennomsnitt eller median.'),
+             br(),
              h4('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
                             innhold på Rapporteket'),
              br(),
@@ -151,7 +153,8 @@ ui <- navbarPage(
              h5('Andel/antall registrert/ferdigstilt for sent for 12månederskontroll:  - mangler variabel'))
              ),
 
-             fluidRow(h4('tabell med resultat Per måned siste år'),
+             fluidRow(h4('tabell med resultat Per måned siste år.'),
+                      h5('(Denne tenker jeg å ha på plass før vi går i prod.)'),
                       tags$div(tags$li('Andel over 70 år'),
                                 tags$li('Gjennomsnittsalder'),
                   tags$li('Andel kvinner'),
@@ -164,7 +167,7 @@ ui <- navbarPage(
 
   # #------------- Registreringsoversikter (vise antall)--------------------
 
-  tabPanel(p('Registreringsoversikter',title="Tabeller med registreringsoversikter"),
+  tabPanel(p('Registreringsoversikter', title="Tabeller med registreringsoversikter"),
            sidebarPanel(width=3,
                         h3('Valgmuligheter'),
                         conditionalPanel(condition = "input.ark == 'Antall operasjoner'",
@@ -361,11 +364,11 @@ tabPanel(p('Fordelinger',
                       )
                     )
                   )
-         ), #tab Fordelinger
+         ) #tab Fordelinger
 
 #------------------Resultater, prosentvise--------------
-tabPanel('Resultater, prosentvise'), #tab, andeler
-tabPanel('Resultater, gjennomsnitt') #tab, gjennomsnitt
+# tabPanel('Resultater, prosentvise'), #tab, andeler
+# tabPanel('Resultater, gjennomsnitt') #tab, gjennomsnitt
 
 ) #fluidpage, dvs. alt som vises på skjermen
 
@@ -389,7 +392,8 @@ server <- function(input, output,session) {
   observe({if (rolle != 'SC') { #
     shinyjs::hide(id = 'velgReshReg')
     shinyjs::hide(id = 'lastNed_dataDump')
-    #hideTab(inputId = "tabs_andeler", target = "Figur, sykehusvisning")
+    #hideTab(inputId = "tabs", target = "Foo")
+    hideTab(inputId = "tab1nivaa", target = "Registeradministrasjon")
   }
   })
 
