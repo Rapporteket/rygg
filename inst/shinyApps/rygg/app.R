@@ -75,6 +75,7 @@ names(sykehusValg) <- c('Alle',sykehusNavn$x)
 
 # Define UI for application
 ui <- navbarPage(id = "tab1nivaa",
+
   #title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
   title = div(a(includeHTML(system.file('www/logo.svg', package='rapbase'))),
               regTitle),# sett inn tittel også i browser-vindu
@@ -169,6 +170,7 @@ ui <- navbarPage(id = "tab1nivaa",
   # #------------- Registreringsoversikter (vise antall)--------------------
 
   tabPanel(p('Registreringsoversikter', title="Tabeller med registreringsoversikter"),
+           value = 'Registreringsoversikter',
            sidebarPanel(width=3,
                         h3('Valgmuligheter'),
                         conditionalPanel(condition = "input.ark == 'Antall operasjoner'",
@@ -246,8 +248,8 @@ ui <- navbarPage(id = "tab1nivaa",
   # ), #tab, KI
 
 #-------Registeradministrasjon----------
-    tabPanel("Registeradministrasjon",
-      #p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
+    tabPanel(p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
+             value = "Registeradministrasjon",
              h3('Egen side for registeradministratorer? (Bare synlig for SC-bruker'),
              #uiOutput('rolle'),
              h4('Alternativt kan vi ha elementer på startsida og/eller registreringsoversiktsida som bare er synlig for SC'),
