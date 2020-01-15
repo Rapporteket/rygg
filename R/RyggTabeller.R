@@ -150,44 +150,26 @@ tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUt
                     Mnd = lubridate::floor_date(as.Date(datoTil)%m-% months(12, abbreviate = T), 'month'), #as.Date(paste0(as.numeric(substr(datoTil,1,4))-1, substr(datoTil,5,8), '01'), tz='UTC')
                     Aar = paste0(year(as.Date(datoTil))-4, '-01-01')
   )
-  RegData <- NIRUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil = datoTil,
+  RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil = datoTil,
                           enhetsUtvalg = enhetsUtvalg, reshID = reshID)$RegData
   RegData <- SorterOgNavngiTidsEnhet(RegData, tidsenhet=tidsenhet, tab=1)$RegData
   #NB: sjekk riktige utvalg!!!
   indLigget <- which(RegData$liggetid>0)
-  indNEMS <- which( (RegData$liggetid>=1) & (RegData$NEMS>1))
   RegDataReinn <- NIRVarTilrettelegg(RegData=RegData, valgtVar = 'reinn', figurtype = 'andelGrVar')$RegData
-  #RegData <- FinnReinnleggelser(RegData=RegData, PasientID = 'PasientID')
-  #indReinn <- intersect(which(RegData$InnDato >= as.Date('2016-01-01', tz='UTC')), which(RegData$Overf==1))
-  ind1708 <- union(which(RegData$DateDischargedIntensive$hour<8), which(RegData$DateDischargedIntensive$hour>=17))
-  RegData$Ut1708 <- 0
-  RegData$Ut1708[ind1708]<-1
 
   tabNokkeltall <- rbind(
-    'Antall opphold' = tapply(RegData$PasientID, RegData$TidsEnhet, FUN=length), #table(RegDataEget$TidsEnhet), #Neget,
-    'Antall pasienter' = tapply(RegData$PasientID, RegData$TidsEnhet,
-                                FUN=function(x) length(unique(x))),
-    'Antall intensivdøgn' = round(as.numeric(tapply(RegData$liggetid, RegData$TidsEnhet, sum, na.rm=T)),0),
-    'Liggetid (median)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=median, na.rm=T),
-    'Liggetid (totalt)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=sum, na.rm=T),
+    'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet,
+                             FUN=function(x) sum(x, na.rm=T)/length(x)*100),
+      'Alder (gj.sn)' =
+      'Kvinneandel' =
+    'Liggetid (gj.sn)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=median, na.rm=T),
     'Respirator-\nstøtte (%)' = tapply(RegData$respiratortid>0, RegData$TidsEnhet,
                                        FUN=function(x) sum(x, na.rm=T)/length(x)*100),
-    'Respiratortid (median)' = tapply(RegData$respiratortid[indRespt], RegData$TidsEnhet[indRespt],
-                                      FUN=median, na.rm=T),
-    'Respiratortid (totalt)' = tapply(RegData$respiratortid[indRespt], RegData$TidsEnhet[indRespt],
-                                      FUN=sum, na.rm=T),
-    'SAPS II (median)' = tapply(RegData$SAPSII[indSAPS], RegData$TidsEnhet[indSAPS], FUN=median, na.rm=T),
-    'NEMS/opph. (median)' = tapply(RegData$NEMS[indNEMS],
-                                   RegData$TidsEnhet[indNEMS], FUN=median, na.rm=T),
-    'NEMS (totalt)' = tapply(RegData$NEMS[indNEMS],
-                             RegData$TidsEnhet[indNEMS], FUN=sum, na.rm=T),
     'Døde (%)' = tapply((RegData$DischargedIntensiveStatus==1), RegData$TidsEnhet,
                         FUN=function(x) sum(x, na.rm=T)/length(x)*100),
     'Reinnleggelser, \n<72t (%)' = tapply(RegDataReinn$Reinn==1, RegDataReinn$TidsEnhet,
                                           #tapply(RegData$Reinn[indReinn]==1, RegData$TidsEnhet[indReinn],
                                           FUN=function(x) sum(x, na.rm=T)/length(x)*100),
-    'Utskrevet \n kl 17-08 (%)' = tapply(RegData$Ut1708, RegData$TidsEnhet,
-                                         FUN=function(x) sum(x, na.rm=T)/length(x)*100)
   )
 
 

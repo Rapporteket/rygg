@@ -122,8 +122,7 @@ ui <- navbarPage(id = "tab1nivaa",
                                           , addUserInfo = TRUE
              ),
              br(),
-             h4('Du er nå inne på Rapporteket for NKR, Degenerativ Rygg.
-             Disse sidene inneholder en samling av figurer og tabeller som viser resultater fra registeret.
+             h4('Her kan du se på av figurer og tabeller som viser resultater fra registeret.
                             Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
                               mot landet for øvrig. Resultatene som vises er
                               basert på operasjonsdato.
@@ -143,26 +142,30 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              fluidRow(
                column(4,
-               h4('Antall skjema i kladd:'),
+               h4('Antall skjema i kladd,'),
                uiOutput("iKladdPas"),
                uiOutput("iKladdLege")
                #h5(paste('Pasientskjema:', uiOutput("iKladdPas"))),
                #h5(paste('Lengeskjema:', uiOutput("iKladdLege")))
              ),
-             column(4,
+             column(8,
                     h4('Registreringsforsinkelse'),
-                    h5('Andel/antall registrert/ferdigstilt for sent for 3månederskontroll:  KOMMER'),
-             h5('Andel/antall registrert/ferdigstilt for sent for 12månederskontroll:  - KOMMER'))
-             ),
+                    uiOutput('forSen3mnd'),
+                    uiOutput('forSen12mnd')
+             )),
 
-             fluidRow(h4('tabell med resultat Per måned siste år.'),
+             fluidRow(h4("Nøkkeltall for degenerativ rygg"),
+                      # selectInput(inputId = 'enhetsNivaaStart', label='Enhetsnivå',
+                      #             choices = c("Egen enhet"=2, "Hele landet"=0,
+                                              # "Egen sykehustype"=4, "Egen region"=7)),
                       h5('KOMMER'),
+                      #tableOutput('tabNokkeltallStart'),
                       tags$div(tags$li('Andel over 70 år'),
                                 tags$li('Gjennomsnittsalder'),
                   tags$li('Andel kvinner'),
                        tags$li('Fornøyd med behandlingen, 3 mnd. etter  - mangler variabel'),
                                tags$li('Helt restituert/mye bedre, 3 mnd. etter - mangler variabel'),
-                                       tags$li('Verre 3 mnd. etter')
+                                       tags$li('Verre 3 mnd. etter-mangler variabel')
            ))
            )#main
   ), #tab
@@ -428,10 +431,34 @@ server <- function(input, output,session) {
                                              ,which(SkjemaOversikt$AvdRESH == reshID)
                                              ))]) #, indSkjema
   names(iKladd) <- c('Pasientskjema','Legeskjema')
-
   output$iKladdPas <- renderText(paste('Pasientskjema: ', iKladd[1]))
   output$iKladdLege <- renderPrint(iKladd[2])
 
+  RegData$Diff <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed), RegData$UtskrivelseDato,units = 'days'))
+
+#startDato <- '2019-01-01'
+
+  # Data3mnd <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
+  #   dplyr::filter(ReshId == reshID & OpDato > startDato & (OpDato < Sys.Date()-100)) #%>%
+
+  forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse){
+    Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
+      dplyr::filter(ReshId == reshID & OpDato > fraDato & (OpDato < tilDato))
+    paste0(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T), ' (',
+    100*round(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
+  }
+
+  output$forSen3mnd <- renderText(paste0('Ant. skjema ferdigstilt for sent for 3 mnd.ktr i perioden ',
+                                         format.Date(startDato, '%d.%b'), ' til ', format.Date(Sys.Date()-100, '%d.%b%Y'), ':  ','<b>',
+                                         forsinketReg(RegData=RegData, fraDato=startDato,
+                                                      tilDato=Sys.Date()-100, forsinkelse=100)))
+  output$forSen12mnd <- renderText(paste0('Ant. skjema ferdigstilt for sent for 12 mnd.ktr i perioden ',
+                                         as.Date(startDato)-365, ' til ', Sys.Date()-380, ':  ','<b>', #<br>
+                                         forsinketReg(RegData=RegData, fraDato=startDato,
+                                                      tilDato=Sys.Date()-100, forsinkelse=400)))
+  # output$forSenGjsn <- renderText(paste0(filter(RegData$Diff,
+  #                                               ReshId == reshID & OpDato > startDato & (OpDato < Sys.Date())) '%<%'
+  #                                          mean(, na.rm = T)))
 
 
     output$tabAntOpphEget <- renderTable(
@@ -454,10 +481,11 @@ server <- function(input, output,session) {
 
   output$undertittelReg <- renderUI({
     br()
+    valgtAar <- as.numeric(format.Date(input$sluttDatoReg, "%Y"))
     t1 <- 'Tabellen viser operasjoner '
     h4(HTML(switch(input$tidsenhetReg, #undertittel <-
                    Mnd = paste0(t1, 'siste 12 måneder før ', input$sluttDatoReg, '<br />'),
-                   Aar = paste0(t1, 'siste 5 år før ', input$sluttDatoReg, '<br />'))
+                   Aar = paste0(t1, 'per år til og med ', valgtAar, '<br />'))
     ))})
 
   #RegData som har tilknyttede skjema av ulik type. Fra NGER!
