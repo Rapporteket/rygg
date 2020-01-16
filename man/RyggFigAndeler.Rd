@@ -6,14 +6,14 @@
 \usage{
 RyggFigAndeler(
   RegData,
-  valgtVar,
+  valgtVar = "alder",
   datoFra = "2007-01-01",
   datoTil = "2999-12-31",
   aar = 0,
   hentData = 0,
   preprosess = 1,
   minald = 0,
-  maxald = 130,
+  maxald = 110,
   erMann = "",
   hovedkat = 99,
   hastegrad = 99,
@@ -23,7 +23,8 @@ RyggFigAndeler(
   outfile = "",
   reshID = 0,
   enhetsUtvalg = 0,
-  lagFig = 1
+  lagFig = 1,
+  ...
 )
 }
 \arguments{
@@ -45,7 +46,7 @@ RyggFigAndeler(
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 
-\item{maxald}{Alder, til og med (Standardverdi: 130)}
+\item{maxald}{Alder, til og med (Standardverdi: 110)}
 
 \item{erMann}{Kjønn, standard: alt annet enn 0/1 gir begge kjønn
 0: Kvinner

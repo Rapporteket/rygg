@@ -20,21 +20,23 @@ RyggPreprosess <- function(RegData=RegData)
 	#Endre variabelnavn:
 	#names(RegData)[which(names(RegData) == 'OpAar')] <- 'Aar'
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
+	if ('FistTimeClosed' %in% names(RegData)) {
+	  RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
 
 
 	# Nye variable:
-	#Trenger kanskje ikke disse siden legger på tidsenhet når bruk for det.
 	#RegData$MndNum1 <- RegData$InnDato$mon +1
 	RegData$MndNum <- as.numeric(format(RegData$InnDato, '%m'))
 	RegData$MndAar <- format(RegData$InnDato, '%b%y')
 	RegData$Kvartal <- ceiling(RegData$MndNum/3)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
+	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
+	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed), RegData$UtskrivelseDato,units = 'days'))
 
 	#Variabel som identifiserer avdelingas resh
 	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
-	if ('FistTimeClosed' %in% names(RegData)) {
-	RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
+
 	#class(RegData$ReshId) <- 'numeric'
 
 	#Formatering

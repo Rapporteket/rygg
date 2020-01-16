@@ -122,7 +122,7 @@ ui <- navbarPage(id = "tab1nivaa",
                                           , addUserInfo = TRUE
              ),
              br(),
-             h4('Her kan du se på av figurer og tabeller som viser resultater fra registeret.
+             h5('Her kan du se på av figurer og tabeller som viser resultater fra registeret.
                             Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
                               mot landet for øvrig. Resultatene som vises er
                               basert på operasjonsdato.
@@ -132,13 +132,12 @@ ui <- navbarPage(id = "tab1nivaa",
              h4('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
                 hovedkategorier og data fra oppfølgingsskjema.'),
              br(),
-             br(),
              #h2(paste("Drift og resultater, egen avdeling")), #,
              h2((uiOutput("egetShTxt"))),
-             fluidRow(
-               h5('Registreringer siste år:'),
-               tableOutput("tabAntOpphEget")
-             ),
+             # fluidRow(
+             #   h5('Registreringer siste år:'),
+             #   tableOutput("tabAntOpphEget")
+             # ),
              br(),
              fluidRow(
                column(4,
@@ -148,25 +147,21 @@ ui <- navbarPage(id = "tab1nivaa",
                #h5(paste('Pasientskjema:', uiOutput("iKladdPas"))),
                #h5(paste('Lengeskjema:', uiOutput("iKladdLege")))
              ),
-             column(8,
+             column(6,
                     h4('Registreringsforsinkelse'),
                     uiOutput('forSen3mnd'),
+                    br(),
                     uiOutput('forSen12mnd')
              )),
+             br(),
+             br(),
 
-             fluidRow(h4("Nøkkeltall for degenerativ rygg"),
+             fluidRow(h4("Nøkkeltall"),
                       # selectInput(inputId = 'enhetsNivaaStart', label='Enhetsnivå',
                       #             choices = c("Egen enhet"=2, "Hele landet"=0,
                                               # "Egen sykehustype"=4, "Egen region"=7)),
-                      h5('KOMMER'),
-                      #tableOutput('tabNokkeltallStart'),
-                      tags$div(tags$li('Andel over 70 år'),
-                                tags$li('Gjennomsnittsalder'),
-                  tags$li('Andel kvinner'),
-                       tags$li('Fornøyd med behandlingen, 3 mnd. etter  - mangler variabel'),
-                               tags$li('Helt restituert/mye bedre, 3 mnd. etter - mangler variabel'),
-                                       tags$li('Verre 3 mnd. etter-mangler variabel')
-           ))
+                      tableOutput('tabNokkeltallStart'),
+           )
            )#main
   ), #tab
 
@@ -199,7 +194,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         br(),
                         br(),
                         br(),
-                        h4('Last ned egne data for kontroll'),
+                        h4('Last ned egne data for kontroll av registrering'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
                         selectInput(inputId = 'velgReshReg', label='Velg sykehus',
@@ -448,18 +443,26 @@ server <- function(input, output,session) {
     100*round(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
   }
 
-  output$forSen3mnd <- renderText(paste0('Ant. skjema ferdigstilt for sent for 3 mnd.ktr i perioden ',
-                                         format.Date(startDato, '%d.%b'), ' til ', format.Date(Sys.Date()-100, '%d.%b%Y'), ':  ','<b>',
-                                         forsinketReg(RegData=RegData, fraDato=startDato,
-                                                      tilDato=Sys.Date()-100, forsinkelse=100)))
-  output$forSen12mnd <- renderText(paste0('Ant. skjema ferdigstilt for sent for 12 mnd.ktr i perioden ',
-                                         as.Date(startDato)-365, ' til ', Sys.Date()-380, ':  ','<b>', #<br>
-                                         forsinketReg(RegData=RegData, fraDato=startDato,
-                                                      tilDato=Sys.Date()-100, forsinkelse=400)))
-  # output$forSenGjsn <- renderText(paste0(filter(RegData$Diff,
-  #                                               ReshId == reshID & OpDato > startDato & (OpDato < Sys.Date())) '%<%'
-  #                                          mean(, na.rm = T)))
-
+  output$forSen3mnd <- renderText(paste0('<b>',forsinketReg(RegData=RegData, fraDato=startDato,
+                                                      tilDato=Sys.Date()-100, forsinkelse=100),'</b>',
+                                  ' skjema ferdigstilt for sent for 3 mnd.ktr i perioden ',
+                                         format.Date(startDato, '%d.%b'), '-', format.Date(Sys.Date()-100, '%d.%b%Y'))
+                                         )
+  output$forSen12mnd <- renderText(paste0('<b>', forsinketReg(RegData=RegData, fraDato=startDato,
+                                                       tilDato=Sys.Date()-100, forsinkelse=400), '</b>',
+                                          ' skjema ferdigstilt for sent for 12 mnd.ktr i perioden ',
+                                          format.Date(as.Date(startDato)-365, '%d.%b'), '-', format.Date(Sys.Date()-380, '%d.%b%Y')))
+  output$tabNokkeltallStart <- function() {
+    tab <- t(tabNokkeltall(RegData=RegData, tidsenhet='Mnd', reshID=reshID)) #enhetsUtvalg=as.numeric(input$enhetsNivaaStart),
+    kableExtra::kable(tab,
+                      full_width=F,
+                      digits = c(0,0,1,1,0)
+    ) %>%
+      column_spec(column = 1, width_min = '5em', width_max = 10) %>%
+      column_spec(column = 2:(ncol(tab)), width = '6em')  %>%
+      row_spec(0, bold = T, align = 'c') %>%
+      kable_styling(full_width = FALSE, position = 'left') #"hover",
+  }
 
     output$tabAntOpphEget <- renderTable(
       tabAntOpphShMnd(RegData=RegData, datoTil=datoTil, reshID = reshID, antMnd=12)

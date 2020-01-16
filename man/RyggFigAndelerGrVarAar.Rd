@@ -40,7 +40,7 @@ RyggFigAndelerGrVarAar(
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 
-\item{maxald}{Alder, til og med (Standardverdi: 130)}
+\item{maxald}{Alder, til og med (Standardverdi: 110)}
 
 \item{erMann}{Kjønn, standard: alt annet enn 0/1 gir begge kjønn
 0: Kvinner

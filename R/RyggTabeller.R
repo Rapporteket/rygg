@@ -145,7 +145,7 @@ lagTabavFigGjsnGrVar <- function(UtDataFraFig){
 #' @param reshID
 #'
 #' @export
-tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=0, reshID=0) {
+tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=2, reshID=0) {
   datoFra <- switch(tidsenhet,
                     Mnd = lubridate::floor_date(as.Date(datoTil)%m-% months(12, abbreviate = T), 'month'), #as.Date(paste0(as.numeric(substr(datoTil,1,4))-1, substr(datoTil,5,8), '01'), tz='UTC')
                     Aar = paste0(year(as.Date(datoTil))-4, '-01-01')
@@ -153,24 +153,20 @@ tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUt
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil = datoTil,
                           enhetsUtvalg = enhetsUtvalg, reshID = reshID)$RegData
   RegData <- SorterOgNavngiTidsEnhet(RegData, tidsenhet=tidsenhet, tab=1)$RegData
-  #NB: sjekk riktige utvalg!!!
-  indLigget <- which(RegData$liggetid>0)
-  RegDataReinn <- NIRVarTilrettelegg(RegData=RegData, valgtVar = 'reinn', figurtype = 'andelGrVar')$RegData
+  # indLigget <- which(RegData$liggetid>0)
+
+prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
 
   tabNokkeltall <- rbind(
-    'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet,
-                             FUN=function(x) sum(x, na.rm=T)/length(x)*100),
-      'Alder (gj.sn)' =
-      'Kvinneandel' =
-    'Liggetid (gj.sn)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=median, na.rm=T),
-    'Respirator-\nstøtte (%)' = tapply(RegData$respiratortid>0, RegData$TidsEnhet,
-                                       FUN=function(x) sum(x, na.rm=T)/length(x)*100),
-    'Døde (%)' = tapply((RegData$DischargedIntensiveStatus==1), RegData$TidsEnhet,
-                        FUN=function(x) sum(x, na.rm=T)/length(x)*100),
-    'Reinnleggelser, \n<72t (%)' = tapply(RegDataReinn$Reinn==1, RegDataReinn$TidsEnhet,
-                                          #tapply(RegData$Reinn[indReinn]==1, RegData$TidsEnhet[indReinn],
-                                          FUN=function(x) sum(x, na.rm=T)/length(x)*100),
-  )
+    'Antall operasjoner' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=length),
+    'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
+      'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean),
+      'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
+    'Registreringsforsinkelse (dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean)
+    )
+
+    # 'Liggetid (gj.sn)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=median, na.rm=T),
+
 
 
   return(tabNokkeltall)

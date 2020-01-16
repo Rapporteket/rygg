@@ -63,7 +63,7 @@ RyggFigGjsnBox(
 
 \item{minald}{Alder, fra og med (Standardverdi: 0)}
 
-\item{maxald}{Alder, til og med (Standardverdi: 130)}
+\item{maxald}{Alder, til og med (Standardverdi: 110)}
 
 \item{ktr}{Hvilken oppfølging man ønsker å se på. Valg: 3mnd - 3 mnd kontroll(standard), 12mnd - 12 mnd kontroll}
 

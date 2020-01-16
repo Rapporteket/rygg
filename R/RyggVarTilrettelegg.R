@@ -680,8 +680,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             tittel <- 'Radiologisk undersøkelse'
             retn <- 'H'
             flerevar <- 1
-            variable <- c('RvCt', 'RvMr',  'RvRtgLscol', 'RvFunksjo') #'RvRadigr', 'RvDiscogr', 'RvDpregblok',
-            grtxt <- c('CT', 'MR', 'Rtg.LS-columna', 'Fleks./Ekst.') #'Radikulografi', 'Diskografi', 'Diag.blokade',
+            variable <- c('RvCt', 'RvMr',  'RvRtgLscol', 'RvFunksjo') #'RvRadigr-it', 'RvDiscogr-ut', 'RvDpregblok',
+            grtxt <- c('CT', 'MR', 'Rtg.LS-columna', 'Fleks./Ekst.') #'Radikulografi-ut', 'Diskografi-ut', 'Diag.blokade'-finnes,
             #variable <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
             #grtxt <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diag.blokade', 'Rtg.LS-columna', 'Fleks./Ekst.')
       }
