@@ -128,8 +128,7 @@ ui <- navbarPage(id = "tab1nivaa",
                               basert på operasjonsdato.
                               Alle resultater er basert på ferdigstilte registreringer. Merk at data er hentet direkte fra registerets database.
                             Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
-             br(),
-             h4('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
+             h5('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
                 hovedkategorier og data fra oppfølgingsskjema.'),
              br(),
              #h2(paste("Drift og resultater, egen avdeling")), #,

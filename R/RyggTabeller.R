@@ -162,11 +162,10 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
     'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
       'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean),
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
-    'Registreringsforsinkelse (dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean)
+    'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean)
     )
 
     # 'Liggetid (gj.sn)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=median, na.rm=T),
-
 
 
   return(tabNokkeltall)
