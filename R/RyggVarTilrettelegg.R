@@ -163,7 +163,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             subtxt <- 'Sykdomsgrad'
             RegData <- RegData[which(RegData$ASA %in% c(1:4,9)), ]  	#Antar ikke opererer døde...
             RegData$VariabelGr <- factor(RegData$ASA, levels = c(1:4,9))
-            tittel <- 'ASA-grad'
+            tittel <- 'ASA-grad (komorbiditet)'
             if (figurtype %in% c('andelGrVar', 'andelTid')) {
                   RegData <- RegData[which(RegData$ASA %in% 1:4), ]
                   RegData$Variabel[which(RegData$ASA > 2)] <- 1
@@ -363,13 +363,13 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
 
 
       if (valgtVar == 'EQangstPre') {#fordeling
-            tittel <- 'Helsetilstand: Angst'
+            tittel <- 'Problemer med angst/depresjon'
             grtxt <- c('Ingen', 'Litt','Middels', 'Svært','Ekstremt', 'Ikke utfylt')
             RegData$VariabelGr <- factor(RegData$EqangstPre, levels = c(1:5,9))
             subtxt <- 'Grad av engstelighet/deprimerthet'	#Tilstand i forhold til angst'
       }
       if (valgtVar == 'EQgangePre') { #fordeling
-            tittel <- 'Helsetilstand: Gange'
+            tittel <- 'Problemer med gangfunksjon før operasjon'
             grtxt <- c('Ingen', 'Litt','Middels', 'Store', 'Ute av stand til å gå', 'Ikke utfylt')
             RegData$VariabelGr <- factor(RegData$EqangstPre, levels = c(1:5,9))
            subtxt <- 'problemer med gange'
@@ -856,7 +856,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   RegData <- RegData[which(RegData$UforetrygdPre %in% 0:3), ]
                   RegData$Variabel[which(RegData$UforetrygdPre %in% c(1,2))] <- 1
                   varTxt <- 'søkt/planlagt å søke'
-                  tittel <- 'Har søkt eller planlegger å søke uføretrygd'
+                  tittel <- 'Har søkt/planlegger å søke uføretrygd før op.'
                   sortAvtagende <- F}
       }
 
@@ -887,7 +887,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             #Kode V2 1:5,9: 'Grunnskole++, 7-10år','Real-, yrkes- el vg skole', 'Allmennfaglig vg skole',
             #Høyskole/universitet, <4 år', 'Høyskole/universitet, 4år+', 'Ukjent'
             #V3: [1,2,3,4,5,9]	["Grunnskole 7-10 år, framhaldsskole eller folkehøyskole",
-            grtxt <- c('Grunnskole++, 7-10år','Real-, yrkes- el vg skole', #'Real-, yrkes-/yrkesfaglig vg skole',
+            grtxt <- c('Grunnskole, 7-10år','Real-, yrkes- el vg skole', #'Real-, yrkes-/yrkesfaglig vg skole',
                        'Allmennfaglig vg skole','Høyskole/universitet, <4 år','Høyskole/universitet, 4år+',
                        'Ikke svart')
             RegData$VariabelGr <- factor(RegData$Utd, levels = c(1:5,9))

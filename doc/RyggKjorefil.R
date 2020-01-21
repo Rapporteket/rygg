@@ -81,7 +81,7 @@ SkjemaOversikt <- read.table('A:/Rygg/SkjemaOversikt2019-11-04.csv',
 SkjemaOversikt$MndAar <- format(as.Date(SkjemaOversikt$HovedDato), '%y.%m')
 table(SkjemaOversikt$MndAar)
 
-indPasientskjema <- which(SkjemaOversikt$SkjemaRekkeflg==5)
+indPasientskjema <- which((SkjemaOversikt$SkjemaRekkeflg==5) & SkjemaOversikt$SkjemaStatus %in% -1:1)
 table(SkjemaOversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")]) # ,
 
 

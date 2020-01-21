@@ -26,8 +26,8 @@ addResourcePath('rap', system.file('www', package='rapbase'))
 
 context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
 paaServer <- (context %in% c("DEV", "TEST", "QA", "PRODUCTION")) #rapbase::isRapContext()
-regTitle = ifelse(paaServer, 'NKR: Norsk Kvalitetsregister for Ryggkirurgi',
-                  'Norsk Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
+regTitle = ifelse(paaServer, 'NKR: Nasjonalt Kvalitetsregister for Ryggkirurgi',
+                  'Nasjonalt Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
 
 
 if (paaServer) {
@@ -100,8 +100,8 @@ ui <- navbarPage(id = "tab1nivaa",
                             resultater for. Der kan man også gjøre ulike filtreringer/utvalg av data.'),
              h4(tags$b('Registreringsoversikter '), 'viser aktivitet i registeret.'),
              #h4(tags$b('Kvalitetsindikatorer '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
-             h4(tags$b('Fordelinger '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
-             h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) en per sykehus og utvikling over tid.
+             h4(tags$b('Fordelinger '), 'viser fordelinger (figur/tabell) av ulike variabler.'),
+             h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) per sykehus og utvikling over tid.
                             Man kan velge hvilken tidsskala man vi se på.'),
              h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
                             Man kan velge om man vil se gjennomsnitt eller median.'),
@@ -289,21 +289,21 @@ tabPanel(p('Fordelinger',
                     title='Alder, Innkomstmåte,... '),
                   sidebarPanel(
                     width = 3,
-                    h4('Her kan man velge hvilken variabel man ønsker å se resultater for og gjøre ulike filtreringer.'),
+                    h4('Her kan man velge hvilken variabel man ønsker å se og gjøre ulike filtreringer.'),
                     br(),
                     selectInput(
                       inputId = "valgtVar", label="Velg variabel",
                       choices = c('Alder' = 'alder',
                                   #'Liggetid' = 'antDagerInnl',
-                                    'Antibiotikaprofylakse?' = 'antibiotika',
+                                  'Angst/depresjon (EQ5D) før operasjon' = 'EQangstPre',
+                                  'Antibiotikaprofylakse?' = 'antibiotika',
                                   #Antall nivå operert' = antNivOpr:
                                   'Arbeidsstatus' = 'arbstatus', #Velger skjema separat
                                   #'Arbeidsstatus, 3 mnd. etter' = 'arbstatus3mnd',
                                   #'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',
                                   'ASA-grad' = 'ASA',
                                   'BMI (Body Mass Index)' = 'BMI',
-                                  'Helsetilstand: Angst' = 'EQangstPre',
-                                  'Helsetilstand: Gange' = 'EQgangePre',
+                                  'Gangfunksjon (EQ5D) før operasjon' = 'EQgangePre',
                                   'Har pasienten søkt erstatning?' = 'erstatningPre',
                                   #Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon
                                   #Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon
@@ -330,7 +330,7 @@ tabPanel(p('Fordelinger',
                                   'Varighet av utstrålende smerter' = 'sympVarighUtstr',
                                   #'Tidligere ryggoperert?' = 'tidlOpr',
                                   #'Tidligere operasjoner, antall' = 'tidlOprAntall',
-                                  'Har pasienten søkt uføretrygd?' = 'uforetrygdPre',
+                                  'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
                                   'Utdanning (høyeste fullførte)' = 'utd'
                       )
