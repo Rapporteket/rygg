@@ -101,10 +101,10 @@ ui <- navbarPage(id = "tab1nivaa",
              h4(tags$b('Registreringsoversikter '), 'viser aktivitet i registeret.'),
              #h4(tags$b('Kvalitetsindikatorer '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
              h4(tags$b('Fordelinger '), 'viser fordelinger (figur/tabell) av ulike variabler.'),
-             h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) per sykehus og utvikling over tid.
-                            Man kan velge hvilken tidsskala man vi se på.'),
-             h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
-                            Man kan velge om man vil se gjennomsnitt eller median.'),
+             # h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) per sykehus og utvikling over tid.
+             #                Man kan velge hvilken tidsskala man vi se på.'),
+             # h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
+             #                Man kan velge om man vil se gjennomsnitt eller median.'),
              br(),
              h4('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
                             innhold på Rapporteket'),
@@ -122,7 +122,7 @@ ui <- navbarPage(id = "tab1nivaa",
                                           , addUserInfo = TRUE
              ),
              br(),
-             h5('Her kan du se på av figurer og tabeller som viser resultater fra registeret.
+             h5('Her kan du se på figurer og tabeller som viser resultater fra registeret.
                             Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
                               mot landet for øvrig. Resultatene som vises er
                               basert på operasjonsdato.
@@ -140,7 +140,7 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              fluidRow(
                column(4,
-               h4('Antall skjema i kladd,'),
+               h4('Antall skjema i kladd'),
                uiOutput("iKladdPas"),
                uiOutput("iKladdLege")
                #h5(paste('Pasientskjema:', uiOutput("iKladdPas"))),
