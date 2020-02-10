@@ -24,6 +24,9 @@ RyggPreprosess <- function(RegData=RegData)
 	  RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
 	if ('TdllOpAnnetNiv' %in% names(RegData)) {
 	  RegData <- dplyr::rename(RegData, 'TidlOpAnnetNiv' = 'TdllOpAnnetNiv')}
+	RegData <- dplyr::rename(RegData, 'LiggetidPostOp' = 'surgeonform_LIGGEDOEGN_POSTOPERATIV',
+	                         'Liggedogn' = 'surgeonform_LIGGEDOEGN_TOTALT')
+
 
 
 	#Variabel som identifiserer avdelingas resh

@@ -303,6 +303,7 @@ tabPanel(p('Fordelinger',
                                   #'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',
                                   'ASA-grad' = 'ASA',
                                   'BMI (Body Mass Index)' = 'BMI',
+                                  'EQ5D, preoperativt' = 'EQ5DPre',
                                   'Gangfunksjon (EQ5D) før operasjon' = 'EQgangePre',
                                   'Har pasienten søkt erstatning?' = 'erstatningPre',
                                   #Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon
@@ -311,7 +312,8 @@ tabPanel(p('Fordelinger',
                                   'Komorbiditet' = 'komorbiditet',
                                   'Komplikasjoner, perop. ' = 'komplPer' ,
                                   #'komplikasjoner, pasientrapp. ' = 'komplPost',
-                                  #'Liggetid ved operasjon' = 'liggedogn',
+                                  'Liggetid ved operasjon, totalt' = 'liggedogn',
+                                  'Liggetid, postoperativt' = 'liggetidPostOp',
                                   'Morsmål' = 'morsmal',
                                   #Nytte3mnd: Hvilken nytte har du hatt av operasjonen? (svar 3 måneder etter)
                                   #Nytte12mnd: Hvilken nytte har du hatt av operasjonen? (svar 12 måneder etter)
