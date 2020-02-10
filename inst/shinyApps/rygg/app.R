@@ -263,7 +263,7 @@ ui <- navbarPage(id = "tab1nivaa",
              selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
                          choices = hastegradvalg
              ),
-             selectInput(inputId = 'tidlOpRes', label='Tidligere operert? VIRKER IKKE. MANGLER VARIABEL',
+             selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
                          choices = tidlOprvalg
              ),
              # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
@@ -328,7 +328,7 @@ tabPanel(p('Fordelinger',
                                   'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
                                   'Varighet av rygg-/hoftesmerter' = 'symptVarighRyggHof',
                                   'Varighet av utstrålende smerter' = 'sympVarighUtstr',
-                                  #'Tidligere ryggoperert?' = 'tidlOpr',
+                                  'Tidligere ryggoperert?' = 'tidlOpr',
                                   #'Tidligere operasjoner, antall' = 'tidlOprAntall',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
@@ -346,7 +346,9 @@ tabPanel(p('Fordelinger',
                     selectInput(inputId = 'hastegrad', label='Operasjonskategori (hastegrad)',
                                 choices = hastegradvalg
                     ),
-                    selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
+                    selectInput(inputId = 'tidlOp', label='Tidligere operert?',
+                                choices = tidlOprvalg
+                    ),selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
                     )
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
@@ -591,6 +593,7 @@ server <- function(input, output,session) {
                   minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
                   erMann=as.numeric(input$erMann),
                   hastegrad = as.numeric(input$hastegrad),
+                  tidlOp = as.numeric(input$tidlOp),
                   session = session)
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
@@ -602,6 +605,7 @@ server <- function(input, output,session) {
                                 minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
                                 erMann=as.numeric(input$erMann),
                                 hastegrad = as.numeric(input$hastegrad),
+                                tidlOp = as.numeric(input$tidlOp),
                                 lagFig = 0, session = session)
 
     tabFord <- lagTabavFig(UtDataFraFig = UtDataFord)

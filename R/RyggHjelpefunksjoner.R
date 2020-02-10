@@ -25,8 +25,8 @@ SorterOgNavngiTidsEnhet <- function(RegData, tidsenhet='Aar', tab=0) {
                                   Halvaar = RegData$Halvaar-min(RegData$Halvaar[RegData$Aar==min(RegData$Aar)])+1+
                                     (RegData$Aar-min(RegData$Aar))*2
   )
-  format.Date(seq(from=as.Date('2018-01-01'),
-                  to=as.Date('2018-09-01'), by='month'), format = '%b%y')
+  # format.Date(seq(from=as.Date('2018-01-01'),
+  #                 to=as.Date('2018-09-01'), by='month'), format = '%b%y')
 
   tidtxt <- switch(tidsenhet,
                    Mnd = format.Date(seq(from=lubridate::floor_date(as.Date(min(as.Date(RegData$InnDato), na.rm = T)), 'month'),
