@@ -86,7 +86,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             RegData <- RegData[which(RegData$Alder>=0), ]    #Tar bort alder<0
             RegData$Variabel <- RegData$Alder  	#GjsnTid, GjsnGrVar
             xAkseTxt <- 'alder (år)'
-            tittel <- 'Alder ved innleggelse'
+            tittel <- c('Alder ved innleggelse', 'test av tittel over to linjer')
             subtxt <- 'Aldersgrupper (år)'
             if (figurtype %in% c('gjsnGrVar', 'gjsnTid')) {
                   tittel <- 'alder ved innleggelse'}

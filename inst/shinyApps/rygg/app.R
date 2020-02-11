@@ -155,12 +155,14 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              br(),
 
-             fluidRow(h4("Nøkkeltall"),
+             fluidRow(
+               column(10,
+                      h4(strong("Nøkkeltall")),
                       # selectInput(inputId = 'enhetsNivaaStart', label='Enhetsnivå',
                       #             choices = c("Egen enhet"=2, "Hele landet"=0,
                                               # "Egen sykehustype"=4, "Egen region"=7)),
-                      tableOutput('tabNokkeltallStart'),
-           )
+                      tableOutput('tabNokkeltallStart')
+           ))
            )#main
   ), #tab
 
@@ -459,10 +461,10 @@ server <- function(input, output,session) {
     tab <- t(tabNokkeltall(RegData=RegData, tidsenhet='Mnd', reshID=reshID)) #enhetsUtvalg=as.numeric(input$enhetsNivaaStart),
     kableExtra::kable(tab,
                       full_width=F,
-                      digits = c(0,0,1,1,0)
+                      digits = c(0,0,1,1,1,1,0)
     ) %>%
-      column_spec(column = 1, width_min = '5em', width_max = 10) %>%
-      column_spec(column = 2:(ncol(tab)), width = '6em')  %>%
+      column_spec(column = 1, width_min = '5em', width_max = '10em') %>%
+      column_spec(column = 2:(ncol(tab)), width = '7em')  %>%
       row_spec(0, bold = T, align = 'c') %>%
       kable_styling(full_width = FALSE, position = 'left') #"hover",
   }
@@ -614,9 +616,11 @@ server <- function(input, output,session) {
 
     output$tittelFord <- renderUI({
       tagList(
-        h3(UtDataFord$tittel),
+        h3(HTML(paste0(UtDataFord$tittel, '<br />'))),
+        #h3(UtDataFord$tittel),
         h5(HTML(paste0(UtDataFord$utvalgTxt, '<br />')))
       )}) #, align='center'
+
     # output$fordelingTab <- function() { #gr1=UtDataFord$hovedgrTxt, gr2=UtDataFord$smltxt renderTable(
     #
     #   #       kable_styling("hover", full_width = F)

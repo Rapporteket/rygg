@@ -66,6 +66,8 @@ tabAntSkjema <- function(SkjemaOversikt, datoFra = '2019-01-01', datoTil=Sys.Dat
   SkjemaOversikt <- SkjemaOversikt[intersect(indDato, indSkjemastatus),]
 
   tab <-table(SkjemaOversikt[,c('ShNavn', 'SkjemaRekkeflg')])
+  tab <- rbind(tab,
+               'TOTALT, alle enheter:'=colSums(tab))
   colnames(tab) <- skjemanavn
   tab <- xtable::xtable(tab)
 
@@ -162,6 +164,8 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
     'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
       'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean),
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
+    'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum),
+    'Liggetid, postop., (gj.sn.)' = tapply(RegData$LiggetidPostOp, RegData$TidsEnhet, FUN=mean),
     'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean)
     )
 
