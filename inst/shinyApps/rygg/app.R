@@ -106,8 +106,14 @@ ui <- navbarPage(id = "tab1nivaa",
              # h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
              #                Man kan velge om man vil se gjennomsnitt eller median.'),
              br(),
-             h4('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
-                            innhold på Rapporteket'),
+             br(),
+             h3("Rapport med månedsresultater"),
+             h4("NB: Dette er en foreløpig versjon. Innholdet vil bli justert og utvidet."),
+             h5('Rapporten kan man også få regelmessig på e-post.
+                        Gå til fanen "Abonnement" for å bestille dette.'),
+             br(),
+             downloadButton(outputId = 'mndRapp.pdf', label='Last ned månedsrapport', class = "butt"),
+             tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color
              br(),
              br(),
              #br(),
@@ -130,6 +136,8 @@ ui <- navbarPage(id = "tab1nivaa",
                             Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
              h5('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
                 hovedkategorier og data fra oppfølgingsskjema.'),
+             h5('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
+                            innhold på Rapporteket'),
              br(),
              #h2(paste("Drift og resultater, egen avdeling")), #,
              h2((uiOutput("egetShTxt"))),
@@ -373,15 +381,39 @@ tabPanel(p('Fordelinger',
                       )
                     )
                   )
-         ) #tab Fordelinger
+         ), #tab Fordelinger
 
 #------------------Resultater, prosentvise--------------
 # tabPanel('Resultater, prosentvise'), #tab, andeler
 # tabPanel('Resultater, gjennomsnitt') #tab, gjennomsnitt
 
+
+#------------------Abonnement-------------------------
+
+tabPanel(p("Abonnement",
+           title='Bestill automatisk utsending av rapporter på e-post'),
+         sidebarLayout(
+           sidebarPanel(width = 3,
+                        selectInput("subscriptionRep", "Rapport:",
+                                    c("Månedsrapport")), #, "Samlerapport", "Influensaresultater")),
+                        selectInput("subscriptionFreq", "Frekvens:",
+                                    list(Årlig="Årlig-year",
+                                          Kvartalsvis="Kvartalsvis-quarter",
+                                          Månedlig="Månedlig-month",
+                                          Ukentlig="Ukentlig-week",
+                                          Daglig="Daglig-DSTday"),
+                                    selected = "Månedlig-month"),
+                        #selectInput("subscriptionFileFormat", "Format:",
+                        #            c("html", "pdf")),
+                        actionButton("subscribe", "Bestill!")
+           ),
+           mainPanel(
+             uiOutput("subscriptionContent")
+           )
+         )
+)
+
 ) #fluidpage, dvs. alt som vises på skjermen
-
-
 
 
 #----------------- Define server logic required  -----------------------
@@ -473,6 +505,15 @@ server <- function(input, output,session) {
       tabAntOpphShMnd(RegData=RegData, datoTil=datoTil, reshID = reshID, antMnd=12)
       ,rownames = T, digits=0, spacing="xs" )
 
+    #-------Samlerapporter--------------------
+
+    output$mndRapp.pdf <- downloadHandler(
+      filename = function(){ paste0('MndRapp', Sys.time(), '.pdf')},
+      content = function(file){
+        henteSamlerapporter(file, rnwFil="RyggMndRapp.Rnw",
+                            reshID = reshID, datoFra = startDato)
+      }
+    )
 
 
 
@@ -661,6 +702,68 @@ server <- function(input, output,session) {
       })
   }) #observe
 
+
+  #------------------ Abonnement ----------------------------------------------
+  ## reaktive verdier for å holde rede på endringer som skjer mens
+  ## applikasjonen kjører
+  rv <- reactiveValues(
+    subscriptionTab = rapbase::makeUserSubscriptionTab(session))
+
+
+  ## lag tabell over gjeldende status for abonnement
+  output$activeSubscriptions <- DT::renderDataTable(
+    rv$subscriptionTab, server = FALSE, escape = FALSE, selection = 'none',
+    rownames = FALSE, options = list(dom = 't')
+  )
+
+  ## lag side som viser status for abonnement, også når det ikke finnes noen
+  output$subscriptionContent <- renderUI({
+    fullName <- rapbase::getUserFullName(session)
+    if (length(rv$subscriptionTab) == 0) {
+      p(paste("Ingen aktive abonnement for", fullName))
+    } else {
+      tagList(
+        p(paste("Aktive abonnement for", fullName, "som sendes per epost til ",
+                rapbase::getUserEmail(session), ":")),
+        DT::dataTableOutput("activeSubscriptions")
+      )
+    }
+  })
+  ## nye abonnement
+  observeEvent (input$subscribe, { #MÅ HA
+    owner <- rapbase::getUserName(session)
+    interval <- strsplit(input$subscriptionFreq, "-")[[1]][2]
+    intervalName <- strsplit(input$subscriptionFreq, "-")[[1]][1]
+    organization <- rapbase::getUserReshId(session)
+    runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
+    email <- rapbase::getUserEmail(session)
+    if (input$subscriptionRep == "Månedsrapport") {
+      synopsis <- "rygg/Rapporteket: månedsrapport"
+      rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
+      #print(rnwFil)
+    }
+
+    fun <- "abonnementRygg"  #"henteSamlerapporter"
+    paramNames <- c('rnwFil', 'brukernavn', "reshID")
+    paramValues <- c(rnwFil, brukernavn, reshID) #input$subscriptionFileFormat)
+
+    #abonnementRygg(rnwFil = 'RyggMndRapp.Rnw', brukernavn='hei', reshID=601161, datoTil=Sys.Date())
+
+    rapbase::createAutoReport(synopsis = synopsis, package = 'rygg',
+                              fun = fun, paramNames = paramNames,
+                              paramValues = paramValues, owner = owner,
+                              email = email, organization = organization,
+                              runDayOfYear = runDayOfYear, interval = interval,
+                              intervalName = intervalName)
+    rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  })
+
+  ## slett eksisterende abonnement
+  observeEvent(input$del_button, {
+    selectedRepId <- strsplit(input$del_button, "_")[[1]][2]
+    rapbase::deleteAutoReport(selectedRepId)
+    rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  })
 
 
 

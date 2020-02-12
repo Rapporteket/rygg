@@ -46,11 +46,10 @@ hentData <- 0
 
 if (!exists('RegData')){
       RegData <- RyggRegDataSQL(datoFra = datoFra1Aar, datoTil = datoTil)
+      RegData <- RyggPreprosess(RegData=RegData)
 	  #RegData er data fra siste år.
 }
-RegDataRaa <- RegData #For å kunne "tilbakestille" RegData
 
-RegData <- RyggPreprosess(RegData=RegData)
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1Aar)$RegData
 SortMnd <- SorterOgNavngiTidsEnhet(RegData=RegData, tidsenhet=tidsenhet)
 RegData <- SortMnd$RegData
@@ -182,7 +181,7 @@ rownames(alderDIV) <- c('Minimum:',
 
 
 print(xtable(alderDIV, digits=1, align=c('l', rep('r', ncol(alderDIV))), 
-		caption='Alderskarakteristikkar (alder i år), siste seks månader.',
+		caption='Alderskarakteristikker (alder i år), siste seks måneder.',
 		label='tab:Alderseigenskapar'), sanitize.rownames.function = identity)
 
 @
@@ -199,8 +198,10 @@ Liggetida inkluderer derfor både preoperativ og postoperativ liggetid).
 finnGjsnMedKj <- function(RegData){
       Gjsn <- sprintf("%.1f", mean(RegData$Liggedogn, na.rm=T))
       Med <- sprintf("%.1f", median(RegData$Liggedogn, na.rm=T))
-      Kvinner <- sprintf("%.0f", 100*prop.table(table(RegData$erMann))[1])
-      Ut <- paste0(c(Gjsn, Med, Kvinner), c('', '', '%'))
+      Sum <- sprintf("%.0f", sum(RegData$Liggedogn, na.rm=T))
+      #Kvinner <- sprintf("%.0f", 100*prop.table(table(RegData$erMann))[1])
+      #Ut <- paste0(c(Gjsn, Med, Kvinner), c('', '', '%'))
+      Ut <- paste0(c(Gjsn, Med, Sum)) #, c('', '', '%'))
       #paste0(sprintf("%.1f %.1f %+.f", Gjsn, Med, Kvinner), '%')
       }
 
@@ -210,49 +211,56 @@ liggetidKj <- rbind(
 	'Resten av landet'= finnGjsnMedKj(RegDataResten)) #,
 #	'Eigen sjukehustype' = finnGjsnMedKj(RegDataShType))
 
-colnames(liggetidKj) <- c('Gj.snitt', 'Median', 'Kvinner')
+colnames(liggetidKj) <- c('Gj.snitt', 'Median', 'Totalsum')
 
 xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))), 
-		caption='Liggedøger og andel kvinner, siste 6 månader.',
+		caption='Liggedøgn, siste 6 måneder.', # og andel kvinner
 		label='tab:liggetidKj')
 		
 @
 
 \end{frame}
 
-
-\begin{frame}[fragile] {Registreringsforsinkelse}
-
-<<'Figurer', results='asis', echo=FALSE>>=
-Registreringsforsinkelse
+<<'LageFigurer', include=FALSE>>=
 dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='regForsinkelse', enhetsUtvalg = 1,
-                      outfile='Registreringsforsinkelse.pdf')
-dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='peropKompDura', enhetsUtvalg = 1,
-                      outfile='peropKompDura.pdf')
+                      reshID = reshID, outfile='RegForsinkelse.pdf')
+
+dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDura', 
+                      reshID = reshID, outfile='peropKompDura.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', 
+#                      reshID = reshID, outfile='peropKompDura.pdf', hentData = 1)
+
 dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
-                      outfile='SymptVarighUtstrTilBen.pdf')
+                      reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
 
 @
 
+\begin{frame}[fragile] {Registreringsforsinkelse}
+
 \begin{figure}[ht]
 \centering              
-\includegraphics[scale=0.35]{Registreringsforsinkelse.pdf}
+\includegraphics[scale=0.35]{RegForsinkelse.pdf}
 \caption{Forsinket registrering av operasjoner, egen avdeling og resten av landet.}
 \end{figure}
+
 \end{frame}
 
 \begin{frame}[fragile] {Durarift}
+\begin{figure}[ht]
 \centering              
 \includegraphics[scale=0.35]{peropKompDura.pdf}
-\caption{Peroperativ komplikasjon; durarift, egen avdeling og resten av landet.}
+%\caption{Peroperativ komplikasjon, durarift.}
+\caption{Peroperativ komplikasjon, durarift, egen avd og resten av landet.}
 \end{figure}
 \end{frame}
 
 \begin{frame}[fragile] {Symptomvarighet}
+\begin{figure}[ht]
 \centering              
 \includegraphics[scale=0.35]{SymptVarighUtstrTilBen.pdf}
 \caption{Varighet av utstrålende smerter til ben, egen avdeling og resten av landet.}
 \end{figure}
 \end{frame}
 
+\end{tiny}
 \end{document}
