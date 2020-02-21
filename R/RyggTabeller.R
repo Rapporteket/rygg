@@ -157,11 +157,11 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
   tabNokkeltall <- rbind(
     'Antall operasjoner' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=length),
     'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
-      'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean),
+      'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean, na.rm=T),
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
-    'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum),
-    'Liggetid, postop., (gj.sn.)' = tapply(RegData$LiggetidPostOp, RegData$TidsEnhet, FUN=mean),
-    'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean)
+    'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum, na.rm=T),
+    'Liggetid, postop., (gj.sn.)' = tapply(RegData$LiggetidPostOp, RegData$TidsEnhet, FUN=mean, na.rm=T),
+    'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean, na.rm=T)
     )
 
     # 'Liggetid (gj.sn)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=median, na.rm=T),
