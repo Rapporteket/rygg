@@ -85,7 +85,7 @@ indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1
       ##Spinal stenose, beregnes for 8 og 9:
       #attach(RegData)
       if (length(intersect(c(8:9), hovedkat)>0)) {indSS <- with(RegData, which((RfSentr == 1 | RfLateral == 1)
-                                                                 & is.na(RfSpondtypeIsmisk)
+                                                                 & RfSpondtypeIsmisk==0
                     & (OpDeUlamin==1 | OpLaminektomi==1 | OpDeFasett==1)
                     & (HovedInngrep %in% c(2:5,7))))}
       if (is.element(8, hovedkat)) {indHovedInngr <- union(indHovedInngr, indSS)}

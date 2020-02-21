@@ -86,7 +86,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             RegData <- RegData[which(RegData$Alder>=0), ]    #Tar bort alder<0
             RegData$Variabel <- RegData$Alder  	#GjsnTid, GjsnGrVar
             xAkseTxt <- 'alder (år)'
-            tittel <- 'Alder ved innleggelse'
+            tittel <- c('Alder ved innleggelse', 'test av tittel over to linjer')
             subtxt <- 'Aldersgrupper (år)'
             if (figurtype %in% c('gjsnGrVar', 'gjsnTid')) {
                   tittel <- 'alder ved innleggelse'}
@@ -237,9 +237,9 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       }
       if (valgtVar == 'EQ5DPre') {#ford gjsnPre (gjsnBox)
             RegData <- RegData[which(RegData$EQ5DPreV3 > -0.6),]
-            gr <- c(-0.6, seq(-0.4, 0.8, 0.2), 1)
+            gr <- c(-0.6, seq(-0.2, 0.9, 0.1), 1)
             #gr <- c(0,seq(20,90,10),150)
-            RegData$VariabelGr <- cut(RegData$EQ5DPreV3, breaks=gr, include.lowest=TRUE, right=FALSE)
+            RegData$VariabelGr <- cut(round(RegData$EQ5DPreV3,3), breaks=gr, include.lowest=TRUE, right=FALSE)
             #grtxt <- c('0-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90+')
             grtxt <- levels(RegData$VariabelGr)
             #grtxt <- c(levels(RegData$VariabelGr)[-length(gr)], '90+')
@@ -516,6 +516,25 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             TittelVar <- 'Liggetid ved operasjon'
             ytxt1 <- 'liggetid'
             KIekstrem <- c(0, 20)
+      }
+      if (valgtVar=='liggetidPostOp') {#fordeling, gjsnGrVar, andeler, gjsnTid
+         #liggedogn
+         #For opphold registrert som dagkirurgi uten at liggedogn er reg., settes liggedogn=0
+         tittel <- 'Liggetid etter operasjon'
+         dagind <- which( (is.na(RegData$LiggetidPostOp) | is.nan(RegData$LiggetidPostOp))  & RegData$Dagkirurgi==1)
+         RegData$LiggetidPostOp[dagind]<-0
+         RegData <- RegData[which(RegData$LiggetidPostOp>=0),]
+         RegData$Variabel <- RegData$LiggetidPostOp #gjsnGrVar
+         gr <- c(0:7,100)
+         RegData$VariabelGr <- cut(RegData$LiggetidPostOp, breaks=gr, include.lowest=TRUE, right=FALSE)
+         grtxt <- c(0:6, '7+')
+         xAkseTxt <- 'Antall liggedøgn' #(subtxt
+         subtxt <- 'døgn'
+         if (figurtype=='gjsnGrVar') {tittel <- 'liggetid'}
+         sortAvtagende <- 'F'
+         TittelVar <- 'Liggetid ved operasjon'
+         ytxt1 <- 'liggetid'
+         KIekstrem <- c(0, 20)
       }
       if (valgtVar == 'misfornoyd') { #AndelGrVar	#%in% c('Misfor3mnd','Misfor12mnd')) { #AndelGrVar
             #3/12mndSkjema. Andel med Misfornøyd/litt misfornøyd (1,2)

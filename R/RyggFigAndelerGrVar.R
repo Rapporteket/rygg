@@ -67,7 +67,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
       }
 
       # Preprosessere data
-      if ((preprosess=1) & (dim(RegData)[1] >1)){
+      if ((preprosess==1) & (dim(RegData)[1] >1)){
             RegData <- RyggPreprosess(RegData=RegData)
       }
       #------- Tilrettelegge variable

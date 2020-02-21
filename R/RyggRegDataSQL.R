@@ -6,9 +6,7 @@
 #' @return RegData data frame
 #' @export
 #'
-RyggRegDataSQL <- function() {
-
-#RyggRegDataSQL <- function(datoFra = '2007-01-01', datoTil = '2099-01-01')
+RyggRegDataSQL <- function(datoFra = '2007-01-01', datoTil = '2099-01-01'){
 
 
   query <- paste0('SELECT
@@ -119,6 +117,8 @@ ArbstatusPreV3,
 	-- SmSti12mnd,
 	-- SmSti3mnd,
 	SmStiPre,
+	surgeonform_LIGGEDOEGN_POSTOPERATIV,
+	surgeonform_LIGGEDOEGN_TOTALT,
 	Sykd,
 	SykdAndreRelevanteSykdBechtrew,
 	SykdAnnenendokrin,
@@ -141,6 +141,9 @@ ArbstatusPreV3,
 	SykemeldVarighPreV3,
 	SymptVarighRyggHof,
 	SympVarighUtstr,
+	TidlIkkeOp,
+	TdllOpAnnetNiv,
+	TidlOpsammeNiv,
 	-- TideOp12mnd,
 	-- TideOp3mnd,
 	-- TidlOpr,
@@ -151,9 +154,10 @@ ArbstatusPreV3,
 	-- Utfylt3Mnd,
 	UtskrivelseDato,
 	Vekt
-FROM AlleVarNum')
-                  #FROM Uttrekk_Rapport ')
+FROM AlleVarNum
+  WHERE OpDato >= \'', datoFra, '\' AND OpDato <= \'', datoTil, '\'')
 
+#FROM Uttrekk_Rapport ')
 
 RegData <- rapbase::LoadRegData(registryName="rygg", query=query, dbType="mysql")
 #RegDataALLE <- rapbase::LoadRegData(registryName="rygg",

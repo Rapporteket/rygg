@@ -22,7 +22,16 @@ RyggPreprosess <- function(RegData=RegData)
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
 	if ('FistTimeClosed' %in% names(RegData)) {
 	  RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
+	if ('TdllOpAnnetNiv' %in% names(RegData)) {
+	  RegData <- dplyr::rename(RegData, 'TidlOpAnnetNiv' = 'TdllOpAnnetNiv')}
+	RegData <- dplyr::rename(RegData, 'LiggetidPostOp' = 'surgeonform_LIGGEDOEGN_POSTOPERATIV',
+	                         'Liggedogn' = 'surgeonform_LIGGEDOEGN_TOTALT')
 
+
+
+	#Variabel som identifiserer avdelingas resh
+	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
+	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 
 	# Nye variable:
 	#RegData$MndNum1 <- RegData$InnDato$mon +1
@@ -33,11 +42,15 @@ RyggPreprosess <- function(RegData=RegData)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed), RegData$UtskrivelseDato,units = 'days'))
 
-	#Variabel som identifiserer avdelingas resh
-	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
-	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
-
-	#class(RegData$ReshId) <- 'numeric'
+	#1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
+	#TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv
+	RegData$TidlOpr <- 9
+	RegData$TidlOpr[RegData$TidlOpsammeNiv==1] <- 1
+  RegData$TidlOpr[RegData$TidlOpAnnetNiv==1] <- 2
+  RegData$TidlOpr[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
+	RegData$TidlOpr[RegData$TidlIkkeOp==1] <- 4
+	#  table(RegData$TidlOpr)
+#Data <- RegData[,c('TidlIkkeOp', 'TidlOpAnnetNiv', 'TidlOpsammeNiv')]
 
 	#Formatering
 	RegData$ShNavn <- as.character(RegData$ShNavn)

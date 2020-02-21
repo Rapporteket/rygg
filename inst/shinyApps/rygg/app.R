@@ -106,8 +106,14 @@ ui <- navbarPage(id = "tab1nivaa",
              # h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
              #                Man kan velge om man vil se gjennomsnitt eller median.'),
              br(),
-             h4('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
-                            innhold på Rapporteket'),
+             br(),
+             h3("Rapport med månedsresultater"),
+             h4("NB: Dette er en foreløpig versjon. Innholdet vil bli justert og utvidet."),
+             h5('Rapporten kan man også få regelmessig på e-post.
+                        Gå til fanen "Abonnement" for å bestille dette.'),
+             br(),
+             downloadButton(outputId = 'mndRapp.pdf', label='Last ned månedsrapport', class = "butt"),
+             tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color
              br(),
              br(),
              #br(),
@@ -130,6 +136,8 @@ ui <- navbarPage(id = "tab1nivaa",
                             Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
              h5('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
                 hovedkategorier og data fra oppfølgingsskjema.'),
+             h5('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
+                            innhold på Rapporteket'),
              br(),
              #h2(paste("Drift og resultater, egen avdeling")), #,
              h2((uiOutput("egetShTxt"))),
@@ -155,12 +163,14 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              br(),
 
-             fluidRow(h4("Nøkkeltall"),
+             fluidRow(
+               column(10,
+                      h4(strong("Nøkkeltall")),
                       # selectInput(inputId = 'enhetsNivaaStart', label='Enhetsnivå',
                       #             choices = c("Egen enhet"=2, "Hele landet"=0,
                                               # "Egen sykehustype"=4, "Egen region"=7)),
-                      tableOutput('tabNokkeltallStart'),
-           )
+                      tableOutput('tabNokkeltallStart')
+           ))
            )#main
   ), #tab
 
@@ -263,7 +273,7 @@ ui <- navbarPage(id = "tab1nivaa",
              selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
                          choices = hastegradvalg
              ),
-             selectInput(inputId = 'tidlOpRes', label='Tidligere operert? VIRKER IKKE. MANGLER VARIABEL',
+             selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
                          choices = tidlOprvalg
              ),
              # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
@@ -303,6 +313,7 @@ tabPanel(p('Fordelinger',
                                   #'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',
                                   'ASA-grad' = 'ASA',
                                   'BMI (Body Mass Index)' = 'BMI',
+                                  'EQ5D, preoperativt' = 'EQ5DPre',
                                   'Gangfunksjon (EQ5D) før operasjon' = 'EQgangePre',
                                   'Har pasienten søkt erstatning?' = 'erstatningPre',
                                   #Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon
@@ -311,7 +322,8 @@ tabPanel(p('Fordelinger',
                                   'Komorbiditet' = 'komorbiditet',
                                   'Komplikasjoner, perop. ' = 'komplPer' ,
                                   #'komplikasjoner, pasientrapp. ' = 'komplPost',
-                                  #'Liggetid ved operasjon' = 'liggedogn',
+                                  'Liggetid ved operasjon, totalt' = 'liggedogn',
+                                  'Liggetid, postoperativt' = 'liggetidPostOp',
                                   'Morsmål' = 'morsmal',
                                   #Nytte3mnd: Hvilken nytte har du hatt av operasjonen? (svar 3 måneder etter)
                                   #Nytte12mnd: Hvilken nytte har du hatt av operasjonen? (svar 12 måneder etter)
@@ -328,7 +340,7 @@ tabPanel(p('Fordelinger',
                                   'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
                                   'Varighet av rygg-/hoftesmerter' = 'symptVarighRyggHof',
                                   'Varighet av utstrålende smerter' = 'sympVarighUtstr',
-                                  #'Tidligere ryggoperert?' = 'tidlOpr',
+                                  'Tidligere ryggoperert?' = 'tidlOpr',
                                   #'Tidligere operasjoner, antall' = 'tidlOprAntall',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
@@ -346,7 +358,9 @@ tabPanel(p('Fordelinger',
                     selectInput(inputId = 'hastegrad', label='Operasjonskategori (hastegrad)',
                                 choices = hastegradvalg
                     ),
-                    selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
+                    selectInput(inputId = 'tidlOp', label='Tidligere operert?',
+                                choices = tidlOprvalg
+                    ),selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
                     )
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
@@ -367,15 +381,39 @@ tabPanel(p('Fordelinger',
                       )
                     )
                   )
-         ) #tab Fordelinger
+         ), #tab Fordelinger
 
 #------------------Resultater, prosentvise--------------
 # tabPanel('Resultater, prosentvise'), #tab, andeler
 # tabPanel('Resultater, gjennomsnitt') #tab, gjennomsnitt
 
+
+#------------------Abonnement-------------------------
+
+tabPanel(p("Abonnement",
+           title='Bestill automatisk utsending av rapporter på e-post'),
+         sidebarLayout(
+           sidebarPanel(width = 3,
+                        selectInput("subscriptionRep", "Rapport:",
+                                    c("Månedsrapport")), #, "Samlerapport", "Influensaresultater")),
+                        selectInput("subscriptionFreq", "Frekvens:",
+                                    list(Årlig="Årlig-year",
+                                          Kvartalsvis="Kvartalsvis-quarter",
+                                          Månedlig="Månedlig-month",
+                                          Ukentlig="Ukentlig-week",
+                                          Daglig="Daglig-DSTday"),
+                                    selected = "Månedlig-month"),
+                        #selectInput("subscriptionFileFormat", "Format:",
+                        #            c("html", "pdf")),
+                        actionButton("subscribe", "Bestill!")
+           ),
+           mainPanel(
+             uiOutput("subscriptionContent")
+           )
+         )
+)
+
 ) #fluidpage, dvs. alt som vises på skjermen
-
-
 
 
 #----------------- Define server logic required  -----------------------
@@ -428,37 +466,25 @@ server <- function(input, output,session) {
   output$iKladdPas <- renderText(paste('Pasientskjema: ', iKladd[1]))
   output$iKladdLege <- renderPrint(iKladd[2])
 
-  RegData$Diff <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed), RegData$UtskrivelseDato,units = 'days'))
 
-#startDato <- '2019-01-01'
 
-  # Data3mnd <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
-  #   dplyr::filter(ReshId == reshID & OpDato > startDato & (OpDato < Sys.Date()-100)) #%>%
-
-  forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse){
-    Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
-      dplyr::filter(ReshId == reshID & OpDato > fraDato & (OpDato < tilDato))
-    paste0(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T), ' (',
-    100*round(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
-  }
-
-  output$forSen3mnd <- renderText(paste0('<b>',forsinketReg(RegData=RegData, fraDato=startDato,
-                                                      tilDato=Sys.Date()-100, forsinkelse=100),'</b>',
+  output$forSen3mnd <- renderText(paste0('<b>',forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
+                                                      tilDato=Sys.Date()-100, forsinkelse=100, reshID=reshID),'</b>',
                                   ' skjema ferdigstilt for sent for 3 mnd.ktr i perioden ',
-                                         format.Date(startDato, '%d.%b'), '-', format.Date(Sys.Date()-100, '%d.%b%Y'))
+                                         format.Date(Sys.Date()-400, '%d.%b%Y'), '-', format.Date(Sys.Date()-100, '%d.%b%Y'))
                                          )
-  output$forSen12mnd <- renderText(paste0('<b>', forsinketReg(RegData=RegData, fraDato=startDato,
-                                                       tilDato=Sys.Date()-100, forsinkelse=400), '</b>',
+  output$forSen12mnd <- renderText(paste0('<b>', forsinketReg(RegData=RegData, fraDato=max(as.Date('2019-01-01'),Sys.Date()-745),
+                                                       tilDato=Sys.Date()-380, forsinkelse=380, reshID=reshID), '</b>',
                                           ' skjema ferdigstilt for sent for 12 mnd.ktr i perioden ',
-                                          format.Date(as.Date(startDato)-365, '%d.%b'), '-', format.Date(Sys.Date()-380, '%d.%b%Y')))
+                                          format.Date(max(as.Date('2019-01-01'),Sys.Date()-745), '%d.%b%Y'), '-', format.Date(Sys.Date()-380, '%d.%b%Y')))
   output$tabNokkeltallStart <- function() {
     tab <- t(tabNokkeltall(RegData=RegData, tidsenhet='Mnd', reshID=reshID)) #enhetsUtvalg=as.numeric(input$enhetsNivaaStart),
     kableExtra::kable(tab,
                       full_width=F,
-                      digits = c(0,0,1,1,0)
+                      digits = c(0,0,1,1,1,1,0)
     ) %>%
-      column_spec(column = 1, width_min = '5em', width_max = 10) %>%
-      column_spec(column = 2:(ncol(tab)), width = '6em')  %>%
+      column_spec(column = 1, width_min = '5em', width_max = '10em') %>%
+      column_spec(column = 2:(ncol(tab)), width = '7em')  %>%
       row_spec(0, bold = T, align = 'c') %>%
       kable_styling(full_width = FALSE, position = 'left') #"hover",
   }
@@ -467,6 +493,15 @@ server <- function(input, output,session) {
       tabAntOpphShMnd(RegData=RegData, datoTil=datoTil, reshID = reshID, antMnd=12)
       ,rownames = T, digits=0, spacing="xs" )
 
+    #-------Samlerapporter--------------------
+
+    output$mndRapp.pdf <- downloadHandler(
+      filename = function(){ paste0('MndRapp', Sys.time(), '.pdf')},
+      content = function(file){
+        henteSamlerapporter(file, rnwFil="RyggMndRapp.Rnw",
+                            reshID = reshID, datoFra = startDato)
+      }
+    )
 
 
 
@@ -591,6 +626,7 @@ server <- function(input, output,session) {
                   minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
                   erMann=as.numeric(input$erMann),
                   hastegrad = as.numeric(input$hastegrad),
+                  tidlOp = as.numeric(input$tidlOp),
                   session = session)
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
@@ -602,15 +638,18 @@ server <- function(input, output,session) {
                                 minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
                                 erMann=as.numeric(input$erMann),
                                 hastegrad = as.numeric(input$hastegrad),
+                                tidlOp = as.numeric(input$tidlOp),
                                 lagFig = 0, session = session)
 
     tabFord <- lagTabavFig(UtDataFraFig = UtDataFord)
 
     output$tittelFord <- renderUI({
       tagList(
-        h3(UtDataFord$tittel),
+        h3(HTML(paste0(UtDataFord$tittel, '<br />'))),
+        #h3(UtDataFord$tittel),
         h5(HTML(paste0(UtDataFord$utvalgTxt, '<br />')))
       )}) #, align='center'
+
     # output$fordelingTab <- function() { #gr1=UtDataFord$hovedgrTxt, gr2=UtDataFord$smltxt renderTable(
     #
     #   #       kable_styling("hover", full_width = F)
@@ -651,6 +690,68 @@ server <- function(input, output,session) {
       })
   }) #observe
 
+
+  #------------------ Abonnement ----------------------------------------------
+  ## reaktive verdier for å holde rede på endringer som skjer mens
+  ## applikasjonen kjører
+  rv <- reactiveValues(
+    subscriptionTab = rapbase::makeUserSubscriptionTab(session))
+
+
+  ## lag tabell over gjeldende status for abonnement
+  output$activeSubscriptions <- DT::renderDataTable(
+    rv$subscriptionTab, server = FALSE, escape = FALSE, selection = 'none',
+    rownames = FALSE, options = list(dom = 't')
+  )
+
+  ## lag side som viser status for abonnement, også når det ikke finnes noen
+  output$subscriptionContent <- renderUI({
+    fullName <- rapbase::getUserFullName(session)
+    if (length(rv$subscriptionTab) == 0) {
+      p(paste("Ingen aktive abonnement for", fullName))
+    } else {
+      tagList(
+        p(paste("Aktive abonnement for", fullName, "som sendes per epost til ",
+                rapbase::getUserEmail(session), ":")),
+        DT::dataTableOutput("activeSubscriptions")
+      )
+    }
+  })
+  ## nye abonnement
+  observeEvent (input$subscribe, { #MÅ HA
+    owner <- rapbase::getUserName(session)
+    interval <- strsplit(input$subscriptionFreq, "-")[[1]][2]
+    intervalName <- strsplit(input$subscriptionFreq, "-")[[1]][1]
+    organization <- rapbase::getUserReshId(session)
+    runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
+    email <- rapbase::getUserEmail(session)
+    if (input$subscriptionRep == "Månedsrapport") {
+      synopsis <- "rygg/Rapporteket: månedsrapport"
+      rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
+      #print(rnwFil)
+    }
+
+    fun <- "abonnementRygg"  #"henteSamlerapporter"
+    paramNames <- c('rnwFil', 'brukernavn', "reshID")
+    paramValues <- c(rnwFil, brukernavn, reshID) #input$subscriptionFileFormat)
+
+    #abonnementRygg(rnwFil = 'RyggMndRapp.Rnw', brukernavn='hei', reshID=601161, datoTil=Sys.Date())
+
+    rapbase::createAutoReport(synopsis = synopsis, package = 'rygg',
+                              fun = fun, paramNames = paramNames,
+                              paramValues = paramValues, owner = owner,
+                              email = email, organization = organization,
+                              runDayOfYear = runDayOfYear, interval = interval,
+                              intervalName = intervalName)
+    rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  })
+
+  ## slett eksisterende abonnement
+  observeEvent(input$del_button, {
+    selectedRepId <- strsplit(input$del_button, "_")[[1]][2]
+    rapbase::deleteAutoReport(selectedRepId)
+    rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  })
 
 
 

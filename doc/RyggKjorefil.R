@@ -135,6 +135,12 @@ for (valgtVar in variable) {
 knit('SamleRappNKR.Rnw') #, encoding = 'UTF-8')
 texi2pdf('SamleRappNKR.tex')
 
+reshID <- 601161
+library(rygg)
+setwd('/home/rstudio/rygg/inst')
+knit('RyggMndRapp.Rnw')
+knitr::knit2pdf('RyggMndRapp.Rnw')
+
 library(knitr)
 knit('C:/ResultattjenesteGIT/nkr/AarsrappOff/ResultaterAarsrapp.Rnw') #, encoding = 'UTF-8')
 library(tools)
