@@ -17,7 +17,7 @@ RyggFigAndeler(
   erMann = "",
   hovedkat = 99,
   hastegrad = 99,
-  tidlOp = "",
+  tidlOp = 99,
   ktr = 0,
   tittelMed = 1,
   outfile = "",

@@ -13,9 +13,13 @@ tabNokkeltall(
 )
 }
 \arguments{
-\item{RegData}{}
+\item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
 
-\item{reshID}{}
+\item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
+
+\item{enhetsUtvalg}{Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.}
+
+\item{reshID}{Parameter følger fra innlogging helseregister.no og angir}
 }
 \description{
 Nøkkeltall ( div oversiktstall)

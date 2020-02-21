@@ -139,12 +139,7 @@ lagTabavFigGjsnGrVar <- function(UtDataFraFig){
 
 
 #' Nøkkeltall ( div oversiktstall)
-#' @param RegData
-#'
-#' @param tidsenhet
-#' @param datoTil
-#' @param enhetsUtvalg
-#' @param reshID
+#' @inheritParams RyggUtvalgEnh
 #'
 #' @export
 tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=2, reshID=0) {

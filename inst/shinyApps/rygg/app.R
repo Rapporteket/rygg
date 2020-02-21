@@ -466,29 +466,17 @@ server <- function(input, output,session) {
   output$iKladdPas <- renderText(paste('Pasientskjema: ', iKladd[1]))
   output$iKladdLege <- renderPrint(iKladd[2])
 
-  RegData$Diff <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed), RegData$UtskrivelseDato,units = 'days'))
 
-#startDato <- '2019-01-01'
 
-  # Data3mnd <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
-  #   dplyr::filter(ReshId == reshID & OpDato > startDato & (OpDato < Sys.Date()-100)) #%>%
-
-  forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse){
-    Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
-      dplyr::filter(ReshId == reshID & OpDato > fraDato & (OpDato < tilDato))
-    paste0(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T), ' (',
-    100*round(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
-  }
-
-  output$forSen3mnd <- renderText(paste0('<b>',forsinketReg(RegData=RegData, fraDato=startDato,
-                                                      tilDato=Sys.Date()-100, forsinkelse=100),'</b>',
+  output$forSen3mnd <- renderText(paste0('<b>',forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
+                                                      tilDato=Sys.Date()-100, forsinkelse=100, reshID=reshID),'</b>',
                                   ' skjema ferdigstilt for sent for 3 mnd.ktr i perioden ',
-                                         format.Date(startDato, '%d.%b'), '-', format.Date(Sys.Date()-100, '%d.%b%Y'))
+                                         format.Date(Sys.Date()-400, '%d.%b%Y'), '-', format.Date(Sys.Date()-100, '%d.%b%Y'))
                                          )
-  output$forSen12mnd <- renderText(paste0('<b>', forsinketReg(RegData=RegData, fraDato=startDato,
-                                                       tilDato=Sys.Date()-100, forsinkelse=400), '</b>',
+  output$forSen12mnd <- renderText(paste0('<b>', forsinketReg(RegData=RegData, fraDato=max(as.Date('2019-01-01'),Sys.Date()-745),
+                                                       tilDato=Sys.Date()-380, forsinkelse=380, reshID=reshID), '</b>',
                                           ' skjema ferdigstilt for sent for 12 mnd.ktr i perioden ',
-                                          format.Date(as.Date(startDato)-365, '%d.%b'), '-', format.Date(Sys.Date()-380, '%d.%b%Y')))
+                                          format.Date(max(as.Date('2019-01-01'),Sys.Date()-745), '%d.%b%Y'), '-', format.Date(Sys.Date()-380, '%d.%b%Y')))
   output$tabNokkeltallStart <- function() {
     tab <- t(tabNokkeltall(RegData=RegData, tidsenhet='Mnd', reshID=reshID)) #enhetsUtvalg=as.numeric(input$enhetsNivaaStart),
     kableExtra::kable(tab,

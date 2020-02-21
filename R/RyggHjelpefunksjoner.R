@@ -122,7 +122,30 @@ dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', 
   RyggTilOffvalgtVar$info <- c(info, rep(NA, dim(RyggTilOffvalgtVar)[1]-length(info)))
   #write.table(RyggTilOffvalgtVar, file = paste0('A:/Resultatportalen/', filUt), sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
   return(invisible(RyggTilOffvalgtVar))
+
+
+}#' Beregn andel registrereinger som er ferdigstilt viss lang tid etter operasjon.
+#'
+#'Forsinkelse er strengt tatt registrering og ferdigstillelse etter UtskrivelseDato,
+#' men mht hva som er for sent for å sende ut oppfølgingsskjema, regnes forsinkelse
+#' som tid etter operasjon
+#'
+#' @param RegData dataramme med reshID, FirstTimeClosed og operasjonsdato
+#' @param fraDato startdato for perioden en ønsker å se på
+#' @param tilDato sluttdato for perioden en ønsker å se på
+#' @param forsinkelse minste antall dager fra operasjon til ferdigstillelse
+#' @param reshID Avdelingas reshID. Benyttes til å filtrere.
+#' @return
+#' @export
+forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID){
+  RegData$Diff <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed),
+                                      RegData$OpDato ,units = 'days')) #UtskrivelseDato
+  Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
+    dplyr::filter(ReshId == reshID & OpDato > fraDato & (OpDato < tilDato))
+  paste0(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T), ' (',
+         100*round(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
 }
+
 
 
 #' Funksjon som produserer rapporten som skal lastes ned av mottager.
