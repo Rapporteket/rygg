@@ -10,8 +10,10 @@ RyggPreprosess <- function(RegData=RegData)
 {
   #Kun ferdigstilte registreringer: Det skal kun leveres ferdigstilte skjema til RapportUttrekk
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
-  RegData$ErMann <- RegData$Kjonn
-  RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
+  #Kjonn Mangler!!
+  RegData$ErMann <- 9
+  #RegData$ErMann <- RegData$Kjonn
+  #RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
@@ -22,10 +24,10 @@ RyggPreprosess <- function(RegData=RegData)
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
 	if ('FistTimeClosed' %in% names(RegData)) {
 	  RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
-	if ('TdllOpAnnetNiv' %in% names(RegData)) {
-	  RegData <- dplyr::rename(RegData, 'TidlOpAnnetNiv' = 'TdllOpAnnetNiv')}
-	RegData <- dplyr::rename(RegData, 'LiggetidPostOp' = 'surgeonform_LIGGEDOEGN_POSTOPERATIV',
-	                         'Liggedogn' = 'surgeonform_LIGGEDOEGN_TOTALT')
+	#if ('TdllOpAnnetNiv' %in% names(RegData)) {
+	#  RegData <- dplyr::rename(RegData, 'TidlOpAnnetNiv' = 'TdllOpAnnetNiv')}
+	#RegData <- dplyr::rename(RegData, 'LiggetidPostOp' = 'surgeonform_LIGGEDOEGN_POSTOPERATIV',
+	#                         'Liggedogn' = 'surgeonform_LIGGEDOEGN_TOTALT')
 
 
 
