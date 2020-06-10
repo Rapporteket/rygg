@@ -13,7 +13,7 @@ library(shinyjs)
 library(zoo)
 
 idag <- Sys.Date()
-startDato <- startDato <- paste0(as.numeric(format(idag-50, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
+startDato <- paste0(as.numeric(format(idag-90, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
 sluttDato <- idag
 datoTil <- as.POSIXlt(idag)
 datofra12 <- lubridate::floor_date(as.Date(datoTil)- months(12, abbreviate = T), unit='month')

@@ -1,7 +1,7 @@
 Package: rygg
 Title: Degenerativ Rygg, figurer, tabeller, analyser
-Version: 2.1.1
-Date: 2020-02-28
+Version: 2.1.2
+Date: 2020-06-10
 Authors@R: 
     person(given = "Lena Ringstad",
            family = "Olsen",
@@ -24,6 +24,7 @@ Imports:
     knitr,
     lubridate,
     rapbase,
+    rapFigurer,
     raplog,
     rapsodi,
     shiny,
