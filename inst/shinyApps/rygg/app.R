@@ -13,7 +13,7 @@ library(shinyjs)
 library(zoo)
 
 idag <- Sys.Date()
-startDato <- paste0(as.numeric(format(idag-90, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
+startDato <- paste0(as.numeric(format(idag-120, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
 sluttDato <- idag
 datoTil <- as.POSIXlt(idag)
 datofra12 <- lubridate::floor_date(as.Date(datoTil)- months(12, abbreviate = T), unit='month')
@@ -257,9 +257,9 @@ ui <- navbarPage(id = "tab1nivaa",
 #-------Registeradministrasjon----------
     tabPanel(p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
              value = "Registeradministrasjon",
-             h3('Egen side for registeradministratorer? (Bare synlig for SC-bruker'),
+             h3('Egen side for registeradministratorer. Siden er bare synlig for SC-bruker'),
              #uiOutput('rolle'),
-             h4('Alternativt kan vi ha elementer på startsida og/eller registreringsoversiktsida som bare er synlig for SC'),
+             h4('Det er også mulig å ha elementer på andre sider som bare er synlig for SC-brukere'),
            br(),
            br(),
            sidebarPanel(
@@ -285,12 +285,18 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data')),
 
-           fluidRow(h3('Hva mer skal med her...?'),
+           fluidRow(
+             h3('Last ned data fra versjon 2.0:'),
+             downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
+
+             br(),
+             br(),
+             h3('Hva mer skal med her...?'),
                     tags$div(
-                      tags$li("Andel ikke besvart 3 mnd. - mangler variabel"),
-                      tags$li("Andel ikke besvart 12 mnd. - mangler variabel"),
-                      tags$li("Andel purringer 3 mnd. - mangler variabel"),
-                      tags$li("Andel purringer 12 mnd. - mangler variabel")
+                      tags$li("Andel ikke besvart 3 mnd.?"),
+                      tags$li("Andel ikke besvart 12 mnd.?"),
+                      tags$li("Andel purringer 3 mnd.?"),
+                      tags$li("Andel purringer 12 mnd.?")
                     ))
   ), #tab SC
 
@@ -594,6 +600,12 @@ server <- function(input, output,session) {
   output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
+
+  dataDumpV2 <- rapbase::LoadRegData(registryName="rygg",
+                                     query='select * FROM Uttrekk_Rapport', dbType="mysql")
+  output$lastNed_dataV2 <- downloadHandler(
+    filename = function(){'dataDumpV2.csv'},
+    content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
   })
   #-----------Registeradministrasjon-----------
 
