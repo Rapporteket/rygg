@@ -56,7 +56,7 @@ maxald <- 130	#alder, til og med
 erMann <- 99			#kjønn, 1-menn, 0-kvinner, standard: '' (alt annet enn 0 og 1), dvs. begge
 hovedkat <- 99		#HovedInngrep, 0-7, Standard: 99, dvs alle op
 hastegrad <- 1 #Elektivt/Akutt, 1-2
-enhetsUtvalg <- 1 #	0: hele landet, 1:egen enhet-resten, 2:egen enhet, 3:egen-egen shgr,
+enhetsUtvalg <- 0 #	0: hele landet, 1:egen enhet-resten, 2:egen enhet, 3:egen-egen shgr,
     #4:egen shusgr, 5:egen shgr-resten, 6:egen enhet- egen region, 7:egen region, 8:egen reg - resten
 ktr <- 0			#1. el 2. kontroll. '3mnd' - 3mnd kontroll, '12mnd' - 12 mnd kontroll
 tittel <- 1
@@ -96,8 +96,10 @@ rm(list=ls())
 outfile <- ''
 tidsenhet <- 'Mnd'
 valgtVar <- 'regForsinkelse'
-RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
-                      sep=';', header=T, encoding = 'UTF-8')
+
+# RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
+#                       sep=';', header=T, encoding = 'UTF-8')
+RegData <- RyggRegDataSQL()
 RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, enhetsUtvalg = 1, reshID = reshID) #, outfile='test.pdf')
 RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData) #,outfile=outfile)
 RyggFigAndelTid(RegData=RegData, valgtVar=valgtVar, tidsenhet = tidsenhet) #, outfile=outfile

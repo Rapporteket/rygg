@@ -189,7 +189,7 @@ RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', d
 
    if (lagFig == 1) {
     rapFigurer::FigFordeling(AggVerdier, tittel=tittel, hovedgrTxt=hovedgrTxt,
-                 smltxt=smltxt, N=Nfig, retn=retn, utvalgTxt=utvalgTxt,
+                 smltxt=smltxt, N=Nfig, Nfig=Nfig, retn=retn, utvalgTxt=utvalgTxt,
                  grtxt=grtxt, grtxt2=grtxt2, medSml=medSml,
                  subtxt=subtxt, outfile=outfile) #pstTxt=pstTxt,
 

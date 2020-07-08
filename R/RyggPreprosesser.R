@@ -22,8 +22,8 @@ RyggPreprosess <- function(RegData=RegData)
 	#Endre variabelnavn:
 	#names(RegData)[which(names(RegData) == 'OpAar')] <- 'Aar'
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
-	if ('FistTimeClosed' %in% names(RegData)) {
-	  RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
+	# if ('FistTimeClosed' %in% names(RegData)) {
+	#   RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
 	#if ('TdllOpAnnetNiv' %in% names(RegData)) {
 	#  RegData <- dplyr::rename(RegData, 'TidlOpAnnetNiv' = 'TdllOpAnnetNiv')}
 	#RegData <- dplyr::rename(RegData, 'LiggetidPostOp' = 'surgeonform_LIGGEDOEGN_POSTOPERATIV',
@@ -42,15 +42,15 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Kvartal <- ceiling(RegData$MndNum/3)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
-	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed), RegData$UtskrivelseDato,units = 'days'))
+	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days'))
 
 	#1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
 	#TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv
 	RegData$TidlOpr <- 9
+	RegData$TidlOpr[RegData$TidlIkkeOp==1] <- 4
 	RegData$TidlOpr[RegData$TidlOpsammeNiv==1] <- 1
   RegData$TidlOpr[RegData$TidlOpAnnetNiv==1] <- 2
   RegData$TidlOpr[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
-	RegData$TidlOpr[RegData$TidlIkkeOp==1] <- 4
 	#  table(RegData$TidlOpr)
 #Data <- RegData[,c('TidlIkkeOp', 'TidlOpAnnetNiv', 'TidlOpsammeNiv')]
 

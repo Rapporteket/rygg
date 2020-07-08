@@ -138,7 +138,7 @@ dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', 
 #' @return
 #' @export
 forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID){
-  RegData$Diff <- as.numeric(difftime(as.Date(RegData$FirstTimeClosed),
+  RegData$Diff <- as.numeric(difftime(as.Date(RegData$MedForstLukket),
                                       RegData$OpDato ,units = 'days')) #UtskrivelseDato
   Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
     dplyr::filter(ReshId == reshID & OpDato > fraDato & (OpDato < tilDato))
