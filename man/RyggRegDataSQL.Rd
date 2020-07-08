@@ -4,7 +4,7 @@
 \alias{RyggRegDataSQL}
 \title{Henter data registrert for Degenerativ Rygg}
 \usage{
-RyggRegDataSQL(datoFra = "2007-01-01", datoTil = "2099-01-01")
+RyggRegDataSQL(datoFra = "2007-01-01", datoTil = "2099-01-01", alle = 0)
 }
 \value{
 RegData data frame

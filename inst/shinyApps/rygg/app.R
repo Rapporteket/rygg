@@ -31,7 +31,7 @@ regTitle = ifelse(paaServer, 'NKR: Nasjonalt Kvalitetsregister for Ryggkirurgi',
 
 
 if (paaServer) {
-  RegData <- RyggRegDataSQL()
+  RegData <- RyggRegDataSQL(alle = 1)
   qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
   SkjemaOversikt <- rapbase::LoadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
   qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
@@ -310,10 +310,8 @@ tabPanel(p('Fordelinger',
                     selectInput(
                       inputId = "valgtVar", label="Velg variabel",
                       choices = c('Alder' = 'alder',
-                                  #'Liggetid' = 'antDagerInnl',
                                   'Angst/depresjon (EQ5D) før operasjon' = 'EQangstPre',
                                   'Antibiotikaprofylakse?' = 'antibiotika',
-                                  #Antall nivå operert' = antNivOpr:
                                   'Arbeidsstatus' = 'arbstatus', #Velger skjema separat
                                   'Arbeidsstatus, 3 mnd. etter' = 'arbstatus3mnd',
                                   'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',
@@ -322,18 +320,18 @@ tabPanel(p('Fordelinger',
                                   'EQ5D, preoperativt' = 'EQ5DPre',
                                   'Gangfunksjon (EQ5D) før operasjon' = 'EQgangePre',
                                   'Har pasienten søkt erstatning?' = 'erstatningPre',
-                                  #Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon
-                                  #Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon
+                                  '-Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon' = 'fornoydhet3mnd',
+                                  '-Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon' = 'fornoydhet12mnd',
                                   #Hovedinngrep = HovedInngrep
                                   'Komorbiditet' = 'komorbiditet',
                                   'Komplikasjoner, perop. ' = 'komplPer' ,
-                                  #'komplikasjoner, pasientrapp. ' = 'komplPost',
+                                  '-Komplikasjoner, pasientrapp. ' = 'komplPost',
                                   'Liggetid ved operasjon, totalt' = 'liggedogn',
                                   'Liggetid, postoperativt' = 'liggetidPostOp',
                                   'Morsmål' = 'morsmal',
-                                  #Nytte3mnd: Hvilken nytte har du hatt av operasjonen? (svar 3 måneder etter)
-                                  #Nytte12mnd: Hvilken nytte har du hatt av operasjonen? (svar 12 måneder etter)
-                                  #'Operasjonsindikasjon' = 'opInd',
+                                  '-Nytte av operasjonen, 3 mnd. etter' = 'nytte3mnd',
+                                  '-Nytte av operasjonen, 12 mnd. etter' = 'nytte12mnd',
+                                  '-Operasjonsindikasjon' = 'opInd',
                                   'Operasjonsindikasjon, paresegrad' = 'opIndPareseGrad',
                                   #'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
                                   'Operasjonskategori' = 'opKat',
@@ -346,8 +344,8 @@ tabPanel(p('Fordelinger',
                                   'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
                                   'Varighet av rygg-/hoftesmerter' = 'symptVarighRyggHof',
                                   'Varighet av utstrålende smerter' = 'sympVarighUtstr',
-                                  'Tidligere ryggoperert?' = 'tidlOpr',
-                                  #'Tidligere operasjoner, antall' = 'tidlOprAntall',
+                                  '-Tidligere ryggoperert?' = 'tidlOpr',
+                                  '-Tidligere operasjoner, antall' = 'tidlOprAntall',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
                                   'Utdanning (høyeste fullførte)' = 'utd'
