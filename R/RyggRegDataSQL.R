@@ -6,16 +6,21 @@
 #' @return RegData data frame
 #' @export
 #'
-RyggRegDataSQL <- function(datoFra = '2007-01-01', datoTil = '2099-01-01'){
+RyggRegDataSQL <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alle=0){
 
-
+if (alle == 1) {
+  RegData <- rapbase::LoadRegData(registryName="rygg",
+                                     query='SELECT * FROM AlleVarNum', dbType="mysql")
+  # RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
+  #                                              query='SELECT * FROM Uttrekk_Rapport', dbType="mysql")
+} else {
   query <- paste0('SELECT
 	AlderVedOpr,
 	-- Antibiotika,
 	AntibiotikaV3,
 	-- AntNivOpr,
-	-- Arbstatus12mnd,
-	-- Arbstatus3mnd,
+Arbstatus12mndV3,
+Arbstatus3mndV3,
 ArbstatusPreV3,
 	ASA,
 	SykehusNavn,
@@ -161,11 +166,12 @@ Morsmal,
 FROM AlleVarNum
   WHERE OpDato >= \'', datoFra, '\' AND OpDato <= \'', datoTil, '\'')
 
+
 #FROM Uttrekk_Rapport ')
 
 RegData <- rapbase::LoadRegData(registryName="rygg", query=query, dbType="mysql")
-#RegDataALLE <- rapbase::LoadRegData(registryName="rygg",
-#                                    query='SELECT * FROM AlleVarNum', dbType="mysql")
+}
+
 return(RegData)
 }
 

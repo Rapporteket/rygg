@@ -315,8 +315,8 @@ tabPanel(p('Fordelinger',
                                   'Antibiotikaprofylakse?' = 'antibiotika',
                                   #Antall nivå operert' = antNivOpr:
                                   'Arbeidsstatus' = 'arbstatus', #Velger skjema separat
-                                  #'Arbeidsstatus, 3 mnd. etter' = 'arbstatus3mnd',
-                                  #'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',
+                                  'Arbeidsstatus, 3 mnd. etter' = 'arbstatus3mnd',
+                                  'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',
                                   'ASA-grad' = 'ASA',
                                   'BMI (Body Mass Index)' = 'BMI',
                                   'EQ5D, preoperativt' = 'EQ5DPre',
@@ -633,12 +633,12 @@ server <- function(input, output,session) {
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
                   reshID=reshID,
-                  enhetsUtvalg=as.numeric(input$enhetsUtvalg),
-                  datoFra=input$datovalg[1], datoTil=input$datovalg[2],
-                  minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
-                  erMann=as.numeric(input$erMann),
-                  hastegrad = as.numeric(input$hastegrad),
-                  tidlOp = as.numeric(input$tidlOp),
+                  # enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                  # datoFra=input$datovalg[1], datoTil=input$datovalg[2],
+                  # minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
+                  # erMann=as.numeric(input$erMann),
+                  # hastegrad = as.numeric(input$hastegrad),
+                  # tidlOp = as.numeric(input$tidlOp),
                   session = session)
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
