@@ -11,9 +11,8 @@ RyggPreprosess <- function(RegData=RegData)
   #Kun ferdigstilte registreringer: Det skal kun leveres ferdigstilte skjema til RapportUttrekk
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
   #Kjonn Mangler!!
-  RegData$ErMann <- 9
-  #RegData$ErMann <- RegData$Kjonn
-  #RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
+  RegData$ErMann <- RegData$Kjonn
+  RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')

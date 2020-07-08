@@ -841,7 +841,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       if (valgtVar == 'tidlOpr') {
             tittel <- 'Tidligere ryggoperert?'
             retn <- 'H'
-            grtxt <- c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
+            grtxt <- c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon') #, 'Ukjent')
             #Versjon 2:  RegData$VariabelGr <- 9
             # indDum <- which(RegData$TidlOpr %in% 1:4)
             # RegData$VariabelGr[indDum] <- RegData$TidlOpr[indDum]
@@ -850,7 +850,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             # RegData$TidlOp[RegData$TidlOpsammeNiv==1] <- 1
             # RegData$TidlOp[RegData$TidlOpAnnetNiv==1] <- 2
             # RegData$TidlOp[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
-            RegData$VariabelGr <- factor(RegData$TidlOpr, levels = c(1:4,9))
+            RegData$VariabelGr <- factor(RegData$TidlOpr, levels = c(1:4))
             #test <- rowSums(RegData[,var])
             #RegData[test>1,var]
       }
