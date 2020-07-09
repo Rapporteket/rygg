@@ -462,8 +462,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             datoTil <- min(datoTil, as.character(Sys.Date()-90))
             retn <- 'H'
             flerevar <- 1
-            subtxt <- '(Komplikasjoner rapporteres kun f.o.m. 2010)'
-            #RegData <- RegData[which(dato > as.POSIXlt('2009-12-31')), ]
             #Andel kun av de som har svart på 3 mnd ktr:
             RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
             # variableV2 <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpMiktProb3Mnd','KpUVI3Mnd',
@@ -472,10 +470,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                           'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
             grtxt <- c('Overfladisk sårinfeksjon', 'Dyp sårinfeksjon',
                        'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
-                       'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Minst en av nevnte kompl.') #'Tot. komplikasjoner'
-            RegData$Kp3Mnd <- NULL
-            RegData$Kp3Mnd[rowSums(RegData[ ,variable[-8]], na.rm = T) > 0] <- 1
-            #RegData$Variabel <- colSums(RegData[ ,kompl])
+                       'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
       }
 
       if (valgtVar == 'kp3Mnd') { #AndelGrVar

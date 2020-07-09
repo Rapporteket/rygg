@@ -42,6 +42,13 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days'))
+	variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
+	              'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')
+	RegData$Kp3Mnd <- NULL
+	RegData$Kp3Mnd[rowSums(RegData[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
+	                                   'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
+	                       na.rm = T) > 0] <- 1
+
 
 	#1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
 	#TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv
@@ -55,21 +62,13 @@ RyggPreprosess <- function(RegData=RegData)
 
 	#Formatering
 	RegData$ShNavn <- as.character(RegData$ShNavn)
-#	RegData$Morsmal <- factor(RegData$Morsmal, levels=1:3)
-#Mangler:	RegData$HovedInngrep <- factor(RegData$HovedInngrep, levels=0:7)
-#Mangler:		RegData$Inngrep <- factor(RegData$Inngrep, levels=0:19)
-	#RegData$SivilStatus <- factor(RegData$SivilStatus, levels=1:3)
-	#RegData$ASA <- factor(RegData$ASA, levels=1:4)
-#	RegData$Utd <- factor(RegData$Utd, levels=1:5)
-	#RegData$ArbstatusPre <- factor(RegData$ArbstatusPre, levels=1:10)
-#	RegData$UforetrygdPre <- factor(RegData$UforetrygdPre, levels=1:4)
-	#RegData$ErstatningPre <- factor(RegData$ErstatningPre, levels=c(0:3,9)
-	# RegData$SymptVarighRyggHof <- factor(RegData$SymptVarighRyggHof, levels=c(1:5,9))
-	# RegData$SympVarighUtstr <- factor(RegData$SympVarighUtstr, levels=c(1:5,9))
+
 
 
 #Legge til underkategori for hovedkategori.
-#	if (is.na(match("Inngrep", names(opdata))) != 'TRUE') {	#Hvis har variabelen Inngrep
+ny <- kategoriserInngrep(RegData=RegData)
+RegData <- ny$RegData
+	#	if (is.na(match("Inngrep", names(opdata))) != 'TRUE') {	#Hvis har variabelen Inngrep
 #	      #if (match("Inngrep", names(opdata))) {	#Hvis har variabelen Inngrep
 #
 #	      #Dataramme av hovedkategorier og underkategorier
