@@ -68,31 +68,47 @@ RyggPreprosess <- function(RegData=RegData)
 #Legge til underkategori for hovedkategori.
 ny <- kategoriserInngrep(RegData=RegData)
 RegData <- ny$RegData
-	#	if (is.na(match("Inngrep", names(opdata))) != 'TRUE') {	#Hvis har variabelen Inngrep
-#	      #if (match("Inngrep", names(opdata))) {	#Hvis har variabelen Inngrep
-#
-#	      #Dataramme av hovedkategorier og underkategorier
-#	      gr_nr <- c(0:19)
-#	      txt <- c('Annet','Mikro','Makro','Tubekirurgi','Udefinert','Mikro','Makro','Tubekirurgi',
-#	               'Udefinert','Laminektomi', 'Interspinøst impl.','PLF','PLIF','TLIF','ALIF',
-#	               'Udefinert fusjon', 'Skiveprotese','Fjern interspinøst impl.','Fjerne ostemat.',
-#	               'Revisjon ostemat.')
-#	      hgr <- c(0,1,1,1,1,2,2,2,2,3,4,5,5,5,5,5,6,7,7,7)
-#	      kat <- data.frame(hgr, hkatnavn[hgr+1], gr_nr, txt)
-#	      underkattxt <- ''
-#	      underkat_num <- ''
-#
-#	      #Velge ut riktige underkategorier:
-#	      if (hovedkat != 99) {
-#	            underkat_num <- kat$gr_nr[kat$hgr==hovedkat]
-#	            opdata_ok <- opdata[which(!is.na(match(opdata$Inngrep,underkat_num))),]
-#	            opdata <- opdata_ok
-#	            underkattxt <- as.character(kat$txt[underkat_num+1])
-#	      }
-#	      names(kat) <- c('Hnr', 'Hnavn', 'Unr', 'Unavn')
-#	      utdata <- list(opdata, hkattxt, underkattxt, underkat_num, kat)
-#	      names(utdata) <- c('data','txt','ukattxt','underkat', 'inngrHinngr')
 
+#--------Definasjon av diagnosegrupper prolaps og spinal stenose V3
+# COMPUTE filter_$=(HovedInngrepV2V3 = 4 or (RfSentr = 1 or RfLateral = 1 or RfForaminalSS = 1)
+#                   & (OpDeUlamin = 1 or OpDeUlaminTilgang > 0 or OpLaminektomi  = 1)
+#                   & (HovedInngrepV2V3 = 2 or HovedInngrepV2V3 = 3
+#                                            or HovedInngrepV2V3 = 5 or HovedInngrepV2V3 = 7) ).
+RegData$LSSopr <- ifelse(RegData$HovedInngrepV2V3 == 4
+                         | (RegData$RfSentr == 1 | RegData$RfLateral == 1 | RegData$RfForaminalSS == 1)
+                         & (RegData$OpDeUlamin == 1 | RegData$OpDeUlaminTilgang %in% 1:3 | RegData$OpLaminektomi == 1)
+                         & (RegData$HovedInngrepV2V3 %in% c(2,3,5,7)),
+                         1, 0)
+
+#*Definisjon av prolapsgruppen, dekompresjon, kvalitetssikre, først gr uten fusjon..
+#COMPUTE filter_$=(HovedInngrepV2V3 = 1 &  LSS_opr = 0).
+# 1  'Ja operert med dekopressjon for prolaps'
+# 0 ' Nei ikke operert med dekopressjon for prolaps'.
+RegData$ProlapsDekr <- ifelse(RegData$HovedInngrepV2V3 == 1 &  RegData$LSSopr == 0, 1, 0)
+
+#*Definisjon av prolapsgruppen,med fusjon.
+# 1  'Ja operert med fusjon for prolaps'
+# 0 ' Nei ikke operert med fusjon for prolaps'.
+# COMPUTE filter_$=((Prolaps_dekr = 0 & LSS_opr = 0) & (HovedInngrepV2V3 = 5 & OprProlap > 0) &
+#                     (RfDegskol =  0 & RfSpondtypeDegen = 0 & RfSpondtypeIsmisk = 0)).
+RegData$ProlapsFusjonert <-
+  ifelse((RegData$ProlapsDekr == 0 & RegData$LSSopr == 0) &
+           (RegData$HovedInngrepV2V3 == 5 & RegData$OprProlap > 0) &
+           (RegData$RfDegskol ==  0 & RegData$RfSpondtypeDegen == 0 & RegData$RfSpondtypeIsmisk == 0),
+         1, 0)
+
+#*Definisjon av prolapsgruppen, prolapsopr med og uten fusjon.
+#COMPUTE filter_$=(Prolaps_dekr = 1 or Prolaps_fusjonert = 1).
+# VARIABLE LABELS  Prolapsopr_alle 'både dekr og fusjon'.
+# 1  'Ja  alle typer prolapsoperason'
+# 0 ' Nei ikke operert for prolaps'.
+RegData$ProlapsoprAlle <- ifelse(RegData$ProlapsDekr == 1 | RegData$ProlapsFusjonert == 1, 1, 0)
+
+
+# DO IF (LSS_opr = 0 & Prolapsopr_alle = 0   & OpDeUlamin = 1).
+# RECODE LSS_opr (0=1).
+utvalg <- which(RegData$LSSopr == 0 & RegData$ProlapsoprAlle == 0   & RegData$OpDeUlamin == 1)
+RegData$LSSopr[utvalg] <- 1
 
   return(invisible(RegData))
 }
