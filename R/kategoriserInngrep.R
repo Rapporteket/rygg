@@ -97,7 +97,7 @@ RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$FusjonKir == 1] <- 5
 # DO IF InngrepV3 = 0 & (OpFusjonPerkutan = 1 or OpFusjonUtenDekomprV3 = 1).
 # RECODE InngrepV3 (0 = 5).
 RegData$InngrepV3[RegData$InngrepV3 == 0
-                  & ((RegData$OpFusjonPerkutan == 1) & (RegData$OpFusjonUtenDekomprV3 == 1))] <- 5
+                  & ((RegData$OpFusjonPerkutan == 1) | (RegData$OpFusjonUtenDekomprV3 == 1))] <- 5
 
 # *Udefinert, defineres inn i Midlinje bevarende dekompresjon.
 # DO IF InngrepV3 = 0 & (RfSkive = 0 & OpLaminektomi ~= 1) & OprProlap = 0.
