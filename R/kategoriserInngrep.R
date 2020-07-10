@@ -20,13 +20,15 @@ RegData$InngrepV3[RegData$OpAndreSkiveprotese == 1] <- 17
 #RECODE InngrepV3  (0 = 16).
 RegData$InngrepV3[RegData$InngrepV3 == 0 &
                     (RegData$OpOsteosyntRevV3 == 1 | RegData$OpOsteosyntFjerningV3 == 1)] <- 16
-table(RegData$InngrepV3)
 
 #deformitet.
 #DO IF InngrepV3 = 0 & (OpKileOsteotomi = 1 or OpPonteSPOsteotomi= 1 or OpSkolioseKyfose =1).
 #RECODE InngrepV3  (0 = 10).
-RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OpKileOsteotomi == 1 | RegData$OpPonteSPOsteotomi == 1
-                  |RegData$OpSkolioseKyfose)] <- 10
+
+RegData$InngrepV3[RegData$InngrepV3 == 0 &
+                    (RegData$OpKileOsteotomi == 1 | RegData$OpPonteSPOsteotomi == 1 |
+                       RegData$OpSkolioseKyfose==1)] <- 10
+#table(RegData$InngrepV3)
 
 #XLIF.
 # DO IF InngrepV3 = 0 & (FusjonKirXlif = 1 & FusjonKir =1).

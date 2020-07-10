@@ -561,7 +561,7 @@ server <- function(input, output,session) {
   }
 
   observe({
-    dataRegKtr <- tilretteleggDataDumper(data=RegOversikt, datovalg = input$datovalg,
+    dataRegKtr <- tilretteleggDataDumper(data=RegOversikt, datovalg = input$datovalgRegKtr,
                                          reshID=input$velgReshReg, rolle = rolle)
   #   RegOversikt <- dplyr::filter(RegOversikt,
   #                                as.Date(HovedDato) >= input$datovalgRegKtr[1],
@@ -593,7 +593,7 @@ server <- function(input, output,session) {
   #   } #else {
   #     #DataDump[which(DataDump$ReshId == reshID), -variablePRM]} #Tar bort PROM/PREM til egen avdeling
 
-  dataDump <- tilretteleggDataDumper(data=RegData, datovalg = input$datovalg,
+  dataDump <- tilretteleggDataDumper(data=RegData, datovalg = input$datovalgRegKtr,
                                      reshID=input$velgReshReg, rolle = rolle)
   output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
