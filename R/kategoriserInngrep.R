@@ -28,7 +28,6 @@ RegData$InngrepV3[RegData$InngrepV3 == 0 &
 RegData$InngrepV3[RegData$InngrepV3 == 0 &
                     (RegData$OpKileOsteotomi == 1 | RegData$OpPonteSPOsteotomi == 1 |
                        RegData$OpSkolioseKyfose==1)] <- 10
-#table(RegData$InngrepV3)
 
 #XLIF.
 # DO IF InngrepV3 = 0 & (FusjonKirXlif = 1 & FusjonKir =1).
@@ -63,30 +62,30 @@ RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$OpLaminektomi == 1 & RegData$
 # *Midlinje bevarende dekompresjon.
 # DO IF InngrepV3 = 0 & (OpDeUlamin = 1 or OpProOsteotomi = 1) & OprProlap < 1 & FusjonKir =0.
 # RECODE InngrepV3 (0 = 8).
-RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OpDeUlamin == 1 | RegData$OpProOsteotomi == 1)
-                  & RegData$FusjonKir == 0 & RegData$OprProlap < 1] <- 8
+RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OpDeUlamin == 1 | RegData$OpProOsteotomi == 1) &
+                  RegData$FusjonKir == 0 & RegData$OprProlap < 1] <- 8
 
 
 # *Prolapskirurgi åpen.
 # DO IF InngrepV3 = 0 & OprProlap > 0 & OpMikroV3 = 0 & FusjonKir =0.
 # RECODE InngrepV3 (0 = 7).
-RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$OprProlap > 0
-                  & RegData$OpMikroV3 == 0 & RegData$FusjonKir == 0] <- 7
+RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$OprProlap > 0 &
+                  RegData$OpMikroV3 == 0 & RegData$FusjonKir == 0] <- 7
 
 
 
 # *Prolapskirurgi mikro.
 # DO IF InngrepV3 = 0 & OprProlap > 0 & OpMikroV3 > 0 & FusjonKir =0.
 # RECODE InngrepV3 (0 = 6).
-RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OprProlap > 0)
-                  & RegData$OpMikroV3 > 0 & RegData$FusjonKir == 0] <- 6
+RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OprProlap > 0) &
+                  RegData$OpMikroV3 > 0 & RegData$FusjonKir == 0] <- 6
 
 # Prolaps udefinert, defineres inn i prolaps mikro.
 # DO IF InngrepV3 = 0 & (RfSkive = 1 & OprProlap > 0 & FusjonKir  ~=  1 & OpMikroV3  ~=  0).
 # RECODE InngrepV3 (0 = 6).
 RegData$InngrepV3[RegData$InngrepV3 == 0 &
-                    ((RegData$OprProlap > 0) & (RegData$RfSkive == 1)
-                     & (RegData$FusjonKir  !=  1) & (RegData$OpMikroV3  !=  0))] <- 6
+                    ((RegData$OprProlap > 0) & (RegData$RfSkive == 1) &
+                     (RegData$FusjonKir  !=  1) & (RegData$OpMikroV3  !=  0))] <- 6
 
 # *Udefinert fusjon.
 # DO IF InngrepV3 = 0 & FusjonKir = 1.
@@ -103,15 +102,13 @@ RegData$InngrepV3[RegData$InngrepV3 == 0
 # DO IF InngrepV3 = 0 & (RfSkive = 0 & OpLaminektomi ~= 1) & OprProlap = 0.
 # RECODE InngrepV3 (0 = 8).
 RegData$InngrepV3[RegData$InngrepV3 == 0
-                  & ((RegData$RfSkive == 0) & (RegData$OpLaminektomi != 1) & (RegData$OprProlap == 0))] <- 8
+                  & ((RegData$RfSkive == 0 & RegData$OpLaminektomi != 1) & (RegData$OprProlap == 0))] <- 8
 
 # *Udefinert, defineres inn i Laminektomi.
 # DO IF InngrepV3 = 0 & OpLaminektomi = 1.
 # RECODE InngrepV3 (0 = 9).
 RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$OpLaminektomi == 1] <- 9
-table(RegData$InngrepV3)
-# 0    5    6    7    8    9   10   11   12   13   14   15   16   17
-# 7    4 1327    2 1358   98 3859  164    7  159   39    8   79  114
+
 # RECODE InngrepV3 (6=1) (7=2) (8=3) (9=4) (4=5) (11=6) (12=7) (13=8) (14=9) (15=10) (0=0) (5=11)
 # (10=12) (16=13) (17=14) INTO InngrepV2V3.
 # VARIABLE LABELS  InngrepV2V3 'fusjonV2 og V3 Inngrep'.
@@ -119,7 +116,6 @@ RegData$InngrepV2V3 <- as.numeric(dplyr::recode(
   RegData$InngrepV3, '6'='1', '7'='2', '8'='3', '9'='4', '4'='5', '11'='6', '12'='7',
   '13'='8', '14'='9', '15'='10', '0'='0', '5'='11','10'='12', '16'='13', '17'='14'))
 
-table(RegData$InngrepV2V3)
 InngrepV2V3_txt <- c('Udef.', 'Prolaps micro', 'Prolaps åpen', 'Dekompresjon',
                      'Laminektomi', 'Eksp. intersp impl.', 'PLF', 'PLIF', 'TLIF', 'ALIF', 'XLIF',
                      'Udef. fusjon', 'Osteotomi/deform.', 'Revisjon', 'Skiveprotese')
@@ -153,7 +149,7 @@ InngrepV2V3_txtlang <- c('Andre inngrep', 'Prolaps micro', 'Prolaps åpen', 'Mid
 RegData$HovedInngrepV2V3 <- dplyr::recode(RegData$InngrepV2V3,
   '0'='0', '3'='2', '4'='3', '5'='4', '12'='6', '13'='7', '14'='8', '1'='1', '2'='1',
   '6'='5', '7'='5', '8'='5', '9'='5', '10'='5', '11'='5')
-table(RegData$HovedInngrepV2V3)
+
 HovedInngrepV2V3_txt <- c('Udef.', 'Prolaps', 'Dekomp.', 'Laminektomi', 'Eksp. intersp impl.',
                           'Fusjon', 'Deformitet', 'Revisjon', 'Skiveprotese')
 HovedInngrepV2V3_txtlang <- c('Andre inngrep', 'Prolapskirurgi', 'Midtlinjebevarende dekompr.',
