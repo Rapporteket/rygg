@@ -415,13 +415,15 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   tittel <- paste0('Fornøyde pasienter', ktrtxt)
             }
       }
-      # if (valgtVar=='hovedInngrep'){ #fordeling
-      #       tittel <- 'Hovedinngrep'
-      #       grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Foramenotomi', 'Laminektomi',
-      #                  'Interspin. implantat', 'Fusjonskirurgi', 'Skiveprotese', 'Rev. av implantat')
-      #       RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:7)
-      #       retn <- 'H'
-      # }
+      if (valgtVar=='hovedInngrep'){ #fordeling
+            tittel <- 'Hovedinngrep'
+            # grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Foramenotomi', 'Laminektomi',
+            #            'Interspin. implantat', 'Fusjonskirurgi', 'Skiveprotese', 'Rev. av implantat')
+            grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Dekompresjon', 'Laminektomi', 'Eksp. intersp impl.',
+                       'Fusjonskirurgi', 'Deformitet', 'Rev. av implantat', 'Skiveprotese')
+            RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:8)
+            retn <- 'H'
+      }
       if (valgtVar=='komorbiditet') {
          tittel <- 'Komorbiditet'
          retn <- 'H'

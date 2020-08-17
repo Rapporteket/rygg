@@ -11,12 +11,12 @@
 #'     \item 0: Hele landet (Standard)
 #'     \item 1: Egen enhet mot resten av landet
 #'     \item 2: Egen enhet
-#'     \item 3: Egen enhet mot egen sykehustype
-#'     \item 4: Egen sykehustype
-#'     \item 5: Egen sykehustype mot resten av landet
-#'     \item 6: Egen enhet mot egen region
-#'     \item 7: Egen region
-#'     \item 8: Egen region mot resten
+#'     \item 3: IKKE def - Egen enhet mot egen sykehustype
+#'     \item 4: IKKE def - Egen sykehustype
+#'     \item 5: IKKE def - Egen sykehustype mot resten av landet
+#'     \item 6: IKKE def - Egen enhet mot egen region
+#'     \item 7: IKKE def - Egen region
+#'     \item 8: IKKE def - Egen region mot resten
 #'   }
 
 #' @inheritParams RyggFigAndeler
@@ -29,16 +29,17 @@
 #'          1: Menn
 #' @param hovedkat Hvilken type hovedinngrep, numerisk 0-9, standard: 99, dvs. alle. Valgmuligheter:
 #'   \itemize{
-#'     \item 0:'Operasjonskategori: "ukjent"',	#hkat=0
+#'     \item 0:'Andre inngrep',
 #'     \item 1:'Prolapskirurgi',
-#'     \item 2:'Foramenotomi',
+#'     \item 2:'Midtlinjebevarende dekompr.',
 #'     \item 3:'Laminektomi',
-#'     \item 4:'Interspinøst implantat',
+#'     \item 4:'Eksp. intersp implantat',
 #'     \item 5:'Fusjonskirurgi',
-#'     \item 6:'Skiveprotese',
+#'     \item 6:'Osteotomi, deformitet',
 #'     \item 7:'Fjerning/rev. av implantat',
-#'     \item 8:'Spinal stenose',
-#'     \item 9:'Degen. spondylolistese'
+#'     \item 8:'Skiveprotese',
+#'     \item 9:'Spinal stenose',
+#'     \item 10:'Degen. spondylolistese'
 #'     \item 99: Alle
 #'   }
 #' @param aar - Operasjonsår. Kan velge flere
@@ -56,8 +57,6 @@ RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil='3000-01-01', m
 
 # Definer intersect-operator
       "%i%" <- intersect
-# Hovedinngrep ikke definert:
-      hovedkat <- 99
 
 #Når bare skal sammenlikne med sykehusgruppe eller region, eller ikke sammenlikne,
 #trengs ikke data for hele landet:
@@ -79,21 +78,19 @@ indAar <- if (aar[1] > 2000) {which(RegData$Aar %in% as.numeric(aar))} else {ind
 indDato <- which(RegData$InnDato >= as.POSIXlt(datoFra) & RegData$InnDato <= as.POSIXlt(datoTil))
 indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
 #Hovedkategori, flervalgsutvalg
-      indHovedInngr <- if (hovedkat[1] %in% 0:7) {which(RegData$HovedInngrep %in% as.numeric(hovedkat))
+      indHovedInngr <- if (hovedkat[1] %in% 0:7) {which(RegData$HovedInngrepV2V3 %in% as.numeric(hovedkat))
             } else {indHovedInngr <- 0}
 
-      ##Spinal stenose, beregnes for 8 og 9:
-      #attach(RegData)
-      if (length(intersect(c(8:9), hovedkat)>0)) {indSS <- with(RegData, which((RfSentr == 1 | RfLateral == 1)
-                                                                 & RfSpondtypeIsmisk==0
-                    & (OpDeUlamin==1 | OpLaminektomi==1 | OpDeFasett==1)
-                    & (HovedInngrep %in% c(2:5,7))))}
-      if (is.element(8, hovedkat)) {indHovedInngr <- union(indHovedInngr, indSS)}
+      ##Spinal stenose:
+      # if (length(intersect(c(8:9), hovedkat)>0)) {indSS <- with(RegData, which((RfSentr == 1 | RfLateral == 1)
+      #                                                            & RfSpondtypeIsmisk==0
+      #               & (OpDeUlamin==1 | OpLaminektomi==1 | OpDeFasett==1)
+      #               & (HovedInngrep %in% c(2:5,7))))}
+      if (is.element(9, hovedkat)) {indHovedInngr <- union(indHovedInngr, which(RegData$LSSopr==1))}
       #Degenerativ spondylolistese:
-      if (is.element(9, hovedkat)) {indHovedInngr <- union(indHovedInngr,
-                                                           intersect(indSS, which(RegData$RfSpondtypeDegen==1)))}
-      #detach(RegData)
-      if (!(hovedkat %in% 0:9)) {indHovedInngr <- 1:Ninn}
+      if (is.element(10, hovedkat)) {indHovedInngr <- union(indHovedInngr,
+                                                           intersect(which(RegData$LSSopr==1), which(RegData$RfSpondtypeDegen==1)))}
+      if (!(hovedkat %in% 0:10)) {indHovedInngr <- 1:Ninn}
 
 indTidlOp <- if (tidlOp %in% 1:4) {which(RegData$TidlOpr==tidlOp)} else {indTidlOp <- 1:Ninn}
 indhastegrad <- if (hastegrad %in% 1:2) {
@@ -108,17 +105,20 @@ RegData <- RegData[indMed,]
 #                        & (OpDeUlamin=1 or OpLaminektomi=1 or OpDeFasett=1)
 #                        & (HovedInngrep=2 or HovedInngrep=3 or HovedInngrep=4  or HovedInngrep=5 or HovedInngrep=7) )
 
-hkatnavn <- c( #0:9
-	'Operasjonskategori: "ukjent"',	#hkat=0
-	'Prolapskirurgi',
-	'Foramenotomi',
-	'Laminektomi',
-	'Interspinøst implantat',
-	'Fusjonskirurgi',
-	'Skiveprotese',
-	'Fjerning/rev. av implantat',
-	'Spinal stenose',
-	'Degen. spondylolistese')
+# hkatnavn <- c( #0:9
+# 	'Operasjonskategori: "ukjent"',	#hkat=0
+# 	'Prolapskirurgi',
+# 	'Foramenotomi',
+# 	'Laminektomi',
+# 	'Interspinøst implantat',
+# 	'Fusjonskirurgi',
+# 	'Skiveprotese',
+# 	'Fjerning/rev. av implantat',
+# 	'Spinal stenose',
+# 	'Degen. spondylolistese')
+HovedInngrepV2V3_txt <- c('Udef.', 'Prolaps', 'Dekomp.', 'Laminektomi', 'Eksp. intersp impl.',
+                          'Fusjon', 'Deformitet', 'Revisjon', 'Skiveprotese') #0:8
+hkatnavn <- c(HovedInngrepV2V3_txt, 'Spinal stenose', 'Degen. spondylolistese')
 
 TidlOprtxt <-	c('Tidl. operert samme nivå', 'Tidl. operert annet nivå', 'Tidl. operert annet og sm. nivå', 'Primæroperasjon')
 hastegradTxt <- paste0('Operasjonskategori: ', c('Elektiv', 'Akutt')) #, '1/2-Akutt'))
@@ -134,7 +134,7 @@ utvalgTxt <- c(paste0('Operasjonsdato: ', if (N>0) {min(RegData$InnDato, na.rm=T
 	if ((minald>0) | (maxald<110)) {paste0('Pasienter fra ', if (N>0) {min(RegData$Alder, na.rm=T)} else {minald},
 						' til ', if (N>0) {max(RegData$Alder, na.rm=T)} else {maxald}, ' år')},
 	if (erMann %in% 0:1) {paste0('Kjønn: ', c('Kvinner', 'Menn')[erMann+1])},
-	if (hovedkat[1] %in% 0:9) {paste0('Hovedinngrep: ', paste(hkatnavn[as.numeric(hovedkat)+1], collapse=','))},
+	if (hovedkat[1] %in% 0:10) {paste0('Hovedinngrep: ', paste(HovedInngrepV2V3_txt[as.numeric(hovedkat)+1], collapse=','))},
       if (hastegrad %in% 1:2) {hastegradTxt[hastegrad]},
       if (tidlOp %in% 1:4) {TidlOprtxt[tidlOp]}
 	)

@@ -72,6 +72,10 @@ sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
 sykehusValg <- c(0,sykehusValg)
 names(sykehusValg) <- c('Alle',sykehusNavn$x)
 
+hovedkatValg <- c('Alle'=99, 'Andre inngrep'=0, 'Prolapskirurgi'=1, 'Midtlinjebevarende dekompr.'=2,
+  'Laminektomi'=3, 'Eksp. intersp implantat'=4, 'Fusjonskirurgi'=5, 'Osteotomi, deformitet'=6,
+  'Revisjon,fjerne implantat'=7, 'Skiveprotese'=8, 'Spinal stenose'=9, 'Degen. spondylolistese'=10)
+
 
 # Define UI for application
 ui <- navbarPage(id = "tab1nivaa",
@@ -322,7 +326,7 @@ tabPanel(p('Fordelinger',
                                   'Har pasienten søkt erstatning?' = 'erstatningPre',
                                   '-Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon' = 'fornoydhet3mnd',
                                   '-Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon' = 'fornoydhet12mnd',
-                                  #Hovedinngrep = HovedInngrep
+                                  '-Hovedinngrep' = 'hovedInngrep',
                                   'Komorbiditet' = 'komorbiditet',
                                   'Komplikasjoner, perop. ' = 'komplPer' ,
                                   '-Komplikasjoner, pasientrapp. ' = 'komplPost',
@@ -364,7 +368,11 @@ tabPanel(p('Fordelinger',
                     ),
                     selectInput(inputId = 'tidlOp', label='Tidligere operert?',
                                 choices = tidlOprvalg
-                    ),selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
+                    ),
+                    selectInput(inputId = 'hovedInngrep', label='Hovedinngrepstype',
+                                choices = hovedkatValg
+                    ),
+                    selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
                     )
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
@@ -637,6 +645,7 @@ server <- function(input, output,session) {
                    erMann=as.numeric(input$erMann),
                    hastegrad = as.numeric(input$hastegrad),
                    tidlOp = as.numeric(input$tidlOp),
+                  hovedkat = as.numeric(input$hovedInngrep),
                   session = session)
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
@@ -649,6 +658,7 @@ server <- function(input, output,session) {
                                 erMann=as.numeric(input$erMann),
                                 hastegrad = as.numeric(input$hastegrad),
                                 tidlOp = as.numeric(input$tidlOp),
+                                hovedkat = as.numeric(input$hovedInngrep),
                                 lagFig = 0, session = session)
 
     tabFord <- lagTabavFig(UtDataFraFig = UtDataFord)
