@@ -357,7 +357,7 @@ tabPanel(p('Fordelinger',
                       )
                     ),
                     dateRangeInput(inputId = 'datovalg', start = startDato, end = idag,
-                                   label = "Tidsperiode", separator="t.o.m.", language="nb"),
+                                   label = "Tidsperiode (operasjonsdato)", separator="t.o.m.", language="nb"),
                     selectInput(inputId = "erMann", label="Kjønn",
                                 choices = kjonn
                     ),
