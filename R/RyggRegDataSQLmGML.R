@@ -215,45 +215,51 @@ FROM AlleVarNum
 
   VarV2 <- sort(names(RegDataV2))
   VarV3 <- sort(names(RegDataV3))
-  #NB: Må tilpasse variabelnavn fra V2 til V3, eks Alder (V2), AlderVedOpr (V3)
-  setdiff(VarV2, VarV3)
-  [4] "Antibiotika"                          "AntNivOpr"                            "Arbstatus12mnd"
-  [7] "Arbstatus3mnd"                        "ArbstatusPre"
-  [10] ""                              ""                            "Bydelkode"
-  [13] "Bydelsted"
-                 "FusjonKirAlif"                        "FusjonKirAlifBen"
-  [34] "FusjonKirAlifBur"                     "FusjonKirPlf"                         "FusjonKirPlfIntr"
-  [37] "FusjonKirPlif"                        "FusjonKirTlif"                        "FusjonSpes"
-  [40] "HFID"                                 "HFNavn"                               "HFReshID"
-  [43] "HovedInngrep"                         "HovedInngreptxt"                      "Hoyde"
-  [46] "Inngrep"                              "Inngreptxt"                           "Kommunenr"
-  [49] "Kp3Mnd"                               "KpInf3Mnd"                            "KpInfDyp12Mnd"
-  [52] "KpMiktProb3Mnd"                       "KpSarinfUspesType3Mnd"                "OpAndreSkiveprotese"
-  [55] "OpAndreSpes"                          "OpDeFasett"                           "OpDeFasettUniBi"
-  [58] "OpIndSme"                             "OpIndSmeType"                         "OpL23"
-  [61] "OpL34"                                "OpL45"                                "OpL5S1"
-  [64] "OpMikro"                              "OpProlap"                             "OpTilgang"
-                                 "Personnummer"                         "PID"
-  [70] "Region"                               "Reop90d"                              "RfAnnet"
-  [73] "RfAnnetspes"                          "RfDegen"                              "RfForamino"
-  [76] "RfNormal"                             "RfPseudom"                            "RfSkive"
-  [79] "RfSynovpre"                           "Roker"                                "RvDiscogr"
-  [82] "RvDpregblok"                          "RvRadigr"                             "SivilStatus"
-  [85] "SkjemaIDIa"                           "SkjemaIDIIa"                          "SykdAnnet"
-  [88] "SykdKroniskSmerterMuskelSkjelettsyst" "SykdVaskulærClaudicatio"              "Sykehustype"
-  [91] "SykemeldVarighPre"                    "TideOp12mnd"                          "TideOp3mnd"
-  [94] "TidlOpr"                              "TypeBen"                              "TypeBenBensub"
-  [97] "Utfylt12Mnd"                          "Utfylt3Mnd"
-                                 library(magrittr)
-  #RegDataV2 %>%
+
+  setdiff(VarV2, VarV3) #Sjekk på nytt når gått gjennom.
+
+  #Tilpass?: "Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre"
+  #V2: TidlOpr. Var må beregnes i V3
+
+
+  table(RegDataV3$SivilStatusV3)
+  1    2    9
+  5455 1936  118
+  table(RegDataV2$SivilStatus)
+  1     2     3
+  279 24923  7573 11201
+
+
+    #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
+    RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
+                                         breaks=c(-Inf, 90, 182, 365, Inf),
+                                         right = FALSE, labels=c(1:4)))
+     RegDataV2$SykemeldVarighPreV3[is.na(RegDataV2$SykemeldVarighPreV3)] <- 9
+
+
+# Endre V2-data fra gamle til nye navn (V2=V3):
     dplyr::rename(RegDataV2,
       Alder = AlderVedOpr,
       EQ5D12mnd = EQ5DV212mnd,
       EQ5D3mnd = EQ5DV23mnd,
       AvdNavn = SykehusNavn,
-      AvdReshID = AvdRESH
+      AvdReshID = AvdRESH,
+      Bydelkode = Bydelskode,
+      Bydelsted = Bydelsnavn,
+      Kommunenr = KommuneNr, #Kommunenavn ikke med i V2
+      KpInfDyp12Mnd = KpInfDyp12mnd,
+      PID = PasientID, #En pasient vil skifte id fra 2019.
+      #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
+
     )
 
+    # plyr::revalue(x, c('HELSEREGION MIDT-NORGE' = 'Midt', 'HELSEREGION NORD' = 'Nord',
+    #                  'HELSEREGION SØR-ØST' = 'Sør-Øst', 'HELSEREGION VEST' = 'Vest'),
+    #             'Helse Midt' = 'Midt', 'Helse Nord' = 'Nord', 'Helse Sør' = 'Sør-Øst',
+    #             'Helse Sør-Øst' = 'Sør-Øst', 'Helse Vest' = 'Vest', 'Helse Øst' = 'Sør-Øst')
+
+  #NB:----------Sjekk ut at alle variabler har samme format
+f.eks. head(RegDataV2, V2ogV3), head(RegDataV3, V2ogV3)
 
   V2ogV3 <- intersect(VarV2, VarV3)
   RegDataV2 <- RegDataV2[ , V2ogV3]
