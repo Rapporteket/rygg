@@ -6,7 +6,7 @@
 #' @return RegData data frame
 #' @export
 #'
-RyggRegDataSQL <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alle=1){
+RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alle=1){
 
 if (alle == 1) {
   RegData <- rapbase::LoadRegData(
@@ -16,157 +16,7 @@ if (alle == 1) {
   # RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
   #                                              query='SELECT * FROM Uttrekk_Rapport', dbType="mysql")
 } else {
-  query <- paste0('SELECT
-	AlderVedOpr,
-	-- Antibiotika,
-	AntibiotikaV3,
-	-- AntNivOpr,
-Arbstatus12mndV3,
-Arbstatus3mndV3,
-ArbstatusPreV3,
-	ASA,
-	SykehusNavn,
-	AvdRESH,
-	BMI,
-  -- Bydelkode,
-  -- Bydelsted,
-	Dagkirurgi,
-	EQ5DV312mnd,
-	EQ5DV33mnd,
-	EQ5DV3Pre,
-	-- Eqangst12mnd,
-	-- Eqangst3mnd,
-	EqangstV3Pre,
-	-- Eqgange12mnd,
-	-- Eqgange3mnd,
-	EqgangeV3Pre,
-	ErstatningPre,
-	-- FirstTimeClosed,
-	-- FistTimeClosed,
-	-- Fornoyd12mnd,
-	-- Fornoyd3mnd,
-	-- HFNavn,
-	-- HovedInngrep,
-	-- HovedInngreptxt,
-	-- Inngrep,
-	-- Inngreptxt,
-	Kjonn,
-	-- KnivtidTot,
-	KommuneNr,
-	KommuneNavn,
---	Kp3Mnd,
---	KpBlod3Mnd,
---	KpDVT3Mnd,
---	KpInf3Mnd,
---	KpInfDyp12Mnd,
---	KpInfDyp3Mnd,
---	KpInfOverfla3Mnd,
---	KpLE3Mnd,
---	KpLungebet3Mnd,
---	KpMiktProb3Mnd,
---	KpUVI3Mnd,
- 	Liggedogn,
- 	LiggetidPostOp,
-MedForstLukket AS FirstTimeClosed,
-Morsmal,
-	-- MorsmalV3,
-	-- Nytte12mnd,
-	-- Nytte3mnd,
-	-- OpAar,
-	OpDato,
---  OpDeUlamin,
---  OpDeFasett,
-	OpIndCauda,
-	OpIndParese,
-	OpIndPareseGrad,
-	-- OpIndSme,
-	-- OpIndSmeType,
-	OpKat,
-	-- OpLaminektomi,
-	-- OpMikro,
-	-- OpProlap,
-	OpTilgangV3,
-	-- OswTot12mnd,
-	-- OswTot3mnd,
-	OswTotPre,
-	PeropKomp,
-	PeropKompAnafy,
-	PeropKompDura,
-	PeropKompFeilnivSide,
-	PeropKompFeilplassImp,
-	PeropKompKardio,
-	PeropKompNerve,
-	PeropKompResp,
-	PeropKompTransfuBlodning,
-	PasientID,
-	-- Region,
-	-- Reop90d,
-	ReopUnderOpph,
-	RfDegenListeseMM,
-	RfSentr,
-	RfSpondtypeDegen,
-	RokerV3,
-	RvCt,
-	-- RvDiscogr,
-	-- RvDpregblok,
-	RvFunksjo,
-	RvMr,
-	-- RvRadigr,
-	RvRtgLscol,
-	Saardren,
-	SivilStatusV3,
-	-- SmBe12mnd,
-	-- SmBe3mnd,
-	SmBePre,
-	-- SmHypp12mnd,
-	-- SmHypp3mnd,
-	SmHyppPre,
-	-- SmRy12mnd,
-	-- SmRy3mnd,
-	SmRyPre,
-	-- SmSti12mnd,
-	-- SmSti3mnd,
-	SmStiPre,
-	-- surgeonform_LIGGEDOEGN_POSTOPERATIV,
-	-- surgeonform_LIGGEDOEGN_TOTALT,
-	Sykd,
-	SykdAndreRelevanteSykdBechtrew,
-	SykdAnnenendokrin,
-	SykdAnnenreumatisk,
-	SykdCerebrovaskular,
-	SykdDepresjonAngst,
-	SykdGeneralisertSmSyndr,
-	SykdHjertekar,
-	SykdHoftekneartose,
-	SykdHypertensjon,
-	SykdKreft,
-	SykdKroniskLunge,
-	SykdKroniskNevrologisk,
-	-- SykdKroniskSmerterMuskelSkjelettsyst,
-	SykdOsteoporose,
-	SykDprebetesMellitus,
-	SykdReumatoidartritt,
-	SykdVaskularClaudicatio,
-	-- Sykehustype,
-	SykemeldVarighPreV3,
-	SymptVarighRyggHof,
-	SympVarighUtstr,
-	TidlIkkeOp,
-	TidlOpAnnetNiv,
-	-- TdllOpAnnetNiv,
-	TidlOpsammeNiv,
-	-- TideOp12mnd,
-	-- TideOp3mnd,
-	-- TidlOpr,
-	-- TidlOprAntall,
-	UforetrygdPre,
-	Utd,
-	-- Utfylt12Mnd,
-	-- Utfylt3Mnd,
-	UtskrivelseDato,
-	Vekt
-FROM AlleVarNum
-  WHERE OpDato >= \'', datoFra, '\' AND OpDato <= \'', datoTil, '\'')
+
 
   #RegData <- rapbase::LoadRegData(registryName="rygg", query=query)
 
@@ -213,13 +63,12 @@ FROM AlleVarNum
   RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% fjernesV3)]
   #RegData <- RyggPreprosess(RegData) #Sjekket at alle nødvendige var for preprosessering er med
 
-  VarV2 <- sort(names(RegDataV2))
-  VarV3 <- sort(names(RegDataV3))
 
-  setdiff(VarV2, VarV3) #Sjekk på nytt når gått gjennom.
+#-----Tilrettelegging av V2-data-------------------------
 
+  #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..
 
-  #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
+    #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
    RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,''), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
     #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
@@ -228,44 +77,64 @@ FROM AlleVarNum
                                          right = FALSE, labels=c(1:4)))
      RegDataV2$SykemeldVarighPreV3[is.na(RegDataV2$SykemeldVarighPreV3)] <- 9
 
-     #Tilpass?: "Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre"
-     #V2: TidlOpr. Var må beregnes i V3
+
+# Variabler med samme innhold i V2 og V3, men avvikende variabelnavn. (navnV3 = navnV2)
+     RegDataV2 <- dplyr::rename(RegDataV2,
+                                AlderVedOpr = Alder,
+                                EQ5DV212mnd = EQ5D12mnd,
+                                EQ5DV23mnd = EQ5D3mnd,
+                                AvdRESH = AvdReshID,
+                                Bydelskode = Bydelkode,
+                                Bydelsnavn = Bydelsted,
+                                KommuneNr = Kommunenr, #Kommunenavn ikke med i V2
+                                KpInfDyp12mnd = KpInfDyp12Mnd,
+                                PasientID = PID, #En pasient vil skifte id fra 2019.
+                                #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
+                                SykehusNavn = AvdNavn
+     )
+
+    #-----Tilrettelegging av V3-data-------------------------
+
+    RegDataV3$Kp3Mnd <- NULL
+    RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
+                                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
+                           na.rm = T) > 0] <- 1
+
+    #TidlOp. V2: 1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
+    #TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv
+    RegDataV3$TidlOpr <- 9
+    RegDataV3$TidlOpr[RegDataV3$TidlIkkeOp==1] <- 4
+    RegDataV3$TidlOpr[RegDataV3$TidlOpsammeNiv==1] <- 1
+    RegDataV3$TidlOpr[RegDataV3$TidlOpAnnetNiv==1] <- 2
+    RegDataV3$TidlOpr[RegDataV3$TidlOpsammeNiv==1 & RegDataV3$TidlOpAnnetNiv==1] <- 3
 
 
-# Endre V2-data fra gamle til nye navn (V2=V3):
-    dplyr::rename(RegDataV2,
-      Alder = AlderVedOpr,
-      EQ5D12mnd = EQ5DV212mnd,
-      EQ5D3mnd = EQ5DV23mnd,
-      AvdNavn = SykehusNavn,
-      AvdReshID = AvdRESH,
-      Bydelkode = Bydelskode,
-      Bydelsted = Bydelsnavn,
-      Kommunenr = KommuneNr, #Kommunenavn ikke med i V2
-      KpInfDyp12Mnd = KpInfDyp12mnd,
-      PID = PasientID, #En pasient vil skifte id fra 2019.
-      #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
 
-    )
+  #NB:----------Sjekk ut at alle variabler har samme format - VENTER TIL ENDELIG V2-FIL PÅ RAPPORTEKET.
+#f.eks. head(RegDataV2, V2ogV3), head(RegDataV3, V2ogV3)
 
-    # plyr::revalue(x, c('HELSEREGION MIDT-NORGE' = 'Midt', 'HELSEREGION NORD' = 'Nord',
-    #                  'HELSEREGION SØR-ØST' = 'Sør-Øst', 'HELSEREGION VEST' = 'Vest'),
-    #             'Helse Midt' = 'Midt', 'Helse Nord' = 'Nord', 'Helse Sør' = 'Sør-Øst',
-    #             'Helse Sør-Øst' = 'Sør-Øst', 'Helse Vest' = 'Vest', 'Helse Øst' = 'Sør-Øst')
+    VarV2 <- sort(names(RegDataV2))
+    VarV3 <- sort(names(RegDataV3))
 
-  #NB:----------Sjekk ut at alle variabler har samme format
-f.eks. head(RegDataV2, V2ogV3), head(RegDataV3, V2ogV3)
+    #Variabler i V2 som ikke er i V3. Noen er bevisst fjernet fra V3, se vektor fjernesV3
+    #setdiff(VarV2, VarV3) #Sjekk på nytt når gått gjennom.
 
   V2ogV3 <- intersect(VarV2, VarV3)
   RegDataV2 <- RegDataV2[ , V2ogV3]
   V3ikkeV2 <- setdiff(VarV3, V2ogV3)
-  RegDataV2[, V3ikkeV2] <- NA
+  RegDataV2[, V3ikkeV2] <- NULL
 
   RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
                        RegDataV3[ ,VarV3])
+  #19.aug: 101 variabler i både V2 og V3. 128 i tillegg i V3
 
-}
 
+  # plyr::revalue(x, c('HELSEREGION MIDT-NORGE' = 'Midt', 'HELSEREGION NORD' = 'Nord',
+  #                  'HELSEREGION SØR-ØST' = 'Sør-Øst', 'HELSEREGION VEST' = 'Vest'),
+  #             'Helse Midt' = 'Midt', 'Helse Nord' = 'Nord', 'Helse Sør' = 'Sør-Øst',
+  #             'Helse Sør-Øst' = 'Sør-Øst', 'Helse Vest' = 'Vest', 'Helse Øst' = 'Sør-Øst')
+
+} #if langt oppe..
 return(RegDataV2V3)
 }
 

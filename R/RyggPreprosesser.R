@@ -42,23 +42,20 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days'))
-	variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
-	              'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')
-	RegData$Kp3Mnd <- NULL
-	RegData$Kp3Mnd[rowSums(RegData[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
-	                                   'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
-	                       na.rm = T) > 0] <- 1
 
+	RegDataV3$Kp3Mnd <- NULL
+	RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
+	                                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
+	                         na.rm = T) > 0] <- 1
 
-	#1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
+	#TidlOp. V2: 1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
 	#TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv
 	RegData$TidlOpr <- 9
 	RegData$TidlOpr[RegData$TidlIkkeOp==1] <- 4
 	RegData$TidlOpr[RegData$TidlOpsammeNiv==1] <- 1
-  RegData$TidlOpr[RegData$TidlOpAnnetNiv==1] <- 2
-  RegData$TidlOpr[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
-	#  table(RegData$TidlOpr)
-#Data <- RegData[,c('TidlIkkeOp', 'TidlOpAnnetNiv', 'TidlOpsammeNiv')]
+	RegData$TidlOpr[RegData$TidlOpAnnetNiv==1] <- 2
+	RegData$TidlOpr[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
+
 
 	#Formatering
 	RegData$ShNavn <- as.character(RegData$ShNavn)
