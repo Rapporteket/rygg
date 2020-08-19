@@ -218,23 +218,18 @@ FROM AlleVarNum
 
   setdiff(VarV2, VarV3) #Sjekk på nytt når gått gjennom.
 
-  #Tilpass?: "Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre"
-  #V2: TidlOpr. Var må beregnes i V3
 
-
-  table(RegDataV3$SivilStatusV3)
-  1    2    9
-  5455 1936  118
-  table(RegDataV2$SivilStatus)
-  1     2     3
-  279 24923  7573 11201
-
+  #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
+   RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,''), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
     #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
     RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
                                          breaks=c(-Inf, 90, 182, 365, Inf),
                                          right = FALSE, labels=c(1:4)))
      RegDataV2$SykemeldVarighPreV3[is.na(RegDataV2$SykemeldVarighPreV3)] <- 9
+
+     #Tilpass?: "Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre"
+     #V2: TidlOpr. Var må beregnes i V3
 
 
 # Endre V2-data fra gamle til nye navn (V2=V3):
