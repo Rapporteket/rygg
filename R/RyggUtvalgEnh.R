@@ -78,7 +78,7 @@ indAar <- if (aar[1] > 2000) {which(RegData$Aar %in% as.numeric(aar))} else {ind
 indDato <- which(RegData$InnDato >= as.POSIXlt(datoFra) & RegData$InnDato <= as.POSIXlt(datoTil))
 indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
 #Hovedkategori, flervalgsutvalg
-      indHovedInngr <- if (hovedkat[1] %in% 0:7) {which(RegData$HovedInngrepV2V3 %in% as.numeric(hovedkat))
+      indHovedInngr <- if (hovedkat[1] %in% 0:8) {which(RegData$HovedInngrepV2V3 %in% as.numeric(hovedkat))
             } else {indHovedInngr <- 0}
 
       ##Spinal stenose:
@@ -118,7 +118,7 @@ RegData <- RegData[indMed,]
 # 	'Degen. spondylolistese')
 HovedInngrepV2V3_txt <- c('Udef.', 'Prolaps', 'Dekomp.', 'Laminektomi', 'Eksp. intersp impl.',
                           'Fusjon', 'Deformitet', 'Revisjon', 'Skiveprotese') #0:8
-hkatnavn <- c(HovedInngrepV2V3_txt, 'Spinal stenose', 'Degen. spondylolistese')
+hkatnavn <- c(HovedInngrepV2V3_txt, 'Spinal stenose', 'Degen. spondylolistese og LSS')
 
 TidlOprtxt <-	c('Tidl. operert samme nivå', 'Tidl. operert annet nivå', 'Tidl. operert annet og sm. nivå', 'Primæroperasjon')
 hastegradTxt <- paste0('Operasjonskategori: ', c('Elektiv', 'Akutt')) #, '1/2-Akutt'))
@@ -134,7 +134,7 @@ utvalgTxt <- c(paste0('Operasjonsdato: ', if (N>0) {min(RegData$InnDato, na.rm=T
 	if ((minald>0) | (maxald<110)) {paste0('Pasienter fra ', if (N>0) {min(RegData$Alder, na.rm=T)} else {minald},
 						' til ', if (N>0) {max(RegData$Alder, na.rm=T)} else {maxald}, ' år')},
 	if (erMann %in% 0:1) {paste0('Kjønn: ', c('Kvinner', 'Menn')[erMann+1])},
-	if (hovedkat[1] %in% 0:10) {paste0('Hovedinngrep: ', paste(HovedInngrepV2V3_txt[as.numeric(hovedkat)+1], collapse=','))},
+	if (hovedkat[1] %in% 0:10) {paste0('Hovedinngrep: ', paste(hkatnavn[as.numeric(hovedkat)+1], collapse=','))},
       if (hastegrad %in% 1:2) {hastegradTxt[hastegrad]},
       if (tidlOp %in% 1:4) {TidlOprtxt[tidlOp]}
 	)

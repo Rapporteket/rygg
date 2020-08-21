@@ -74,7 +74,7 @@ names(sykehusValg) <- c('Alle',sykehusNavn$x)
 
 hovedkatValg <- c('Alle'=99, 'Andre inngrep'=0, 'Prolapskirurgi'=1, 'Midtlinjebevarende dekompr.'=2,
   'Laminektomi'=3, 'Eksp. intersp implantat'=4, 'Fusjonskirurgi'=5, 'Osteotomi, deformitet'=6,
-  'Revisjon,fjerne implantat'=7, 'Skiveprotese'=8, 'Spinal stenose'=9, 'Degen. spondylolistese'=10)
+  'Revisjon,fjerne implantat'=7, 'Skiveprotese'=8, 'Spinal stenose'=9, 'Degen. spondylolistese og LSS'=10)
 
 
 # Define UI for application
@@ -354,7 +354,8 @@ tabPanel(p('Fordelinger',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
                                   'Utdanning (høyeste fullførte)' = 'utd'
-                      )
+                      ),
+                      selected = c('Registreringsforsinkelse' = 'regForsinkelse')
                     ),
                     dateRangeInput(inputId = 'datovalg', start = startDato, end = idag,
                                    label = "Tidsperiode (operasjonsdato)", separator="t.o.m.", language="nb"),
