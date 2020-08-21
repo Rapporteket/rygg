@@ -43,8 +43,8 @@ RyggPreprosess <- function(RegData=RegData)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days'))
 
-	RegDataV3$Kp3Mnd <- NULL
-	RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
+	RegData$Kp3Mnd <- NULL
+	RegData$Kp3Mnd[rowSums(RegData[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
 	                                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
 	                         na.rm = T) > 0] <- 1
 
