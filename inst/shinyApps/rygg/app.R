@@ -558,31 +558,26 @@ server <- function(input, output,session) {
 # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
   tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
     data <- dplyr::filter(data,
-                          # InnDato >= datovalg[1],
-                          # InnDato <= datovalg[2])
                           as.Date(InnDato) >= datovalg[1],
                           as.Date(InnDato) <= datovalg[2])
     if (rolle == 'SC') {
+      PIDtab <- rapbase::LoadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+      data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
       valgtResh <- as.numeric(reshID)
       ind <- if (valgtResh == 0) {1:dim(data)[1]
       } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
       data <- data[ind,]
-    } else {data[which(data$ReshId == reshID), ]}
+    } else {
+      data <- data[which(data$ReshId == reshID), ]}
+    return(data)
   }
 
   observe({
-    dataRegKtr <- tilretteleggDataDumper(data=RegOversikt, datovalg = input$datovalgRegKtr,
-                                         reshID=input$velgReshReg, rolle = rolle)
-  #   RegOversikt <- dplyr::filter(RegOversikt,
-  #                                as.Date(HovedDato) >= input$datovalgRegKtr[1],
-  #                                as.Date(HovedDato) <= input$datovalgRegKtr[2])
-  # tabDataRegKtr <- if (rolle == 'SC') {
-  #   valgtResh <- as.numeric(input$velgReshReg)
-  #   ind <- if (valgtResh == 0) {1:dim(RegOversikt)[1]
-  #     } else {which(as.numeric(RegOversikt$AvdRESH) %in% as.numeric(valgtResh))}
-  #   RegOversikt <- RegOversikt[ind,]
-  #     } else {RegOversikt[which(RegOversikt$AvdRESH == reshID), ]}
-
+    reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
+    indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
+    dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
+                                as.Date(InnDato) >= input$datovalgRegKtr[1],
+                                as.Date(InnDato) <= input$datovalgRegKtr[2])
 
   output$lastNed_dataTilRegKtr <- downloadHandler(
     filename = function(){'dataTilKtr.csv'},
