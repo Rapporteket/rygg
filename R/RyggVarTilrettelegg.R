@@ -593,7 +593,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             }}
 
       if (valgtVar=='opInd') { #fordeling
-            tittel <- 'Operasjonsindikasjon (var. smerte mangler..)'
+            tittel <- 'Operasjonsindikasjon'
             retn <- 'H'
             flerevar <- 1
             variable <- c('OpIndCauda', 'OpIndParese') #, 'OpIndSme')
@@ -807,9 +807,10 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
 
       if (valgtVar == 'smStiPreHypp') { #fordeling
          tittel <- 'Hyppighet av smertestillende før operasjonen'
-         grtxt <- c('Sjeldnere', 'Månedlig', 'Ukentlig', 'Daglig', 'Oftere', 'Ikke utfylt')
+         grtxt <- c('Sjeldnere', 'Månedlig', 'Ukentlig', 'Daglig', 'Flere ganger om dagen', 'Ikke utfylt') #'Oftere',
          #RegData <- RegData[which(RegData$SmHyppPre %in% c(1:5, 9)), ]
          RegData$VariabelGr <- factor(RegData$SmHyppPre, levels = c(1:5,9))
+         retn <- 'H'
       }
 
       if (valgtVar == 'smStiPre') { #fordeling, andelGrVar/Tid
