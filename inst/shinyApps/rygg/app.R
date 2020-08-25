@@ -308,6 +308,7 @@ ui <- navbarPage(id = "tab1nivaa",
 tabPanel(p('Fordelinger',
                     title='Alder, Innkomstmåte,... '),
                   sidebarPanel(
+                    id = "brukervalg_fordeling",
                     width = 3,
                     h4('Her kan man velge hvilken variabel man ønsker å se og gjøre ulike filtreringer.'),
                     br(),
@@ -376,9 +377,11 @@ tabPanel(p('Fordelinger',
                     ),
                     selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
-                    )
+                    ),
+                    br(),
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
+                    actionButton("reset_fordValg", label="Tilbakestill valg")
                   ),
                   mainPanel(
                     tabsetPanel(
@@ -453,6 +456,11 @@ server <- function(input, output,session) {
                    target = 'Registeradministrasjon') #
   }
   })
+
+  observeEvent(input$reset_fordValg, shinyjs::reset("brukervalg_fordeling"))
+  #observeEvent(input$reset_andelValg, shinyjs::reset("brukervalg_andeler"))
+  #observeEvent(input$reset_gjsnValg, shinyjs::reset("brukervalg_gjsn"))
+
 #print(dim(RegData)[1])
   # widget
   if (paaServer) {
