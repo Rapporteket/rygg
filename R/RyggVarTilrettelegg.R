@@ -429,7 +429,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          grtxt <- c('Andre inngrep', 'Prolaps micro', 'Prolaps åpen', 'Midtlinjebev. dekomp.',
                     'Laminektomi', 'Eksp. intersp impl.', 'PLF', 'PLIF', 'TLIF', 'ALIF', 'XLIF',
                     'Udefinert fusjon', 'Osteotomi/deform.', 'Revisjon', 'Skiveprotese')
-         RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:14)
+         RegData$VariabelGr <- factor(RegData$InngrepV2V3, levels = 0:14)
          retn <- 'H'
       }
 
