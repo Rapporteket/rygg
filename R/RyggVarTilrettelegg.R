@@ -174,18 +174,18 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             }
       }
 
-      # if (valgtVar == 'beinsmLavPre') { #AndelGrVar, AndelTid
-      #       #Lav beinsmerte og ingen parese. (Først og fremst prolaps)
-      #       RegData$Variabel[which((RegData$OpIndParese==0) & (RegData$SmBePre < 3.5))] <- 1
-      #       RegData <- RegData[which(RegData$SmBePre <= 10),]
-      #       sortAvtagende <- F
-      #       tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
-      #       #intToUtf8(2264)
-      #       #KImaalRetn <- 'lav'
-      #       KImaalGrenser <- c(0,3)
-      #       varTxt <- 'med manglende indikasjon'
-      #
-      # }
+      if (valgtVar == 'beinsmLavPre') { #AndelGrVar, AndelTid
+            #Lav beinsmerte og ingen parese. (Først og fremst prolaps)
+            RegData$Variabel[which((RegData$OpIndParese==0) & (RegData$SmBePre < 3.5))] <- 1
+            RegData <- RegData[which(RegData$SmBePre <= 10),]
+            sortAvtagende <- F
+            tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
+            #intToUtf8(2264)
+            #KImaalRetn <- 'lav'
+            KImaalGrenser <- c(0,3)
+            varTxt <- 'med manglende indikasjon'
+
+      }
       if (valgtVar == 'beinsmEndrLav') { #AndelGrVar
             #Mislykkede operasjoner
             RegData$BeinsmEndr <- switch(as.character(ktr),
@@ -426,7 +426,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       }
       if (valgtVar=='inngrep'){ #fordeling
          tittel <- 'Inngrepstyper'
-         grtxt <- c('Andre inngrep', 'Prolaps micro', 'Prolaps åpen', 'Midtlinjebev. dekomp.',
+         grtxt <- c('Andre inngrep', 'Prolaps mikro', 'Prolaps åpen', 'Midtlinjebev. dekomp.',
                     'Laminektomi', 'Eksp. intersp impl.', 'PLF', 'PLIF', 'TLIF', 'ALIF', 'XLIF',
                     'Udefinert fusjon', 'Osteotomi/deform.', 'Revisjon', 'Skiveprotese')
          RegData$VariabelGr <- factor(RegData$InngrepV2V3, levels = 0:14)

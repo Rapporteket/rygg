@@ -207,7 +207,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         br(),
                         br(),
                         br(),
-                        h4('Last ned egne data for kontroll av registrering'),
+                        h4('Last ned egne data'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
                         selectInput(inputId = 'velgReshReg', label='Velg sykehus',
@@ -274,7 +274,9 @@ ui <- navbarPage(id = "tab1nivaa",
                                      'Durarift' = 'peropKompDura',
                                      'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
              ),
-             selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
+             selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
+                         choices = hovedkatValg
+             ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
                          choices = hastegradvalg
              ),
              selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
@@ -296,12 +298,12 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              br(),
              h3('Hva mer skal med her...?'),
-                    tags$div(
-                      tags$li("Andel ikke besvart 3 mnd.?"),
-                      tags$li("Andel ikke besvart 12 mnd.?"),
-                      tags$li("Andel purringer 3 mnd.?"),
-                      tags$li("Andel purringer 12 mnd.?")
-                    ))
+                    # tags$div(
+                    #   tags$li("Andel ikke besvart 3 mnd.?"),
+                    #   tags$li("Andel ikke besvart 12 mnd.?"),
+                    #   tags$li("Andel purringer 3 mnd.?"),
+                    #   tags$li("Andel purringer 12 mnd.?"))
+             )
   ), #tab SC
 
 #-------------Fordelinger---------------------
@@ -325,19 +327,19 @@ tabPanel(p('Fordelinger',
                                   'EQ5D, preoperativt' = 'EQ5DPre',
                                   'Gangfunksjon (EQ5D) før operasjon' = 'EQgangePre',
                                   'Har pasienten søkt erstatning?' = 'erstatningPre',
-                                  '-Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon' = 'fornoydhet3mnd',
-                                  '-Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon' = 'fornoydhet12mnd',
-                                  '-Hovedinngrep' = 'hovedInngrep',
-                                  '-Inngrepstyper' = 'inngrep',
+                                  'Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon' = 'fornoydhet3mnd',
+                                  'Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon' = 'fornoydhet12mnd',
+                                  'Hovedinngrep' = 'hovedInngrep',
+                                  'Inngrepstyper' = 'inngrep',
                                   'Komorbiditet' = 'komorbiditet',
                                   'Komplikasjoner, perop. ' = 'komplPer' ,
-                                  '-Komplikasjoner, pasientrapp. ' = 'komplPost',
+                                  'Komplikasjoner, pasientrapp. ' = 'komplPost',
                                   'Liggetid ved operasjon, totalt' = 'liggedogn',
                                   'Liggetid, postoperativt' = 'liggetidPostOp',
                                   'Morsmål' = 'morsmal',
-                                  '-Nytte av operasjonen, 3 mnd. etter' = 'nytte3mnd',
-                                  '-Nytte av operasjonen, 12 mnd. etter' = 'nytte12mnd',
-                                  '-Operasjonsindikasjon' = 'opInd',
+                                  'Nytte av operasjonen, 3 mnd. etter' = 'nytte3mnd',
+                                  'Nytte av operasjonen, 12 mnd. etter' = 'nytte12mnd',
+                                  'Operasjonsindikasjon' = 'opInd',
                                   'Operasjonsindikasjon, paresegrad' = 'opIndPareseGrad',
                                   #'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
                                   'Operasjonskategori' = 'opKat',
@@ -350,8 +352,8 @@ tabPanel(p('Fordelinger',
                                   'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
                                   'Varighet av rygg-/hoftesmerter' = 'symptVarighRyggHof',
                                   'Varighet av utstrålende smerter' = 'sympVarighUtstr',
-                                  '-Tidligere ryggoperert?' = 'tidlOpr',
-                                  '-Tidligere operasjoner, antall' = 'tidlOprAntall',
+                                  'Tidligere ryggoperert?' = 'tidlOpr',
+                                  'Tidligere operasjoner, antall' = 'tidlOprAntall',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
                                   'Utdanning (høyeste fullførte)' = 'utd'
@@ -458,6 +460,7 @@ server <- function(input, output,session) {
   })
 
   observeEvent(input$reset_fordValg, shinyjs::reset("brukervalg_fordeling"))
+
   #observeEvent(input$reset_andelValg, shinyjs::reset("brukervalg_andeler"))
   #observeEvent(input$reset_gjsnValg, shinyjs::reset("brukervalg_gjsn"))
 
@@ -626,6 +629,7 @@ server <- function(input, output,session) {
   if (rolle=='SC') {
   observe({
     tabdataTilResPort <- dataTilResPort(RegData=RegData, valgtVar = input$valgtVarRes,
+                                        hovedkat = as.numeric(input$hovedInngrepRes),
                                         aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
                                         hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
 
