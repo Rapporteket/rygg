@@ -11,9 +11,8 @@ RyggPreprosess <- function(RegData=RegData)
   #Kun ferdigstilte registreringer: Det skal kun leveres ferdigstilte skjema til RapportUttrekk
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
   #Kjonn Mangler!!
-  RegData$ErMann <- 9
-  #RegData$ErMann <- RegData$Kjonn
-  #RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
+  RegData$ErMann <- RegData$Kjonn
+  RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
@@ -44,57 +43,69 @@ RyggPreprosess <- function(RegData=RegData)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days'))
 
-	#1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
+	RegData$Kp3Mnd <- NULL
+	RegData$Kp3Mnd[rowSums(RegData[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
+	                                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
+	                         na.rm = T) > 0] <- 1
+
+	#TidlOp. V2: 1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
 	#TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv
 	RegData$TidlOpr <- 9
 	RegData$TidlOpr[RegData$TidlIkkeOp==1] <- 4
 	RegData$TidlOpr[RegData$TidlOpsammeNiv==1] <- 1
-  RegData$TidlOpr[RegData$TidlOpAnnetNiv==1] <- 2
-  RegData$TidlOpr[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
-	#  table(RegData$TidlOpr)
-#Data <- RegData[,c('TidlIkkeOp', 'TidlOpAnnetNiv', 'TidlOpsammeNiv')]
+	RegData$TidlOpr[RegData$TidlOpAnnetNiv==1] <- 2
+	RegData$TidlOpr[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
+
 
 	#Formatering
 	RegData$ShNavn <- as.character(RegData$ShNavn)
-#	RegData$Morsmal <- factor(RegData$Morsmal, levels=1:3)
-#Mangler:	RegData$HovedInngrep <- factor(RegData$HovedInngrep, levels=0:7)
-#Mangler:		RegData$Inngrep <- factor(RegData$Inngrep, levels=0:19)
-	#RegData$SivilStatus <- factor(RegData$SivilStatus, levels=1:3)
-	#RegData$ASA <- factor(RegData$ASA, levels=1:4)
-#	RegData$Utd <- factor(RegData$Utd, levels=1:5)
-	#RegData$ArbstatusPre <- factor(RegData$ArbstatusPre, levels=1:10)
-#	RegData$UforetrygdPre <- factor(RegData$UforetrygdPre, levels=1:4)
-	#RegData$ErstatningPre <- factor(RegData$ErstatningPre, levels=c(0:3,9)
-	# RegData$SymptVarighRyggHof <- factor(RegData$SymptVarighRyggHof, levels=c(1:5,9))
-	# RegData$SympVarighUtstr <- factor(RegData$SympVarighUtstr, levels=c(1:5,9))
+
 
 
 #Legge til underkategori for hovedkategori.
-#	if (is.na(match("Inngrep", names(opdata))) != 'TRUE') {	#Hvis har variabelen Inngrep
-#	      #if (match("Inngrep", names(opdata))) {	#Hvis har variabelen Inngrep
-#
-#	      #Dataramme av hovedkategorier og underkategorier
-#	      gr_nr <- c(0:19)
-#	      txt <- c('Annet','Mikro','Makro','Tubekirurgi','Udefinert','Mikro','Makro','Tubekirurgi',
-#	               'Udefinert','Laminektomi', 'Interspinøst impl.','PLF','PLIF','TLIF','ALIF',
-#	               'Udefinert fusjon', 'Skiveprotese','Fjern interspinøst impl.','Fjerne ostemat.',
-#	               'Revisjon ostemat.')
-#	      hgr <- c(0,1,1,1,1,2,2,2,2,3,4,5,5,5,5,5,6,7,7,7)
-#	      kat <- data.frame(hgr, hkatnavn[hgr+1], gr_nr, txt)
-#	      underkattxt <- ''
-#	      underkat_num <- ''
-#
-#	      #Velge ut riktige underkategorier:
-#	      if (hovedkat != 99) {
-#	            underkat_num <- kat$gr_nr[kat$hgr==hovedkat]
-#	            opdata_ok <- opdata[which(!is.na(match(opdata$Inngrep,underkat_num))),]
-#	            opdata <- opdata_ok
-#	            underkattxt <- as.character(kat$txt[underkat_num+1])
-#	      }
-#	      names(kat) <- c('Hnr', 'Hnavn', 'Unr', 'Unavn')
-#	      utdata <- list(opdata, hkattxt, underkattxt, underkat_num, kat)
-#	      names(utdata) <- c('data','txt','ukattxt','underkat', 'inngrHinngr')
+ny <- kategoriserInngrep(RegData=RegData)
+RegData <- ny$RegData
 
+#--------Definasjon av diagnosegrupper prolaps og spinal stenose V3
+# COMPUTE filter_$=(HovedInngrepV2V3 = 4 or (RfSentr = 1 or RfLateral = 1 or RfForaminalSS = 1)
+#                   & (OpDeUlamin = 1 or OpDeUlaminTilgang > 0 or OpLaminektomi  = 1)
+#                   & (HovedInngrepV2V3 = 2 or HovedInngrepV2V3 = 3
+#                                            or HovedInngrepV2V3 = 5 or HovedInngrepV2V3 = 7) ).
+RegData$LSSopr <- ifelse(RegData$HovedInngrepV2V3 == 4
+                         | (RegData$RfSentr == 1 | RegData$RfLateral == 1 | RegData$RfForaminalSS == 1)
+                         & (RegData$OpDeUlamin == 1 | RegData$OpDeUlaminTilgang %in% 1:3 | RegData$OpLaminektomi == 1)
+                         & (RegData$HovedInngrepV2V3 %in% c(2,3,5,7)),
+                         1, 0)
+
+#*Definisjon av prolapsgruppen, dekompresjon, kvalitetssikre, først gr uten fusjon..
+#COMPUTE filter_$=(HovedInngrepV2V3 = 1 &  LSS_opr = 0).
+# 1  'Ja operert med dekopressjon for prolaps'
+# 0 ' Nei ikke operert med dekopressjon for prolaps'.
+RegData$ProlapsDekr <- ifelse(RegData$HovedInngrepV2V3 == 1 &  RegData$LSSopr == 0, 1, 0)
+
+#*Definisjon av prolapsgruppen,med fusjon.
+# 1  'Ja operert med fusjon for prolaps'
+# 0 ' Nei ikke operert med fusjon for prolaps'.
+# COMPUTE filter_$=((Prolaps_dekr = 0 & LSS_opr = 0) & (HovedInngrepV2V3 = 5 & OprProlap > 0) &
+#                     (RfDegskol =  0 & RfSpondtypeDegen = 0 & RfSpondtypeIsmisk = 0)).
+RegData$ProlapsFusjonert <-
+  ifelse((RegData$ProlapsDekr == 0 & RegData$LSSopr == 0) &
+           (RegData$HovedInngrepV2V3 == 5 & RegData$OprProlap > 0) &
+           (RegData$RfDegskol ==  0 & RegData$RfSpondtypeDegen == 0 & RegData$RfSpondtypeIsmisk == 0),
+         1, 0)
+
+#*Definisjon av prolapsgruppen, prolapsopr med og uten fusjon.
+#COMPUTE filter_$=(Prolaps_dekr = 1 or Prolaps_fusjonert = 1).
+# VARIABLE LABELS  Prolapsopr_alle 'både dekr og fusjon'.
+# 1  'Ja  alle typer prolapsoperason'
+# 0 ' Nei ikke operert for prolaps'.
+RegData$ProlapsoprAlle <- ifelse(RegData$ProlapsDekr == 1 | RegData$ProlapsFusjonert == 1, 1, 0)
+
+
+# DO IF (LSS_opr = 0 & Prolapsopr_alle = 0   & OpDeUlamin = 1).
+# RECODE LSS_opr (0=1).
+utvalg <- which(RegData$LSSopr == 0 & RegData$ProlapsoprAlle == 0   & RegData$OpDeUlamin == 1)
+RegData$LSSopr[utvalg] <- 1
 
   return(invisible(RegData))
 }

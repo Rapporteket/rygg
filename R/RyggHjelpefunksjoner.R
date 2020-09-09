@@ -115,7 +115,8 @@ dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', 
 
   filUt <- paste0('RyggTilOff', ifelse(filUt=='dummy',  valgtVar, filUt), '.csv')
   RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, figurtype = 'andelGrVar')
-  RyggUtvalg <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad, tidlOp=tidlOp) #datoFra = datoFra) #, hovedkat=hovedkat) # #, datoTil=datoTil)
+  RyggUtvalg <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
+                              tidlOp=tidlOp, hovedkat=hovedkat) #datoFra = datoFra) #) # #, datoTil=datoTil)
   RegData <- RyggUtvalg$RegData
   RyggTilOffvalgtVar <- RegData[,c('Aar', "ShNavn", "ReshId", "Variabel")]
   info <- c(RyggVarSpes$tittel, RyggUtvalg$utvalgTxt)

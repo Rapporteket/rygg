@@ -97,7 +97,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             RegData <- RegData[which(RegData$Alder>=0), ]    #Tar bort alder<0
             RegData$Variabel <- RegData$Alder  	#GjsnTid, GjsnGrVar
             xAkseTxt <- 'alder (år)'
-            tittel <- c('Alder ved innleggelse', 'test av tittel over to linjer')
+            tittel <- 'Alder ved innleggelse' #c('XX', 'test av tittel over to linjer') - funker!
             subtxt <- 'Aldersgrupper (år)'
             if (figurtype %in% c('gjsnGrVar', 'gjsnTid')) {
                   tittel <- 'alder ved innleggelse'}
@@ -174,18 +174,18 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             }
       }
 
-      # if (valgtVar == 'beinsmLavPre') { #AndelGrVar, AndelTid
-      #       #Lav beinsmerte og ingen parese. (Først og fremst prolaps)
-      #       RegData$Variabel[which((RegData$OpIndParese==0) & (RegData$SmBePre < 3.5))] <- 1
-      #       RegData <- RegData[which(RegData$SmBePre <= 10),]
-      #       sortAvtagende <- F
-      #       tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
-      #       #intToUtf8(2264)
-      #       #KImaalRetn <- 'lav'
-      #       KImaalGrenser <- c(0,3)
-      #       varTxt <- 'med manglende indikasjon'
-      #
-      # }
+      if (valgtVar == 'beinsmLavPre') { #AndelGrVar, AndelTid
+            #Lav beinsmerte og ingen parese. (Først og fremst prolaps)
+            RegData$Variabel[which((RegData$OpIndParese==0) & (RegData$SmBePre < 3.5))] <- 1
+            RegData <- RegData[which(RegData$SmBePre <= 10),]
+            sortAvtagende <- F
+            tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
+            #intToUtf8(2264)
+            #KImaalRetn <- 'lav'
+            KImaalGrenser <- c(0,3)
+            varTxt <- 'med manglende indikasjon'
+
+      }
       if (valgtVar == 'beinsmEndrLav') { #AndelGrVar
             #Mislykkede operasjoner
             RegData$BeinsmEndr <- switch(as.character(ktr),
@@ -415,13 +415,25 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   tittel <- paste0('Fornøyde pasienter', ktrtxt)
             }
       }
-      # if (valgtVar=='hovedInngrep'){ #fordeling
-      #       tittel <- 'Hovedinngrep'
-      #       grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Foramenotomi', 'Laminektomi',
-      #                  'Interspin. implantat', 'Fusjonskirurgi', 'Skiveprotese', 'Rev. av implantat')
-      #       RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:7)
-      #       retn <- 'H'
-      # }
+      if (valgtVar=='hovedInngrep'){ #fordeling
+            tittel <- 'Hovedinngrep'
+            # grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Foramenotomi', 'Laminektomi',
+            #            'Interspin. implantat', 'Fusjonskirurgi', 'Skiveprotese', 'Rev. av implantat')
+            grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Dekompresjon', 'Laminektomi', 'Eksp. intersp impl.',
+                       'Fusjonskirurgi', 'Deformitet', 'Rev. av implantat', 'Skiveprotese')
+            RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:8)
+            retn <- 'H'
+      }
+      if (valgtVar=='inngrep'){ #fordeling
+         tittel <- 'Inngrepstyper'
+         grtxt <- c('Andre inngrep', 'Prolaps mikro', 'Prolaps åpen', 'Midtlinjebev. dekomp.',
+                    'Laminektomi', 'Eksp. intersp impl.', 'PLF', 'PLIF', 'TLIF', 'ALIF', 'XLIF',
+                    'Udefinert fusjon', 'Osteotomi/deform.', 'Revisjon', 'Skiveprotese')
+         RegData$VariabelGr <- factor(RegData$InngrepV2V3, levels = 0:14)
+         retn <- 'H'
+      }
+
+
       if (valgtVar=='komorbiditet') {
          tittel <- 'Komorbiditet'
          retn <- 'H'
@@ -462,8 +474,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             datoTil <- min(datoTil, as.character(Sys.Date()-90))
             retn <- 'H'
             flerevar <- 1
-            subtxt <- '(Komplikasjoner rapporteres kun f.o.m. 2010)'
-            #RegData <- RegData[which(dato > as.POSIXlt('2009-12-31')), ]
             #Andel kun av de som har svart på 3 mnd ktr:
             RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
             # variableV2 <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpMiktProb3Mnd','KpUVI3Mnd',
@@ -472,10 +482,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                           'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
             grtxt <- c('Overfladisk sårinfeksjon', 'Dyp sårinfeksjon',
                        'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
-                       'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Minst en av nevnte kompl.') #'Tot. komplikasjoner'
-            RegData$Kp3Mnd <- NULL
-            RegData$Kp3Mnd[rowSums(RegData[ ,variable[-8]], na.rm = T) > 0] <- 1
-            #RegData$Variabel <- colSums(RegData[ ,kompl])
+                       'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
       }
 
       if (valgtVar == 'kp3Mnd') { #AndelGrVar
@@ -586,7 +593,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             }}
 
       if (valgtVar=='opInd') { #fordeling
-            tittel <- 'Operasjonsindikasjon (var. smerte mangler..)'
+            tittel <- 'Operasjonsindikasjon'
             retn <- 'H'
             flerevar <- 1
             variable <- c('OpIndCauda', 'OpIndParese') #, 'OpIndSme')
@@ -800,9 +807,10 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
 
       if (valgtVar == 'smStiPreHypp') { #fordeling
          tittel <- 'Hyppighet av smertestillende før operasjonen'
-         grtxt <- c('Sjeldnere', 'Månedlig', 'Ukentlig', 'Daglig', 'Oftere', 'Ikke utfylt')
+         grtxt <- c('Sjeldnere', 'Månedlig', 'Ukentlig', 'Daglig', 'Flere ganger om dagen', 'Ikke utfylt') #'Oftere',
          #RegData <- RegData[which(RegData$SmHyppPre %in% c(1:5, 9)), ]
          RegData$VariabelGr <- factor(RegData$SmHyppPre, levels = c(1:5,9))
+         retn <- 'H'
       }
 
       if (valgtVar == 'smStiPre') { #fordeling, andelGrVar/Tid
@@ -841,7 +849,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       if (valgtVar == 'tidlOpr') {
             tittel <- 'Tidligere ryggoperert?'
             retn <- 'H'
-            grtxt <- c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
+            grtxt <- c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon') #, 'Ukjent')
             #Versjon 2:  RegData$VariabelGr <- 9
             # indDum <- which(RegData$TidlOpr %in% 1:4)
             # RegData$VariabelGr[indDum] <- RegData$TidlOpr[indDum]
@@ -850,7 +858,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             # RegData$TidlOp[RegData$TidlOpsammeNiv==1] <- 1
             # RegData$TidlOp[RegData$TidlOpAnnetNiv==1] <- 2
             # RegData$TidlOp[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
-            RegData$VariabelGr <- factor(RegData$TidlOpr, levels = c(1:4,9))
+            RegData$VariabelGr <- factor(RegData$TidlOpr, levels = c(1:4))
             #test <- rowSums(RegData[,var])
             #RegData[test>1,var]
       }
@@ -887,27 +895,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   tittel <- 'Har søkt/planlegger å søke uføretrygd før op.'
                   sortAvtagende <- F}
       }
-
-      # if (valgtVar=='underkat'){
-      #       RegData$Variabel <- RegData$Inngrep
-      #       tittel <- 'Fordeling av inngrepstyper'
-      #       if (hovedkat==99){hovedkat <- 1}
-      #       #if (hovedkat %in% 0:7) {
-      #       gr_nr <- c(0:19)
-      #       txt <- c('Annet','Mikro','Makro','Tubekirurgi','Udefinert',
-      #                'Mikro','Makro','Tubekirurgi', 'Udefinert',
-      #                'Laminektomi', 'Interspinøst impl.',
-      #                'PLF','PLIF','TLIF','ALIF', 'Udefinert fusjon',
-      #                'Skiveprotese','Fjern interspinøst impl.','Fjerne ostemat.','Revisjon ostemat.')
-      #       hgr <- c(0,1,1,1,1,2,2,2,2,3,4,5,5,5,5,5,6,7,7,7)
-      #       kat <- data.frame(hgr, gr_nr, txt)	#hkatnavn[hgr+1],
-      #       underkat_num <- kat$gr_nr[kat$hgr==hovedkat]
-      #
-      #       RegData <- RegData[which(RegData$Inngrep %in% underkat_num), ]
-      #       grtxt <- as.character(kat$txt[underkat_num+1])
-      #       RegData$VariabelGr <- factor(RegData$Inngrep, levels = underkat_num)
-      #       #}
-      # }
 
 
       if (valgtVar == 'utd') { #AndelGrVar, AndelTid

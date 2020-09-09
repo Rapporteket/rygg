@@ -22,16 +22,17 @@ RyggVarTilrettelegg(
 
 \item{hovedkat}{Hvilken type hovedinngrep, numerisk 0-9, standard: 99, dvs. alle. Valgmuligheter:
 \itemize{
-\item 0:'Operasjonskategori: "ukjent"',    #hkat=0
+\item 0:'Andre inngrep',
 \item 1:'Prolapskirurgi',
-\item 2:'Foramenotomi',
+\item 2:'Midtlinjebevarende dekompr.',
 \item 3:'Laminektomi',
-\item 4:'Interspinøst implantat',
+\item 4:'Eksp. intersp implantat',
 \item 5:'Fusjonskirurgi',
-\item 6:'Skiveprotese',
+\item 6:'Osteotomi, deformitet',
 \item 7:'Fjerning/rev. av implantat',
-\item 8:'Spinal stenose',
-\item 9:'Degen. spondylolistese'
+\item 8:'Skiveprotese',
+\item 9:'Spinal stenose',
+\item 10:'Degen. spondylolistese'
 \item 99: Alle
 }}
 

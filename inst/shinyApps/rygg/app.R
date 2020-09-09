@@ -72,6 +72,10 @@ sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
 sykehusValg <- c(0,sykehusValg)
 names(sykehusValg) <- c('Alle',sykehusNavn$x)
 
+hovedkatValg <- c('Alle'=99, 'Andre inngrep'=0, 'Prolapskirurgi'=1, 'Midtlinjebevarende dekompr.'=2,
+  'Laminektomi'=3, 'Eksp. intersp implantat'=4, 'Fusjonskirurgi'=5, 'Osteotomi, deformitet'=6,
+  'Revisjon,fjerne implantat'=7, 'Skiveprotese'=8, 'Spinal stenose'=9, 'Degen. spondylolistese og LSS'=10)
+
 
 # Define UI for application
 ui <- navbarPage(id = "tab1nivaa",
@@ -134,8 +138,8 @@ ui <- navbarPage(id = "tab1nivaa",
                               basert på operasjonsdato.
                               Alle resultater er basert på ferdigstilte registreringer. Merk at data er hentet direkte fra registerets database.
                             Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
-             h5('Grunnet overgang til ny teknisk løsning, er det fortsatt mye "utdata" som mangler. Eksempelvis
-                hovedkategorier og data fra oppfølgingsskjema.'),
+             h5('Grunnet overgang til ny teknisk løsning, inneholder Rapporteket per nå kun data f.o.m. 1.januar 2019.
+                Data bakover i tid vil være på plass i løpet av oktober.'),
              h5('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
                             innhold på Rapporteket'),
              br(),
@@ -203,7 +207,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         br(),
                         br(),
                         br(),
-                        h4('Last ned egne data for kontroll av registrering'),
+                        h4('Last ned egne data'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
                         selectInput(inputId = 'velgReshReg', label='Velg sykehus',
@@ -212,7 +216,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
                         br(),
                         br(),
-                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump for V3')
 
            ),
 
@@ -270,7 +274,9 @@ ui <- navbarPage(id = "tab1nivaa",
                                      'Durarift' = 'peropKompDura',
                                      'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
              ),
-             selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
+             selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
+                         choices = hovedkatValg
+             ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
                          choices = hastegradvalg
              ),
              selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
@@ -292,18 +298,19 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              br(),
              h3('Hva mer skal med her...?'),
-                    tags$div(
-                      tags$li("Andel ikke besvart 3 mnd.?"),
-                      tags$li("Andel ikke besvart 12 mnd.?"),
-                      tags$li("Andel purringer 3 mnd.?"),
-                      tags$li("Andel purringer 12 mnd.?")
-                    ))
+                    # tags$div(
+                    #   tags$li("Andel ikke besvart 3 mnd.?"),
+                    #   tags$li("Andel ikke besvart 12 mnd.?"),
+                    #   tags$li("Andel purringer 3 mnd.?"),
+                    #   tags$li("Andel purringer 12 mnd.?"))
+             )
   ), #tab SC
 
 #-------------Fordelinger---------------------
 tabPanel(p('Fordelinger',
                     title='Alder, Innkomstmåte,... '),
                   sidebarPanel(
+                    id = "brukervalg_fordeling",
                     width = 3,
                     h4('Her kan man velge hvilken variabel man ønsker å se og gjøre ulike filtreringer.'),
                     br(),
@@ -320,18 +327,19 @@ tabPanel(p('Fordelinger',
                                   'EQ5D, preoperativt' = 'EQ5DPre',
                                   'Gangfunksjon (EQ5D) før operasjon' = 'EQgangePre',
                                   'Har pasienten søkt erstatning?' = 'erstatningPre',
-                                  '-Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon' = 'fornoydhet3mnd',
-                                  '-Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon' = 'fornoydhet12mnd',
-                                  #Hovedinngrep = HovedInngrep
+                                  'Fornoyd3mnd: Fornøydhet 3 mnd etter operasjon' = 'fornoydhet3mnd',
+                                  'Fornoyd12mnd: Fornøydhet 12 mnd etter operasjon' = 'fornoydhet12mnd',
+                                  'Hovedinngrep' = 'hovedInngrep',
+                                  'Inngrepstyper' = 'inngrep',
                                   'Komorbiditet' = 'komorbiditet',
                                   'Komplikasjoner, perop. ' = 'komplPer' ,
-                                  '-Komplikasjoner, pasientrapp. ' = 'komplPost',
+                                  'Komplikasjoner, pasientrapp. ' = 'komplPost',
                                   'Liggetid ved operasjon, totalt' = 'liggedogn',
                                   'Liggetid, postoperativt' = 'liggetidPostOp',
                                   'Morsmål' = 'morsmal',
-                                  '-Nytte av operasjonen, 3 mnd. etter' = 'nytte3mnd',
-                                  '-Nytte av operasjonen, 12 mnd. etter' = 'nytte12mnd',
-                                  '-Operasjonsindikasjon' = 'opInd',
+                                  'Nytte av operasjonen, 3 mnd. etter' = 'nytte3mnd',
+                                  'Nytte av operasjonen, 12 mnd. etter' = 'nytte12mnd',
+                                  'Operasjonsindikasjon' = 'opInd',
                                   'Operasjonsindikasjon, paresegrad' = 'opIndPareseGrad',
                                   #'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
                                   'Operasjonskategori' = 'opKat',
@@ -344,15 +352,16 @@ tabPanel(p('Fordelinger',
                                   'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
                                   'Varighet av rygg-/hoftesmerter' = 'symptVarighRyggHof',
                                   'Varighet av utstrålende smerter' = 'sympVarighUtstr',
-                                  '-Tidligere ryggoperert?' = 'tidlOpr',
-                                  '-Tidligere operasjoner, antall' = 'tidlOprAntall',
+                                  'Tidligere ryggoperert?' = 'tidlOpr',
+                                  'Tidligere operasjoner, antall' = 'tidlOprAntall',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
                                   'Utdanning (høyeste fullførte)' = 'utd'
-                      )
+                      ),
+                      selected = c('Registreringsforsinkelse' = 'regForsinkelse')
                     ),
                     dateRangeInput(inputId = 'datovalg', start = startDato, end = idag,
-                                   label = "Tidsperiode", separator="t.o.m.", language="nb"),
+                                   label = "Tidsperiode (operasjonsdato)", separator="t.o.m.", language="nb"),
                     selectInput(inputId = "erMann", label="Kjønn",
                                 choices = kjonn
                     ),
@@ -364,11 +373,17 @@ tabPanel(p('Fordelinger',
                     ),
                     selectInput(inputId = 'tidlOp', label='Tidligere operert?',
                                 choices = tidlOprvalg
-                    ),selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
+                    ),
+                    selectInput(inputId = 'hovedInngrep', label='Hovedinngrepstype',
+                                choices = hovedkatValg
+                    ),
+                    selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
-                    )
+                    ),
+                    br(),
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
+                    actionButton("reset_fordValg", label="Tilbakestill valg")
                   ),
                   mainPanel(
                     tabsetPanel(
@@ -443,6 +458,12 @@ server <- function(input, output,session) {
                    target = 'Registeradministrasjon') #
   }
   })
+
+  observeEvent(input$reset_fordValg, shinyjs::reset("brukervalg_fordeling"))
+
+  #observeEvent(input$reset_andelValg, shinyjs::reset("brukervalg_andeler"))
+  #observeEvent(input$reset_gjsnValg, shinyjs::reset("brukervalg_gjsn"))
+
 #print(dim(RegData)[1])
   # widget
   if (paaServer) {
@@ -548,31 +569,26 @@ server <- function(input, output,session) {
 # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
   tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
     data <- dplyr::filter(data,
-                          # InnDato >= datovalg[1],
-                          # InnDato <= datovalg[2])
                           as.Date(InnDato) >= datovalg[1],
                           as.Date(InnDato) <= datovalg[2])
     if (rolle == 'SC') {
+      PIDtab <- rapbase::LoadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+      data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
       valgtResh <- as.numeric(reshID)
       ind <- if (valgtResh == 0) {1:dim(data)[1]
       } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
       data <- data[ind,]
-    } else {data[which(data$ReshId == reshID), ]}
+    } else {
+      data <- data[which(data$ReshId == reshID), ]}
+    return(data)
   }
 
   observe({
-    dataRegKtr <- tilretteleggDataDumper(data=RegOversikt, datovalg = input$datovalg,
-                                         reshID=input$velgReshReg, rolle = rolle)
-  #   RegOversikt <- dplyr::filter(RegOversikt,
-  #                                as.Date(HovedDato) >= input$datovalgRegKtr[1],
-  #                                as.Date(HovedDato) <= input$datovalgRegKtr[2])
-  # tabDataRegKtr <- if (rolle == 'SC') {
-  #   valgtResh <- as.numeric(input$velgReshReg)
-  #   ind <- if (valgtResh == 0) {1:dim(RegOversikt)[1]
-  #     } else {which(as.numeric(RegOversikt$AvdRESH) %in% as.numeric(valgtResh))}
-  #   RegOversikt <- RegOversikt[ind,]
-  #     } else {RegOversikt[which(RegOversikt$AvdRESH == reshID), ]}
-
+    reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
+    indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
+    dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
+                                as.Date(InnDato) >= input$datovalgRegKtr[1],
+                                as.Date(InnDato) <= input$datovalgRegKtr[2])
 
   output$lastNed_dataTilRegKtr <- downloadHandler(
     filename = function(){'dataTilKtr.csv'},
@@ -593,7 +609,10 @@ server <- function(input, output,session) {
   #   } #else {
   #     #DataDump[which(DataDump$ReshId == reshID), -variablePRM]} #Tar bort PROM/PREM til egen avdeling
 
-  dataDump <- tilretteleggDataDumper(data=RegData, datovalg = input$datovalg,
+  RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
+                                    query='SELECT * FROM AlleVarNum')
+  RegDataV3 <- RyggPreprosess(RegDataV3)
+  dataDump <- tilretteleggDataDumper(data=RegDataV3, datovalg = input$datovalgRegKtr,
                                      reshID=input$velgReshReg, rolle = rolle)
   output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
@@ -610,6 +629,7 @@ server <- function(input, output,session) {
   if (rolle=='SC') {
   observe({
     tabdataTilResPort <- dataTilResPort(RegData=RegData, valgtVar = input$valgtVarRes,
+                                        hovedkat = as.numeric(input$hovedInngrepRes),
                                         aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
                                         hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
 
@@ -631,12 +651,13 @@ server <- function(input, output,session) {
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
                   reshID=reshID,
-                  # enhetsUtvalg=as.numeric(input$enhetsUtvalg),
-                  # datoFra=input$datovalg[1], datoTil=input$datovalg[2],
-                  # minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
-                  # erMann=as.numeric(input$erMann),
-                  # hastegrad = as.numeric(input$hastegrad),
-                  # tidlOp = as.numeric(input$tidlOp),
+                   enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                   datoFra=input$datovalg[1], datoTil=input$datovalg[2],
+                   minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
+                   erMann=as.numeric(input$erMann),
+                   hastegrad = as.numeric(input$hastegrad),
+                   tidlOp = as.numeric(input$tidlOp),
+                  hovedkat = as.numeric(input$hovedInngrep),
                   session = session)
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
@@ -649,6 +670,7 @@ server <- function(input, output,session) {
                                 erMann=as.numeric(input$erMann),
                                 hastegrad = as.numeric(input$hastegrad),
                                 tidlOp = as.numeric(input$tidlOp),
+                                hovedkat = as.numeric(input$hovedInngrep),
                                 lagFig = 0, session = session)
 
     tabFord <- lagTabavFig(UtDataFraFig = UtDataFord)
