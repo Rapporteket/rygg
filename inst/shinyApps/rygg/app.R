@@ -31,7 +31,7 @@ regTitle = ifelse(paaServer, 'NKR: Nasjonalt Kvalitetsregister for Ryggkirurgi',
 
 
 if (paaServer) {
-  RegData <- RyggRegDataSQL(alle = 1)
+  RegData <- RyggRegDataSQLV2V3()  #RyggRegDataSQL(alle = 1)
   qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
   SkjemaOversikt <- rapbase::LoadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
   qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
@@ -216,7 +216,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
                         br(),
                         br(),
-                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump for V3')
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
 
            ),
 
@@ -609,17 +609,17 @@ server <- function(input, output,session) {
   #   } #else {
   #     #DataDump[which(DataDump$ReshId == reshID), -variablePRM]} #Tar bort PROM/PREM til egen avdeling
 
-  RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
-                                    query='SELECT * FROM AlleVarNum')
-  RegDataV3 <- RyggPreprosess(RegDataV3)
-  dataDump <- tilretteleggDataDumper(data=RegDataV3, datovalg = input$datovalgRegKtr,
+  RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV3=1)
+    #rapbase::LoadRegData(registryName="rygg", query='SELECT * FROM AlleVarNum')
+  RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
+  dataDump <- tilretteleggDataDumper(data=RegDataV2V3, datovalg = input$datovalgRegKtr,
                                      reshID=input$velgReshReg, rolle = rolle)
   output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
 
   dataDumpV2 <- rapbase::LoadRegData(registryName="rygg",
-                                     query='select * FROM Uttrekk_Rapport', dbType="mysql")
+                                     query='select * FROM Uttrekk_Rapport_FROM_TORE', dbType="mysql")
   output$lastNed_dataV2 <- downloadHandler(
     filename = function(){'dataDumpV2.csv'},
     content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
