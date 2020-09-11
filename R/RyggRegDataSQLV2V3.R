@@ -4,18 +4,15 @@
 #'
 #'
 #' @inheritParams RyggUtvalgEnh
-#' @param alleVarV3 0: fjerner variabler som ikke er i bruk på Rapporteket (standard), 1: har med alle variabler fra V3
-#'
+#' @param alleVarV3 0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
+#'                  1: har med alle variabler fra V3
 #'
 #' @return RegData data frame
 #' @export
 #'
 RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alleVarV3=0){
 
-
-
-
-  #RegData <- rapbase::LoadRegData(registryName="rygg", query=query)
+#Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
   RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
@@ -64,6 +61,27 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
 
 
   #-----Tilrettelegging av V2-data-------------------------
+  # *endoskopisk  kirurgi definisjon I V3 som gir variabel som er lik V 2.0.
+  # COMPUTE filter_$=(OpMikroV3 = 3).
+  # VARIABLE LABELS filter_$ 'OpMikroV3 = 3 (FILTER)'.
+  # VALUE LABELS filter_$ 0 'Not Selected' 1 'Selected'.
+  # FORMATS filter_$ (f1.0).
+  # FILTER BY filter_$.
+  # EXECUTE.
+
+# table(RegDataV2$OpMikro, useNA = 'a') #0:nei, 1:ja
+# table(RegDataV3$OpMikroV3, useNA = 'a') #0:nei, 1-3:ja, 9:ikke utf
+
+  # USE ALL.
+  # RECODE filter_$ (1=1) (MISSING=0) (ELSE=0) INTO OpAndreEndosk.
+  # VARIABLE LABELS  OpAndreEndosk 'endoskopisk kirurgi'.
+  # VALUE LABELS OpAndreEndosk
+  # 0 'Ikke endoskopisk kirurgi'
+  # 1 'Endoskopisk kirurgi'.
+  # EXECUTE.
+# table(RegDataV2$OpAndreEndosk, useNA = 'a') #0:nei, 1:ja
+# table(RegDataV3$OpAndreEn, useNA = 'a') #Finnes ikke
+
 
   #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..
 
