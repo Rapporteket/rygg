@@ -15,7 +15,8 @@ RyggRegDataSQLV2V3(
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
 
-\item{alleVarV3}{0: fjerner variabler som ikke er i bruk på Rapporteket (standard), 1: har med alle variabler fra V3}
+\item{alleVarV3}{0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
+1: har med alle variabler fra V3}
 }
 \value{
 RegData data frame

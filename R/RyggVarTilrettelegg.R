@@ -532,6 +532,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          #liggedogn
          #For opphold registrert som dagkirurgi uten at liggedogn er reg., settes liggedogn=0
          tittel <- 'Liggetid etter operasjon'
+         RegData <- RegData[which(RegData$OpDato >= '2019-01-01'), ]
          dagind <- which( (is.na(RegData$LiggetidPostOp) | is.nan(RegData$LiggetidPostOp))  & RegData$Dagkirurgi==1)
          RegData$LiggetidPostOp[dagind]<-0
          RegData <- RegData[which(RegData$LiggetidPostOp>=0),]

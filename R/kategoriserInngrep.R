@@ -60,31 +60,31 @@ RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$FusjonKirPlfV3 == 1 & RegData
 RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$OpLaminektomi == 1 & RegData$FusjonKir == 0] <- 9
 
 # *Midlinje bevarende dekompresjon.
-# DO IF InngrepV3 = 0 & (OpDeUlamin = 1 or OpProOsteotomi = 1) & OprProlap < 1 & FusjonKir =0.
+# DO IF InngrepV3 = 0 & (OpDeUlamin = 1 or OpProOsteotomi = 1) & OpProlap < 1 & FusjonKir =0.
 # RECODE InngrepV3 (0 = 8).
 RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OpDeUlamin == 1 | RegData$OpProOsteotomi == 1) &
-                  RegData$FusjonKir == 0 & RegData$OprProlap < 1] <- 8
+                  RegData$FusjonKir == 0 & RegData$OpProlap < 1] <- 8
 
 
 # *Prolapskirurgi åpen.
-# DO IF InngrepV3 = 0 & OprProlap > 0 & OpMikroV3 = 0 & FusjonKir =0.
+# DO IF InngrepV3 = 0 & OpProlap > 0 & OpMikroV3 = 0 & FusjonKir =0.
 # RECODE InngrepV3 (0 = 7).
-RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$OprProlap > 0 &
+RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$OpProlap > 0 &
                   RegData$OpMikroV3 == 0 & RegData$FusjonKir == 0] <- 7
 
 
 
 # *Prolapskirurgi mikro.
-# DO IF InngrepV3 = 0 & OprProlap > 0 & OpMikroV3 > 0 & FusjonKir =0.
+# DO IF InngrepV3 = 0 & OpProlap > 0 & OpMikroV3 > 0 & FusjonKir =0.
 # RECODE InngrepV3 (0 = 6).
-RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OprProlap > 0) &
+RegData$InngrepV3[RegData$InngrepV3 == 0 & (RegData$OpProlap > 0) &
                   RegData$OpMikroV3 > 0 & RegData$FusjonKir == 0] <- 6
 
 # Prolaps udefinert, defineres inn i prolaps mikro.
-# DO IF InngrepV3 = 0 & (RfSkive = 1 & OprProlap > 0 & FusjonKir  ~=  1 & OpMikroV3  ~=  0).
+# DO IF InngrepV3 = 0 & (RfSkive = 1 & OpProlap > 0 & FusjonKir  ~=  1 & OpMikroV3  ~=  0).
 # RECODE InngrepV3 (0 = 6).
 RegData$InngrepV3[RegData$InngrepV3 == 0 &
-                    ((RegData$OprProlap > 0) & (RegData$RfSkive == 1) &
+                    ((RegData$OpProlap > 0) & (RegData$RfSkive == 1) &
                      (RegData$FusjonKir  !=  1) & (RegData$OpMikroV3  !=  0))] <- 6
 
 # *Udefinert fusjon.
@@ -99,10 +99,10 @@ RegData$InngrepV3[RegData$InngrepV3 == 0
                   & ((RegData$OpFusjonPerkutan == 1) | (RegData$OpFusjonUtenDekomprV3 == 1))] <- 5
 
 # *Udefinert, defineres inn i Midlinje bevarende dekompresjon.
-# DO IF InngrepV3 = 0 & (RfSkive = 0 & OpLaminektomi ~= 1) & OprProlap = 0.
+# DO IF InngrepV3 = 0 & (RfSkive = 0 & OpLaminektomi ~= 1) & OpProlap = 0.
 # RECODE InngrepV3 (0 = 8).
 RegData$InngrepV3[RegData$InngrepV3 == 0
-                  & ((RegData$RfSkive == 0 & RegData$OpLaminektomi != 1) & (RegData$OprProlap == 0))] <- 8
+                  & ((RegData$RfSkive == 0 & RegData$OpLaminektomi != 1) & (RegData$OpProlap == 0))] <- 8
 
 # *Udefinert, defineres inn i Laminektomi.
 # DO IF InngrepV3 = 0 & OpLaminektomi = 1.
