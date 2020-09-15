@@ -81,6 +81,11 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
 
   RegDataV2$AntibiotikaV3 <-  plyr::mapvalues(RegDataV2$Antibiotika, from = c(0, 1, NA), to = c(0,1,9))
 
+  #V2: Kode 1:4,NA: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
+  #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger","Innvilget","Ikke utfylt"]
+  RegDataV2$ErstatningPre <- plyr::mapvalues(RegDataV2$ErstatningPre, from = c(2,3,4,NA), to = c(0,2,3,9))
+  RegDataV2$UforetrygdPre <- plyr::mapvalues(RegDataV2$UforetrygdPre, from = c(2,3,4,NA), to = c(0,2,3,9))
+
   # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
   # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
   RegDataV2 <- dplyr::rename(RegDataV2,
