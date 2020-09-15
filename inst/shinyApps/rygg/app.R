@@ -138,8 +138,7 @@ ui <- navbarPage(id = "tab1nivaa",
                               basert på operasjonsdato.
                               Alle resultater er basert på ferdigstilte registreringer. Merk at data er hentet direkte fra registerets database.
                             Dette medfører at nyere data ikke er kvalitetssikret ennå.'),
-             h5('Grunnet overgang til ny teknisk løsning, inneholder Rapporteket per nå kun data f.o.m. 1.januar 2019.
-                Data bakover i tid vil være på plass i løpet av oktober.'),
+
              h5('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
                             innhold på Rapporteket'),
              br(),
