@@ -438,6 +438,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          tittel <- 'Komorbiditet'
          retn <- 'H'
          flerevar <- 1
+         RegData <- RegData[which(RegData$OpDato >= '2019-01-01'), ]
          # variableV2 <- c('SykdAndreRelevanteSykdBechtrew', 'SykdAnnenendokrin', 'SykdAnnenreumatisk',
          #               'SykdCerebrovaskular', 'SykdDepresjonAngst', 'SykdHjertekar', 'SykdHoftekneartose',
          #               'SykdHypertensjon', 'SykdKreft', 'SykdKroniskLunge', 'SykdKroniskNevrologisk',
