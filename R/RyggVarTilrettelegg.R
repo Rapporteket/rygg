@@ -446,14 +446,18 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          variable <- c('SykdAndreRelevanteSykdBechtrew', 'SykdAnnenendokrin', 'SykdAnnenreumatisk',
                          'SykdCerebrovaskular', 'SykdDepresjonAngst', 'SykdHjertekar', 'SykdHoftekneartose',
                          'SykdHypertensjon', 'SykdKreft', 'SykdKroniskLunge', 'SykdKroniskNevrologisk',
-                         'SykdOsteoporose', 'SykDprebetesMellitus',                   #'SykdKroniskSmerterMuskelSkjelettsyst',
-                         'SykdReumatoidartritt', 'SykdVaskularClaudicatio', 'SykdGeneralisertSmSyndr',
+                         'SykdOsteoporose', 'SykdOsteoporoseBrudd', 'SykDprebetesMellitus',                   #'SykdKroniskSmerterMuskelSkjelettsyst',
+                       'SykdPolynevropati', 'SykdProstatisme',
+                       'SykdReumatoidartritt', 'SykdVaskularClaudicatio', 'SykdGeneralisertSmSyndr',
                        'Sykd')
+
          grtxt <- c('Bechterew', 'Endokrin', 'Reumatisk',
                     'Cerebrovaskulær', 'Depresjon/Angst', 'Hjerte-kar', 'Hoftekneartose',
                     'Hypertensjon', 'Kreft', 'Lungesykd.', 'Nevrologisk sykd.',
-                    'Osteoporose', 'Diabetes Mell.',                         #'Muskel-/skjelettsm.',
-                    'Reumatoid artritt', 'Vask. Claudicatio', 'Gen.smertesyndrom', 'Tot. Komorb.')
+                    'Osteoporose', 'Osteoporosebrudd', 'Diabetes Mell.',                         #'Muskel-/skjelettsm.',
+                    'Polynevropati', 'Prostatisme',
+                    'Reumatoid artritt', 'Vask. Claudicatio', 'Gen.smertesyndrom',
+                    'Tot. Komorb.')
 
          cexgr <- 0.9	#Kan endres for enkeltvariable
       }
@@ -886,7 +890,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             #Kode V2 1:4,tom: 'Ja', 'Nei', 'Planlegger søknad', 'Innvilget', 'Ukjent')
             #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger å søke","Er allerede innvilget","Ikke utfylt"]
             tittel <- 'Har pasienten søkt uføretrygd?'
-            retn <- 'H'
+            #retn <- 'H'
             grtxt <- c('Nei', 'Ja', 'Planlegger søknad', 'Innvilget', 'Ukjent')
             RegData$VariabelGr <- factor(RegData$UforetrygdPre, levels = c(0:3,9))
             if (figurtype %in% c('andelGrVar', 'andelTid')){
