@@ -1,21 +1,14 @@
-
+#Generere filer og tall til årsrapport for 2019.
+library(rygg)
+library(xtable)
 
 RyggData <- RyggRegDataSQLV2V3()
-
-
-#Bygger opp kjørefil basert på dokumentet ResutaterAarsrappKapittel.Rnw fra nkr-pakken.
-
-# Preprosessere data:
 RegData <- RyggPreprosess(RegData=RyggData)
-RegData$ShNavn <- as.character(RegData$ShNavn)
 
 RegData$ODIendr <- RegData$OswTotPre-RegData$OswTot12mnd
 RegData$ODIpst <- with(RegData, (OswTotPre-OswTot12mnd)/OswTotPre*100)
 
 #Felles parametre:
-ktr <- 2
-ktrtxt <- '12 mnd.'
-
 startAar <- 2011
 rappAar <- 2019
 datoFra1aar <- paste0(rappAar,'-01-01')
@@ -25,100 +18,66 @@ datoTil12mnd <- paste0(rappAar-1,'-12-31')
 datoFra <- paste0(startAar,'-01-01')
 datoTil <- paste0(rappAar,'-12-31')
 
-#Gjør utvalg
-#Tidsrom	Det vil bare være hensiktsmessig å velge hele år.
+ktr <- 2
+
+#Gjør utvalg/tilrettelegge årsfiler
 RegData <- RegData[which(RegData$InnDato >= as.POSIXlt(datoFra)),]
-#RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoTil)$RegData
 RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoTil)$RegData
-RegData12mnd <- RegData[which(RegData$OpAar < rappAar), ] #For å ikke få med de som har fått 12mnd-skjema i inneværende år.
+RegData12mnd <- RegData[which(RegData$Aar < rappAar), ] #For å ikke få med de som har fått 12mnd-skjema i inneværende år.
 RegDataPro <- RegData[which(RegData$HovedInngrep==1),]
-RegDataPro12mnd <- RegDataPro[which(RegDataPro$OpAar<rappAar), ]
+RegDataPro12mnd <- RegDataPro[which(RegDataPro$Aar<rappAar), ]
 RegDataSS <- RyggUtvalgEnh(RegData, hovedkat = 8)$RegData
 
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
 
-dato <- strptime(RegData$OpDato,format="%d.%m.%Y")
-datomin <- min(dato)
-datomax <- max(dato)
+# # Spinal stenose: BRUK UTVALG !!!!
+# attach(RegData)
+# indSS <-with(RegData, which((RfSentr == 1 | RfLateral == 1)
+#                             & is.na(RfSpondtypeIsmisk)
+#                             & (OpDeUlamin==1 | OpLaminektomi==1 | OpDeFasett==1)
+#                             & (HovedInngrep %in% c(2:5,7))))
+# #Degenerativ spondylolistese:
+# indDegenSpondy <- intersect(indSS, which(RegData$RfSpondtypeDegen==1))
+# indDegenSpondyFusj <- intersect(indDegenSpondy, which(RegData$HovedInngrep==5))
+# detach(RegData)
 
-# Spinal stenose: BRUK UTVALG !!!!
-attach(RegData)
-indSS <-with(RegData, which((RfSentr == 1 | RfLateral == 1)
-                            & is.na(RfSpondtypeIsmisk)
-                            & (OpDeUlamin==1 | OpLaminektomi==1 | OpDeFasett==1)
-                            & (HovedInngrep %in% c(2:5,7))))
-#Degenerativ spondylolistese:
-indDegenSpondy <- intersect(indSS, which(RegData$RfSpondtypeDegen==1))
-indDegenSpondyFusj <- intersect(indDegenSpondy, which(RegData$HovedInngrep==5))
-detach(RegData)
-
-tabAvdN <- addmargins(table(RegData[c('ShNavn','OpAar')]))
+tabAvdN <- addmargins(table(RegData[c('ShNavn','Aar')]))
 antKol <- ncol(tabAvdN)
 tabAvdN5 <- tabAvdN[,(antKol-5):antKol]
 rownames(tabAvdN5)[dim(tabAvdN5)[1] ]<- 'TOTALT, alle avd.:'
-colnames(tabAvdN5)[dim(tabAvdN5)[2] ]<- paste0(min(RegData$OpAar),'-',rappAar)
+colnames(tabAvdN5)[dim(tabAvdN5)[2] ]<- paste0(min(RegData$Aar),'-',rappAar)
 
 xtable(tabAvdN5, digits=0, align=c('l', rep('r', 6)),
-       caption=paste0('Antall registreringer ved hver avdeling siste 5 år, samt totalt siden ', min(RegData$OpAar, na.rm=T),'.'),
+       caption=paste0('Antall registreringer ved hver avdeling siste 5 år, samt totalt siden ', min(RegData$Aar, na.rm=T),'.'),
        label = 'tab:AntReg')
-
-tabKjPst <- sprintf('%.1f',table(RegData$Kjonn)/Ntot*100)
-ant2007_2017 <- 38636
-ant_TOT <- round(ant2007_2017 + tabAvdN['Sum',as.character(2018:rappAar)]    )
-#HELLER HENT FRA DATA...
-
-#Avdelinger som har registrerer i perioden \Sexpr{min(RegData$OpAar)} til \Sexpr{rappAar}\Sexpr{dim(tabAvdN)[1]-1} .
-#Totalt er det registrert \Sexpr{Ntot} operasjoner.
-#Andel menn og kvinner i totalpop: tabKjPst
-#Siste rygginngrep registrert i datauttrekket: datomax
-#Registrering 2007-tom rappAar: ant_TOT
 
 
 
 
 #Gjennomsnittsalderen per år:
-AlderAar <- tapply(RegData$Alder, RegData$OpAar, 'mean', na.rm=T)
-AlderAar <- sprintf('%.1f', AlderAar)
+AlderAar <- tapply(RegData$Alder, RegData$Aar, 'mean', na.rm=T)
+#AlderAar <- sprintf('%.1f', AlderAar)
 
 #Over 70 år i rappAar:  Andel70 per år pg \% (sum(RegData1aar$Alder>=70)
 Andel70 <- sprintf('%.0f',sum(RegData1aar$Alder>=70, na.rm=T)/sum(RegData1aar$Alder > -1, na.rm=T)*100)
-Andel70startAar <- sprintf('%.1f',sum(RegData1aar$Alder>=70, na.rm=T)/sum(RegData1aar$Alder > -1, na.rm=T)*100)
 
 
-Alder70Tid <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', outfile='FigAlder70.pdf')
-Alder70Aar <- sprintf('%.1f',Alder70Tid$AggVerdier$Hoved)
-#(slås sm. med over?)
+Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', outfile='FigAlder70.pdf')
+Alder70Aar$AggVerdier$Hoved
 
 #Andelen pasienter med fedme:
-  FedmeAar <- table(RegData$BMI>30, RegData$OpAar)
-  AndelFedmeAar <- FedmeAar['TRUE',]/table(RegData$OpAar)*100
+  FedmeAar <- table(RegData$BMI>30, RegData$Aar)
+  AndelFedmeAar <- FedmeAar['TRUE',]/table(RegData$Aar)*100
 
-
-#----Figurer
-  RyggFigAndeler(RegData=RegData1aar, valgtVar='Alder', datoFra=datoFra1aar, datoTil=datoTil, outfile='FigAlderFord.pdf')
-
-  RyggFigAndeler(RegData=RegData1aar, valgtVar='BMI', datoFra=datoFra, datoTil=datoTil,
-                            outfile='FigBMI.pdf')
-  RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar='Morsmal', outfile = 'FigMorsmal.pdf')
-  FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='Morsmal', aar = startAar:rappAar,
-                                       outfile='FigMorsmalAar.pdf')
-
-  Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='Utd', datoFra=datoFra1aar, datoTil=datoTil,
-                              outfile='FigUtd.pdf')
-  HoyUtdAvd <- RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='Utd', Ngrense = 10,
-                                   outfile='FigHoyUtdAvd.pdf')
-  UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Utd', aar = startAar:rappAar,
-                                  outfile='FigUtdAar.pdf')
-  UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='UforetrygdPre', outfile='FigUforTid.pdf')
-
-  UforetrygdPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='UforetrygdPre', datoFra=datoFra1aar,
-                                       outfile='FigUforAvd.pdf')
-  ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='ErstatningPre', outfile='FigErstatTid.pdf')
+#Kjønnsfordeling, alle år, kvinner menn:
+  (tabKjPst <- sprintf('%.1f',table(RegData$ErMann)/Ntot*100))
 
 
 #Andelen fremmedspråklige (inkl. samisk) per år:
-  FremmedSpraak <- sprintf('%.1f', FremmedSpraakAar$AggVerdier$Hoved)
+  FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='Morsmal', aar = startAar:rappAar,
+                                       outfile='FigMorsmalAar.pdf')
+  (FremmedSpraak <- sprintf('%.1f', FremmedSpraakAar$AggVerdier$Hoved))
 
 #Andelen ryggopererte med høyere utdanning (høyskole eller universitet):
   UtdanningAar <- sprintf('%.1f', UtdanningTid$AggVerdier$Hoved)
@@ -210,12 +169,32 @@ RoykAar <- sprintf('%.1f', RoykTid$AggVerdier$Hoved)
 
 
 
-#----- Figurer
-  #1: Samme nivå, 2:Annet nivå, 3: Annet og sm. nivå, 4: Primæroperasjon
+#----Figurer
+RyggFigAndeler(RegData=RegData1aar, valgtVar='Alder', datoFra=datoFra1aar, datoTil=datoTil, outfile='FigAlderFord.pdf')
+
+RyggFigAndeler(RegData=RegData1aar, valgtVar='BMI', datoFra=datoFra, datoTil=datoTil,
+               outfile='FigBMI.pdf')
+RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar='Morsmal', outfile = 'FigMorsmal.pdf')
+Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='Utd', datoFra=datoFra1aar, datoTil=datoTil,
+                            outfile='FigUtd.pdf')
+HoyUtdAvd <- RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='Utd', Ngrense = 10,
+                                 outfile='FigHoyUtdAvd.pdf')
+UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Utd', aar = startAar:rappAar,
+                                outfile='FigUtdAar.pdf')
+UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='UforetrygdPre', outfile='FigUforTid.pdf')
+
+UforetrygdPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='UforetrygdPre', datoFra=datoFra1aar,
+                                     outfile='FigUforAvd.pdf')
+ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='ErstatningPre', outfile='FigErstatTid.pdf')
+
+RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj',
+                    outfile = 'FigdegSponFusj.pdf')
+
+
+
+#1: Samme nivå, 2:Annet nivå, 3: Annet og sm. nivå, 4: Primæroperasjon
   #NB: I figuren er 4 kodet om til 0 !!!
 AndelTidlOp <- RyggFigAndelStabelTid(RegData=RegData, outfile='TidlOp.pdf', valgtVar='TidlOp')
-#? TidlOpFordHoved <- rowSums(AndelTidlOp$AndelerHoved)
-#? TidlOpHoved <- round(TidlOpFordHoved[2:4]*100/sum(TidlOpFordHoved[2:4]), 1)
 
 RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Roker', outfile='FigRokerTid.pdf')
 
@@ -231,26 +210,26 @@ AndelerTidlOp[2] #operert i annet nivå
 AndelerTidlOp[3] #operert i både samme og annet nivå.
 
 #Prolapspasienter operert mer enn 2 ganger tidligere (startår-rapp.år):
-AndelTidlOp3Pro <- round(table(RegDataPro$TidlOprAntall>2,RegDataPro$OpAar)['TRUE',]/table(RegDataPro$OpAar)*100,1)
+AndelTidlOp3Pro <- round(table(RegDataPro$TidlOprAntall>2,RegDataPro$Aar)['TRUE',]/table(RegDataPro$Aar)*100,1)
 min(AndelTidlOp3Pro)
 max(AndelTidlOp3Pro)
 #lumbal spinal stenosepasienter operert mer enn 2 ganger tidligere (startår-rapp.år):
-AndelTidlOp3SS <- round(table(RegDataSS$TidlOprAntall>2,RegDataSS$OpAar)['TRUE',]/table(RegDataSS$OpAar)*100,1)
+AndelTidlOp3SS <- round(table(RegDataSS$TidlOprAntall>2,RegDataSS$Aar)['TRUE',]/table(RegDataSS$Aar)*100,1)
 min(AndelTidlOp3SS) max(AndelTidlOp3SS)
 
 
 #Andelen operert for lumbalt prolaps ved hjelp av synsfremmende midler:
-MikroAarPro <- prop.table(table(RegDataPro$OpMikro, RegDataPro$OpAar),2)*100
+MikroAarPro <- prop.table(table(RegDataPro$OpMikro, RegDataPro$Aar),2)*100
 BruktMikroAarPro <- sprintf('%.0f', MikroAarPro['1',])
 
 #Andelen operert for lumbal spinal stenose ved hjelp av synsfremmende midler:
-MikroAarSS <- prop.table(table(RegDataSS$OpMikro, RegDataSS$OpAar),2)*100
+MikroAarSS <- prop.table(table(RegDataSS$OpMikro, RegDataSS$Aar),2)*100
 BruktMikroAarSS <- sprintf('%.0f', MikroAarSS['1',])
 
 
-FornoydPro <- sprintf('%.0f',prop.table(table(RegDataPro12mnd$Fornoyd12mnd, RegDataPro12mnd$OpAar),2)[1,]*100)
-SaarInfSS <- prop.table(table(RegDataSS$KpInf3Mnd, RegDataSS$OpAar),2)*100
-FornoydSS <- sprintf('%.0f',prop.table(table(RegDataSS$Fornoyd12mnd, RegDataSS$OpAar),2)[1,]*100)
+FornoydPro <- sprintf('%.0f',prop.table(table(RegDataPro12mnd$Fornoyd12mnd, RegDataPro12mnd$Aar),2)[1,]*100)
+SaarInfSS <- prop.table(table(RegDataSS$KpInf3Mnd, RegDataSS$Aar),2)*100
+FornoydSS <- sprintf('%.0f',prop.table(table(RegDataSS$Fornoyd12mnd, RegDataSS$Aar),2)[1,]*100)
 
 
 
@@ -261,7 +240,7 @@ HovedInngrep <- RyggFigAndeler(RegData=RegData1aar, valgtVar='HovedInngrep', dat
 #Andel operert for lumbalt prolaps: \%
 round(HovedInngrep$Andeler[1,2])
 #Andel operert for Spinal stenose
-indSS1aar <- intersect(which(RegData$OpAar==rappAar), indSS)
+indSS1aar <- intersect(which(RegData$Aar==rappAar), indSS)
 AndelSSrappaar <- round(100*length(indSS1aar)/dim(RegData1aar)[1])
 
 #Tabell, fordeling av hovedinngrepstype
@@ -273,23 +252,19 @@ xtable(HovedInngrepTab, align=c('l','r','r'), caption=paste0('Fordeling av hoved
 
 
 
-RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj',
-                             outfile = 'FigdegSponFusj.pdf')
-
-
 
 #Andelen operert med dagkirurgi for hhv prolaps og spinal stenose
-ProDagTid <- table(RegDataPro[ ,c('Dagkirurgi', 'OpAar')], useNA = 'a')
+ProDagTid <- table(RegDataPro[ ,c('Dagkirurgi', 'Aar')], useNA = 'a')
 ProDagPst <- prop.table(ProDagTid[1:2,],2)*100
 ProDag11_naa <- c(round(ProDagPst['1','2011']), round(ProDagPst['1',as.character(rappAar)]))
 
-SSDagTid <- table(RegDataSS[ ,c('Dagkirurgi', 'OpAar')], useNA = 'a')
+SSDagTid <- table(RegDataSS[ ,c('Dagkirurgi', 'Aar')], useNA = 'a')
 SSDagPst <- prop.table(SSDagTid[1:2,],2)*100
 SSDag11_naa <- c(round(SSDagPst['1','2011']), round(SSDagPst['1',as.character(rappAar)]))
 
 #Andel operert for spinal stenose som også hadde Degenerativ spondylolistese, rappAar
 AntDegenSpondSS <-  dim(RyggUtvalgEnh(RegDataSS, hovedkat = 9, aar = rappAar)$RegData)[1]
-AntSS <- sum(RegDataSS$OpAar==rappAar)
+AntSS <- sum(RegDataSS$Aar==rappAar)
 AndelDegSponSS <- round(AntDegenSpondSS/AntSS*100,1)
 
 
@@ -317,27 +292,27 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdPro.pdf',
 RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
                  valgtVar='Liggedogn', hovedkat = 8, valgtMaal = 'Gjsn')
 RyggFigGjsnBox(RegData=RegData, outfile='OswEndrPro.pdf',
-               aar=startAar:(rappAar-1), valgtVar='OswEndr', hovedkat=1, ktr=ktr)
+               aar=startAar:(rappAar-1), valgtVar='OswEndr', hovedkat=1, ktr=2)
 RyggFigGjsnBox(RegData=RegData, outfile='OswEndrSS.pdf',
-               aar=startAar:(rappAar-1), valgtVar='OswEndr', hovedkat=8, ktr=ktr)
+               aar=startAar:(rappAar-1), valgtVar='OswEndr', hovedkat=8, ktr=2)
 
 
 
 #gjennomsnittlig ODI score, lumbalt prolaps, rappAar, før operasjon:
-indProPP <-  with(RegDataPro, which((OpAar == (rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
+indProPP <-  with(RegDataPro, which((Aar == (rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
 ODIprePro <- sprintf('%.1f', mean(RegDataPro$OswTotPre[indProPP]))
 #gjennomsnittlig ODI score, lumbalt prolaps, rappAar, etter operasjon:
 ODIpostPro <- sprintf('%.1f', mean(RegDataPro$OswTot12mnd[indProPP]))
 
 #ODI-pre, lumbal spinal stenose:
-indSSPP <-  with(RegDataSS, which((OpAar == (rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
+indSSPP <-  with(RegDataSS, which((Aar == (rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
 ODIpreSS <- sprintf('%.1f', mean(RegDataSS$OswTotPre[indSSPP]))
 #ODI-post, lumbal spinal stenose:
 ODIpostSS <- sprintf('%.1f', mean(RegDataSS$OswTot12mnd[indSSPP]))
 
 #ODI-pre, fusjonkirurgi:
 indFusjPP <-  with(RegData,
-                   which(HovedInngrep==5 & (OpAar==(rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
+                   which(HovedInngrep==5 & (Aar==(rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
 ODIpreFusj <- sprintf('%.1f', mean(RegData$OswTotPre[indFusjPP]))
 #ODI-pre, fusjonkirurgi:
 ODIpostFusj <- sprintf('%.1f', mean(RegData$OswTot12mnd[indFusjPP]))
@@ -390,7 +365,7 @@ FornoydProTid
 FornoydSSTid
 
 #Liggetid, prolaps:
-LiggetidPro <- tapply(RegDataPro$Liggedogn[indPro], RegDataPro$OpAar[indPro], mean, na.rm=T)
+LiggetidPro <- tapply(RegDataPro$Liggedogn[indPro], RegDataPro$Aar[indPro], mean, na.rm=T)
 NedgLiggetidPro <- sprintf('%.1f', abs(LiggetidPro[as.character(rappAar)]-LiggetidPro['2010']))
 
 

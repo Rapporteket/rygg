@@ -19,6 +19,11 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
                                     query='SELECT * FROM AlleVarNum')
 
+  # table(RegDataV2$AvdNavn)
+  # sort(unique(RegDataV2$AvdNavn))
+  # table(RegDataV3$SykehusNavn)
+  # sort(unique(RegDataV3$SykehusNavn))
+
   if (alleVarV3 == 0) {
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
   fjernesV3 <-
@@ -57,15 +62,6 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
 
     RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% fjernesV3)]
   }
-
-  #RegData <- RyggPreprosess(RegData) #Sjekket at alle nødvendige var for preprosessering er med
-
-  # table(RegDataV2$ErstatningPre, useNA = 'a') #3mnd, 12mnd
-  # 1     2     3     4  <NA>
-  # 1005 38830   881   767  2495
-  # table(RegDataV3$ErstatningPre, useNA = 'a')
-  # 0    1    2    3    9 <NA>
-  # 5703  200  139   90 1736    6
 
   #-----Tilrettelegging av V2-data-------------------------
     #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..

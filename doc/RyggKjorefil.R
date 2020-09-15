@@ -253,18 +253,16 @@ valgtMaal <- 'Med'
 #----------------------------------------------------------------------------------------------------------------
 #-------- Andel per sykehus eller annen gr.variabel (AndelGrVar)-----------------------------------------
 #----------------------------------------------------------------------------------------------------------------
-valgtVar <- 'SympVarighUtstr'
 outfile <- '' #paste0(valgtVar, 'Sh.pdf')
-RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
-                      sep=';', header=T, encoding = 'UTF-8')
+RegData <- RyggRegDataSQLV2V3() #read.table('A:/Rygg/AlleVarNum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
 
-RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData, hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
+RyggFigAndelerGrVar(valgtVar='degSponFusj', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
                     datoFra='2017-01-01', ktr=1, outfile=outfile)
 
 library(rygg)
 
 variable <- c('alder70', 'antibiotika', 'arbstatus', 'ASA', 'beinsmLavPre',
-              'BeinsmEndrLav', 'BMI', 'degSponFusj', 'degSponSSSten', 'ErstatningPre', 'Fornoyd',
+              'beinsmEndrLav', 'BMI', 'degSponFusj', 'degSponSSSten', 'ErstatningPre', 'Fornoyd',
               'KpInf3Mnd', 'Kp3Mnd', 'Misfornoyd', 'Nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
               'Osw22', 'Osw48', 'PeropKompDura', 'Roker', 'Saardren', 'SmStiPre', 'SymptVarighRyggHof',
               'SympVarighUtstr', 'tidlOp3', 'UforetrygdPre', 'Utd', 'Verre')

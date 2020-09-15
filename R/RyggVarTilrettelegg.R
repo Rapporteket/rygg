@@ -172,6 +172,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   RegData$Variabel[which(RegData$ASA > 2)] <- 1
                   tittel <- 'ASA-grad > II'
             }
+            sortAvtagende <- FALSE
       }
 
       if (valgtVar == 'beinsmLavPre') { #AndelGrVar, AndelTid
@@ -213,15 +214,15 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   sortAvtagende <- FALSE
             }}
 
-      # if (valgtVar == 'degSponFusj') { #AndelGrVar, AndelTid
-      #       #hovedkat=9 #Degen. spondylolistese
-      #       RegData <- RyggUtvalgEnh(RegData, hovedkat=9)$RegData
-      #       RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
-      #       varTxt <- 'tilfeller'
-      #       tittel <- 'Degen. spondylolistese operert med fusjonskirurgi'
-      #       sortAvtagende <- F
-      #       xAkseTxt <- 'Andel med fusjonskirurgi (%)'
-      # }
+      if (valgtVar == 'degSponFusj') { #AndelGrVar, AndelTid
+            #hovedkat=10 #Degen. spondylolistese
+            RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
+            RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
+            varTxt <- 'tilfeller'
+            tittel <- 'Degen. spondylolistese operert med fusjonskirurgi'
+            sortAvtagende <- F
+            xAkseTxt <- 'Andel med fusjonskirurgi (%)'
+      }
       if (valgtVar == 'degSponSSSten') { #AndelGrVar
             #(Først og fremst fusjonskirurgi)
             RegData$Variabel[which((RegData$RfSentr==1) & (RegData$RfSpondtypeDegen == 1))] <- 1

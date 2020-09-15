@@ -4,7 +4,7 @@
 #' Funksjon som gjør utvalg i datagrunnlaget til registreringene for Nakke
 #'
 #' Funksjon som gjør utvalg av dataene, returnerer det reduserte datasettet og utvalgsteksten.
-#' Gjøre ingen utvalg, vil alle data vises.
+#' Gjøres ingen utvalg, vil alle data vises.
 #'
 #' Argumentet \emph{enhetsUtvalg} har følgende valgmuligheter:
 #'   \itemize{
