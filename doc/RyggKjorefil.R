@@ -92,6 +92,10 @@ table(SkjemaOversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")
 
 library(rygg)
 library(rapbase)
+
+tapply(RegData$OswTotPre, RegData$Aar, FUN = 'median')
+
+
 rm(list=ls())
 outfile <- ''
 tidsenhet <- 'Mnd'
@@ -190,11 +194,11 @@ for (valgtVar in variable) {
  library(rygg)
  RegData <- RyggRegDataSQLV2V3()
 
- RyggFigGjsnGrVar(RegData=RegData, outfile='', valgtVar='smBePre')
+ RyggFigGjsnGrVar(RegData=RegData, outfile='', valgtVar='OswTotPre')
  #, tidlOp=tidlOp, erMann=erMann,
  #                 hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal='Gjsn',
  #                 datoFra=datoFra, datoTil=datoTil, aar=aar, enhetsUtvalg=enhetsUtvalg)
- utdata <- RyggFigGjsnBox(RegData=RegData, outfile='', aar=2017:2019, valgtVar='smBePre')
+ utdata <- RyggFigGjsnBox(RegData=RegData, outfile='', aar=2007:2020, tidsenhet = 'Aar', valgtVar='OswEndr')
  # , tidlOp=tidlOp, erMann=erMann, hastegrad = hastegrad,
  #                          hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal=valgtMaal,
  #                          datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=enhetsUtvalg, tidsenhet = tidsenhet, reshID=reshID) #aar=aar,

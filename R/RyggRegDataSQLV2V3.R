@@ -18,14 +18,24 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
   RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
                                     query='SELECT * FROM AlleVarNum')
-#table(RegDataV3$Fornoyd3mnd, useNA = 'a')
 
+  RegDataV2$Aar <- lubridate::year(RegDataV2$OpDato)
+  tapply(RegDataV2$OswTot3mnd, RegDataV2$Aar, FUN = 'median', na.rm=T)
+  RegDataV3$Aar <- lubridate::year(RegDataV3$OpDato)
+  tapply(RegDataV3$OswTot3mnd, RegDataV3$Aar, FUN = 'median', na.rm=T)
+
+  #table(RegDataV3$Fornoyd3mnd, useNA = 'a')
+
+  # tab <- table(RegData[,c("ShNavn", 'Aar')])
+  # oppsum <- cbind('2007-18' = rowSums(tab[,c(as.character(2007:2018))]),
+  #       '2019-20'= rowSums(tab[,c(as.character(2019:2020))]))
    #table(RegDataV2$AvdNavn)
    # sort(unique(RegDataV2$AvdNavn))
    # tab <- unique(RegDataV2[ ,c("AvdNavn", "AvdReshID")])
    # print(tab[order(tab$AvdNavn),], row.names = F)
   # table(RegDataV3$SykehusNavn)
   # sort(unique(RegDataV3$SykehusNavn))
+  #unique(RegData[ ,c("ShNavn", "ReshId")])[order(RegData$ShNavn)]
 
   if (alleVarV3 == 0) {
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
@@ -60,7 +70,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
       "RFKunDegenerasjon", "RfKyfose", "RfMeyerdingGrad", "RfModic", "RfModicTypeI",
       "RfModicTypeII", "RfSkive", "RfSynovpre",
       "RfTypeIAktNivaa", "RfTypeIAnnetNivaa", "RfTypeIIAktNivaa", "RfTypeIIAnnetNivaa",
-      "RvBlokadeFacett", "RvBlokadeNerverot", "RvDpregblok", "RvFunksjoTranslMM", "RvFunksjoVinkelEndrGr",
+      "RvBlokadeFacett", "RvBlokadeNerverot", "RvFunksjoTranslMM", "RvFunksjoVinkelEndrGr",
       "SpesTrombProfyl", "Utfdato12mnd", "Utfdato3mnd", "UtfyltDato")
 
     RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% fjernesV3)]

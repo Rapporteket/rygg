@@ -5,8 +5,7 @@ library(xtable)
 RyggData <- RyggRegDataSQLV2V3()
 RegData <- RyggPreprosess(RegData=RyggData)
 
-RegData$ODIendr <- RegData$OswTotPre-RegData$OswTot12mnd
-RegData$ODIpst <- with(RegData, (OswTotPre-OswTot12mnd)/OswTotPre*100)
+#--NB: For 2019 mangler registrering av infeksjoner, dvs. KpInfOverfla3Mnd','KpInfDyp3Mnd
 
 #Felles parametre:
 startAar <- 2011
@@ -27,9 +26,13 @@ RegData12mnd <- RegData[which(RegData$Aar < rappAar), ] #For å ikke få med de 
 RegDataPro <- RegData[which(RegData$HovedInngrep==1),]
 RegDataPro12mnd <- RegDataPro[which(RegDataPro$Aar<rappAar), ]
 RegDataSS <- RyggUtvalgEnh(RegData, hovedkat = 8)$RegData
+#(Sjekk om antall stemmer!)
 
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
+
+RegData$ODIendr <- RegData$OswTotPre-RegData$OswTot12mnd
+RegData$ODIpst <- with(RegData, (OswTotPre-OswTot12mnd)/OswTotPre*100)
 
 # # Spinal stenose: BRUK UTVALG !!!!
 # attach(RegData)
@@ -80,6 +83,9 @@ Alder70Aar$AggVerdier$Hoved
   (FremmedSpraak <- sprintf('%.1f', FremmedSpraakAar$AggVerdier$Hoved))
 
 #Andelen ryggopererte med høyere utdanning (høyskole eller universitet):
+  UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Utd', aar = startAar:rappAar,
+                                  outfile='FigUtdAar.pdf')
+
   UtdanningAar <- sprintf('%.1f', UtdanningTid$AggVerdier$Hoved)
 
 
@@ -95,7 +101,7 @@ ArbNum <- round(table(RegData1aar$ArbstatusPre)*100/sum(table(RegData1aar$Arbsta
 ArbNum[1]
 
 #Andel pasienter svart på spørsmål om arbeidsstatus: \%
-  NsvarArb <- sum(table(RegData1aar$ArbstatusPre))
+  NsvarArb <- sum(RegData1aar$ArbstatusPre %in% 1:9)
   round(NsvarArb/Ntot1aar*100, 1)
 
 Arb <- paste0(ArbNum, '%')
@@ -110,42 +116,48 @@ sum(ArbNum[6:10])
 
 
 #Har søkt eller planlegger å søke uføretrygd, rappAar:
+UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='UforetrygdPre', outfile='FigUforTid.pdf')
 UforAar <- sprintf('%.1f', UforTid$AggVerdier$Hoved)
+
 #Har søkt eller planlegger å søke erstatning, rappAar:
+ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='ErstatningPre', outfile='FigErstatTid.pdf')
 ErstatningAar <- sprintf('%.1f', ErstatningTid$AggVerdier$Hoved)
 
 #Tabell, pasienter som har vært til radiologiske undersøkelser.
-RVvar <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
-RVant <- colSums(RegData1aar[, RVvar], na.rm=T)
-RVpst <- round(RVant*100/Ntot1aar,1)
-
-RV <- cbind('Antall' = c(RVant, Ntot1aar),
-            'Andeler' = c(paste0(RVpst, '%'),' ')
-)
-rownames(RV) <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diagnostisk blokade',
-                  'Røntgen LS-columna', 'Med fleksjon/ekstensjon', 'Tot. ant.')
-xtable(RV, caption=paste0('Radiologisk vurdering, ',rappAar),
-       label="tab:RV", align=c('l','r','r'))
+#MÅ EVT OPPDATERES. Borte: RvDiscogr', 'RvRadigr',
+#Sjekk om skal være med!
+# RVvar <- c('RvCt', 'RvMr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
+# RVant <- colSums(RegData1aar[, RVvar], na.rm=T)
+# RVpst <- round(RVant*100/Ntot1aar,1)
+#
+# RV <- cbind('Antall' = c(RVant, Ntot1aar),
+#             'Andeler' = c(paste0(RVpst, '%'),' ')
+# )
+# rownames(RV) <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diagnostisk blokade',
+#                   'Røntgen LS-columna', 'Med fleksjon/ekstensjon', 'Tot. ant.')
+# xtable(RV, caption=paste0('Radiologisk vurdering, ',rappAar),
+#        label="tab:RV", align=c('l','r','r'))
 
 
 
 #Tabell, diagnoser basert på radiologiske funn
-RFvar <- c("RfNormal", "RfSkive", "RfSentr", "RfLateral", "RfForamino", "RfDegen",
-           "RfSpondtypeIsmisk", "RfSpondtypeDegen", "RfDegskol", "RfSynovpre", "RfPseudom")
-RFant <- colSums(RegData1aar[, RFvar], na.rm=T)[-1]
-RFpst <- round(RFant*100/Ntot1aar)
-RF <- cbind('Antall' = c(RFant, Ntot1aar),
-            'Andeler' = c(paste0(RFpst, '%'),' '))
-
-#Teller opp de som er diagnostisert som normale:
-RFNorm <- intersect(which(rowSums(RegData1aar[, RFvar[2:11]], na.rm=T) == 0),
-                    which(RegData1aar$RfNormal == 1))
-rownames(RF) <- c('Skiveprolaps', 'Sentral spinalstenose', 'Lateral spinalstenose',
-                  'Foraminal stenose', 'Degenerativ rygg/skivedegenerasjon',
-                  'Istmisk spondylolistese', 'Degenerativ spondylolistese',
-                  'Degenerativ skoliose', 'Synovial syste', 'Pseudomeningocele', 'Tot.ant.')
-xtable(RF, caption=paste0('Radiologiske diagnoser, ', rappAar),
-       label="tab:RF", align=c('l','r','r'))
+#Sjekk inklusjon av variabler !!!!!!!! Borte: "RfNormal", "RfForamino", "RfDegen", "RfPseudom"
+# RFvar <- c( "RfSkive", "RfSentr", "RfLateral",
+#            "RfSpondtypeIsmisk", "RfSpondtypeDegen", "RfDegskol", "RfSynovpre")
+# RFant <- colSums(RegData1aar[, RFvar], na.rm=T)[-1]
+# RFpst <- round(RFant*100/Ntot1aar)
+# RF <- cbind('Antall' = c(RFant, Ntot1aar),
+#             'Andeler' = c(paste0(RFpst, '%'),' '))
+#
+# #Teller opp de som er diagnostisert som normale:
+# RFNorm <- intersect(which(rowSums(RegData1aar[, RFvar[2:11]], na.rm=T) == 0),
+#                     which(RegData1aar$RfNormal == 1))
+# rownames(RF) <- c('Skiveprolaps', 'Sentral spinalstenose', 'Lateral spinalstenose',
+#                   'Foraminal stenose', 'Degenerativ rygg/skivedegenerasjon',
+#                   'Istmisk spondylolistese', 'Degenerativ spondylolistese',
+#                   'Degenerativ skoliose', 'Synovial syste', 'Pseudomeningocele', 'Tot.ant.')
+# xtable(RF, caption=paste0('Radiologiske diagnoser, ', rappAar),
+#        label="tab:RF", align=c('l','r','r'))
 
 #Tabell, ASA
 ASAant <- table(factor(RegData1aar$ASA, levels=1:5), useNA='a')
@@ -156,17 +168,18 @@ rownames(ASA) <- c('I','II','III','IV', 'V', 'Ikke besvart')
 xtable(ASA, caption=paste0('Fordeling av ASA-grad, operasjoner utført i ', rappAar),
        label="tab:ASA", align=c('c','r','r'))
 
-#Tabell, røyking
-RoykTot <- round(sum(RegData1aar$Roker, na.rm=T)/sum(table(RegData1aar$Roker))*100,0)
-Royk <- round(prop.table(ftable(RegData1aar[,c('Kjonn','Roker')]),1)[,2]*100, 0)
+#Tabell, røyking - må oppdateres...
+RoykTot <- round(sum(RegData1aar$RokerV3, na.rm=T)/sum(table(RegData1aar$RokerV3))*100,0)
+Royk <- round(prop.table(ftable(RegData1aar[,c('Kjonn','RokerV3')]),1)[,2]*100, 0)
 names(Royk) <- c('Menn', 'Kvinner')
 
 #Andelen pasienter med ASA grad I-II:
 round(sum(table(RegData1aar$ASA)[1:2])/Ntot1aar*100, 1)
 
 #Andel røykere som ryggopereres, per år:
+RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Roker', outfile='FigRokerTid.pdf')
 RoykAar <- sprintf('%.1f', RoykTid$AggVerdier$Hoved)
-
+RoykTid$AggVerdier
 
 
 #----Figurer
@@ -179,13 +192,9 @@ Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='Utd', datoFra=datoFra
                             outfile='FigUtd.pdf')
 HoyUtdAvd <- RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='Utd', Ngrense = 10,
                                  outfile='FigHoyUtdAvd.pdf')
-UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Utd', aar = startAar:rappAar,
-                                outfile='FigUtdAar.pdf')
-UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='UforetrygdPre', outfile='FigUforTid.pdf')
 
 UforetrygdPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='UforetrygdPre', datoFra=datoFra1aar,
                                      outfile='FigUforAvd.pdf')
-ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='ErstatningPre', outfile='FigErstatTid.pdf')
 
 RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj',
                     outfile = 'FigdegSponFusj.pdf')
@@ -195,9 +204,6 @@ RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj',
 #1: Samme nivå, 2:Annet nivå, 3: Annet og sm. nivå, 4: Primæroperasjon
   #NB: I figuren er 4 kodet om til 0 !!!
 AndelTidlOp <- RyggFigAndelStabelTid(RegData=RegData, outfile='TidlOp.pdf', valgtVar='TidlOp')
-
-RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Roker', outfile='FigRokerTid.pdf')
-
 
 #Andelen reoperasjoner, per år:
 AndelReop <- round(colSums(AndelTidlOp$AndelerHoved[2:4,]))
@@ -215,7 +221,7 @@ min(AndelTidlOp3Pro)
 max(AndelTidlOp3Pro)
 #lumbal spinal stenosepasienter operert mer enn 2 ganger tidligere (startår-rapp.år):
 AndelTidlOp3SS <- round(table(RegDataSS$TidlOprAntall>2,RegDataSS$Aar)['TRUE',]/table(RegDataSS$Aar)*100,1)
-min(AndelTidlOp3SS) max(AndelTidlOp3SS)
+c(min(AndelTidlOp3SS), max(AndelTidlOp3SS))
 
 
 #Andelen operert for lumbalt prolaps ved hjelp av synsfremmende midler:
@@ -227,10 +233,11 @@ MikroAarSS <- prop.table(table(RegDataSS$OpMikro, RegDataSS$Aar),2)*100
 BruktMikroAarSS <- sprintf('%.0f', MikroAarSS['1',])
 
 
-FornoydPro <- sprintf('%.0f',prop.table(table(RegDataPro12mnd$Fornoyd12mnd, RegDataPro12mnd$Aar),2)[1,]*100)
-SaarInfSS <- prop.table(table(RegDataSS$KpInf3Mnd, RegDataSS$Aar),2)*100
-FornoydSS <- sprintf('%.0f',prop.table(table(RegDataSS$Fornoyd12mnd, RegDataSS$Aar),2)[1,]*100)
-
+#SaarInfSS <- prop.table(table(RegDataSS$KpInf3Mnd, RegDataSS$Aar),2)*100 - har ikke sårinfeksjon for 2019
+#FornoydPro <- sprintf('%.0f',)
+prop.table(table(RegDataPro12mnd$Fornoyd12mnd, RegDataPro12mnd$Aar),2)[1,]*100
+#FornoydSS <- sprintf('%.0f', )
+prop.table(table(RegDataSS$Fornoyd12mnd, RegDataSS$Aar),2)[1,]*100
 
 
 
