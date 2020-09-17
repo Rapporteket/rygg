@@ -61,8 +61,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          ktr <- 2
          valgtVar <- sub('12mnd', '', valgtVar)}
       varPrePost <- c('fornoydhet', 'nytte', 'EQ5DEndr','EQ5DEndr',
-                      'OswEndr', 'SmBeinEndr', 'SmRyggEndr',
-                      'OswEndrPre', 'SmBeinEndrPre', 'SmRyggEndrPre')
+                      'OswEndr', 'SmBeinEndr', 'SmRyggEndr')
       if ((valgtVar %in% varPrePost) & (ktr==0)) {ktr <- 1}
       # Ferdig1a - pasientskjema
       # Ferdigstilt1b3mnd
@@ -736,7 +735,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             tittel <- 'Beinsmerter før operasjon'
          }
          if (figurtype %in% c('gjsnBox', 'gjsnGrVar')){
-            RegData <- RegData[RegData$RegData$SmBePre %in% 0:10, ]
+            RegData <- RegData[RegData$SmBePre %in% 0:10, ]
             RegData$Variabel <- RegData$SmBePre
             tittel <- 'beinsmerter før operasjonen'
          }

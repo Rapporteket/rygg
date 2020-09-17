@@ -190,31 +190,25 @@ for (valgtVar in variable) {
  library(rygg)
  RegData <- RyggRegDataSQLV2V3()
 
- RyggFigGjsnGrVar(RegData=RegData, outfile='', valgtVar='smRyggEndr')
+ RyggFigGjsnGrVar(RegData=RegData, outfile='', valgtVar='smBePre')
  #, tidlOp=tidlOp, erMann=erMann,
  #                 hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal='Gjsn',
  #                 datoFra=datoFra, datoTil=datoTil, aar=aar, enhetsUtvalg=enhetsUtvalg)
- utdata <- RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar)
+ utdata <- RyggFigGjsnBox(RegData=RegData, outfile='', aar=2017:2019, valgtVar='smBePre')
  # , tidlOp=tidlOp, erMann=erMann, hastegrad = hastegrad,
  #                          hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal=valgtMaal,
  #                          datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=enhetsUtvalg, tidsenhet = tidsenhet, reshID=reshID) #aar=aar,
 
- #Tid
-variable <- c('EQ5DPre', 'OswTotPre', 'smBePre', 'smRyPre',
-              'EQ5DEndr', 'liggedogn', 'OswEndr', 'smRyggEndr', 'smBeinEndr',
-              'EQ5DEndrPre', 'OswEndrPre', 'smRyggEndr', 'smBeinEndr')
-#GrVar
-variable <- c('alder', 'liggedogn', 'OswEndr', 'smBeinEndr', 'smRyggEndr')
-
+variable <- c('alder', 'liggedogn', 'EQ5DPre', 'EQ5DEndr', 'EQ5DEndrPre',
+              'OswTotPre', 'smBePre', 'smRyPre', 'OswEndrPre', 'smRyggEndr', 'smBeinEndr')
 
 for (var in variable) {
-  outfile <- paste0(var, 'GjsnSh.png')
-  RyggFigGjsnGrVar(valgtVar=var, RegData=RegData, datoFra='2018-01-01', ktr=1,
-                  medKI = 0,  outfile=outfile)
-  # (outfile <- paste0(var, 'MedBox.png'))
-  #     RyggFigGjsnBox(valgtVar=var, RegData=RegData, datoFra='2017-01-01',
-  #                    enhetsUtvalg = 1, reshID = reshID, valgtMaal = 'Med',
-  #                    tidsenhet = 'Kvartal', ktr=1, outfile=outfile)
+  # outfile <- paste0(var, 'GjsnSh.png')
+  # RyggFigGjsnGrVar(valgtVar=var, RegData=RegData, datoFra='2018-01-01', ktr=1,
+  #                 medKI = 0,  outfile=outfile)
+  (outfile <- paste0(var, 'MedBox.png'))
+      RyggFigGjsnBox(valgtVar=var, RegData=RegData, datoFra='2017-01-01', #valgtMaal = 'Med',
+                     tidsenhet = 'Kvartal', outfile=outfile)
 }
 
 
