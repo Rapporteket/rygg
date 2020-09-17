@@ -45,7 +45,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil='30
       varTxt <- ''
       if (offData == 0) {
             RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar,
-                                               ktr=ktr, figurtype = 'andelTid')
+                                               datoTil=datoTil, ktr=ktr, figurtype = 'andelTid')
             RegData <- RyggVarSpes$RegData
             sortAvtagende <- RyggVarSpes$sortAvtagende
             varTxt <- RyggVarSpes$varTxt

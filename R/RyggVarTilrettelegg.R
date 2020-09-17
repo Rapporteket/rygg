@@ -68,10 +68,11 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       # Ferdigstilt1b3mnd
       # Ferdigstilt1b12mnd
       # Ferdig2a - legeskjema
-      if (valgtVar %in% varPrePost){
-            if (ktr == 1) {RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]}
-            if (ktr == 2) {RegData <- RegData[which(RegData$Ferdigstilt1b12mnd==1), ]}
-      }
+      #FILTRERING PÅ DENNE BLIR DET SAMME SOM Å FILTRERE PÅ VERSJON 3...!
+      # if (valgtVar %in% varPrePost){
+      #       if (ktr == 1) {RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]}
+      #       if (ktr == 2) {RegData <- RegData[which(RegData$Ferdigstilt1b12mnd==1), ]}
+      # }
       ktrtxt <- c(' før operasjon', ' (3 mnd etter)', ' (12 mnd. etter)')[ktr+1]
       trekkfraDager <- c(0,90,365)[ktr+1]
 
@@ -175,29 +176,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             sortAvtagende <- FALSE
       }
 
-      if (valgtVar == 'beinsmLavPre') { #AndelGrVar, AndelTid
-            #Lav beinsmerte og ingen parese. (Først og fremst prolaps)
-            RegData$Variabel[which((RegData$OpIndParese==0) & (RegData$SmBePre < 3.5))] <- 1
-            RegData <- RegData[which(RegData$SmBePre <= 10),]
-            sortAvtagende <- F
-            tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
-            #intToUtf8(2264)
-            #KImaalRetn <- 'lav'
-            KImaalGrenser <- c(0,3)
-            varTxt <- 'med manglende indikasjon'
-
-      }
-      if (valgtVar == 'beinsmEndrLav') { #AndelGrVar
-            #Mislykkede operasjoner
-            RegData$BeinsmEndr <- switch(as.character(ktr),
-                                         '1'= (RegData$SmBePre - RegData$SmBe3mnd),
-                                         '2'= (RegData$SmBePre - RegData$SmBe12mnd))
-            RegData <- RegData[which(RegData$BeinsmEndr >= -10), ]	#Fjerne tomme og ugyldige
-            #          RegData$Variabel[which(RegData$BeinsmEndr <1.5)] <- 1
-            RegData$Variabel[which(is.na(RegData$OpIndParese) & (RegData$BeinsmEndr < 1.5))] <- 1
-            tittel <- paste0("Forbedring av beinsmerte-skår <= 1 poeng, ", ktrtxt)
-            sortAvtagende <- FALSE
-      }
       if (valgtVar == 'BMI') { #Fordeling, AndelGrVar
             #BMI > 30
             RegData <- RegData[which(RegData$BMI >10), ]
@@ -230,14 +208,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             varTxt <- 'som har dette'
             sortAvtagende <- FALSE
       }
-      if (valgtVar=='EQ5DEndr') {#gjsnGrVar, gjsnTid
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$EQ5D3mnd - RegData$EQ5DPre),
-                                       '2'= (RegData$EQ5D12mnd - RegData$EQ5DPre))
-            RegData <- RegData[which(!is.na(RegData$Variabel)),]
-            tittel <- paste0('forbedring av EQ5D', ktrtxt)#gjsnGrVar, gjsnTid
-            KIekstrem <- c(-1.6, 1.6)
-      }
       if (valgtVar == 'EQ5DPre') {#ford gjsnPre (gjsnBox)
             RegData <- RegData[which(RegData$EQ5DV3Pre > -0.6),]
             gr <- c(-0.6, seq(-0.2, 0.9, 0.1), 1)
@@ -253,7 +223,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             KIekstrem <- c(-0.6, 1)
       }
 
-      if (valgtVar == 'EQ5DEndrPre') {#gjsnPre (gjsnBox)
+      if (valgtVar == 'EQ5DEndr') {#gjsnPre (gjsnBox)
             tittel <- paste0('forbedring av EQ5D', ktrtxt)
             RegData$Variabel <- switch(as.character(ktr),
                                        '1'= (RegData$EQ5DV33mnd - RegData$EQ5DV3Pre),
@@ -268,162 +238,65 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             KIekstrem <- c(-1.6, 1.6)
       }
 
-      if (valgtVar == 'OswEndr') {
-            #Forbedring=lavere Oswestry
-            tittel <- paste0('forbedring av ODI', ktrtxt)
-            RegData$Variabel <- -switch(as.character(ktr),
-                                        '1'= (RegData$OswTot3mnd - RegData$OswTotPre),
-                                        '2'= (RegData$OswTot12mnd - RegData$OswTotPre))
-            RegData <- RegData[which(!is.na(RegData$Variabel)),]
-            KIekstrem <- c(-100, 100)
-      }
-      if (valgtVar == 'OswEndrPre') {
-            #Forbedring=lavere Oswestry
-            tittel <- paste0('forbedring av ODI', ktrtxt)
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$OswTotPre - RegData$OswTot3mnd),
-                                       '2'= (RegData$OswTotPre - RegData$OswTot12mnd))
-            RegData <- RegData[which(!is.na(RegData$Variabel)),]
-            KIekstrem <- c(-100, 100)
-            Xlab <- 'Oswestry før operasjon'
-            gr <- c(seq(0,90,10), 101)
-            RegData$Gr <- cut(RegData$OswTotPre, gr, right=F)
-            GrNavn <- levels(RegData$Gr)
-            AntGr <- length(GrNavn)
-            GrNavn[AntGr] <- '[90,100]'
-      }
-
-      if (valgtVar == 'OswTotPre') { #fordeling, gjsnBox, gjsnGrVar
-            RegData$Variabel <- RegData$OswTotPre
-            RegData <- RegData[which(!is.na(RegData$Variabel)),]
-            tittel <- 'oswestryskår før operasjonen'
-            gr <- seq(0, 100, 10)
-            RegData$VariabelGr <- cut(RegData$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
-            grtxt <- levels(RegData$VariabelGr)
-            xAkseTxt <- 'skår'
-            KIekstrem <- c(0, 100)
-            sortAvtagende <- FALSE
-      }
-      if (valgtVar == 'smBeinEndr') {
-            tittel <- paste0('bedring av beinsmerter ',ktrtxt)
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$SmBePre - RegData$SmBe3mnd),
-                                       '2'= (RegData$SmBePre - RegData$SmBe12mnd))
-            RegData <- RegData[which(!is.na(RegData$Variabel)),]
-            KIekstrem <- c(-10,10)
-      }
-      if (valgtVar == 'smBeinEndrPre') {
-            tittel <- 'endring i beinsmerter'
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$SmBePre - RegData$SmBe3mnd),
-                                       '2'= (RegData$SmBePre - RegData$SmBe12mnd))
-            KIekstrem <- c(-10,10)
-      }
-      if (valgtVar == 'smBePre') { #fordeling, gjsn
-         if (figurtype=='andeler'){
-            RegData$VariabelGr <- RegData$SmBePre
-            levels(RegData$VariabelGr) <- c(0:10,99)
-            grtxt <- c(as.character(0:10), 'Ikke utfylt')
-            tittel <- 'Beinsmerter før operasjon'
-         }
-         if (figurtype %in% c('gjsnBox', 'gjsnGrVar')){
-         RegData$Variabel <- RegData$SmBePre
-         RegData <- RegData[RegData$Variabel %in% 0:10, ]
-            tittel <- 'beinsmerter før operasjonen'
-         }
-            xAkseTxt <- 'skår'
-            KIekstrem <- c(0, 10)
-      }
-
-      if (valgtVar == 'smRyggEndr') {
-            tittel <- paste0('forbedring av  ryggsmerter', ktrtxt)
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= RegData$SmRyPre - RegData$SmRy3mnd,
-                                       '2'= RegData$SmRyPre - RegData$SmRy12mnd)
-            KIekstrem <- c(-10,10)
-      }
-
-      if (valgtVar == 'smRyggEndrPre') {
-            tittel <- paste0('forbedring av ryggsmerter', ktrtxt)
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$SmRyPre - RegData$SmRy3mnd),
-                                       '2'= (RegData$SmRyPre - RegData$SmRy12mnd))
-            KIekstrem <- c(-10,10)
-      }
-      if (valgtVar == 'smRyPre') { #fordeling
-         if (figurtype=='andeler'){
-            RegData$VariabelGr <- RegData$SmRyPre
-            levels(RegData$VariabelGr) <- c(0:10,99)
-            grtxt <- c(as.character(0:10), 'Ikke utfylt')
-            tittel <- 'Ryggsmerter før operasjon'
-         }
-         if (figurtype %in% c('gjsnBox', 'gjsnGrVar')){
-            RegData$Variabel <- RegData$SmRyPre
-            RegData <- RegData[RegData$Variabel %in% 0:10, ]
-            tittel <- 'ryggsmerter før operasjonen'
-         }
-      }
-
-
       if (valgtVar == 'EQangstPre') {#fordeling
-            tittel <- 'Problemer med angst/depresjon'
-            grtxt <- c('Ingen', 'Litt','Middels', 'Svært','Ekstremt', 'Ikke utfylt')
-            RegData$VariabelGr <- factor(RegData$EqangstV3Pre, levels = c(1:5,9))
-            subtxt <- 'Grad av engstelighet/deprimerthet'	#Tilstand i forhold til angst'
+         tittel <- 'Problemer med angst/depresjon'
+         grtxt <- c('Ingen', 'Litt','Middels', 'Svært','Ekstremt', 'Ikke utfylt')
+         RegData$VariabelGr <- factor(RegData$EqangstV3Pre, levels = c(1:5,9))
+         subtxt <- 'Grad av engstelighet/deprimerthet'	#Tilstand i forhold til angst'
       }
       if (valgtVar == 'EQgangePre') { #fordeling
-            tittel <- 'Problemer med gangfunksjon før operasjon'
-            grtxt <- c('Ingen', 'Litt','Middels', 'Store', 'Ute av stand til å gå', 'Ikke utfylt')
-            RegData$VariabelGr <- factor(RegData$EqgangeV3Pre, levels = c(1:5,9))
-           subtxt <- 'problemer med gange'
+         tittel <- 'Problemer med gangfunksjon før operasjon'
+         grtxt <- c('Ingen', 'Litt','Middels', 'Store', 'Ute av stand til å gå', 'Ikke utfylt')
+         RegData$VariabelGr <- factor(RegData$EqgangeV3Pre, levels = c(1:5,9))
+         subtxt <- 'problemer med gange'
       }
       if (valgtVar == 'erstatningPre') { #fordeling, AndelGrVar, #AndelTid
-            #Pasientskjema. Andel med ErstatningPre
-            #V2: Kode 1:4,9: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
-            #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger","Innvilget","Ikke utfylt"]
+         #Pasientskjema. Andel med ErstatningPre
+         #V2: Kode 1:4,9: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
+         #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger","Innvilget","Ikke utfylt"]
 
-            grtxt <- c('Nei', 'Ja', 'Planlegger', 'Innvilget', 'Ikke utfylt')
-            #RegData$VariabelGr <- 9
-            #indDum <- which(RegData$ErstatningPre %in% 1:4)
-            #RegData$VariabelGr[indDum] <- RegData$ErstatningPre[indDum]
-            RegData$VariabelGr <- factor(RegData$ErstatningPre, levels = c(0:3,9))
-            tittel <- 'Har pasienten søkt erstatning?'
-            if (figurtype %in% c('andelGrVar', 'andelTid')) {
-                  RegData <- RegData[which(RegData$ErstatningPre %in% 0:3), ]
-                  RegData$Variabel[which(RegData$ErstatningPre %in% c(1,2))] <- 1
-                  tittel <- 'Pasienten har søkt/planlegger å søke erstatning'
-                  varTxt <- 'som har søkt erstatning'
-                  sortAvtagende <- FALSE}
+         grtxt <- c('Nei', 'Ja', 'Planlegger', 'Innvilget', 'Ikke utfylt')
+         #RegData$VariabelGr <- 9
+         #indDum <- which(RegData$ErstatningPre %in% 1:4)
+         #RegData$VariabelGr[indDum] <- RegData$ErstatningPre[indDum]
+         RegData$VariabelGr <- factor(RegData$ErstatningPre, levels = c(0:3,9))
+         tittel <- 'Har pasienten søkt erstatning?'
+         if (figurtype %in% c('andelGrVar', 'andelTid')) {
+            RegData <- RegData[which(RegData$ErstatningPre %in% 0:3), ]
+            RegData$Variabel[which(RegData$ErstatningPre %in% c(1,2))] <- 1
+            tittel <- 'Pasienten har søkt/planlegger å søke erstatning'
+            varTxt <- 'som har søkt erstatning'
+            sortAvtagende <- FALSE}
       }
 
       if (valgtVar =='fornoydhet') { #fordeling, AndelGrVar
-            #3/12mndSkjema. Andel med helt Fornøyd (1)
-            #Kode 1:5,9: 'Fornøyd', 'Litt fornøyd', 'Verken eller', 'Litt misfornøyd', 'Misfornøyd', 'Ukjent')
-            tittel <- paste('Fornøydhet', ktrtxt)
-            datoTil <- min(datoTil, as.character(Sys.Date()-trekkfraDager))
-            RegData$Fornoyd <- switch(as.character(ktr),
-                                      '1'= RegData$Fornoyd3mnd,
-                                      '2'= RegData$Fornoyd12mnd)
-            grtxt <- c('Fornøyd', 'Litt fornøyd', 'Verken eller', 'Litt misfornøyd', 'Misfornøyd', 'Ukjent')
-            RegData$VariabelGr <- 9
-            indDum <- which(RegData$Fornoyd %in% 1:5)
-            RegData$VariabelGr[indDum] <- RegData$Fornoyd[indDum]
-            RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(1:5,9))
-            if (figurtype %in% c('andelGrVar', 'andelTid')) {
-                  RegData <- RegData[which(RegData$Fornoyd %in% 1:5), ]
-                  RegData$Variabel[which(RegData$Fornoyd %in% 1:2)] <- 1 #
-                  #RegData$Variabel[which(RegData$Fornoyd ==1)] <- 1 #%in% 1:2
-                  tittel <- paste0('Fornøyde pasienter', ktrtxt)
-            }
+         #3/12mndSkjema. Andel med helt Fornøyd (1)
+         #Kode 1:5,9: 'Fornøyd', 'Litt fornøyd', 'Verken eller', 'Litt misfornøyd', 'Misfornøyd', 'Ukjent')
+         tittel <- paste('Fornøydhet', ktrtxt)
+         datoTil <- min(datoTil, as.Date(Sys.Date()-trekkfraDager))
+         RegData$Fornoyd <- switch(as.character(ktr),
+                                   '1'= RegData$Fornoyd3mnd,
+                                   '2'= RegData$Fornoyd12mnd)
+         grtxt <- c('Fornøyd', 'Litt fornøyd', 'Verken eller', 'Litt misfornøyd', 'Misfornøyd', 'Ukjent')
+         RegData$VariabelGr <- 9
+         indDum <- which(RegData$Fornoyd %in% 1:5)
+         RegData$VariabelGr[indDum] <- RegData$Fornoyd[indDum]
+         RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(1:5,9))
+         if (figurtype %in% c('andelGrVar', 'andelTid')) {
+            RegData <- RegData[which(RegData$Fornoyd %in% 1:5), ]
+            RegData$Variabel[which(RegData$Fornoyd %in% 1:2)] <- 1 #
+            #RegData$Variabel[which(RegData$Fornoyd ==1)] <- 1 #%in% 1:2
+            tittel <- paste0('Fornøyde pasienter', ktrtxt)
+         }
       }
       if (valgtVar=='hovedInngrep'){ #fordeling
-            tittel <- 'Hovedinngrep'
-            # grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Foramenotomi', 'Laminektomi',
-            #            'Interspin. implantat', 'Fusjonskirurgi', 'Skiveprotese', 'Rev. av implantat')
-            grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Dekompresjon', 'Laminektomi', 'Eksp. intersp impl.',
-                       'Fusjonskirurgi', 'Deformitet', 'Rev. av implantat', 'Skiveprotese')
-            RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:8)
-            retn <- 'H'
+         tittel <- 'Hovedinngrep'
+         # grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Foramenotomi', 'Laminektomi',
+         #            'Interspin. implantat', 'Fusjonskirurgi', 'Skiveprotese', 'Rev. av implantat')
+         grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Dekompresjon', 'Laminektomi', 'Eksp. intersp impl.',
+                    'Fusjonskirurgi', 'Deformitet', 'Rev. av implantat', 'Skiveprotese')
+         RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:8)
+         retn <- 'H'
       }
       if (valgtVar=='inngrep'){ #fordeling
          tittel <- 'Inngrepstyper'
@@ -446,9 +319,9 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          #               'SykdKroniskSmerterMuskelSkjelettsyst', 'SykdOsteoporose', 'SykDprebetesMellitus',
          #               'SykdReumatoidartritt', 'SykdVaskularClaudicatio', 'Sykd')
          variable <- c('SykdAndreRelevanteSykdBechtrew', 'SykdAnnenendokrin', 'SykdAnnenreumatisk',
-                         'SykdCerebrovaskular', 'SykdDepresjonAngst', 'SykdHjertekar', 'SykdHoftekneartose',
-                         'SykdHypertensjon', 'SykdKreft', 'SykdKroniskLunge', 'SykdKroniskNevrologisk',
-                         'SykdOsteoporose', 'SykdOsteoporoseBrudd', 'SykDprebetesMellitus',                   #'SykdKroniskSmerterMuskelSkjelettsyst',
+                       'SykdCerebrovaskular', 'SykdDepresjonAngst', 'SykdHjertekar', 'SykdHoftekneartose',
+                       'SykdHypertensjon', 'SykdKreft', 'SykdKroniskLunge', 'SykdKroniskNevrologisk',
+                       'SykdOsteoporose', 'SykdOsteoporoseBrudd', 'SykDprebetesMellitus',                   #'SykdKroniskSmerterMuskelSkjelettsyst',
                        'SykdPolynevropati', 'SykdProstatisme',
                        'SykdReumatoidartritt', 'SykdVaskularClaudicatio', 'SykdGeneralisertSmSyndr',
                        'Sykd')
@@ -465,56 +338,57 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       }
 
       if (valgtVar=='komplPer') { #fordeling
-            tittel <- 'Peroperative komplikasjoner'
-            retn <- 'H'
-            flerevar <- 1
-            #NB <- '(Komplikasjoner rapporteres kun f.o.m. 2010)'
-            variable <- c('PeropKompDura', 'PeropKompFeilnivSide', 'PeropKompNerve', 'PeropKompTransfuBlodning',
-                          'PeropKompKardio','PeropKompFeilplassImp','PeropKompResp','PeropKompAnafy')
-            grtxt <- c('Durarift', 'Operert feil nivå/side', 'Nerveskade', 'Transfusjonskrevende blødning',
-                       'Kardiovaskulær komplikasjon', 'Feilplassert implantat', 'Respiratorisk komplikasjon', 'Anafylaksi')
+         tittel <- 'Peroperative komplikasjoner'
+         retn <- 'H'
+         flerevar <- 1
+         #NB <- '(Komplikasjoner rapporteres kun f.o.m. 2010)'
+         variable <- c('PeropKompDura', 'PeropKompFeilnivSide', 'PeropKompNerve', 'PeropKompTransfuBlodning',
+                       'PeropKompKardio','PeropKompFeilplassImp','PeropKompResp','PeropKompAnafy')
+         grtxt <- c('Durarift', 'Operert feil nivå/side', 'Nerveskade', 'Transfusjonskrevende blødning',
+                    'Kardiovaskulær komplikasjon', 'Feilplassert implantat', 'Respiratorisk komplikasjon', 'Anafylaksi')
       }
 
       if (valgtVar=='komplPost') {
-            tittel <- 'Pasientrapporterte komplikasjoner'
-            datoTil <- min(datoTil, as.character(Sys.Date()-90))
-            retn <- 'H'
-            flerevar <- 1
-            #Andel kun av de som har svart på 3 mnd ktr:
-            RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
-            # variableV2 <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpMiktProb3Mnd','KpUVI3Mnd',
-            #               'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
-            variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd', #'KpMiktProb3Mnd',
-                          'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
-            grtxt <- c('Overfladisk sårinfeksjon', 'Dyp sårinfeksjon',
-                       'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
-                       'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
+         tittel <- 'Pasientrapporterte komplikasjoner'
+         datoTil <- min(datoTil, as.character(Sys.Date()-90))
+         retn <- 'H'
+         flerevar <- 1
+         #Andel kun av de som har svart på 3 mnd ktr:
+         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
+         # variableV2 <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpMiktProb3Mnd','KpUVI3Mnd',
+         #               'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
+         variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd', #'KpMiktProb3Mnd',
+                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
+         grtxt <- c('Overfladisk sårinfeksjon', 'Dyp sårinfeksjon',
+                    'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
+                    'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
       }
 
       if (valgtVar == 'kp3Mnd') { #AndelGrVar
-            #Komplikasjoner 0:nei, 1:ja
-            RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
-            variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd', #'KpMiktProb3Mnd',
-                          'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')
-            RegData$Kp3Mnd <- NULL
-            RegData$Kp3Mnd[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
-            RegData$Variabel <- RegData$Kp3Mnd
-            tittel <- 'Pasientrapporterte komplikasjoner (%)'
-            sortAvtagende <- FALSE
+         #Komplikasjoner 0:nei, 1:ja
+         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
+         variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd', #'KpMiktProb3Mnd',
+                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')
+         RegData$Kp3Mnd <- NULL
+         RegData$Kp3Mnd[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
+         RegData$Variabel <- RegData$Kp3Mnd
+         tittel <- 'Pasientrapporterte komplikasjoner (%)'
+         sortAvtagende <- FALSE
       }
       if (valgtVar == 'kpInf3Mnd') { #AndelGrVar, AndelTid
-            #Komplikasjoner 0:nei, 1:ja
-            RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
-            RegData$Variabel <- NULL
-            RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3Mnd', 'KpInfDyp3Mnd')], na.rm = T) > 0] <- 1
-            RarTxt <- 'tilfeller'
-            tittel <- 'Sårinfeksjon, pasientrapportert'
-            sortAvtagende <- FALSE
-            xAkseTxt <- 'Andel sårinfeksjoner (%)'
-            #KImaalRetn <- 'lav'
-            if (hovedkat == 1) {KImaalGrenser <- c(0,2)}
-            if (hovedkat == 8) {KImaalGrenser <- c(0,3)}
+         #Komplikasjoner 0:nei, 1:ja
+         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
+         RegData$Variabel <- NULL
+         RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3Mnd', 'KpInfDyp3Mnd')], na.rm = T) > 0] <- 1
+         RarTxt <- 'tilfeller'
+         tittel <- 'Sårinfeksjon, pasientrapportert'
+         sortAvtagende <- FALSE
+         xAkseTxt <- 'Andel sårinfeksjoner (%)'
+         #KImaalRetn <- 'lav'
+         if (hovedkat == 1) {KImaalGrenser <- c(0,2)}
+         if (hovedkat == 8) {KImaalGrenser <- c(0,3)}
       }
+
       if (valgtVar=='liggedogn') {#fordeling, gjsnGrVar, andeler, gjsnTid
             #liggedogn
             #For opphold registrert som dagkirurgi uten at liggedogn er reg., settes liggedogn=0
@@ -693,6 +567,42 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             sortAvtagende <- F
       }
 
+      if (valgtVar == 'OswEndr') {
+         #Forbedring=lavere Oswestry
+         tittel <- paste0('forbedring av ODI', ktrtxt)
+         RegData$Variabel <- -switch(as.character(ktr),
+                                     '1'= (RegData$OswTot3mnd - RegData$OswTotPre),
+                                     '2'= (RegData$OswTot12mnd - RegData$OswTotPre))
+         RegData <- RegData[which(!is.na(RegData$Variabel)),]
+         KIekstrem <- c(-100, 100)
+      }
+      if (valgtVar == 'OswEndrPre') {
+         #Forbedring=lavere Oswestry
+         tittel <- paste0('forbedring av ODI', ktrtxt)
+         RegData$Variabel <- switch(as.character(ktr),
+                                    '1'= (RegData$OswTotPre - RegData$OswTot3mnd),
+                                    '2'= (RegData$OswTotPre - RegData$OswTot12mnd))
+         RegData <- RegData[which(!is.na(RegData$Variabel)),]
+         KIekstrem <- c(-100, 100)
+         Xlab <- 'Oswestry før operasjon'
+         gr <- c(seq(0,90,10), 101)
+         RegData$Gr <- cut(RegData$OswTotPre, gr, right=F)
+         GrNavn <- levels(RegData$Gr)
+         AntGr <- length(GrNavn)
+         GrNavn[AntGr] <- '[90,100]'
+      }
+
+      if (valgtVar == 'OswTotPre') { #fordeling, gjsnBox, gjsnGrVar
+         RegData$Variabel <- RegData$OswTotPre
+         RegData <- RegData[which(!is.na(RegData$Variabel)),]
+         tittel <- 'oswestryskår før operasjonen'
+         gr <- seq(0, 100, 10)
+         RegData$VariabelGr <- cut(RegData$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
+         grtxt <- levels(RegData$VariabelGr)
+         xAkseTxt <- 'skår'
+         KIekstrem <- c(0, 100)
+         sortAvtagende <- FALSE
+      }
       if (valgtVar=='peropKomp') { #AndelGrVar
             #Komplikasjoner ved operasjon
             #Kode 1:Ja,  tomme:Nei
@@ -759,17 +669,21 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             sortAvtagende <- F}
       }
 
-      if (valgtVar=='roker') { #AndelGrVar, #AndelTid
+      if (valgtVar=='roker') { #fordeling, AndelGrVar, #AndelTid
             #PasientSkjema. Andel med Roker=1
             #Kode 0,1,tom: Nei, Ja Ukjent
             #V3: [0,1,2,9] ["Nei","Ja","Har røkt tidligere","Ikke utfylt"]
             tittel <- 'Røyker du?'
+            if (figurtype == 'andeler'){
             grtxt <- c("Nei","Ja","Har røkt tidligere","Ikke utfylt")
+            RegData <- RegData[which(RegData$RokerV3 %in% c(0:2,9)), ]
             RegData$VariabelGr <- factor(RegData$RokerV3, levels = c(0:2,9))
-
+            }
             if (figurtype %in% c('andelGrVar', 'andelTid')){
-                  RegData <- RegData[which(RegData$RokerV3 %in% 0:2), ]
-                  RegData$Variabel[RegData$RokerV3==1] <- 1
+                  # RegData <- RegData[which(RegData$RokerV3 %in% 0:2), ]
+                  # RegData$Variabel[RegData$RokerV3==1] <- 1
+                  RegData <- RegData[which(RegData$RokerV2 %in% 0:1), ]
+                  RegData$Variabel <- RegData$RokerV2
                   tittel <- 'Røykere'
                   varTxt <- 'røykere'
                   sortAvtagende <- FALSE}
@@ -795,29 +709,75 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          grtxt <- c('Gift/Samboer', 'Enslig', 'Ikke utfylt')
          RegData$VariabelGr <- factor(RegData$SivilStatusV3, levels = c(1:2,9))
       }
-      if (valgtVar=='smBeinEndr') {#gjsnGrVar
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$SmBePre - RegData$SmBe3mnd),
-                                       '2'= (RegData$SmBePre - RegData$SmBe12mnd))
-            RegData <- RegData[which(!is.na(RegData$Variabel)),]
-            tittel <- paste0('forbedring av beinsmerter', ktrtxt)#gjsnGrVar
-
-      }
-      if (valgtVar=='smRyggEndr') {#gjsnGrVar
-            RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$SmRyPre - RegData$SmRy3mnd),
-                                       '2'= (RegData$SmRyPre - RegData$SmRy12mnd))
-            RegData <- RegData[which(!is.na(RegData$Variabel)),]
-            tittel <- paste0('forbedring av ryggsmerter', ktrtxt)#gjsnGrVar
-
-      }
-
-      if (valgtVar == 'smStiPreHypp') { #fordeling
+       if (valgtVar == 'smStiPreHypp') { #fordeling
          tittel <- 'Hyppighet av smertestillende før operasjonen'
          grtxt <- c('Sjeldnere', 'Månedlig', 'Ukentlig', 'Daglig', 'Flere ganger om dagen', 'Ikke utfylt') #'Oftere',
          #RegData <- RegData[which(RegData$SmHyppPre %in% c(1:5, 9)), ]
          RegData$VariabelGr <- factor(RegData$SmHyppPre, levels = c(1:5,9))
          retn <- 'H'
+      }
+
+      if (valgtVar == 'smBeinEndr') {
+         tittel <- paste0('bedring av beinsmerter ',ktrtxt)
+         RegData <- RegData[which((RegData$SmBePre %in% 0:10) &
+                                     (RegData$SmBe3mnd %in% 0:10) & (RegData$SmBe3mnd %in% 0:10)), ]
+         RegData$Variabel <- switch(as.character(ktr),
+                                    '1'= (RegData$SmBePre - RegData$SmBe3mnd),
+                                    '2'= (RegData$SmBePre - RegData$SmBe12mnd))
+         #RegData <- RegData[which(!is.na(RegData$Variabel)),]
+         KIekstrem <- c(-10,10)
+      }
+
+      if (valgtVar == 'smBePre') { #fordeling, gjsn
+         if (figurtype=='andeler'){
+            RegData$VariabelGr <- RegData$SmBePre
+            levels(RegData$VariabelGr) <- c(0:10,99)
+            grtxt <- c(as.character(0:10), 'Ikke utfylt')
+            tittel <- 'Beinsmerter før operasjon'
+         }
+         if (figurtype %in% c('gjsnBox', 'gjsnGrVar')){
+            RegData <- RegData[RegData$RegData$SmBePre %in% 0:10, ]
+            RegData$Variabel <- RegData$SmBePre
+            tittel <- 'beinsmerter før operasjonen'
+         }
+         xAkseTxt <- 'skår'
+         KIekstrem <- c(0, 10)
+      }
+      if (valgtVar == 'smBePreLav') { #AndelGrVar, AndelTid
+         #Lav beinsmerte og ingen parese. (Først og fremst prolaps)
+         RegData <- RegData[which(RegData$SmBePre %in% 0:10),]
+         RegData$Variabel[which((RegData$OpIndParese==0) & (RegData$SmBePre < 3.5))] <- 1
+         sortAvtagende <- F
+         tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
+         #intToUtf8(2264)
+         #KImaalRetn <- 'lav'
+         KImaalGrenser <- c(0,3)
+         varTxt <- 'med manglende indikasjon'
+
+      }
+
+      if (valgtVar == 'smRyggEndr') {#gjsn
+         tittel <- paste0('forbedring av  ryggsmerter', ktrtxt)
+         RegData <- RegData[which((RegData$SmRyPre %in% 0:10) &
+                                     (RegData$SmRy3mnd %in% 0:10) & (RegData$SmRy12mnd %in% 0:10)), ]
+         RegData$Variabel <- switch(as.character(ktr),
+                                    '1'= RegData$SmRyPre - RegData$SmRy3mnd,
+                                    '2'= RegData$SmRyPre - RegData$SmRy12mnd)
+         KIekstrem <- c(-10,10)
+      }
+
+      if (valgtVar == 'smRyggPre') { #fordeling, gjsn
+         if (figurtype=='andeler'){
+            RegData$VariabelGr <- RegData$SmRyPre
+            levels(RegData$VariabelGr) <- c(0:10,99)
+            grtxt <- c(as.character(0:10), 'Ikke utfylt')
+            tittel <- 'Ryggsmerter før operasjon'
+         }
+         if (figurtype %in% c('gjsnBox', 'gjsnGrVar')){
+            RegData <- RegData[RegData$SmRyPre %in% 0:10, ]
+            RegData$Variabel <- RegData$SmRyPre
+            tittel <- 'ryggsmerter før operasjonen'
+         }
       }
 
       if (valgtVar == 'smStiPre') { #fordeling, andelGrVar/Tid

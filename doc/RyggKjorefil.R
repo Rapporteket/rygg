@@ -157,28 +157,6 @@ valgtVar='DeknNakke17' #DeknNakke17, 'DeknRygg17'
 RyggFigAndelerGrVarDeknGr(RegData=RegData, outfile='', valgtVar='SymptVarighRyggHof')
 RyggFigAndelerGrVar(RegData = RegData, valgtVar='Morsmal', outfile = '')
 
-#-------------------------------------------------------
-#---------AndelTid
-#-------------------------------------------------------
-valgtVar <- 'OswEndr20'	#alder70, degSponFusj, KpInf3Mnd, OswEndr20
-outfile <- ''#paste0(valgtVar, '.png')	#Navn angis av Jasper
-
-
-RyggFigAndelTid(RegData=RegData, outfile=outfile, valgtVar=valgtVar, hovedkat=hovedkat, preprosess=1,
-                      minald = minald, maxald = maxald, aar=aar, tidsenhet = tidsenhet,
-                      erMann=erMann, ktr=ktr, tidlOp=tidlOp, enhetsUtvalg=enhetsUtvalg, tittel=1,
-                reshID=reshID)
-variable <- c('alder70', 'degSponFusj', 'KpInf3Mnd', 'OswEndr20')
-for (var in variable) {
-      outfile <- paste0(var, 'ATid.png')
-      RyggFigAndelTid(valgtVar=var, RegData=RegData, datoFra='2011-01-01', ktr=1, outfile=outfile)
-}
-
-RyggFigAndelTid(RegData=0, preprosess=1,valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, hovedkat=hovedkat,
-      ktr=ktr, tidlOp = tidlOp, minald=minald, maxald=maxald, erMann=erMann, reshID=reshID, outfile='',
-      enhetsUtvalg=enhetsUtvalg, hentData=0)
-
-
 #----------------------------------------------------------------
 #			FigAndeler (RyggFigAndeler.r
 #----------------------------------------------------------------
@@ -204,71 +182,68 @@ for (valgtVar in variable) {
                            outfile = outfile, reshID=reshID)
 }
 
-#                   RyggFigGjsnBox
-#---------- GjsnBox -------------------------
-#------- Endring i effektmål som funksjon av tid eller prescore
+ #----------------------------------------------------------
+ #                   RyggFigGjsnGrVar
+ #                   RyggFigGjsnBox
+ #----------------------------------------------------------
+ #------- Endring i effektmål som funksjon av tid eller prescore
+ library(rygg)
+ RegData <- RyggRegDataSQLV2V3()
 
-valgtVar <- 'EQ5DPre' #
-outfile <- ''#paste0(valgtVar,enhetsUtvalg, '.png')	#paste0(valgtVar,enhetsUtvalg, '.pdf')
+ RyggFigGjsnGrVar(RegData=RegData, outfile='', valgtVar='smRyggEndr')
+ #, tidlOp=tidlOp, erMann=erMann,
+ #                 hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal='Gjsn',
+ #                 datoFra=datoFra, datoTil=datoTil, aar=aar, enhetsUtvalg=enhetsUtvalg)
+ utdata <- RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar)
+ # , tidlOp=tidlOp, erMann=erMann, hastegrad = hastegrad,
+ #                          hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal=valgtMaal,
+ #                          datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=enhetsUtvalg, tidsenhet = tidsenhet, reshID=reshID) #aar=aar,
 
-utdata <- RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidlOp=tidlOp, erMann=erMann, hastegrad = hastegrad,
-		hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal=valgtMaal,
-		datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=enhetsUtvalg, tidsenhet = tidsenhet, reshID=reshID) #aar=aar,
-
-#RyggFigGjsnBox
-#RegData=0, outfile=outfile, valgtVar=valgtVar,valgtMaal=valgtMaal, enhetsUtvalg=enhetsUtvalg,
-#datoFra=datoFra, datoTil=datoTil, hovedkat=hovedkat, tidlOp=tidlOp,  ktr=ktr, erMann=erMann,
-#minald=minald, maxald=maxald, hentData=1, preprosess=1, reshID=reshID
+ #Tid
+variable <- c('EQ5DPre', 'OswTotPre', 'smBePre', 'smRyPre',
+              'EQ5DEndr', 'liggedogn', 'OswEndr', 'smRyggEndr', 'smBeinEndr',
+              'EQ5DEndrPre', 'OswEndrPre', 'smRyggEndr', 'smBeinEndr')
+#GrVar
+variable <- c('alder', 'liggedogn', 'OswEndr', 'smBeinEndr', 'smRyggEndr')
 
 
-variable <- c('EQ5DPre', 'OswTotPre', 'SmBePre', 'SmRyPre',
-              'EQ5DEndr', 'liggedogn', 'OswEndr', 'SmRyggEndr', 'SmBeinEndr',
-              'EQ5DEndrPre', 'OswEndrPre', 'SmRyggEndrPre', 'SmBeinEndrPre')
 for (var in variable) {
-      (outfile <- paste0(var, 'MedBox.png'))
-      RyggFigGjsnBox(valgtVar=var, RegData=RegData, datoFra='2017-01-01',
-                     enhetsUtvalg = 1, reshID = reshID, valgtMaal = 'Med',
-                     tidsenhet = 'Kvartal', ktr=1, outfile=outfile)
-}
-
-#----------------------------------------------------------
-#                   RyggFigGjsnGrVar
-#----------------------------------------------------------
-
-valgtVar <- 'SmBeinEndr' #'alder' 'Liggedogn', 'OswEndr', 'SmBeinEndr', 'SmRyggEndr'
-outfile <- ''#paste0(valgtVar,enhetsUtvalg, '.png')	#paste0(valgtVar,enhetsUtvalg, '.pdf')
-
-RyggFigGjsnGrVar(RegData=RegData, outfile=outfile, valgtVar=valgtVar, tidlOp=tidlOp, erMann=erMann,
-                         hovedkat=hovedkat, minald=minald, maxald=maxald, ktr=ktr, tittel=tittel, valgtMaal='Gjsn',
-                         datoFra=datoFra, datoTil=datoTil, aar=aar, enhetsUtvalg=enhetsUtvalg)
-setwd('C:/ResultattjenesteGIT/nkr/test/')
-variable <- c('alder', 'Liggedogn', 'OswEndr', 'SmBeinEndr', 'SmRyggEndr')()
-for (var in variable) {
-      outfile <- paste0(var, 'GjsnSh.png')
-      RyggFigGjsnGrVar(valgtVar=var, RegData=RegData, datoFra='2016-01-01', ktr=1, outfile=outfile)
+  outfile <- paste0(var, 'GjsnSh.png')
+  RyggFigGjsnGrVar(valgtVar=var, RegData=RegData, datoFra='2018-01-01', ktr=1,
+                  medKI = 0,  outfile=outfile)
+  # (outfile <- paste0(var, 'MedBox.png'))
+  #     RyggFigGjsnBox(valgtVar=var, RegData=RegData, datoFra='2017-01-01',
+  #                    enhetsUtvalg = 1, reshID = reshID, valgtMaal = 'Med',
+  #                    tidsenhet = 'Kvartal', ktr=1, outfile=outfile)
 }
 
 
-valgtMaal <- 'Med'
 #----------------------------------------------------------------------------------------------------------------
 #-------- Andel per sykehus eller annen gr.variabel (AndelGrVar)-----------------------------------------
-#----------------------------------------------------------------------------------------------------------------
-outfile <- '' #paste0(valgtVar, 'Sh.pdf')
+#---------AndelTid
+#-------------------------------------------------------
 RegData <- RyggRegDataSQLV2V3() #read.table('A:/Rygg/AlleVarNum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
 
-RyggFigAndelerGrVar(valgtVar='degSponFusj', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
-                    datoFra='2017-01-01', ktr=1, outfile=outfile)
 
-library(rygg)
+RyggFigAndelerGrVar(valgtVar='roker', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
+                    datoFra='2017-01-01', datoTil = '2019-02-01',ktr=1, outfile='')
 
-variable <- c('alder70', 'antibiotika', 'arbstatus', 'ASA', 'beinsmLavPre',
-              'beinsmEndrLav', 'BMI', 'degSponFusj', 'degSponSSSten', 'ErstatningPre', 'Fornoyd',
-              'KpInf3Mnd', 'Kp3Mnd', 'Misfornoyd', 'Nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
-              'Osw22', 'Osw48', 'PeropKompDura', 'Roker', 'Saardren', 'SmStiPre', 'SymptVarighRyggHof',
-              'SympVarighUtstr', 'tidlOp3', 'UforetrygdPre', 'Utd', 'Verre')
+RyggFigAndelTid(RegData=RegData, outfile='', valgtVar='nytte', datoFra = '2017-01-01', ktr = 1)
+# , hovedkat=hovedkat, preprosess=1,
+#                 minald = minald, maxald = maxald, aar=aar, tidsenhet = tidsenhet,
+#                 erMann=erMann, ktr=ktr, tidlOp=tidlOp, enhetsUtvalg=enhetsUtvalg, tittel=1,
+#                 reshID=reshID)
+#Sjekk Oswestry-skår for V3
+ variable <- c('alder70', 'antibiotika', 'arbstatus', 'ASA', 'smBePreLav',
+              'beinsmEndrLav', 'BMI', 'degSponFusj', 'degSponSSSten', 'erstatningPre', 'fornoydhet',
+              'KpInf3Mnd', 'Kp3Mnd', 'misfornoyd', 'nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
+              'Osw22', 'Osw48', 'peropKompDura', 'roker', 'saardren', 'smStiPre', 'symptVarighRyggHof',
+              'sympVarighUtstr', 'tidlOp3', 'uforetrygdPre', 'utd', 'verre')
 for (var in variable) {
-      outfile <- paste0(var, 'Sh.png')
-      RyggFigAndelerGrVar(valgtVar=var, RegData=RegData, datoFra='2016-01-01', ktr=1, outfile=outfile)
+      # outfile <- paste0(var, 'Sh.png')
+      # RyggFigAndelerGrVar(valgtVar=var, RegData=RegData, datoFra='2016-01-01', ktr=1, outfile=outfile)
+      outfile <- paste0(var, 'ATid.png')
+      RyggFigAndelTid(valgtVar=var, RegData=RegData, datoFra='2011-01-01', ktr=1, outfile=outfile)
 }
 
 #---------Traktplott------

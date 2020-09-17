@@ -71,7 +71,8 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
             RegData <- RyggPreprosess(RegData=RegData)
       }
       #------- Tilrettelegge variable
-      RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
+      RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr,
+                                         datoTil=datoTil, figurtype = 'andelGrVar')
       RegData <- RyggVarSpes$RegData
       sortAvtagende <- RyggVarSpes$sortAvtagende
       #varTxt <- RyggVarSpes$varTxt

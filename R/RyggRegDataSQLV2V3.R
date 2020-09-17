@@ -18,9 +18,12 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
   RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
                                     query='SELECT * FROM AlleVarNum')
+#table(RegDataV3$Fornoyd3mnd, useNA = 'a')
 
-  # table(RegDataV2$AvdNavn)
-  # sort(unique(RegDataV2$AvdNavn))
+   #table(RegDataV2$AvdNavn)
+   # sort(unique(RegDataV2$AvdNavn))
+   # tab <- unique(RegDataV2[ ,c("AvdNavn", "AvdReshID")])
+   # print(tab[order(tab$AvdNavn),], row.names = F)
   # table(RegDataV3$SykehusNavn)
   # sort(unique(RegDataV3$SykehusNavn))
 
@@ -82,6 +85,11 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV2$ErstatningPre <- plyr::mapvalues(RegDataV2$ErstatningPre, from = c(2,3,4,NA), to = c(0,2,3,9))
   RegDataV2$UforetrygdPre <- plyr::mapvalues(RegDataV2$UforetrygdPre, from = c(2,3,4,NA), to = c(0,2,3,9))
 
+  RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
+  RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
+  RegDataV2$OpIndPareseGrad[is.na(RegDataV2$OpIndPareseGrad)] <- 9
+  RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
+
   # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
   # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
   RegDataV2 <- dplyr::rename(RegDataV2,
@@ -94,6 +102,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
                              KommuneNr = Kommunenr, #Kommunenavn ikke med i V2
                              KpInfDyp12mnd = KpInfDyp12Mnd,
                              PasientID = PID, #En pasient vil skifte id fra 2019.
+                             RokerV2 = Roker,
                              #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
                              SykehusNavn = AvdNavn
   )
@@ -168,6 +177,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,0,0,1,0))
 
   RegDataV3$MedForstLukket <- as.character(as.Date(RegDataV3$MedForstLukket)) #Kobling med NA fungerer ikke for datotid-var
+RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = c(2, NA), to = c(0,9))
 
   #NB:----------Sjekk ut at alle variabler har samme format - VENTER TIL ENDELIG V2-FIL PÅ RAPPORTEKET.
   #f.eks.
