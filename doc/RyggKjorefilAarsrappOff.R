@@ -47,8 +47,9 @@ RegData$ODIpst <- with(RegData, (OswTotPre-OswTot12mnd)/OswTotPre*100)
 
 
 #---------FIGURER--------------
-SympVarighUtstrTidPro.pdf
-SympVarighUtstrProTid
+SympVarighUtstrAarPro.pdf #- figur med sml. av år
+RyggFigAndelTid(valgtVar='SympVarighUtstr', RegData=RegData,
+                preprosess = 0, hovedkat=1,outfile='SympVarighUtstrTidPro.pdf')
 
 RyggFigGjsnBox(RegData=RegData, aar = rappAar-1, valgtVar<-'SmBeinEndrPre', ktr=ktr,
                outfile='FigBeinsmEndrPre.pdf')
@@ -64,20 +65,20 @@ BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='BeinsmLavPre', aa
 # KpInf3MndSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', aar=(rappAar-1):rappAar,
 #                                    Ngrense = 20,
 #                                    hovedkat = 8, outfile='FigKpInf3MndSS.pdf')
-PeropKompDuraTidSmlGr.pdf
-PeropKompDuraProAar.pdf
-PeropKompDuraSSAar.pdf
+PeropKompDuraTidSmlGr.pdf #linjediagram per år, ulike operasjonstyper og totalt
+PeropKompDuraProAar.pdf #- andel per sykehus, sml. to og to år (RyggFigAndelerGrVarAar, evt. ..VarKval
+PeropKompDuraSSAar.pdf #- andel per sykehus, sml. to og to år
 DuraPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='PeropKompDura',
                                aar=(rappAar-1):rappAar, Ngrense = 20,
                                hastegrad = 1, tidlOp = 4, hovedkat = 1, outfile='FigDuraPro.pdf')
 DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='PeropKompDura',
                               aar=(rappAar-1):rappAar, Ngrense = 20,
                               hastegrad = 1, tidlOp = 4, hovedkat = 8, outfile='FigDuraSS.pdf')
-ODIendrProAar.pdf ?
-ODIendrSSAar.pdf ?
-FigOsw22Pro.pdf ?
-FigOsw22SS.pdf?
-FigFornoydAvdPro.pdf
+ODIendrProAar.pdf #Per sykehus, to år (2017 og 18)
+ODIendrSSAar.pdf #Per sykehus, to år (2017 og 18)
+FigOsw22Pro.pdf #AndelGrVar, prolaps, elektiv, primær, to år, 12mnd
+FigOsw22SS.pdf ##AndelGrVar, SS, elektiv, primær, to år, 12mnd
+FigFornoydAvdPro.pdf #AndelGrVar, helt fornøyd 12mnd, prolaps, elektiv, primær N>=20
 FigFornoydAvdSS.pdf
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='Fornoyd', ktr=ktr,
                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
@@ -192,8 +193,7 @@ RyggFigAndelerGrVar(valgtVar='SympVarighUtstr', RegData=RegData1aar, datoFra=dat
                            preprosess = 0, outfile='VarighUtstrAvdPro.pdf')
 RyggFigAndelerGrVar(valgtVar='SympVarighUtstr', RegData=RegData1aar, datoFra=datoFra1aar, hovedkat=8,
                            preprosess = 0, outfile='VarighUtstrAvdSS.pdf')
-RyggFigAndelTid(valgtVar='SympVarighUtstr', RegData=RegData,
-                       preprosess = 0, hovedkat=1,outfile='VarighUtstrTidPro.pdf')
+
 RyggFigAndelTid(valgtVar='SympVarighUtstr', RegData=RegData,
                        preprosess = 0, hovedkat=8,outfile='VarighUtstrTidSS.pdf')
 
