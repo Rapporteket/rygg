@@ -19,8 +19,8 @@ RyggRegDataSQLV2V3(
 1: har med alle variabler fra V3}
 }
 \value{
-RegData data frame
+RegData, dataramme med data f.o.m. 2007.
 }
 \description{
-Henter data for Degenerativ Rygg fra "staging" (?)
+Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3
 }

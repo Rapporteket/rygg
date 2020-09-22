@@ -19,7 +19,6 @@
 #'     \item 8: IKKE def - Egen region mot resten
 #'   }
 
-#' @inheritParams RyggFigAndeler
 #' @param datoFra Tidligste operasjonsdato i utvalget (vises alltid i figuren).
 #' @param datoTil Seneste operasjonsdato i utvalget (vises alltid i figuren).
 #' @param minald Alder, fra og med (Standardverdi: 0)
@@ -48,6 +47,7 @@
 #' @param enhetsUtvalg Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.
 #' @param reshID Parameter følger fra innlogging helseregister.no og angir
 #' @param fargepalett Velge fargepalett, standard:BlaaOff ("offentliggjøringsfargene")
+#' @inheritParams RyggFigAndeler
 #'
 #' @return Returnerer filtrert versjon av RegData
 #' @export

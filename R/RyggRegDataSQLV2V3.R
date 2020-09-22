@@ -1,12 +1,12 @@
 #' Henter data registrert for Degenerativ Rygg
 #'
-#' Henter data for Degenerativ Rygg fra "staging" (?)
+#' Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3
 #'
-#' @inheritParams RyggUtvalgEnh
 #' @param alleVarV3 0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
 #'                  1: har med alle variabler fra V3
+#' @inheritParams RyggUtvalgEnh
 #'
-#' @return RegData data frame
+#' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
 
 RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alleVarV3=1){
@@ -104,8 +104,6 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
     'Aleris, Bergen' = 'Aleris Bergen',
     'Aleris, Oslo' = 'Aleris Oslo',
-    #'Colosseum Oslo' = 'Aleris Oslo' ? Ingen Colosseum Oslo i V2
-    #'Colosseum Stavanger'= 'Aleris Stavanger'
     'Teres Colloseum, Oslo' = 'Aleris Oslo',
     'Teres Colloseum, Stavanger'  = 'Aleris Stavanger',
     'Teres, Bergen' = 'Aleris Bergen',

@@ -2,13 +2,16 @@
 library(rygg)
 library(xtable)
 
+
 RyggData <- RyggRegDataSQLV2V3()
 RegData <- RyggPreprosess(RegData=RyggData)
 
-RegData <- read.table('A:/Rygg/RyggV2V3_2020-09-22.csv', sep=';', header=T, encoding = 'UTF-8', stringsAsFactors = FALSE,)
+#RegData <- read.table('A:/Rygg/RyggV2V3_2020-09-22.csv', sep=';', header=T, encoding = 'UTF-8', stringsAsFactors = FALSE,)
 
 #--NB: For 2019 mangler registrering av infeksjoner, dvs. KpInfOverfla3Mnd','KpInfDyp3Mnd
 #table(RegData[,c('ShNavn', 'Aar')])
+
+#MANGLER: Alle stabelfigurer. Eks. RyggFigAndelStabelTid(RegData=RegData, outfile='TidlOp.pdf', valgtVar='TidlOp')
 
 #Felles parametre:
 startAar <- 2011
@@ -251,19 +254,13 @@ prop.table(table(RegDataSS$Fornoyd12mnd, RegDataSS$Aar),2)[1,]*100
 
 
 #Hyppigste tilstandene pasienter ble operert for i rappAar} var
-HovedInngrep <- RyggFigAndeler(RegData=RegData1aar, valgtVar='HovedInngrep', datoFra=datoFra1aar,
+HovedInngrep <- RyggFigAndeler(RegData=RegData1aar, valgtVar='hovedInngrep', datoFra=datoFra1aar,
                                datoTil=datoTil, outfile='HovedInngrep.pdf')
-#Andel operert for lumbalt prolaps: \%
-round(HovedInngrep$Andeler[1,2])
-#Andel operert for Spinal stenose
-indSS1aar <- intersect(which(RegData$Aar==rappAar), indSS)
-AndelSSrappaar <- round(100*length(indSS1aar)/dim(RegData1aar)[1])
-
 #Tabell, fordeling av hovedinngrepstype
-  HovedInngrepTab <- cbind('Antall' = HovedInngrep$Antall[1,],
-                           'Andeler' = paste0(round(as.numeric(HovedInngrep$Andeler[1,])),'%')
+  HovedInngrepTab <- cbind('Antall' = HovedInngrep$AggVerdier$Hoved,
+                           'Andeler' = paste0(round(as.numeric(HovedInngrep$AggVerdier$Hoved)),'%')
   )
-rownames(HovedInngrepTab) <- HovedInngrep$GruppeTekst
+rownames(HovedInngrepTab) <- HovedInngrep$grtxt
 xtable(HovedInngrepTab, align=c('l','r','r'), caption=paste0('Fordeling av hovedinngrep, ', rappAar), label="tab:AntHovedInngrep", digits=1)
 
 
@@ -286,6 +283,8 @@ AndelDegSponSS <- round(AntDegenSpondSS/AntSS*100,1)
 
 
 #andelen som får tilleggsbehandling med fusjonskirurgi:
+
+#MANGLER:
 DegSponFusjSStid <- RyggFigAndelTid(RegData=RegData, valgtVar = 'degSponFusj', hovedkat = 8,
                                     outfile = 'FigdegSponFusjSStid.pdf')
 DegSponFusjSSAar <- sprintf('%.1f', DegSponFusjSStid$AggVerdier$Hoved)
@@ -294,7 +293,7 @@ DegSponFusjSSAar <- sprintf('%.1f', DegSponFusjSStid$AggVerdier$Hoved)
 
 #Tabell, antibiotika
 AntibiotikaData <- RyggFigAndelTid(RegData=RegData, outfile='Antibiotika.pdf',
-                                     valgtVar = 'Antibiotika')
+                                     valgtVar = 'antibiotika')
 Antibiotika <- rbind('Andeler' = paste(round(AntibiotikaData$AggVerdier$Hoved, 1), '%',sep=''),
                      'Antall' = AntibiotikaData$Ngr$Hoved)
 xtable(Antibiotika, caption=AntibiotikaData$Tittel, label="tab:AntibiotikaAndel",
@@ -303,10 +302,13 @@ xtable(Antibiotika, caption=AntibiotikaData$Tittel, label="tab:AntibiotikaAndel"
 
 
 #---Figurer
+#MANGLER
 RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdPro.pdf',
-                 valgtVar='Liggedogn', hovedkat = 1, valgtMaal = 'Gjsn')
+                 valgtVar='liggedogn', hovedkat = 1, valgtMaal = 'Gjsn')
 RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
-                 valgtVar='Liggedogn', hovedkat = 8, valgtMaal = 'Gjsn')
+                 valgtVar='liggedogn', hovedkat = 8, valgtMaal = 'Gjsn')
+
+--
 RyggFigGjsnBox(RegData=RegData, outfile='OswEndrPro.pdf',
                aar=startAar:(rappAar-1), valgtVar='OswEndr', hovedkat=1, ktr=2)
 RyggFigGjsnBox(RegData=RegData, outfile='OswEndrSS.pdf',
@@ -337,7 +339,7 @@ ODIpostFusj <- sprintf('%.1f', mean(RegData$OswTot12mnd[indFusjPP]))
 #--Figurer
 RyggFigGjsnGrVar(RegData=RegData, outfile='OswEndrAvdPro.pdf', Ngrense = 20,
                           aar=c((rappAar-2):(rappAar-1)),
-                          valgtVar='OswEndr', hovedkat=1, tidlOp=4, opKat=1, ktr=ktr)
+                          valgtVar='OswEndr', hovedkat=1, tidlOp=4, hastegrad=1, ktr=ktr)
 RyggFigGjsnGrVar(RegData=RegData, outfile='OswEndrAvdSS.pdf', Ngrense = 20,
                         aar=c((rappAar-2):(rappAar-1)),
                  valgtVar='OswEndr', hovedkat=8, tidlOp=4, ktr=ktr)
@@ -366,10 +368,10 @@ FornoydSSTid <- RyggFigAndelStabelTid(RegData=RegData, outfile='FigFornoydSS.pdf
 
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='Fornoyd', ktr=ktr,
                            aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
-                           hovedkat=1,  opKat=1, tidlOp=4,  outfile='FigFornoydAvdPro.pdf')
+                           hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='FigFornoydAvdPro.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='Fornoyd', ktr=ktr,
                            aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
-                           hovedkat=8,  opKat=1, tidlOp=4,  outfile='FigFornoydAvdSS.pdf')
+                           hovedkat=8,  hastegrad=1, tidlOp=4,  outfile='FigFornoydAvdSS.pdf')
 RyggFigGjsnBox(RegData=RegData, valgtVar='Liggedogn', datoFra=datoFra, datoTil=datoTil,
                       hovedkat = 1, outfile='LiggetidProlaps.pdf') #
 
@@ -394,7 +396,7 @@ AndelOhjSS <- round(prop.table(table(RegData$OpKat[indSS]))*100,1)
 ODISSTidlOpAnt3 <- round(prop.table(table((RegData$ODIpst)[indSS]>=30,
                                           RegData$TidlOprAntall[indSS]>2),2)*100,1)
 
-opKat <- 1  #Bare elektive pasienter
+hastegrad <- 1  #Bare elektive pasienter
 tidlOp <- 4 #Bare primæroperasjoner
 
 
@@ -404,15 +406,6 @@ TidlOp3 <- RyggFigAndelTid(RegData=RegData, hovedkat = 1, valgtVar = 'tidlOp3', 
 #suksessraten, lumbalt prolaps, ikke tidl. operert:
 ODIProTidlOp <- round(prop.table(table(RegDataPro$ODIendr>20, RegDataPro$TidlOpr==4),2)*100,1)
 ODIProTidlOp['TRUE','TRUE']
-
-Hos pasienter med lumbalt prolaps som ikke har vært operert i ryggen tidligere er
-suksessraten \Sexpr{ODIProTidlOp['TRUE','TRUE']} \% mot \Sexpr{ODIProTidlOp['TRUE','FALSE']} \%.
-Hos prolapspasienter operert som ø-hjelp er andelen med betydelig forbedring
-(suksessrate)  \Sexpr{ODIProOpKat['TRUE','2']} \%, mot \Sexpr{ODIProOpKat['TRUE','1']} \% av de som blir
-operert planlagt (elektivt). Dersom man har vært operert mer enn 2 ganger tidligere i
-ryggen faller suksessraten fra  for lumbal spinal stenoseopererte betydelig (10\%).
-Langt færre pasienter i spinal stenosegruppen opereres som øyeblikkelig hjelp; \Sexpr{AndelOhjSS[2]} \%.
-
 
 #Tabell, symptomvarighet
 UtsRHnum <- round(table(RegData1aar$SympVarighUtstr, useNA='a')*100/Ntot1aar, 1)
@@ -446,7 +439,7 @@ xtable(cbind('Andeler'=UtsRH), caption=paste0('Varighet av nåværende utstråle
 
   BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='BeinsmLavPre', aar=(rappAar-1):rappAar,
                                       Ngrense = 20,
-                                      hovedkat=1,  opKat=1, tidlOp=4,  outfile='FigBeinsmLavPre.pdf')
+                                      hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='FigBeinsmLavPre.pdf')
 
   KpInf3MndPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', aar=(rappAar-1):rappAar,
                                         Ngrense = 20,
@@ -462,7 +455,7 @@ xtable(cbind('Andeler'=UtsRH), caption=paste0('Varighet av nåværende utstråle
 
     DuraPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='PeropKompDura',
                                    aar=(rappAar-1):rappAar, Ngrense = 20,
-                                   opKat = 1, tidlOp = 4, hovedkat = 1, outfile='FigDuraPro.pdf')
+                                   hastegrad = 1, tidlOp = 4, hovedkat = 1, outfile='FigDuraPro.pdf')
   DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='PeropKompDura',
                                 aar=(rappAar-1):rappAar, Ngrense = 20,
-                                opKat = 1, tidlOp = 4, hovedkat = 8, outfile='FigDuraSS.pdf')
+                                hastegrad = 1, tidlOp = 4, hovedkat = 8, outfile='FigDuraSS.pdf')
