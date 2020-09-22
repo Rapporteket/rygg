@@ -112,7 +112,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
     'Teres, Bergen' = 'Aleris Bergen',
     'Teres, Drammen' =  'Aleris Drammen'  ,
     'Ulriksdal' = 'Volvat',
-    'UNN, nevrokir' = 'UNN Tromsø')
+    'UNN, nevrokir' = 'Tromsø')
   )
 
 

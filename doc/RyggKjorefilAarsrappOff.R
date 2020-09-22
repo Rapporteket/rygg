@@ -6,6 +6,7 @@ RyggData <- RyggRegDataSQLV2V3()
 RegData <- RyggPreprosess(RegData=RyggData)
 
 #--NB: For 2019 mangler registrering av infeksjoner, dvs. KpInfOverfla3Mnd','KpInfDyp3Mnd
+#table(RegData[,c('ShNavn', 'Aar')])
 
 #Felles parametre:
 startAar <- 2011
@@ -18,9 +19,10 @@ datoFra <- paste0(startAar,'-01-01')
 datoTil <- paste0(rappAar,'-12-31')
 
 ktr <- 2
+Ntot07 <- dim(RegData)[1]
 
 #Gjør utvalg/tilrettelegge årsfiler
-RegData <- RegData[which(RegData$InnDato >= as.POSIXlt(datoFra)),]
+RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData
 RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoTil)$RegData
 RegData12mnd <- RegData[which(RegData$Aar < rappAar), ] #For å ikke få med de som har fått 12mnd-skjema i inneværende år.
 RegDataPro <- RegData[which(RegData$HovedInngrep==1),]
@@ -30,6 +32,7 @@ RegDataSS <- RyggUtvalgEnh(RegData, hovedkat = 8)$RegData
 
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
+AntAvd <- length(unique(RegData$ShNavn))
 
 RegData$ODIendr <- RegData$OswTotPre-RegData$OswTot12mnd
 RegData$ODIpst <- with(RegData, (OswTotPre-OswTot12mnd)/OswTotPre*100)
@@ -59,34 +62,32 @@ xtable(tabAvdN5, digits=0, align=c('l', rep('r', 6)),
 
 
 #Gjennomsnittsalderen per år:
-AlderAar <- tapply(RegData$Alder, RegData$Aar, 'mean', na.rm=T)
+(AlderAar <- tapply(RegData$Alder, RegData$Aar, 'mean', na.rm=T))
 #AlderAar <- sprintf('%.1f', AlderAar)
 
 #Over 70 år i rappAar:  Andel70 per år pg \% (sum(RegData1aar$Alder>=70)
-Andel70 <- sprintf('%.0f',sum(RegData1aar$Alder>=70, na.rm=T)/sum(RegData1aar$Alder > -1, na.rm=T)*100)
-
-
+#(Andel70 <- sprintf('%.0f',sum(RegData1aar$Alder>=70, na.rm=T)/sum(RegData1aar$Alder > -1, na.rm=T)*100))
 Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', outfile='FigAlder70.pdf')
 Alder70Aar$AggVerdier$Hoved
 
 #Andelen pasienter med fedme:
   FedmeAar <- table(RegData$BMI>30, RegData$Aar)
-  AndelFedmeAar <- FedmeAar['TRUE',]/table(RegData$Aar)*100
+  (AndelFedmeAar <- FedmeAar['TRUE',]/table(RegData$Aar)*100)
 
 #Kjønnsfordeling, alle år, kvinner menn:
   (tabKjPst <- sprintf('%.1f',table(RegData$ErMann)/Ntot*100))
 
-
 #Andelen fremmedspråklige (inkl. samisk) per år:
-  FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='Morsmal', aar = startAar:rappAar,
+  FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = startAar:rappAar,
                                        outfile='FigMorsmalAar.pdf')
-  (FremmedSpraak <- sprintf('%.1f', FremmedSpraakAar$AggVerdier$Hoved))
+  FremmedSpraakAar$AggVerdier$Hoved
+  #(FremmedSpraak <- sprintf('%.1f', FremmedSpraakAar$AggVerdier$Hoved))
 
 #Andelen ryggopererte med høyere utdanning (høyskole eller universitet):
-  UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Utd', aar = startAar:rappAar,
+  UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='utd', aar = startAar:rappAar,
                                   outfile='FigUtdAar.pdf')
-
-  UtdanningAar <- sprintf('%.1f', UtdanningTid$AggVerdier$Hoved)
+  UtdanningTid$AggVerdier$Hoved
+  #UtdanningAar <- sprintf('%.1f', UtdanningTid$AggVerdier$Hoved)
 
 
 #TabArbstat - variabel endret. Se nærmere på resultater !!!
@@ -96,32 +97,61 @@ Alder70Aar$AggVerdier$Hoved
 
 
 
-#I fullt arbeid når de blir ryggoperert:
+#Andel i fullt arbeid når de blir ryggoperert, årsrapportåret:
 ArbNum <- round(table(RegData1aar$ArbstatusPre)*100/sum(table(RegData1aar$ArbstatusPre)), 1)
 ArbNum[1]
 
-#Andel pasienter svart på spørsmål om arbeidsstatus: \%
+#Andel pasienter svart på spørsmål om arbeidsstatus, årsrapportåret: \%
   NsvarArb <- sum(RegData1aar$ArbstatusPre %in% 1:9)
   round(NsvarArb/Ntot1aar*100, 1)
 
 Arb <- paste0(ArbNum, '%')
-names(Arb) <- c('I arbeid', 'Hjemmeværende', 'Student/skoleelev', 'Pensjonist', 'Arbeidsledig',
-                'Sykemeldt', 'Aktiv sykemeldt', 'Delvis Sykemeldt', 'Attføring/rehabiliteirng', 'Uføretrygdet')
+# names(Arb) <- c('I arbeid', 'Hjemmeværende', 'Student/skoleelev', 'Pensjonist', 'Arbeidsledig',
+#                 'Sykemeldt', 'Aktiv sykemeldt', 'Delvis Sykemeldt', 'Attføring/rehabiliteirng', 'Uføretrygdet')
+names(Arb) <- c("Fulltidsjobb","Deltidsjobb","Student/skoleelev",
+           "Alderspensjonist", "Arbeidsledig","Sykemeldt","Delvis sykemeldt",
+           "Arbeidsavklaringspenger", "Uførepensjonert","Ikke utfylt")
+
 xtable(cbind('Andeler'=Arb),  align=c('l','r'),
        caption=paste0('Arbeidsstatus, pasienter operert i ', rappAar,'.'),
        label="tab:Arb")
 
 #Mottok sykepenger (sykemeldte, uføretrygdede eller attføring):
-sum(ArbNum[6:10])
+sum(ArbNum[6:9])
 
 
 #Har søkt eller planlegger å søke uføretrygd, rappAar:
-UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='UforetrygdPre', outfile='FigUforTid.pdf')
-UforAar <- sprintf('%.1f', UforTid$AggVerdier$Hoved)
+UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='uforetrygdPre', outfile='FigUforTid.pdf')
+UforTid$AggVerdier$Hoved
+#UforAar <- sprintf('%.1f', UforTid$AggVerdier$Hoved)
 
 #Har søkt eller planlegger å søke erstatning, rappAar:
-ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='ErstatningPre', outfile='FigErstatTid.pdf')
-ErstatningAar <- sprintf('%.1f', ErstatningTid$AggVerdier$Hoved)
+ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='erstatningPre', outfile='FigErstatTid.pdf')
+ErstatningTid$AggVerdier$Hoved
+#ErstatningAar <- sprintf('%.1f', ErstatningTid$AggVerdier$Hoved)
+
+
+#Tabell, ASA
+ASAant <- table(factor(RegData1aar$ASA, levels=1:5), useNA='a')
+ASApst <- round(ASAant*100/Ntot1aar, 1)
+ASA <- cbind('Antall' = ASAant,
+             'Prosent' = paste0(ASApst, '%'))
+rownames(ASA) <- c('I','II','III','IV', 'V', 'Ikke besvart')
+xtable(ASA, caption=paste0('Fordeling av ASA-grad, operasjoner utført i ', rappAar),
+       label="tab:ASA", align=c('c','r','r'))
+
+#Andelen pasienter med ASA grad I-II:
+round(sum(table(RegData1aar$ASA)[1:2])/Ntot1aar*100, 1)
+
+#Røyking - må oppdateres...
+# AndelRoykere <- round(sum(RegData1aar$RokerV3, na.rm=T)/sum(table(RegData1aar$RokerV3))*100,0)
+# Royk <- round(prop.table(ftable(RegData1aar[,c('Kjonn','RokerV3')]),1)[,2]*100, 0)
+# names(Royk) <- c('Menn', 'Kvinner')
+
+
+#Andel røykere som ryggopereres, per år:
+RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='roker', outfile='FigRokerTid.pdf')
+RoykTid$AggVerdier$Hoved
 
 #Tabell, pasienter som har vært til radiologiske undersøkelser.
 #MÅ EVT OPPDATERES. Borte: RvDiscogr', 'RvRadigr',
@@ -158,29 +188,6 @@ ErstatningAar <- sprintf('%.1f', ErstatningTid$AggVerdier$Hoved)
 #                   'Degenerativ skoliose', 'Synovial syste', 'Pseudomeningocele', 'Tot.ant.')
 # xtable(RF, caption=paste0('Radiologiske diagnoser, ', rappAar),
 #        label="tab:RF", align=c('l','r','r'))
-
-#Tabell, ASA
-ASAant <- table(factor(RegData1aar$ASA, levels=1:5), useNA='a')
-ASApst <- round(ASAant*100/Ntot1aar, 1)
-ASA <- cbind('Antall' = ASAant,
-             'Prosent' = paste0(ASApst, '%'))
-rownames(ASA) <- c('I','II','III','IV', 'V', 'Ikke besvart')
-xtable(ASA, caption=paste0('Fordeling av ASA-grad, operasjoner utført i ', rappAar),
-       label="tab:ASA", align=c('c','r','r'))
-
-#Tabell, røyking - må oppdateres...
-RoykTot <- round(sum(RegData1aar$RokerV3, na.rm=T)/sum(table(RegData1aar$RokerV3))*100,0)
-Royk <- round(prop.table(ftable(RegData1aar[,c('Kjonn','RokerV3')]),1)[,2]*100, 0)
-names(Royk) <- c('Menn', 'Kvinner')
-
-#Andelen pasienter med ASA grad I-II:
-round(sum(table(RegData1aar$ASA)[1:2])/Ntot1aar*100, 1)
-
-#Andel røykere som ryggopereres, per år:
-RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='Roker', outfile='FigRokerTid.pdf')
-RoykAar <- sprintf('%.1f', RoykTid$AggVerdier$Hoved)
-RoykTid$AggVerdier
-
 
 #----Figurer
 RyggFigAndeler(RegData=RegData1aar, valgtVar='Alder', datoFra=datoFra1aar, datoTil=datoTil, outfile='FigAlderFord.pdf')
