@@ -91,7 +91,6 @@ table(SkjemaOversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")
 #Oppfølgingsskjema har ikke fått selvvalgte navn. Variable fra oppfølgingsskjema sjekkes IKKE
 
 library(rygg)
-library(rapbase)
 
 tapply(RegData$OswTotPre, RegData$Aar, FUN = 'median')
 
@@ -103,10 +102,10 @@ valgtVar <- 'regForsinkelse'
 
 # RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
 #                       sep=';', header=T, encoding = 'UTF-8')
-RegData <- RyggRegDataSQL()
-RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, enhetsUtvalg = 1, reshID = reshID) #, outfile='test.pdf')
-RyggFigAndelerGrVar(valgtVar=valgtVar, RegData=RegData) #,outfile=outfile)
-RyggFigAndelTid(RegData=RegData, valgtVar=valgtVar, tidsenhet = tidsenhet) #, outfile=outfile
+RegData <- RyggRegDataSQLV2V3()
+test <- RyggFigAndeler(RegData=RegData)  #, valgtVar=valgtVar, enhetsUtvalg = 1, reshID = reshID) #, outfile='test.pdf')
+utdata <- RyggFigAndelerGrVar(RegData=RegData) #, valgtVar=valgtVar,outfile=outfile)
+utdata <- RyggFigAndelTid(RegData=RegData, valgtVar='roker', tidsenhet = 'Aar') #, outfile=outfile
 RyggFigGjsnBox(RegData=RegData, outfile=outfile, valgtVar=valgtVar,tidsenhet = tidsenhet) #aar=aar,
 RyggFigGjsnGrVar(RegData=RegData, outfile=outfile, valgtVar=valgtVar)
 

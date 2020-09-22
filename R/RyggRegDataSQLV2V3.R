@@ -19,10 +19,10 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
                                     query='SELECT * FROM AlleVarNum')
 
-  RegDataV2$Aar <- lubridate::year(RegDataV2$OpDato)
-  tapply(RegDataV2$OswTot3mnd, RegDataV2$Aar, FUN = 'median', na.rm=T)
-  RegDataV3$Aar <- lubridate::year(RegDataV3$OpDato)
-  tapply(RegDataV3$OswTot3mnd, RegDataV3$Aar, FUN = 'median', na.rm=T)
+  # RegDataV2$Aar <- lubridate::year(RegDataV2$OpDato)
+  # tapply(RegDataV2$OswTot3mnd, RegDataV2$Aar, FUN = 'median', na.rm=T)
+  # RegDataV3$Aar <- lubridate::year(RegDataV3$OpDato)
+  # tapply(RegDataV3$OswTot3mnd, RegDataV3$Aar, FUN = 'median', na.rm=T)
 
   #table(RegDataV3$Fornoyd3mnd, useNA = 'a')
 
@@ -35,7 +35,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
    # print(tab[order(tab$AvdNavn),], row.names = F)
   # table(RegDataV3$SykehusNavn)
   # sort(unique(RegDataV3$SykehusNavn))
-  #unique(RegData[ ,c("ShNavn", "ReshId")])[order(RegData$ShNavn)]
+  #unique(RegDataV2[ ,c("AvdNavn", "AvdReshID")])[order(unique(RegDataV2$AvdNavn)),]
+  #unique(RegDataV3[ ,c("SykehusNavn", "AvdRESH")])[order(unique(RegDataV3$SykehusNavn)),]
+  #unique(RegData[ ,c("SykehusNavn", "AvdRESH")])
 
   if (alleVarV3 == 0) {
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
@@ -79,8 +81,6 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   #-----Tilrettelegging av V2-data-------------------------
     #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..
 
-  #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
-  RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
   RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
@@ -99,6 +99,22 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
   RegDataV2$OpIndPareseGrad[is.na(RegDataV2$OpIndPareseGrad)] <- 9
   RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
+  RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
+  RegDataV2$Utd[is.na(RegDataV2$Utd)] <- 9
+
+  RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
+    'Aleris, Bergen' = 'Aleris Bergen',
+    'Aleris, Oslo' = 'Aleris Oslo',
+    #'Colosseum Oslo' = 'Aleris Oslo' ? Ingen Colosseum Oslo i V2
+    #'Colosseum Stavanger'= 'Aleris Stavanger'
+    'Teres Colloseum, Oslo' = 'Aleris Oslo',
+    'Teres Colloseum, Stavanger'  = 'Aleris Stavanger',
+    'Teres, Bergen' = 'Aleris Bergen',
+    'Teres, Drammen' =  'Aleris Drammen'  ,
+    'Ulriksdal' = 'Volvat',
+    'UNN, nevrokir' = 'UNN Tromsø')
+  )
+
 
   # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
   # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
@@ -119,11 +135,14 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
 
 
 
+
   #-----Tilrettelegging av V3-data-------------------------
 
   #Navneendring av V3:
   RegDataV3 <- dplyr::rename(RegDataV3,
                              OpProlap = OprProlap) #Siden Alle andre heter Op..
+  #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
+  RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
   #Legge til underkategori for hovedkategori.
   ny <- kategoriserInngrep(RegData=RegDataV3)
