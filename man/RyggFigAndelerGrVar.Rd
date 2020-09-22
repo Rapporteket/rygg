@@ -6,7 +6,7 @@
 \usage{
 RyggFigAndelerGrVar(
   RegData,
-  valgtVar,
+  valgtVar = "alder70",
   datoFra = "2007-01-01",
   datoTil = "3000-12-31",
   aar = 0,

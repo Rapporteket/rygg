@@ -15,7 +15,7 @@ RyggFigGjsnGrVar(
   maxald = 130,
   erMann = 99,
   hovedkat = 99,
-  tidlOp = "",
+  tidlOp = 99,
   hentData = 0,
   preprosess = 1,
   hastegrad = 99,
@@ -26,7 +26,8 @@ RyggFigGjsnGrVar(
   Ngrense = 10,
   medKI = 1,
   reshID = 0,
-  outfile = ""
+  outfile = "",
+  ...
 )
 }
 \arguments{

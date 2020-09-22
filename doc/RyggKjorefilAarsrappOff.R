@@ -5,6 +5,8 @@ library(xtable)
 RyggData <- RyggRegDataSQLV2V3()
 RegData <- RyggPreprosess(RegData=RyggData)
 
+RegData <- read.table('A:/Rygg/RyggV2V3_2020-09-22.csv', sep=';', header=T, encoding = 'UTF-8', stringsAsFactors = FALSE,)
+
 #--NB: For 2019 mangler registrering av infeksjoner, dvs. KpInfOverfla3Mnd','KpInfDyp3Mnd
 #table(RegData[,c('ShNavn', 'Aar')])
 
@@ -15,14 +17,14 @@ datoFra1aar <- paste0(rappAar,'-01-01')
 datoFra2aar <- paste0(rappAar-1,'-01-01')
 datoFra3aar <- paste0(rappAar-2,'-01-01')
 datoTil12mnd <- paste0(rappAar-1,'-12-31')
-datoFra <- paste0(startAar,'-01-01')
-datoTil <- paste0(rappAar,'-12-31')
+datoFra <- as.Date(paste0(startAar,'-01-01'))
+datoTil <- as.Date(paste0(rappAar,'-12-31'))
 
 ktr <- 2
 Ntot07 <- dim(RegData)[1]
 
 #Gjør utvalg/tilrettelegge årsfiler
-RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData
+RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData #RegData[which(RegData$InnDato>= as.Date(datoFra) & RegData$InnDato <= as.Date(datoTil)), ] #
 RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoTil)$RegData
 RegData12mnd <- RegData[which(RegData$Aar < rappAar), ] #For å ikke få med de som har fått 12mnd-skjema i inneværende år.
 RegDataPro <- RegData[which(RegData$HovedInngrep==1),]
@@ -67,7 +69,7 @@ xtable(tabAvdN5, digits=0, align=c('l', rep('r', 6)),
 
 #Over 70 år i rappAar:  Andel70 per år pg \% (sum(RegData1aar$Alder>=70)
 #(Andel70 <- sprintf('%.0f',sum(RegData1aar$Alder>=70, na.rm=T)/sum(RegData1aar$Alder > -1, na.rm=T)*100))
-Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', outfile='FigAlder70.pdf')
+Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', preprosess = 0, outfile='FigAlder70.pdf')
 Alder70Aar$AggVerdier$Hoved
 
 #Andelen pasienter med fedme:
@@ -79,12 +81,12 @@ Alder70Aar$AggVerdier$Hoved
 
 #Andelen fremmedspråklige (inkl. samisk) per år:
   FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = startAar:rappAar,
-                                       outfile='FigMorsmalAar.pdf')
+                                       outfile='FigMorsmalAar.pdf', preprosess = 0)
   FremmedSpraakAar$AggVerdier$Hoved
   #(FremmedSpraak <- sprintf('%.1f', FremmedSpraakAar$AggVerdier$Hoved))
 
 #Andelen ryggopererte med høyere utdanning (høyskole eller universitet):
-  UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='utd', aar = startAar:rappAar,
+  UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='utd', aar = startAar:rappAar, preprosess = 0,
                                   outfile='FigUtdAar.pdf')
   UtdanningTid$AggVerdier$Hoved
   #UtdanningAar <- sprintf('%.1f', UtdanningTid$AggVerdier$Hoved)
@@ -121,12 +123,12 @@ sum(ArbNum[6:9])
 
 
 #Har søkt eller planlegger å søke uføretrygd, rappAar:
-UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='uforetrygdPre', outfile='FigUforTid.pdf')
+UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='uforetrygdPre', preprosess = 0, outfile='FigUforTid.pdf')
 UforTid$AggVerdier$Hoved
 #UforAar <- sprintf('%.1f', UforTid$AggVerdier$Hoved)
 
 #Har søkt eller planlegger å søke erstatning, rappAar:
-ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='erstatningPre', outfile='FigErstatTid.pdf')
+ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='erstatningPre', preprosess = 0, outfile='FigErstatTid.pdf')
 ErstatningTid$AggVerdier$Hoved
 #ErstatningAar <- sprintf('%.1f', ErstatningTid$AggVerdier$Hoved)
 
@@ -190,11 +192,11 @@ RoykTid$AggVerdier$Hoved
 #        label="tab:RF", align=c('l','r','r'))
 
 #----Figurer
-RyggFigAndeler(RegData=RegData1aar, valgtVar='Alder', datoFra=datoFra1aar, datoTil=datoTil, outfile='FigAlderFord.pdf')
+RyggFigAndeler(RegData=RegData1aar, preprosess = 0, valgtVar='alder', datoFra=datoFra1aar, datoTil=datoTil, outfile='FigAlderFord.pdf')
 
-RyggFigAndeler(RegData=RegData1aar, valgtVar='BMI', datoFra=datoFra, datoTil=datoTil,
+RyggFigAndeler(RegData=RegData1aar, preprosess = 0, valgtVar='BMI', datoFra=datoFra, datoTil=datoTil,
                outfile='FigBMI.pdf')
-RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar='Morsmal', outfile = 'FigMorsmal.pdf')
+RyggFigAndelerGrVar(RegData = RegData1aar, preprosess = 0, valgtVar='Morsmal', outfile = 'FigMorsmal.pdf')
 Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='Utd', datoFra=datoFra1aar, datoTil=datoTil,
                             outfile='FigUtd.pdf')
 HoyUtdAvd <- RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='Utd', Ngrense = 10,

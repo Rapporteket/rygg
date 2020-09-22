@@ -7,7 +7,7 @@
 RyggRegDataSQLV2V3(
   datoFra = "2007-01-01",
   datoTil = "2099-01-01",
-  alleVarV3 = 0
+  alleVarV3 = 1
 )
 }
 \arguments{
