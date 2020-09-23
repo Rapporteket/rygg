@@ -127,7 +127,7 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr20',  outfile='OswEndr20Pro.pdf',
                 aar=aar2, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='Osw30TidSS.pdf',
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf',
                 aar=aar2, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
 #-----------------------------------------------------------------------------------------------------------------------------
