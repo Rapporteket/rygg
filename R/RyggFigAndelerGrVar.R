@@ -152,6 +152,9 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
 
       if (tittel==0) {Tittel<-''} else {Tittel <- RyggVarSpes$tittel}
 
+      if (valgtVar == 'OswEndr20' & hovedkat == 1) {KImaalGrenser <- c(0, AndelHele, 100)}
+      if (valgtVar == 'OswEndr30pst' & hovedkat == 9) {KImaalGrenser <- c(0, AndelHele, 100)}
+
       FigDataParam <- list(AggVerdier=AndelerGrSort,
                                AggTot=AndelHele,
                                N=N,
@@ -203,6 +206,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
                             xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
                             las=1, cex.names=cexShNavn*0.9))
          #Legge på målnivå
+         #OswEndr20
          if (!is.na(KImaalGrenser[1])) {
             antMaalNivaa <- length(KImaalGrenser)-1
             rekkef <- 1:antMaalNivaa

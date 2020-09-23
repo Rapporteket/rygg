@@ -107,6 +107,8 @@ HoyUtdAvd <- RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='utd', Ngrense = 
 UforetrygdPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='uforetrygdPre', datoFra=datoFra1aar,
                                      outfile='UforAvd.pdf')
 
+RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj', aar = (rappAar-4):rappAar,
+                    outfile = 'DegSponFusj.pdf')
 DegSponFusjSStid <- RyggFigAndelTid(RegData=RegData, valgtVar = 'degSponFusj', hovedkat=9,
                                     outfile = 'DegSponFusjSStid.pdf')
 
@@ -121,7 +123,12 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdPro.pdf',
 RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
                  valgtVar='liggedogn', hovedkat=9, valgtMaal = 'Gjsn')
 
+#NYE:
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr20',  outfile='OswEndr20Pro.pdf',
+                aar=aar2, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='Osw30TidSS.pdf',
+                aar=aar2, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 #---------------------------Kvalitetsindikatorkjøring, 2018
@@ -405,8 +412,7 @@ FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = 
 RyggFigGjsnBox(RegData=RegData, aar = rappAar-1, valgtVar ='smBeinEndrPre',  preprosess = 0,
                ktr=2, outfile='FigBeinsmEndrPre.pdf')
 
-RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj',
-                    outfile = 'FigdegSponFusj.pdf')
+
 RyggFigAndeler(RegData=RegData1aar, preprosess = 0, valgtVar='alder', datoFra=datoFra1aar, datoTil=datoTil, outfile='FigAlderFord.pdf')
 
 RyggFigAndeler(RegData=RegData1aar, preprosess = 0, valgtVar='BMI', datoFra=datoFra, datoTil=datoTil,

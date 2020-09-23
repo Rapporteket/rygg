@@ -547,9 +547,10 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                                       '1'= (RegData$OswTotPre - RegData$OswTot3mnd),
                                       '2'= (RegData$OswTotPre - RegData$OswTot12mnd))
             RegData <- RegData[which(RegData$OswEndr >= -100), ]
-            RegData$Variabel[which(RegData$OswEndr >20)] <- 1
+            RegData$Variabel[which(RegData$OswEndr >=20)] <- 1
             varTxt <- 'med >20 poeng forbedring'
-            tittel <- paste0('Forbedring av Oswestry-skår > 20 poeng', ktrtxt)
+            tittel <- paste0('Forbedring av Oswestry-skår >= 20 poeng', ktrtxt)
+
       }
 
       if (valgtVar == 'OswEndr30pst') { #AndelGrVar, andelTid

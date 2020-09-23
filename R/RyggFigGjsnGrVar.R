@@ -177,6 +177,7 @@ AggVerdier <- list(Hoved=Midt, Rest=0, KIned=KIned, KIopp=KIopp, KIHele=KIHele)
 
 
 
+
 #Se RyggFigSoyler for forklaring av innhold i lista GjsnGrVarData
 GjsnGrVarData <- list(AggVerdier=AggVerdier, #Endres til Soyleverdi? Evt. AggVerdier
                         AggTot=MidtHele, #Til AggVerdiTot?
