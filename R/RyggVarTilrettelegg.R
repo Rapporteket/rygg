@@ -61,7 +61,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          ktr <- 2
          valgtVar <- sub('12mnd', '', valgtVar)}
       varPrePost <- c('fornoydhet', 'nytte', 'EQ5DEndr','EQ5DEndr',
-                      'OswEndr', 'SmBeinEndr', 'SmRyggEndr')
+                      'OswEndr', 'SmBeinEndr', 'SmRyggEndr',
+                      'OswEndrPre', 'SmBeinEndrPre', 'SmRyggEndrPre')
       if ((valgtVar %in% varPrePost) & (ktr==0)) {ktr <- 1}
       # Ferdig1a - pasientskjema
       # Ferdigstilt1b3mnd
@@ -611,8 +612,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             xAkseTxt <- 'Andel durarift (%)'
             varTxt <- 'med durarift'
             #KImaalRetn <- 'lav'
-            if (hovedkat == 1) {KImaalGrenser <- c(0,2)}
-            if (hovedkat == 8) {KImaalGrenser <- c(0,3)}
+            if (hovedkat == 1) {KImaalGrenser <- c(0,2,20)}
+            if (hovedkat %in% c(5,9)) {KImaalGrenser <- c(0,3,20)}
       }
       if (valgtVar=='radUnders') { #fordeling
             tittel <- 'Radiologisk undersøkelse'
@@ -742,9 +743,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
          #intToUtf8(2264)
          #KImaalRetn <- 'lav'
-         KImaalGrenser <- c(0,3)
+         KImaalGrenser <- c(0,3,20)
          varTxt <- 'med manglende indikasjon'
-
       }
 
       if (valgtVar == 'smRyggEndr') {#gjsn
@@ -800,7 +800,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                                    symptVarighRyggHof ='Varighet av rygg-/hoftesmerter minst ett år',
                                    sympVarighUtstr = 'Varighet av utstrålende smerter minst ett år')
                   sortAvtagende <- F}
-            if (valgtVar == 'sympVarighUtstr') {KImaalGrenser <- c(0,20,40)}
+            if (valgtVar == 'sympVarighUtstr') {KImaalGrenser <- c(0,20,100)}
       }
 
 

@@ -89,8 +89,9 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
       }
 
       if (reshID==0) {enhetsUtvalg <- 0}
-      RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
-                                  minald=minald, maxald=maxald, erMann=erMann, aar=as.numeric(c(tidlAar, aar)),
+      RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, aar=as.numeric(c(tidlAar, aar))
+                                  ,reshID=reshID, datoFra=datoFra, datoTil=datoTil,
+                                  minald=minald, maxald=maxald, erMann=erMann,
                                   hovedkat=hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg)
 
       smltxt <- RyggUtvalg$smltxt
@@ -106,25 +107,25 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
       names(RegData)[which(names(RegData) == grVar)] <- 'grVar'
       #grVar kan være sykehus, boområde osv.
       #Hvis siste år for få reg - ta også bort resultater fra foregående år.
-      N <- dim(RegData)[1] #table(RegData$OpAar)      #Antall per år
+      N <- dim(RegData)[1] #table(RegData$Aar)      #Antall per år
 
       #----------------------------------------------------------------------------------------------
       #KODEN MÅ KOMPRIMERES!!!!!!!!!:
       if (tidlAar[1] != 0) { #Sammenligne med resultater for tidligere år.
             RegData$grNaa <- 0 #Har fjernet år som ikke skal være med
-            RegData$grNaa[which(RegData$OpAar %in% aar)] <- 1
+            RegData$grNaa[which(RegData$Aar %in% aar)] <- 1
             katVariable <- c('grNaa', 'grVar')
             Nvar <- tapply(RegData$Variabel, RegData[ ,katVariable], sum, na.rm=T) #Variabel er en 0/1-variabel.
             if(N > 0) {Ngr <- table(RegData[ ,katVariable])}	else {Ngr <- 0}
 
             #Sjekk for AK-justering
             if (AKjust == 1) { #Alders-og kjønnsjustering
-                  Nvar <- tapply(RegData$Variabel, RegData[ ,c('OpAar', 'grVar')], sum, na.rm=T) #Variabel er en 0/1-variabel.
+                  Nvar <- tapply(RegData$Variabel, RegData[ ,c('Aar', 'grVar')], sum, na.rm=T) #Variabel er en 0/1-variabel.
                   AndelerGr <- StandAlderKjonn(RegData=RegData, stdPop='Register', antAldgr=3,
                                                katVariable=katVariable)
                   #Hvis Norge som egen søyle:
                   #StandGrVar <- StandAlderKjonn(RegData=RegData, stdPop='Register', antAldgr=3, katVariable=katVariable)
-                  #StandNorge <- StandAlderKjonn(RegData=RegData, stdPop='Register', antAldgr=3, katVariable='OpAar')
+                  #StandNorge <- StandAlderKjonn(RegData=RegData, stdPop='Register', antAldgr=3, katVariable='Aar')
                   #AndelerGr <- cbind(StandGrVar, StandNorge)
 
             }  else {
@@ -193,7 +194,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
       #-----------Figur---------------------------------------
       # Lager ikke figur hvis ALLE N er mindre enn grensa eller hvis ugyldig parameterkombinasjon.
       if 	( max(Ngr) < Ngrense) {
-            FigTypUt <- rapbase::figtype(outfile)
+            FigTypUt <- rapFigurer::figtype(outfile)
             farger <- FigTypUt$farger
             plot.new()
             if (dim(RegData)[1]>0) {
@@ -211,7 +212,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             #----------- Figurparametre ------------------------------
             cexShNavn <- 1 #0.85
             hoyde <- ifelse(grVar=='BoHF', 3*600, 3*800)
-            FigTypUt <- rapbase::figtype(outfile, height=3*800, fargepalett=RyggUtvalg$fargepalett)
+            FigTypUt <- rapFigurer::figtype(outfile, height=3*800, fargepalett=RyggUtvalg$fargepalett)
             farger <- FigTypUt$farger
             soyleFarger <- farger[4] #rep(farger[3], AntGrNgr)
             prikkFarge <- farger[3]
@@ -219,7 +220,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             fargerMaalNiva <-  c('#4fc63f', '#fbf850','#c6312a') #c('green','yellow', 'red')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
             #Tilpasse marger for å kunne skrive utvalgsteksten
             NutvTxt <- length(utvalgTxt)
-            vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.85)
+            vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.8)
             #NB: strwidth oppfører seg ulikt avh. av device...
             par('fig'=c(vmarg, ifelse(tidlAar[1]!=0,1,1), 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
 
@@ -233,7 +234,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             #Legge på målnivå
             KImaalGrenser <- RyggVarSpes$KImaalGrenser #c(0,20,40) #,xmax)
             antMaalNivaa <- length(KImaalGrenser)-1
-            maalOppTxt <- c('Høy', 'Moderat', 'Lav')
+            maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')
             rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
                  ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
             ybunn <- 0.1

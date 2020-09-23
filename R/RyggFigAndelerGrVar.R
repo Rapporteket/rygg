@@ -187,13 +187,13 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
          #--------------------------FIGUR---------------------------------------------------
          #Innparametre: ...
          #----------- Figurparametre ------------------------------
-         cexShNavn <- 1 #0.85
+         cexShNavn <- 0.9 #0.85
 
          FigTypUt <- rapFigurer::figtype(outfile, height=3*800, fargepalett=fargepalett)
          farger <- FigTypUt$farger
          #Tilpasse marger for å kunne skrive utvalgsteksten
          NutvTxt <- length(utvalgTxt)
-         vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.7)
+         vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.8)
          #NB: strwidth oppfører seg ulikt avh. av device...
          par('fig'=c(vmarg, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
 
@@ -208,7 +208,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
             rekkef <- 1:antMaalNivaa
             if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
             fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
-            maalOppTxt <- c('Høy', 'Moderat', 'Lav')[rekkef]
+            maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
             rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
                  ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
             legend(x=0, y=-4, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
