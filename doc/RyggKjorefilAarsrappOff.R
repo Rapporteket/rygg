@@ -52,6 +52,20 @@ AntAvd <- length(unique(RegData$ShNavn))
 
 #---------FIGURER, årsrapport 2019--------------
 
+# Dekningsgrad for hvert sykehus, Se tidligere figurer.
+
+#NY2020: Ventetid fra operasjon bestemt til opr.tidpkt.N=20, Siste år, Variabel: VentetidSpesialistTilOpr, Utvalg: Elektive.
+RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20,
+               hastegrad=1, outfile='VentetidBestOp_Sh.pdf')
+
+# Andel skjema som er registrert innen 12 uker etter at pasienten er uskrevet, registreringsforsinkelse per sykehus.
+RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
+               outfile='RegForinkelse_Sh.pdf')
+
+RyggFigAndeler(RegData = RegData1aar, valgtVar='AntibiotikaMedikament',
+               preprosess = 0, outfile = 'AntibiotikaMedikament.pdf')
+
+
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
                        Ngrense=20, aar=aar2, tidlAar=tidlAar2, outfile='SympVarighUtstrAarPro.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, outfile='SympVarighUtstrTidPro.pdf')

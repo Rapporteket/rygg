@@ -92,6 +92,20 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             data(deknNakke17, package = 'nkr')
             RegData <- deknNakke17 #paste0(valgtVar)
       }
+      if (valgtVar=='deknRygg19') {        #andelerGrVar
+         tittel <- 'Dekningsgrad, NKR Degenerativ Rygg, 2019'
+         xAkseTxt <- 'dekningsgrad, NKR'
+         KImaal <- 0.8
+         data('deknRygg19', package = 'rygg') #paste0(valgtVar,'.Rdata')
+         RegData <- deknRygg19 #paste0(valgtVar)
+      }
+      if (valgtVar=='deknNakke19') {        #andelerGrVar
+         tittel <- 'Dekningsgrad, NKR Degenerativ Nakke, 2019'
+         xAkseTxt <- 'dekningsgrad, NKR'
+         KImaal <- 0.8
+         data(deknNakke19, package = 'nakke')
+         RegData <- deknNakke19 #paste0(valgtVar)
+      }
 
 
       if (valgtVar=='alder') {	#Fordeling, GjsnGrVar, GjsnTid
@@ -132,6 +146,14 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   tittel <- 'Fått antibiotika'
                   varTxt <- 'som har fått antibiotika'
             }
+      }
+      if (valgtVar=='AntibiotikaMedikament'){ #fordeling
+         tittel <- 'Antibiotikatyper'
+         grtxt <- c("Cefalotin","Cefuroxim","Cefalexin","(Di)Kloksacillin","Klindamycin",
+                    "Penicillin","Erytromycin","Ampicillin","Tetracyclin","Trimetoprim+Sulfonamid",
+                    "Vancomycin","Fusidinsyre","Ciprofloxacin","Cefazolin","Annet")
+         RegData$VariabelGr <- factor(RegData$AntibiotikaMedikament, levels = c(1:14,20))
+         retn <- 'H'
       }
 
       if (valgtVar == 'arbstatus') { #Fordeling, AndelGrVar, AndelTid
@@ -627,21 +649,13 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       }
        if (valgtVar == 'regForsinkelse') {  #Andeler, GjsnGrVar
          #Verdier: 0-3402
-         #RegData$Diff <- as.numeric(as.Date(as.POSIXct(RegData$MedForstLukket, format="%Y-%m-%d")) -
-         #                              as.Date(as.POSIXct(RegData$UtskrivelseDato, format="%Y-%m-%d"))) #difftime(RegData$InnDato, RegData$Leveringsdato) #
-         RegData$Diff <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days')) #
-         #RegData[,c('InnDato', "MedForstLukket", "DischgDt", 'Diff')]
-         #           RegData$InnDato <- as.Date(RegData$AdmitDt, format="%Y-%m-%d") #as.Date(RegData$AdmitDt, format="%Y-%m-%d")
-         #          RegData$Test <- as.Date(RegData$MedForstLukket, format="%Y-%m-%d")
-         RegData <- RegData[which(RegData$Diff > -1), ]
+         RegData <- RegData[which(RegData$DiffUtFerdig > -1), ]
          tittel <- switch(figurtype,
                           andeler='Tid fra utskriving til ferdigstilt registrering',
                           andelGrVar = 'Mer enn 30 dager fra utskriving til ferdig registrering') #
-         #RegData$Variabel[RegData$Diff > 2*7] <- 1
-         RegData$Variabel <- RegData$Diff
          subtxt <- 'døgn'
          gr <- c(0,1,7,14,30,90,365,5000) #gr <- c(seq(0, 90, 10), 1000)
-         RegData$VariabelGr <- cut(RegData$Diff, breaks = gr, include.lowest = TRUE, right = TRUE)
+         RegData$VariabelGr <- cut(RegData$DiffUtFerdig, breaks = gr, include.lowest = TRUE, right = TRUE)
          grtxt <- c('1', '(1-7]', '(7-14]', '(14-30]', '(30-90]', '(90-365]', '>365')
          cexgr <- 0.9
          xAkseTxt <- 'dager'
@@ -649,14 +663,14 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
 
          if (figurtype == 'andeler') {	#Fordelingsfigur
             gr <- c(seq(0,98,7), 2000)
-            RegData$VariabelGr <- cut(RegData$Diff, breaks=gr, include.lowest=TRUE, right=FALSE)
+            RegData$VariabelGr <- cut(RegData$DiffUtFerdig, breaks=gr, include.lowest=TRUE, right=FALSE)
             #plot(RegData$VariabelGr)
             grtxt <- c(1:14, '>3 mnd.')
             subtxt <- 'innen gitte uker etter utskriving'
          }
 
          if (figurtype %in% c('andelTid', 'andelGrVar')) {
-            RegData$Variabel[which(RegData$Diff >90)] <- 1
+            RegData$Variabel[which(RegData$DiffUtFerdig >90)] <- 1
             tittel <- 'Registrert for sent for 3 mnd. oppfølging'
             varTxt <- 'for sent registrert'
             sortAvtagende <- F}
@@ -873,6 +887,19 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   tittel <- 'Andel høyskole-/universitetsutdannede'
             }}
 
+
+      if (valgtVar == 'ventetidSpesOp') { #Fordeling, AndelGrVar, AndelTid
+         grtxt <- c("< 3 mnd.","3-6 mnd","6-12 mnd.","> 12 mnd.","Ikke utfylt")
+         RegData$VariabelGr <- factor(RegData$VentetidSpesialistTilOpr, levels = c(1:4,9))
+         retn <- 'H'
+         tittel <- 'Ventetid fra operasjon bestemt til utført'
+         if (figurtype %in% c('andelGrVar', 'andelTid')) {
+            RegData <- RegData[which(RegData$VentetidSpesialistTilOpr %in% 1:4),]
+            RegData$Variabel[which(RegData$VentetidSpesialistTilOpr == 1)] <- 1
+            varTxt <- 'ventet <3mnd'
+            tittel <- 'Ventetid < 3 mnd. fra operasjon bestemt til utført'
+            KImaalGrenser <- c(0,50,80,100)
+         }}
 
       if (valgtVar == 'verre') { #AndelGrVar		#%in% c('Verre3mnd','Verre12mnd')) {
             #3/12mndSkjema. Andel med helt mye verre og noen sinne (6:7)
