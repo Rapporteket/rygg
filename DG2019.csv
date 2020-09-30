@@ -1,0 +1,45 @@
+Sykehus;N;Antall;Dekningsgrad
+OUS, Oslo legevakt;11;0;0
+OUS, Rikshospitalet;111;48;43.24324324
+OUS, Ullevål;642;427;66.51090343
+Akershus universitetssykehus, Nordbyhagen;422;219;51.8957346
+Sykehuset i Vestfold, Larvik;55;0;0
+Sykehuset i Vestfold, Tønsberg;247;129;52.22672065
+Sykehuset Innlandet, Elverum;163;130;79.75460123
+Sykehuset Innlandet, Gjøvik;150;136;90.66666667
+Sykehuset Innlandet, Lillehammer;71;68;95.77464789
+Sykehuset Østfold, Kalnes;129;46;35.65891473
+Sykehuset Østfold, Moss;87;0;0
+Sørlandet sykehus, Arendal;96;28;29.16666667
+Sørlandet sykehus, Flekkefjord;2;0;0
+Sørlandet sykehus, Kristiansand;223;170;76.23318386
+Vestre Viken, Bærum;197;170;86.29441624
+Vestre Viken, Drammen;468;310;66.23931624
+Vestre Viken, Kongsberg;14;0;0
+Sykehuset Telemark, Skien;168;85;50.5952381
+Martina Hansens hospital;520;409;78.65384615
+Helse Bergen, Haukeland;411;241;58.63746959
+Helse Bergen, Kysthospitalet i Hagevik;436;286;65.59633028
+Helse Bergen, Voss;1;0;0
+Helse Fonna, Haugesund;69;60;86.95652174
+Helse Førde, Førde;81;0;0
+Helse Stavanger, Stavanger;483;404;83.64389234
+Helse Møre og Romsdal, Kristiansund;105;104;99.04761905
+Helse Møre og Romsdal, Volda;46;21;45.65217391
+Helse Møre og Romsdal, Ålesund;160;118;73.75
+St. Olavs hospital, Trondheim;640;519;81.09375
+Helse Nord-Trøndelag, Levanger;107;77;71.96261682
+Helse Nord-Trøndelag, Namsos;74;60;81.08108108
+Helgelandssykehuset, Mo i Rana;31;11;35.48387097
+Nordlandssykehuset, Bodø;65;3;4.615384615
+Universitetssykehuset Nord-Norge, Narvik;1;0;0
+Universitetssykehuset Nord-Norge, Tromsø;386;203;52.59067358
+Aleris Colosseum Stavanger;28;28;100
+Aleris Helse AS avd Oslo;1;0;0
+Aleris Helse AS Colosseum;54;54;100
+IbsenSykehuset AS;16;16;100
+Volvat Medisinske Senter AS;118;118;100
+Norsk Idrettsmedisinsk Institutt;57;57;100
+Oslofjordklinikken;434;434;100
+Oslofjordklinikken Vest AS;127;127;100
+Hele landet;7707;5316;68.97625535
