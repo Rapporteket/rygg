@@ -90,7 +90,7 @@ RyggFigAndelerGrVar(RegData=RegData, valgtVar='Osw22', ktr=2,
                     hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='Osw22Pro.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='Osw22', ktr=2,
                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
-                    hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='Osw22SS.pdf')
+                    hovedkat=9,  hastegrad=1, tidlOp=4,  outfile='Osw22SS.pdf')
 
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='fornoydhet', ktr=ktr,
                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
