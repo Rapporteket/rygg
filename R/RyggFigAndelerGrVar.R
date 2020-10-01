@@ -84,15 +84,15 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
             #save(deknNakke17, file = '../data/deknNakke17.Rdata')
             Ngr <- 100
             indLandet <- which(RegData$ShNavn== 'Hele landet')
-            AndelHele <- RegData$DekningsgradNKR[indLandet]
-            AndelerGr <- RegData$DekningsgradNKR[-indLandet]
+            AndelHele <- RegData$Dekningsgrad[indLandet]
+            AndelerGr <- RegData$Dekningsgrad[-indLandet]
             fargepalett='BlaaOff'
             utvalgTxt <- ''
             medSml=0
             AntGr <- length(AndelerGr)
-            GrNavn <- paste0(RegData$ShNavn,' (',RegData$Totalt , ')')[-indLandet]
+            GrNavn <- paste0(RegData$ShNavn,' (',RegData$N , ')')[-indLandet]
             hovedgrTxt <- 'Hele landet'
-            N <- RegData$Totalt[indLandet]
+            N <- RegData$N[indLandet]
             xAkseTxt <- RyggVarSpes$xAkseTxt
             KImaalGrenser <- c(0,60,80,100)
 
