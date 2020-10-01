@@ -58,37 +58,12 @@ AntAvd <- length(unique(RegData$ShNavn))
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20,
                hastegrad=1, outfile='VentetidBestOp_Sh.pdf')
 
-# Andel skjema som er registrert innen 12 uker etter at pasienten er uskrevet, registreringsforsinkelse per sykehus.
-RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
-               outfile='RegForinkelse_Sh.pdf')
-
 RyggFigAndeler(RegData = RegData1aar, valgtVar='AntibiotikaMedikament',
                preprosess = 0, outfile = 'AntibiotikaMedikament.pdf')
 
 
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
-                       Ngrense=20, aar=aar2, tidlAar=tidlAar2, outfile='SympVarighUtstrAarPro.pdf')
-RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, outfile='SympVarighUtstrTidPro.pdf')
-
-BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='smBePreLav', aar=(rappAar-1):rappAar,
-                                    Ngrense = 20, preprosess = 0, hovedkat=1,   outfile='BeinsmLavPrePro.pdf')
-# KpInf3MndTidSmlGr.pdf - kan ikke ha med i årsrapport for 2019, men Resport.
-# KpInf3MndProAar
-# KpInf3MndSSAar.pdf
-# KpInf3MndPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', aar=(rappAar-1):rappAar,
-#                                     Ngrense = 20,
-#                                     hovedkat = 1, outfile='FigKpInf3MndPro.pdf')
-# KpInf3MndSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', aar=(rappAar-1):rappAar,
-#                                    Ngrense = 20,
-#                                    hovedkat=9, outfile='FigKpInf3MndSS.pdf')
 # Vent: PeropKompDuraTidSmlGr.pdf #linjediagram per år, ulike operasjonstyper og totalt
 
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, hastegrad=1,
-                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarPro.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, tidlOp=4, hastegrad=1,
-                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarFusj.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, hastegrad=1,
-                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarSS.pdf')
 
 RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=1, tidlOp=4, hastegrad=1, ktr=2,
                  Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarPro.pdf')
@@ -126,9 +101,6 @@ RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj', aar = (rappAar-
 DegSponFusjSStid <- RyggFigAndelTid(RegData=RegData, valgtVar = 'degSponFusj', hovedkat=9,
                                     outfile = 'DegSponFusjSStid.pdf')
 
-RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidDS.pdf', tidsenhet = 'Aar',
-               valgtVar='OswEndr', hovedkat=10, ktr=ktr)
-
 Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', preprosess = 0,
                               outfile='Alder70.pdf')
 
@@ -137,12 +109,48 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdPro.pdf',
 RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
                  valgtVar='liggedogn', hovedkat=9, valgtMaal = 'Gjsn')
 
-#NYE:
+
+
+#------ Kvalitetsindikatorer for 2019..
+
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
+                       Ngrense=20, aar=aar2, tidlAar=tidlAar2, outfile='SympVarighUtstrAarPro.pdf')
+RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, outfile='SympVarighUtstrTidPro.pdf')
+
+
+BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='smBePreLav', aar=(rappAar-1):rappAar,
+                                    Ngrense = 20, preprosess = 0, hovedkat=1,   outfile='BeinsmLavPrePro.pdf')
+
+#Infeksjoner ikke registrert i 2019
+#3 kval.ind: Prolaps, Fusjon, SS
+# KpInf3MndPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', aar=(rappAar-1):rappAar,
+#                                     Ngrense = 20,
+#                                     hovedkat = 1, outfile='KpInf3MndPro.pdf')
+# KpInf3MndSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', aar=(rappAar-1):rappAar,
+#                                    Ngrense = 20,
+#                                    hovedkat=9, outfile='KpInf3MndSS.pdf')
+
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, hastegrad=1,
+                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarPro.pdf')
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, tidlOp=4, hastegrad=1,
+                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarFusj.pdf')
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, hastegrad=1,
+                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarSS.pdf')
+
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr20',  outfile='OswEndr20Pro.pdf',
-                aar=aar2, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+                    aar=aar2, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf',
-                aar=aar2, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+                    aar=aar2, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+
+RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidDS.pdf', tidsenhet = 'Aar',
+               valgtVar='OswEndr', hovedkat=10, ktr=ktr)
+
+
+# Andel skjema som er registrert innen 30 dager etter at pasienten er uskrevet, registreringsforsinkelse per sykehus.
+RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
+                    outfile='RegForinkelse_Sh.pdf')
+
 
 #-----------------------------------------------------------------------------------------------------------------------------
 #---------------------------Kvalitetsindikatorkjøring, 2018
