@@ -147,7 +147,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   varTxt <- 'som har fått antibiotika'
             }
       }
-      if (valgtVar=='AntibiotikaMedikament'){ #fordeling
+      if (valgtVar=='antibiotikaMedikament'){ #fordeling
          tittel <- 'Antibiotikatyper'
          grtxt <- c("Cefalotin","Cefuroxim","Cefalexin","(Di)Kloksacillin","Klindamycin",
                     "Penicillin","Erytromycin","Ampicillin","Tetracyclin","Trimetoprim+Sulfonamid",
@@ -852,6 +852,18 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             tittel <- 'Flere enn to tidligere operasjoner'
             sortAvtagende <- F
       }
+
+
+      if (valgtVar == 'trombProfyl') { #AndelGrVar, AndelTid
+         #Legeskjema
+         tittel <- 'Tromboseprofylakse gitt ifm. operasjon'
+         #if (figurtype %in% c('andelGrVar', 'andelTid')){
+            RegData <- RegData[which(RegData$PostopTrombProfyl %in% 0:1), ]
+            RegData$Variabel <- RegData$PostopTrombProfyl
+            varTxt <- 'fått tromboseprofylakse'
+            sortAvtagende <- F #}
+      }
+
 
       if (valgtVar == 'uforetrygdPre') { #fordeling, AndelGrVar, AndelTid
             #PasientSkjema. Andel med UforetrygdPre ja og planlegger

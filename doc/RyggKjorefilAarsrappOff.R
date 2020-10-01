@@ -62,7 +62,7 @@ RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
                outfile='RegForinkelse_Sh.pdf')
 
-RyggFigAndeler(RegData = RegData1aar, valgtVar='AntibiotikaMedikament',
+RyggFigAndeler(RegData = RegData1aar, valgtVar='antibiotikaMedikament',
                preprosess = 0, outfile = 'AntibiotikaMedikament.pdf')
 
 
@@ -126,7 +126,11 @@ RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj', aar = (rappAar-
 DegSponFusjSStid <- RyggFigAndelTid(RegData=RegData, valgtVar = 'degSponFusj', hovedkat=9,
                                     outfile = 'DegSponFusjSStid.pdf')
 
-RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidDS.pdf', tidsenhet = 'Aar',
+
+
+
+
+RyggFigGjsnBox(RegData=RegData, aar=startAar:(rappAar-1) ,tidsenhet = 'Aar', outfile='OswEndrTidDS.pdf',
                valgtVar='OswEndr', hovedkat=10, ktr=ktr)
 
 Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', preprosess = 0,
@@ -139,10 +143,13 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
 
 #NYE:
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr20',  outfile='OswEndr20Pro.pdf',
-                aar=aar2, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+                aar=aar2_12mnd, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf',
-                aar=aar2, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+                aar=aar2_12mnd, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+
+RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='trombProfyl', outfile='TrombProfyl.pdf')
+
 
 #-----------------------------------------------------------------------------------------------------------------------------
 #---------------------------Kvalitetsindikatorkjøring, 2018
