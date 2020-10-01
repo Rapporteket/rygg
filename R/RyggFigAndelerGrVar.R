@@ -80,21 +80,39 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
       #KImaal <- RyggVarSpes$KImaal
       if (length(grep('dekn',valgtVar)) == 1) { #Bruke vedlagte dekningsdata
             #Dekningsgradsfigur
-            #RegData <- read.table(paste0('../data/',valgtVar, '.csv'), sep=';', header=T, stringsAsFactors = FALSE)  # na.strings = "NULL", encoding = 'UTF-8',
+          RegData <- read.table('./data-raw/DG2019.csv', sep=';', header=T, stringsAsFactors = FALSE)  # na.strings = "NULL", encoding = 'UTF-8',
             #save(deknNakke17, file = '../data/deknNakke17.Rdata')
+<<<<<<< HEAD
             Ngr <- 100
             indLandet <- which(RegData$ShNavn== 'Hele landet')
             AndelHele <- RegData$Dekningsgrad[indLandet]
             AndelerGr <- RegData$Dekningsgrad[-indLandet]
+=======
+          #data('deknRygg19', package = 'rygg') #paste0(valgtVar,'.Rdata')
+          #RegData <- deknRygg19 #paste0(valgtVar)
+          tittel <- 'Dekningsgrad, NKR Degenerativ Rygg, 2019'
+        xAkseTxt <- 'dekningsgrad, Rygg'
+        KImaal <- 0.8
+            Ngr <- RegData$Antall
+            indLandet <- which(RegData$Sykehus== 'Hele landet')
+            AndelHele <- RegData$DekningsgradNKR[indLandet]
+            AndelerGr <- RegData$DekningsgradNKR[-indLandet]
+>>>>>>> f58a3410f493ddded26b2051136d00f5a9d8d9ba
             fargepalett='BlaaOff'
             utvalgTxt <- ''
             medSml=0
+            sortAvtagende <- T
             AntGr <- length(AndelerGr)
             GrNavn <- paste0(RegData$ShNavn,' (',RegData$N , ')')[-indLandet]
             hovedgrTxt <- 'Hele landet'
             N <- RegData$N[indLandet]
+<<<<<<< HEAD
             xAkseTxt <- RyggVarSpes$xAkseTxt
+=======
+>>>>>>> f58a3410f493ddded26b2051136d00f5a9d8d9ba
             KImaalGrenser <- c(0,60,80,100)
+            grVar <- 'ShNavn'
+            Ngrense <- 0
 
       } else {
             #if (!is.null(dim(RegData))) {
@@ -128,7 +146,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
             AntGr <- length(which(Ngr >= Ngrense))	#Alle som har gyldig resultat
             AndelHele <- round(100*sum(RegData$Variabel)/N, 2)
             AndelerGr <- round(100*tapply(RegData$Variabel, RegData[ ,grVar], sum, na.rm=T)/Ngr,2)
-            Ngrtxt <- as.character(Ngr)
+
             GrNavn <- names(Ngr)
             xAkseTxt <- "Andel opphold (%)"
 
@@ -145,6 +163,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
       sortInd <- order(as.numeric(AndelerGr), decreasing=sortAvtagende, na.last = FALSE)
       AndelerGrSort <- AndelerGr[sortInd]
       GrNavnSort <- GrNavn[sortInd]
+      Ngrtxt <- as.character(Ngr)
       Ngrtxt <- Ngrtxt[sortInd]
 
       andeltxtUsort <- paste0(sprintf('%.1f',AndelerGr), ' %')
