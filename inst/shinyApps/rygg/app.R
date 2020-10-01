@@ -318,6 +318,7 @@ tabPanel(p('Fordelinger',
                       choices = c('Alder' = 'alder',
                                   'Angst/depresjon (EQ5D) før operasjon' = 'EQangstPre',
                                   'Antibiotikaprofylakse?' = 'antibiotika',
+                                  'Antibiotikatyper' = 'antibiotikaMedikament',
                                   'Arbeidsstatus' = 'arbstatus', #Velger skjema separat
                                   'Arbeidsstatus, 3 mnd. etter' = 'arbstatus3mnd',
                                   'Arbeidsstatus 12 mnd. etter' = 'arbstatus12mnd',

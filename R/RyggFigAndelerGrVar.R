@@ -86,7 +86,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
           #RegData <- deknRygg19 #paste0(valgtVar)
           tittel <- 'Dekningsgrad, NKR Degenerativ Rygg, 2019'
         xAkseTxt <- 'dekningsgrad, Rygg'
-        KImaal <- 0.8
+        #xAkseTxt <- RyggVarSpes$xAkseTxt
             Ngr <- RegData$Antall
             indLandet <- which(RegData$Sykehus== 'Hele landet')
             AndelHele <- RegData$DekningsgradNKR[indLandet]
@@ -96,7 +96,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
             medSml=0
             sortAvtagende <- T
             AntGr <- length(AndelerGr)
-            GrNavn <- paste0(RegData$ShNavn,' (',RegData$Totalt , ')')[-indLandet]
+            GrNavn <- paste0(RegData$ShNavn,' (',RegData$N , ')')[-indLandet]
             hovedgrTxt <- 'Hele landet'
             N <- RegData$N[indLandet]
             KImaalGrenser <- c(0,60,80,100)
@@ -145,7 +145,7 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
                   AndelerGr <- c(AndelerGr[-indGrUt],AndelGrUt) #AndelerGr[indGrUt] <- NA
                   #GrNavn <- c(names(Ngr)[-indGrUt], paste0(length(indGrUt), ' avd. med N<',Ngrense), )
                   GrUtNavn <- paste0(length(indGrUt), ' avd. med N<',Ngrense)
-                  Ngrtxt <- c(Ngrtxt[-indGrUt],sum(Ngr[indGrUt]))  #Ngrtxt[indGrUt] <- paste0('<', Ngrense)
+                  Ngrtxt <- c(Ngr[-indGrUt],sum(Ngr[indGrUt]))  #Ngrtxt[indGrUt] <- paste0('<', Ngrense)
                   GrNavn <- c(GrNavn[-indGrUt], GrUtNavn) #paste0(c(GrNavn[-indGrUt], GrUtNavn),' (',Ngrtxt , ')')
             }
       }
@@ -223,7 +223,8 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
             maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
             rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
                  ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
-            legend(x=0, y=-4, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
+            legPos <- ifelse(AntGr < 31, -3, -3.5)
+            legend(x=0, y=legPos, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
                    ncol=antMaalNivaa+1,
                    xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
                    legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
