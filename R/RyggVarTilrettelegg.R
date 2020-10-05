@@ -674,6 +674,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             tittel <- 'Registrert for sent for 3 mnd. oppfølging'
             varTxt <- 'for sent registrert'
             sortAvtagende <- F}
+         KImaalGrenser <- c(0,3,10,100)
       }
 
       if (valgtVar=='roker') { #fordeling, AndelGrVar, #AndelTid

@@ -216,11 +216,13 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar='alder70', datoFra='2007-01-01
          #Legge på målnivå
          #OswEndr20
          if (!is.na(KImaalGrenser[1])) {
-            antMaalNivaa <- length(KImaalGrenser)-1
+           antMaalNivaa <- length(KImaalGrenser)-1
             rekkef <- 1:antMaalNivaa
-            if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
             fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
+            if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
+
             maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
+            if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
             rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
                  ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
             legPos <- ifelse(AntGr < 31, -3, -3.5)
