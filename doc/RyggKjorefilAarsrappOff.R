@@ -53,6 +53,8 @@ AntAvd <- length(unique(RegData$ShNavn))
 #---------FIGURER, årsrapport 2019--------------
 
 # Dekningsgrad for hvert sykehus, Se tidligere figurer.
+RyggFigAndelerGrVar(RegData=0, valgtVar='dekn19Rygg', outfile='DGrygg.pdf')
+RyggFigAndelerGrVar(RegData=0, valgtVar='dekn19Nakke', outfile='DGnakke.pdf') #
 
 #Denne ble til overs etter konflikt...:
 #                aar=aar2_12mnd, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
