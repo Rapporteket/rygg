@@ -431,3 +431,18 @@ NKR2017 <- RegData[which(NKR2017$OpDato<2017), ]
 sort(variable)[which(!(sort(variable) %in% sort(names(RegData))))]
 
 
+
+#------------Sjekk av gml. ny resh------------
+
+RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
+                                  query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
+                                  query='SELECT * FROM AlleVarNum')
+RegData <- RyggRegDataSQLV2V3()
+#table(RegData[,c(ReshId)])
+tab <- unique(RegData[, c("ShNavn", "ReshId")])
+tab[order(tab$ShNavn),]
+
+sort(table(tab$ShNavn)) #To: Aleris Bergen, Aleris Oslo, Tromsø, Volvat
+sort(table(tab$ReshId)) #To: 105153  601161
+tab[tab$ReshId==601161,]

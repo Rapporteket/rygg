@@ -414,7 +414,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       if (valgtVar=='liggedogn') {#fordeling, gjsnGrVar, andeler, gjsnTid
             #liggedogn
             #For opphold registrert som dagkirurgi uten at liggedogn er reg., settes liggedogn=0
-            tittel <- 'Liggetid ved operasjon'
+            tittel <- 'Total liggetid ved operasjon'
             dagind <- which( (is.na(RegData$Liggedogn) | is.nan(RegData$Liggedogn))  & RegData$Dagkirurgi==1)
             RegData$Liggedogn[dagind]<-0
             RegData <- RegData[which(RegData$Liggedogn>=0),]
@@ -424,9 +424,9 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             grtxt <- c(0:6, '7+')
             xAkseTxt <- 'Antall liggedøgn' #(subtxt
             subtxt <- 'døgn'
-            if (figurtype=='gjsnGrVar') {tittel <- 'liggetid'}
+            if (figurtype=='gjsnGrVar') {tittel <- 'total liggetid'}
             sortAvtagende <- 'F'
-            TittelVar <- 'Liggetid ved operasjon'
+            TittelVar <- 'Total liggetid ved operasjon'
             ytxt1 <- 'liggetid'
             KIekstrem <- c(0, 20)
       }

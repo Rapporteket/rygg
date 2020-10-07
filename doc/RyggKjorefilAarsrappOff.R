@@ -152,15 +152,15 @@ RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidDS.pdf', tidsenhet = 'Aar',
                valgtVar='OswEndr', hovedkat=10, ktr=ktr)
 
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr20',  outfile='OswEndr20Pro.pdf',
-                    aar=aar2, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+                    aar=aar2_12mnd, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf',
-                    aar=aar2, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf', #OswEndr30pstSS.pdf
+                    aar=aar2_12mnd, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 
 
 # Andel skjema som er registrert innen 12 uker etter at pasienten er uskrevet, registreringsforsinkelse per sykehus.
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
-                    outfile='RegForsinkelse_Sh.pdf')
+                    outfile='RegForsinkelse_Sh.pdf') #RegForsinkelse_Sh.pdf
 #ventetidSpesOp
 RyggFigAndelerGrVar(RegData=RegData1aar, preprosess = 0,
                     outfile='')

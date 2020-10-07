@@ -134,6 +134,7 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
                   RegData <- RegData[which(RegData[ ,grVar] != ''),] #Tar ut registreringer uten grupperingsnavn
                   RegData[ ,grVar] <- as.factor(RegData[ ,grVar])
                   Ngr <- table(RegData[ ,grVar])
+                  Ngrtxt <- as.character(Ngr)
             }	else {Ngr <- 0}
             N <- dim(RegData)[1]
             AntGr <- length(which(Ngr >= Ngrense))	#Alle som har gyldig resultat
@@ -161,7 +162,6 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
       sortInd <- order(as.numeric(AndelerGr), decreasing=sortAvtagende, na.last = FALSE)
       AndelerGrSort <- AndelerGr[sortInd]
       GrNavnSort <- GrNavn[sortInd]
-      Ngrtxt <- as.character(Ngr)
       Ngrtxt <- Ngrtxt[sortInd]
 
       andeltxtUsort <- paste0(sprintf('%.1f',AndelerGr), ' %')
