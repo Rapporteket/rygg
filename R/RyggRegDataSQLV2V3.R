@@ -13,9 +13,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
 
 #Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
-  RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
+  RegDataV2 <- rapbase::loadRegData(registryName="rygg",
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
-  RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
+  RegDataV3 <- rapbase::loadRegData(registryName="rygg",
                                     query='SELECT * FROM AlleVarNum')
 
   # RegDataV2$Aar <- lubridate::year(RegDataV2$OpDato)

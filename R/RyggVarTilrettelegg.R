@@ -430,7 +430,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             ytxt1 <- 'liggetid'
             KIekstrem <- c(0, 20)
       }
-      if (valgtVar=='liggetidPostOp') {#fordeling, gjsnGrVar, andeler, gjsnTid
+      if (valgtVar=='liggetidPostOp') {#fordeling, gjsnGrVar, gjsnTid
          #liggedogn
          #For opphold registrert som dagkirurgi uten at liggedogn er reg., settes liggedogn=0
          tittel <- 'Liggetid etter operasjon'
@@ -711,7 +711,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                   tittel <- 'Andel som får sårdren (%)'
             }
       }
-      if (valgtVar == 'sivilStatus') {
+      if (valgtVar == 'sivilStatus') { #fordeling
          tittel <- 'Sivilstatus'
          #V2: grtxt <- c('Gift', 'Samboer', 'Enslig', 'Ukjent')
          grtxt <- c('Gift/Samboer', 'Enslig', 'Ikke utfylt')

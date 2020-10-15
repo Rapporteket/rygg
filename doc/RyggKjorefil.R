@@ -41,6 +41,8 @@ load(file=paste0(fil, '.Rdata'))
 #RegData <- RegData[sample(1:dim(RegData)[1],10000), ]
 load('A:/Rygg/RyggData.RData')
 
+RegData <- RyggRegDataSQLV2V3()
+
 
 #----------------------------- Parametre-------------
 library(nkr)
@@ -222,10 +224,13 @@ for (var in variable) {
 RegData <- RyggRegDataSQLV2V3() #read.table('A:/Rygg/AlleVarNum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
 
 
-RyggFigAndelerGrVar(valgtVar='roker', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
+DataUt <- RyggFigAndelerGrVar(valgtVar='roker', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
                     datoFra='2017-01-01', datoTil = '2019-02-01',ktr=1, outfile='')
+#tab <- lagTabavFig(UtDataFraFig=DataUt, figurtype='andelGrVar')
 
-RyggFigAndelTid(RegData=RegData, outfile='', valgtVar='nytte', datoFra = '2017-01-01', ktr = 1)
+DataUt <- RyggFigAndelTid(RegData=RegData, outfile='', valgtVar='nytte', datoFra = '2017-01-01', ktr = 1)
+tab <- lagTabavFig(UtDataFraFig=DataUt, figurtype='andelTid')
+
 # , hovedkat=hovedkat, preprosess=1,
 #                 minald = minald, maxald = maxald, aar=aar, tidsenhet = tidsenhet,
 #                 erMann=erMann, ktr=ktr, tidlOp=tidlOp, enhetsUtvalg=enhetsUtvalg, tittel=1,

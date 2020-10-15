@@ -21,14 +21,18 @@
 RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil='3000-12-31', aar=0,
                             tidsenhet='Aar', hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1,
                         minald=0, maxald=130, erMann=99, reshID=0, outfile='', hastegrad=99,
-                        enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, offData=0) {
+                        enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, offData=0,... ) {
+
+   if ("session" %in% names(list(...))) {
+      raplog::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
+   }
 
       if (hentData == 1) {
             RegData <- RyggRegDataSQL()
       }
       if (offData == 1) {
             utvalgsInfo <- RegData$utvalgsInfo
-            KImaal <- RegData$KImaal
+            KImaal <- RegData$KImaalGrenser
             sortAvtagende <- RegData$sortAvtagende
             tittel <- RegData$tittel
             RegData <- RegData$RyggRegData01Off
@@ -49,7 +53,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil='30
             RegData <- RyggVarSpes$RegData
             sortAvtagende <- RyggVarSpes$sortAvtagende
             varTxt <- RyggVarSpes$varTxt
-            KImaal <- RyggVarSpes$KImaal
+            KImaal <- RyggVarSpes$KImaalGrenser
             tittel <- RyggVarSpes$tittel
       }
 
@@ -87,34 +91,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil='30
                          Kvartal = 'Operasjonsår og -kvartal',
                          Mnd='Operasjonsår og -måned')
 
-      # RegData$Mnd <- RegData$InnDato$mon +1
-      # RegData$Kvartal <- ceiling(RegData$Mnd/3)
-      # RegData$Halvaar <- ceiling(RegData$Mnd/6)
-      # RegData$Aar <- 1900 + RegData$InnDato$year #strptime(RegData$Innleggelsestidspunkt, format="%Y")$year
-      #
-      # #Brukes til sortering
-      # RegData$TidsEnhet <- switch(tidsenhet,
-      #                             Aar = RegData$OpAar-min(RegData$OpAar)+1,
-      #                             Mnd = RegData$Mnd-min(RegData$Mnd[RegData$OpAar==min(RegData$OpAar)])+1
-      #                             +(RegData$OpAar-min(RegData$OpAar))*12,
-      #                             Kvartal = RegData$Kvartal-min(RegData$Kvartal[RegData$OpAar==min(RegData$OpAar)])+1+
-      #                                   (RegData$OpAar-min(RegData$OpAar))*4,
-      #                             Halvaar = RegData$Halvaar-min(RegData$Halvaar[RegData$OpAar==min(RegData$OpAar)])+1+
-      #                                   (RegData$OpAar-min(RegData$OpAar))*2
-      # )
-      #
-      # tidtxt <- switch(tidsenhet,
-      #                  Mnd = paste(substr(RegData$OpAar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)], 3,4),
-      #                              sprintf('%02.0f', RegData$Mnd[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='.'),
-      #                  Kvartal = paste(substr(RegData$OpAar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)], 3,4),
-      #                                  sprintf('%01.0f', RegData$Kvartal[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='-'),
-      #                  Halvaar = paste(substr(RegData$OpAar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)], 3,4),
-      #                                  sprintf('%01.0f', RegData$Halvaar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='-'),
-      #                  Aar = as.character(RegData$OpAar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]))
-      #
-      # RegData$TidsEnhet <- factor(RegData$TidsEnhet, levels=1:max(RegData$TidsEnhet)) #evt. levels=tidtxt
-
-
       #--------------- Gjøre beregninger ------------------------------
 
       AggVerdier <- list(Hoved = 0, Rest =0)
@@ -140,7 +116,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil='30
 
       FigDataParam <- list(AggVerdier=AggVerdier, N=N,
                            Ngr=Ngr,
-                           KImaal <- KImaal,
+                           KImaal = KImaal,
                            #soyletxt=soyletxt,
                            grtxt2=grtxt2,
                            varTxt=varTxt,

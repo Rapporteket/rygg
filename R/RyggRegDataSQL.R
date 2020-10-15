@@ -9,11 +9,11 @@
 RyggRegDataSQL <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alle=1){
 
 if (alle == 1) {
-  RegData <- rapbase::LoadRegData(
+  RegData <- rapbase::loadRegData(
     registryName="rygg",
     query=paste0('SELECT * FROM AlleVarNum WHERE OpDato >= \'', datoFra, '\' AND OpDato <= \'', datoTil, '\''),
     dbType="mysql")
-  # RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
+  # RegDataV2 <- rapbase::loadRegData(registryName="rygg",
   #                                              query='SELECT * FROM Uttrekk_Rapport', dbType="mysql")
 } else {
   query <- paste0('SELECT
@@ -171,7 +171,7 @@ FROM AlleVarNum
 
 #FROM Uttrekk_Rapport ')
 
-RegData <- rapbase::LoadRegData(registryName="rygg", query=query, dbType="mysql")
+RegData <- rapbase::loadRegData(registryName="rygg", query=query, dbType="mysql")
 }
 
 return(RegData)
