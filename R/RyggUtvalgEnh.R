@@ -75,7 +75,7 @@ Ninn <- dim(RegData)[1]
 
 indAld <- which(RegData$Alder >= minald & RegData$Alder <= maxald)
 indAar <- if (aar[1] > 2000) {which(RegData$Aar %in% as.numeric(aar))} else {indAar <- 1:Ninn}
-indDato <- which(RegData$InnDato >= as.POSIXlt(datoFra) & RegData$InnDato <= as.POSIXlt(datoTil))
+indDato <- which(RegData$InnDato >= as.Date(datoFra) & RegData$InnDato <= as.Date(datoTil))
 indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
 #Hovedkategori, flervalgsutvalg
       indHovedInngr <- if (hovedkat[1] %in% 0:8) {which(RegData$HovedInngrepV2V3 %in% as.numeric(hovedkat))

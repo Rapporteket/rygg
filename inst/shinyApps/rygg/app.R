@@ -63,9 +63,10 @@ enhetsUtvalg <- c("Egen mot resten av landet"=1,
 #   "Egen region mot resten" = 8)
 tidsenhetValg <- rev(c('År'= 'Aar', 'Halvår' = 'Halvaar',
                        'Kvartal'='Kvartal', 'Måned'='Mnd'))
-tidlOprvalg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet nivå'=2,
+tidlOprValg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet nivå'=2,
                    'Tidl. operert annet og sm. nivå'=3, 'Primæroperasjon'=4)
-hastegradvalg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
+hastegradValg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
+ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 
 sykehusNavn <- sort(unique(RegData$ShNavn), index.return=T)
 sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
@@ -276,10 +277,10 @@ ui <- navbarPage(id = "tab1nivaa",
              selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
                          choices = hovedkatValg
              ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
-                         choices = hastegradvalg
+                         choices = hastegradValg
              ),
              selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
-                         choices = tidlOprvalg
+                         choices = tidlOprValg
              ),
              # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
              #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
@@ -369,10 +370,10 @@ tabPanel(p('Fordelinger',
                                 max = 110, value = c(0, 110)
                     ),
                     selectInput(inputId = 'hastegrad', label='Operasjonskategori (hastegrad)',
-                                choices = hastegradvalg
+                                choices = hastegradValg
                     ),
                     selectInput(inputId = 'tidlOp', label='Tidligere operert?',
-                                choices = tidlOprvalg
+                                choices = tidlOprValg
                     ),
                     selectInput(inputId = 'hovedInngrep', label='Hovedinngrepstype',
                                 choices = hovedkatValg
@@ -415,7 +416,8 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
 
            selectInput(
              inputId = "valgtVarAndel", label="Velg variabel",
-             choices = c('Alder over 70 år' = 'alder70',
+             choices = c('Kval.ind: For sen registrering' = 'regForsinkelse',
+                         'Alder over 70 år' = 'alder70',
                          'Antibiotika' = 'antibiotika',
                          'Arbeidsstatus' = 'arbstatus',
                          'ASA-grad > II' = 'ASA',
@@ -432,32 +434,36 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Oswestry-skår > 48 poeng' = 'Osw48',
                          'Komplikasjoner ved operasjon' = 'peropKomp',
                          'Komplikasjon ved op.: Durarift' = 'peropKompDura',
-                         'For sen registrering' = 'regForsinkelse',
                          'Røykere' = 'roker',
-                         'Lite beinsmerter, ingen parese' = 'smBePreLav',
+                         'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
                          'Smertestillende før operasjon' = 'smStiPre',
                          'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
-                         'Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
+                         'Kval.ind: Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
                          'Flere enn to tidligere operasjoner' = 'tidlOp3',
                          'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl',
                          'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                          'Høyere utdanning' = 'utd',
-                         'Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
+                         'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
                          'Mye verre/verre enn noen gang' = 'verre'
              )
            ),
+           #uiOutput("datovalgAndel"),
            dateRangeInput(inputId = 'datovalgAndel', start = startDato, end = idag,
                           label = "Tidsperiode", separator="t.o.m.", language="nb"),
+           selectInput(inputId = 'ktrAndel', label='Oppfølgingsskjema',
+                       choices = ktrValg
+           ),
+
            selectInput(inputId = "erMannAndel", label="Kjønn",
                        choices = kjonn
            ),
            sliderInput(inputId="alderAndel", label = "Alder", min = 0,
                        max = 110, value = c(0, 110)),
            selectInput(inputId = 'hastegradAndel', label='Operasjonskategori (hastegrad)',
-                       choices = hastegradvalg
+                       choices = hastegradValg
            ),
            selectInput(inputId = 'tidlOpAndel', label='Tidligere operert?',
-                       choices = tidlOprvalg
+                       choices = tidlOprValg
            ),
            selectInput(inputId = 'hovedInngrepAndel', label='Hovedinngrepstype',
                        choices = hovedkatValg
@@ -562,7 +568,6 @@ server <- function(input, output,session) {
   #observeEvent(input$reset_andelValg, shinyjs::reset("brukervalg_andeler"))
   #observeEvent(input$reset_gjsnValg, shinyjs::reset("brukervalg_gjsn"))
 
-#print(dim(RegData)[1])
   # widget
   if (paaServer) {
     output$appUserName <- renderText(rapbase::getUserFullName(session))
@@ -822,10 +827,20 @@ server <- function(input, output,session) {
 
 
 #--------------Andeler-----------------------------------
+  observe({
+  #   minDato <- ifelse(input$ktrAndel == '2', min(as.Date(startDato), Sys.Date()-365*2), startDato)
+  #   output$datovalgAndel <- renderUI({
+  #
+  #   #selectInput("User", "Date:", choices = as.character(dat5[dat5$email==input$Select,"date"]))
+  #   dateRangeInput(inputId = 'datovalgAndel', start = as.Date(minDato), end = idag,
+  #                  label = "Tidsperiode", separator="t.o.m.", language="nb")
+  # })
+
   output$andelerGrVar <- renderPlot({
     RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
                         datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
                         minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                        ktr = as.numeric(input$ktrAndel),
                         erMann=as.numeric(input$erMannAndel),
                         hastegrad = as.numeric(input$hastegradAndel),
                         tidlOp = as.numeric(input$tidlOpAndel),
@@ -840,6 +855,7 @@ server <- function(input, output,session) {
                     reshID= reshID,
                     datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
                     minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                    ktr = as.numeric(input$ktrAndel),
                     erMann=as.numeric(input$erMannAndel),
                     hastegrad = as.numeric(input$hastegradAndel),
                     tidlOp = as.numeric(input$tidlOpAndel),
@@ -850,12 +866,12 @@ server <- function(input, output,session) {
   }, height = 300, width = 1000
   )
 
-  observe({
     #AndelTid
     AndelerTid <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
                                   reshID= reshID,
-                                  datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
+                                  datoFra=as.Date(input$datovalgAndel[1]), datoTil=input$datovalgAndel[2],
                                   minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                                  ktr = as.numeric(input$ktrAndel),
                                   erMann=as.numeric(input$erMannAndel),
                                   hastegrad = as.numeric(input$hastegradAndel),
                                   tidlOp = as.numeric(input$tidlOpAndel),
@@ -889,6 +905,7 @@ server <- function(input, output,session) {
     AndelerShus <- RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
                                        datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
                                        minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                                       ktr = as.numeric(input$ktrAndel),
                                        erMann=as.numeric(input$erMannAndel),
                                        hastegrad = as.numeric(input$hastegradAndel),
                                        tidlOp = as.numeric(input$tidlOpAndel),
