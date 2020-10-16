@@ -161,9 +161,6 @@ RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30
 # Andel skjema som er registrert innen 12 uker etter at pasienten er uskrevet, registreringsforsinkelse per sykehus.
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
                     outfile='RegForsinkelse_Sh.pdf') #RegForsinkelse_Sh.pdf
-#ventetidSpesOp
-RyggFigAndelerGrVar(RegData=RegData1aar, preprosess = 0,
-                    outfile='')
 
 #-----------------------------------------------------------------------------------------------------------------------------
 #---------------------------Kvalitetsindikatorkjøring, 2018

@@ -417,34 +417,36 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
            selectInput(
              inputId = "valgtVarAndel", label="Velg variabel",
              choices = c('Kval.ind: For sen registrering' = 'regForsinkelse',
+                         'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
+                         'Kval.ind: Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
+                         'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
                          'Alder over 70 år' = 'alder70',
                          'Antibiotika' = 'antibiotika',
                          'Arbeidsstatus' = 'arbstatus',
                          'ASA-grad > II' = 'ASA',
-                         'Fedme (BMI>30)' = 'BMI',
                          'Degen. spondy. op. m/fusjon' = 'degSponFusj',
-                         'Har degen. spondy. og spin.stenose' = 'degSponSSSten',
-                         'Søkt erstatning før operasjon' = 'erstatningPre',
+                         'Fedme (BMI>30)' = 'BMI',
+                         'Flere enn to tidligere operasjoner' = 'tidlOp3',
                          'Fornøyde pasienter' = 'fornoydhet',
-                         'Komplikasjoner, pasientrapportert' = 'kp3Mnd',
-                         'Misfornøyde pasienter' = 'misfornoyd',
                          'Fremmelspråklig' = 'morsmal',
+                         # 'Komplikasjoner, pasientrapportert' = 'kp3Mnd',
+                         'Har degen. spondy. og spin.stenose' = 'degSponSSSten',
                          'Helt bra eller mye bedre' = 'nytte',
-                         'Oswestry-skår < 23 poeng' = 'Osw22',
-                         'Oswestry-skår > 48 poeng' = 'Osw48',
+                         'Høyere utdanning' = 'utd',
                          'Komplikasjoner ved operasjon' = 'peropKomp',
                          'Komplikasjon ved op.: Durarift' = 'peropKompDura',
+                         'Misfornøyde pasienter' = 'misfornoyd',
+                         'Mye verre/verre enn noen gang' = 'verre',
+                         'Forbedring av Oswestry-skår >= 20p' = 'OswEndr20',
+                         'Minst 30% forbedring av Oswestry-skår' = 'OswEndr30pst',
+                         'Oswestry-skår < 23 poeng' = 'Osw22',
+                         'Oswestry-skår > 48 poeng' = 'Osw48',
                          'Røykere' = 'roker',
-                         'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
                          'Smertestillende før operasjon' = 'smStiPre',
                          'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
-                         'Kval.ind: Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
-                         'Flere enn to tidligere operasjoner' = 'tidlOp3',
-                         'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl',
-                         'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
-                         'Høyere utdanning' = 'utd',
-                         'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
-                         'Mye verre/verre enn noen gang' = 'verre'
+                        'Søkt erstatning før operasjon' = 'erstatningPre',
+                        'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
+                        'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl'
              )
            ),
            #uiOutput("datovalgAndel"),
@@ -501,7 +503,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                              tableOutput("andelerGrVarTab"),
                              downloadButton(outputId = 'lastNed_tabAndelGrVar', label='Last ned tabell')),
                       column(width = 1),
-                      column(width = 5,
+                      column(width = 6,
                              h3("Utvikling over tid"),
                              tableOutput("andelTidTab"),
                              downloadButton(outputId = 'lastNed_tabAndelTid', label='Last ned tabell'))
@@ -877,6 +879,7 @@ server <- function(input, output,session) {
                                   tidlOp = as.numeric(input$tidlOpAndel),
                                   hovedkat = as.numeric(input$hovedInngrepAndel),
                                   enhetsUtvalg = input$enhetsUtvalgAndel,
+                                  tidsenhet = input$tidsenhetAndel,
                                   session=session) #,lagFig=0)
     tabAndelTid <- lagTabavFig(UtDataFraFig = AndelerTid, figurtype = 'andelTid')
 
@@ -885,9 +888,9 @@ server <- function(input, output,session) {
       antKol <- ncol(tabAndelTid)
       kableExtra::kable(tabAndelTid, format = 'html'
                         , full_width=F
-                        , digits = c(0,1,0,1)[1:antKol]
+                        , digits = c(0,0,1,0,0,1)[1:antKol]
       ) %>%
-        add_header_above(c(" "=1, 'Egen enhet/gruppe' = 2, 'Resten' = 2)[1:(antKol/2+1)]) %>%
+        add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
         column_spec(column = 1, width_min = '7em') %>%
         column_spec(column = 2:(antKol+1), width = '7em') %>%
         row_spec(0, bold = T)

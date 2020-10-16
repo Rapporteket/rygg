@@ -660,6 +660,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          cexgr <- 0.9
          xAkseTxt <- 'dager'
          sortAvtagende <- FALSE
+         datoTil <- min(datoTil, as.character(Sys.Date()-trekkfraDager))
 
          if (figurtype == 'andeler') {	#Fordelingsfigur
             gr <- c(seq(0,98,7), 2000)

@@ -118,7 +118,8 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
       hovedgrTxt <- RyggUtvalg$hovedgrTxt
 
       FigDataParam <- list(AggVerdier=AggVerdier, N=N,
-                           Ngr=Ngr,
+                           Ngr=list('Hoved' = NAarHoved, 'Rest'= NAarHendRest),
+                           Nvar = Ngr,
                            KImaal = KImaal,
                            #soyletxt=soyletxt,
                            grtxt2=grtxt2,
