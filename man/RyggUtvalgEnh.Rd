@@ -7,7 +7,7 @@
 RyggUtvalgEnh(
   RegData,
   datoFra = "2009-01-01",
-  datoTil = "3000-01-01",
+  datoTil = Sys.Date(),
   minald = 0,
   maxald = 110,
   erMann = "",

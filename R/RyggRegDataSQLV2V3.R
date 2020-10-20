@@ -34,8 +34,11 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
    # print(tab[order(tab$AvdNavn),], row.names = F)
   # table(RegDataV3$SykehusNavn)
   # sort(unique(RegDataV3$SykehusNavn))
-  #unique(RegDataV2[ ,c("AvdNavn", "AvdReshID")])[order(unique(RegDataV2$AvdNavn)),]
-  #unique(RegDataV3[ ,c("SykehusNavn", "AvdRESH")])[order(unique(RegDataV3$SykehusNavn)),]
+  # reshV2 <- unique(RegDataV2[ ,c("AvdNavn", "AvdReshID")])[order(unique(RegDataV2$AvdNavn)),]
+  # reshV3 <- unique(RegDataV3[ ,c("SykehusNavn", "AvdRESH")])[order(unique(RegDataV3$SykehusNavn)),]
+  # setdiff(reshV3$SykehusNavn, reshV2$AvdNavn)
+  # setdiff(reshV2$AvdNavn, reshV3$SykehusNavn)
+  #Funker ikke ReshTab <- merge(reshV3, reshV2, by.x = 'sykehusNavn', by.y = 'AvdNavn', all=TRUE)
   #unique(RegData[ ,c("SykehusNavn", "AvdRESH")])
 
   if (alleVarV3 == 0) {
@@ -104,6 +107,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
     'Aleris, Bergen' = 'Aleris Bergen',
     'Aleris, Oslo' = 'Aleris Oslo',
+    'Oslofjordklinikken Øst' = 'Oslofjordklinikken',
     'Teres Colloseum, Oslo' = 'Aleris Oslo',
     'Teres Colloseum, Stavanger'  = 'Aleris Stavanger',
     'Teres, Bergen' = 'Aleris Bergen',
@@ -112,8 +116,19 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
     'UNN, nevrokir' = 'Tromsø')
   )
 
+  RegDataV2$AvdReshID <- plyr::revalue(RegDataV2$AvdReshID,  #Gammelt navn V2 - nytt navn (V3), dvs. gmlresh	nyresh
+                                     c('107137' =	'107508', #Aleris Bergen
+                                       '107511' =	'999975', #Aleris Oslo
+                                       '999999' =	'110771') #Volvat
+)
 
-  # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
+  # >   setdiff(reshV3$SykehusNavn, reshV2$AvdNavn)
+  # [1] "Ibsensykehuset" "Skien"          "Tønsberg"
+  # >   setdiff(reshV2$AvdNavn, reshV3$SykehusNavn)
+  # [1] "Aleris Drammen"      "Aleris Bergen"       "Larvik"              "Rikshospitalet, ort" "Flekkefjord"         "Førde"
+  # [7] "Molde"               "Bodø"                   "Molde"                  "Oslofjordklinikken Øst" "Bodø"
+
+    # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
   # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
   RegDataV2 <- dplyr::rename(RegDataV2,
                              AlderVedOpr = Alder,

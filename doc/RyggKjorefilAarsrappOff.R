@@ -275,51 +275,83 @@ RyggFigGjsnBox(RegData=RegData, valgtVar='OswEndr', hovedkat=9, tidlOp=4, hasteg
 #-----------Filer til Resultatportalen -----------------------
 #------------------------------------------------------------------------------------
 rm(list=ls())
-library(nkr)
+library(rygg)
 #NKRdata1 <- read.table('A:/Rygg/Versjon2/NKR2019-01-16.csv', sep=';', header=T) #, encoding = 'UTF-8')
-NKRdata <- read.table('A:/Rygg/Versjon2/NKR2019-09.csv', sep=';', header=T) #, encoding = 'UTF-8')
-RyggData <- RyggPreprosess(RegData=NKRdata)
-datoFra = '2011-01-01'
+#NKRdata <- read.table('A:/Rygg/Versjon2/NKR2019-09.csv', sep=';', header=T) #, encoding = 'UTF-8')
+#RyggData <- RyggPreprosess(RegData=NKRdata)
+#datoFra = '2011-01-01'
 
 # Aar	ReshId	Teller Ind1	Nevner Ind1	  AarID	   Indikator
 #2014	103469	  0	          1	       2014103469	  ind1
 
+#------------
 
 
-DataTilResultatportalen(RegData = RyggData, valgtVar='SympVarighUtstr', datoFra = '2011-01-01', hovedkat=1,
-                        filUt = 'ind1_Varighet_bensmerter_Rygg')
+#---------
+library(rygg)
+library(magrittr)
+RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+valgteAar <- 2011:2019
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='sympVarighUtstr', aar=valgteAar,
+                             indID = 'ind1' ,
+                             hovedkat=1, filUt = 'ind1_Varighet_bensmerter_Rygg')
+head(DataTilRes)
 
 #--Bensmerter mindre eller lik 3 på numerisk smerteskala
-DataTilResultatportalen(RegData = RyggData, valgtVar='beinsmLavPre', datoFra = '2011-01-01', hovedkat=1,
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='smBePreLav', aar=valgteAar, hovedkat=1,
+                             indID = 'ind2',
                         filUt = 'ind2_lav_bensmerte_prolaps_Rygg')
 
 #--Sårinfeksjon, dyp og overfladisk
-DataTilResultatportalen(RegData = RyggData, valgtVar='KpInf3Mnd', datoFra = '2011-01-01', hovedkat=1,
-                        filUt = 'ind3_Saarinfeksjon_prolaps')
-DataTilResultatportalen(RegData = RyggData, valgtVar='KpInf3Mnd', datoFra = '2011-01-01', hovedkat=9,
-                        filUt = 'ind4_Saarinfeksjon_stenose')
+# DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='kpInf3Mnd', aar=valgteAar, hovedkat=1,
+#                              indID = 'ind3',
+#                              filUt = 'ind3_Saarinfeksjon_prolaps')
+#
+# DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='kpInf3Mnd', aar=valgteAar, hovedkat=9,
+#                              indID = 'ind4',
+#                              filUt = 'ind4_Saarinfeksjon_stenose')
 
 #-----------Durarift
-DataTilResultatportalen(RegData = RyggData, valgtVar='PeropKompDura', datoFra = '2011-01-01', hovedkat=1,
-                        tidlOp=4, hastegrad=1, filUt = 'ind5_Durarift prolaps_Rygg')
-DataTilResultatportalen(RegData = RyggData, valgtVar='PeropKompDura', datoFra = '2011-01-01', hovedkat=9,
-                        tidlOp=4, hastegrad=1, filUt = 'ind6_Durarift_stenose_Rygg')
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='peropKompDura', aar=valgteAar, hovedkat=1,
+                             indID = 'ind5', tidlOp=4, hastegrad=1, filUt = 'ind5_Durarift prolaps_Rygg')
+
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='peropKompDura', aar=valgteAar, hovedkat=9,
+                             indID = 'ind6',
+                             tidlOp=4, hastegrad=1, filUt = 'ind6_Durarift_stenose_Rygg')
+
+# IKKE? valgtVar='peropKompDura', hovedkat=5, tidlOp=4, hastegrad=1,
+
+#------Nye 2019
+#Sjekkliste, trygg kirurgi
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='tryggKir', aar=valgteAar, hovedkat=9,
+                             indID = 'ind7',
+                             tidlOp=4, hastegrad=1, filUt = 'ind7_TryggKirurgi_Rygg')
+
+#Ventetid, operasjon bestemt til utført
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='ventetidSpesOp', aar=valgteAar, hovedkat=9,
+                             indID = 'ind8',
+                             tidlOp=4, hastegrad=1, filUt = 'ind8_VentetidOperasjon_Rygg')
+
+#-------Oswestry------
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='OswEndr20',
+                             indID = 'ind9',
+                             hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2,
+                             aar=valgteAar, filUt = 'ind9_OswEndr20poengPro_Rygg')
+
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='OswEndr30pstSS',
+                             indID = 'ind10',
+                             hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2,
+                             aar=valgteAar, filUt = 'ind10_OswEndr30pstPro_Rygg')
+
+# valgtVar='OswEndr', hovedkat=10,
+# valgtVar='regForsinkelse'
+
+
 
 #Alle sykehus og resh:
-ShResh <- unique(RegData[c('ReshId', 'ShNavn')])
-write.table(ShResh, file = 'A:/Resultatportalen/RyggShResh', sep = ';', row.names = F)
+ShResh <- unique(RyggData[c('ReshId', 'ShNavn')])
+write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
 
-# DataTilResultatportalen <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01',
-#                                     hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
-#   filUt <- paste0(ifelse(filUt=='dummy',  valgtVar, filUt), '.csv')
-#   RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, figurtype = 'andelGrVar')
-#   RyggUtvalg <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, datoFra = datoFra, hovedkat=hovedkat, tidlOp=tidlOp, hastegrad=hastegrad) #, datoTil=datoTil, aar=aar)
-#   RegData <- RyggUtvalg$RegData
-#   RyggTilOffvalgtVar <- RegData[,c('Aar', "ShNavn", "ReshId", "Variabel")]
-#   info <- c(RyggVarSpes$tittel, RyggUtvalg$utvalgTxt)
-#   RyggTilOffvalgtVar$info <- c(info, rep(NA, dim(RyggTilOffvalgtVar)[1]-length(info)))
-#   write.table(RyggTilOffvalgtVar, file = paste0('A:/Resultatportalen/', filUt), sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
-# }
 
 #---Nøkkelinformasjon, Resultatportalen------
 #---- R Y G G
@@ -390,7 +422,7 @@ NokkeltallRygg <- rbind(
   'Fornøyd med behandlingen, 12 mnd. etter' = andelFornoyd12mnd,
   'Helt restituert/mye bedre, 3 mnd. etter' = andelSuksess,
   'Helt restituert/mye bedre, 12 mnd. etter' = andelSuksess,
-  'Verre 3 mnd. etter' = andelVerre
+  'Verre 3 mnd. etter' = andelVerre,
   'Verre 12 mnd. etter' = andelVerre
 )
 tabNokkeltallRygg <- cbind(row.names(NokkeltallRygg),NokkeltallRygg)
@@ -443,72 +475,6 @@ DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='PeropKompDura',
 # sjekket
 FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = startAar:rappAar,
                                      outfile='FigMorsmalAar.pdf', preprosess = 0)
-
-
-#--------Figurer som muligens er ute--------------
-RyggFigGjsnBox(RegData=RegData, aar = rappAar-1, valgtVar ='smBeinEndrPre',  preprosess = 0,
-               ktr=2, outfile='FigBeinsmEndrPre.pdf')
-
-
-RyggFigAndeler(RegData=RegData1aar, preprosess = 0, valgtVar='alder', datoFra=datoFra1aar, datoTil=datoTil, outfile='FigAlderFord.pdf')
-
-RyggFigAndeler(RegData=RegData1aar, preprosess = 0, valgtVar='BMI', datoFra=datoFra, datoTil=datoTil,
-               outfile='FigBMI.pdf')
-
-RyggFigGjsnBox(RegData=RegData, outfile='OswEndrPro.pdf',
-               aar=startAar:(rappAar-1), valgtVar='OswEndr', hovedkat=1, ktr=2)
-RyggFigGjsnBox(RegData=RegData, outfile='OswEndrSS.pdf',
-               aar=startAar:(rappAar-1), valgtVar='OswEndr', hovedkat=9, ktr=2)
-
-RyggFigGjsnGrVar(RegData=RegData, outfile='OswEndrAvdPro.pdf', Ngrense = 20,
-                 aar=c((rappAar-2):(rappAar-1)),
-                 valgtVar='OswEndr', hovedkat=1, tidlOp=4, hastegrad=1, ktr=ktr)
-RyggFigGjsnGrVar(RegData=RegData, outfile='OswEndrAvdSS.pdf', Ngrense = 20,
-                 aar=c((rappAar-2):(rappAar-1)),
-                 valgtVar='OswEndr', hovedkat=9, tidlOp=4, ktr=ktr)
-
-
-RyggFigAndelTid(RegData=RegData, outfile='Osw20TidPro.pdf',
-                aar=c((rappAar-2):(rappAar-1)), valgtVar='OswEndr20', hovedkat=1, ktr=ktr)
-RyggFigAndelTid(RegData=RegData, outfile='Osw30TidSS.pdf',
-                aar=c((rappAar-2):(rappAar-1)), valgtVar='OswEndr30pst', hovedkat=9, ktr=ktr)
-
-RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidPro.pdf',
-               aar=c((rappAar-2):(rappAar-1)), valgtVar='OswEndr', hovedkat=1, ktr=ktr)
-
-RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidSS.pdf',
-               aar=c((rappAar-2):(rappAar-1)), valgtVar='OswEndr', hovedkat=9, ktr=ktr)
-
-RyggFigAndelStabelTid(RegData=RegData, aar=startAar:(rappAar-1), outfile='FigNyttePro.pdf', valgtVar='Nytte',
-                      hovedkat=1, ktr=ktr)
-
-RyggFigAndelStabelTid(RegData=RegData, aar=startAar:(rappAar-1), outfile='FigNytteSS.pdf', valgtVar='Nytte',
-                      hovedkat=9, ktr=ktr)
-FornoydProTid <- RyggFigAndelStabelTid(RegData=RegData, outfile='FigFornoydPro.pdf',
-                                       valgtVar='Fornoyd', hovedkat=1, aar=startAar:(rappAar-1), ktr=ktr)
-FornoydSSTid <- RyggFigAndelStabelTid(RegData=RegData, outfile='FigFornoydSS.pdf',
-                                      valgtVar='Fornoyd', hovedkat=9, aar=startAar:(rappAar-1), ktr=ktr)
-
-RyggFigGjsnBox(RegData=RegData, valgtVar='Liggedogn', datoFra=datoFra, datoTil=datoTil,
-               hovedkat = 1, outfile='LiggetidProlaps.pdf') #
-
-
-
-RyggFigAndelerGrVar(valgtVar='SympVarighUtstr', RegData=RegData1aar, datoFra=datoFra1aar, hovedkat=1,
-                           preprosess = 0, outfile='VarighUtstrAvdPro.pdf')
-RyggFigAndelerGrVar(valgtVar='SympVarighUtstr', RegData=RegData1aar, datoFra=datoFra1aar, hovedkat=9,
-                           preprosess = 0, outfile='VarighUtstrAvdSS.pdf')
-
-RyggFigAndelTid(valgtVar='SympVarighUtstr', RegData=RegData,
-                       preprosess = 0, hovedkat=9,outfile='VarighUtstrTidSS.pdf')
-
-
-RyggFigAndelerGrVar(valgtVar='SymptVarighRyggHof', RegData=RegData1aar, datoFra=datoFra1aar, hovedkat=1,
-                           preprosess = 0, outfile='VarighRyggHofAvdPro.pdf')
-RyggFigAndelerGrVar(valgtVar='SymptVarighRyggHof', RegData=RegData1aar, datoFra=datoFra1aar, hovedkat=9,
-                           preprosess = 0, outfile='VarighRyggHofAvdSS.pdf')
-
-
 
 
 

@@ -357,6 +357,7 @@ tabPanel(p('Fordelinger',
                                   'Søkt erstatning?' = 'erstatningPre',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
+                                  'Trygg kirurgi-prosedyre utført' = 'tryggKir',
                                   'Utdanning (høyeste fullførte)' = 'utd'
                       ),
                       selected = c('Registreringsforsinkelse' = 'regForsinkelse')
@@ -420,6 +421,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
                          'Kval.ind: Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
                          'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
+                         'Kval.ind: Trygg kirurgi-prosedyre utført' = 'tryggKir',
                          'Alder over 70 år' = 'alder70',
                          'Antibiotika' = 'antibiotika',
                          'Arbeidsstatus' = 'arbstatus',

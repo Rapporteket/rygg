@@ -51,7 +51,7 @@
 #'
 #' @return Returnerer filtrert versjon av RegData
 #' @export
-RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil='3000-01-01', minald=0, maxald=110,
+RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil=Sys.Date(), minald=0, maxald=110,
                           erMann='', hovedkat=99, aar=0, tidlOp=99, hastegrad=99, #hastegrad=99,
                           enhetsUtvalg=0, reshID=0, fargepalett='BlaaOff') {
 

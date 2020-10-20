@@ -82,47 +82,30 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 #' Generere data til Resultatportalen
 #'
 #' @param filUt tilnavn for utdatatabell (fjern?)
-#' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr
-#' @inheritParams RyggFigAndeler
+#' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
+#' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
 #' @inheritParams RyggUtvalgEnh
 #' @return Datafil til Resultatportalen
 #' @export
 
-dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0,
-                                    hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
+dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
+                           indID = 'indDummy', hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
 
-#2019-09-11: hovedkategori er ikke definert! Inntil videre
-  #   if (valgtVar=='symptVarighUtstr_pro') {
-  #   valgtVar <- 'sympVarighUtstr'
-  #   hovedkat <- 1}
-  # if (valgtVar=='beinsmLavPre_pro') {
-  #   valgtVar <- 'beinsmLavPre'
-  #   hovedkat <- 1}
-  # if (valgtVar=='kpInf3Mnd_pro') {
-  #   valgtVar <- 'kpInf3Mnd'
-  #   hovedkat <- 1}
-  # if (valgtVar=='kpInf3Mnd_SS') {
-  #   valgtVar <- 'kpInf3Mnd'
-  #   hovedkat <- 8}
-  # if (valgtVar=='peropKompDura_proPrimElek') {
-  #   valgtVar <- 'peropKompDura'
-  #   hovedkat <- 1
-  #   tidlOp <- 4
-  #   hastegrad <- 1}
-  # if (valgtVar=='peropKompDura_SSPrimElek') {
-  #   valgtVar <- 'peropKompDura'
-  #   hovedkat <- 8}
 
-  filUt <- paste0('RyggTilOff', ifelse(filUt=='dummy',  valgtVar, filUt), '.csv')
-  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, figurtype = 'andelGrVar')
-  RyggUtvalg <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
-                              tidlOp=tidlOp, hovedkat=hovedkat) #datoFra = datoFra) #) # #, datoTil=datoTil)
-  RegData <- RyggUtvalg$RegData
-  RyggTilOffvalgtVar <- RegData[,c('Aar', "ShNavn", "ReshId", "Variabel")]
-  info <- c(RyggVarSpes$tittel, RyggUtvalg$utvalgTxt)
-  RyggTilOffvalgtVar$info <- c(info, rep(NA, dim(RyggTilOffvalgtVar)[1]-length(info)))
-  #write.table(RyggTilOffvalgtVar, file = paste0('A:/Resultatportalen/', filUt), sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
-  return(invisible(RyggTilOffvalgtVar))
+  filUt <- paste0('Rygg', ifelse(filUt=='dummy',  valgtVar, filUt), '.csv')
+  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
+  RegData <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
+                              tidlOp=tidlOp, hovedkat=hovedkat)$RegData      #datoFra = datoFra) #) # #, datoTil=datoTil)
+  #RegData <- RyggUtvalg$RegData
+  # Aar	ReshId	Teller Ind1	Nevner Ind1	  AarID	   Indikator
+  #2014	103469	  0	          1	       2014103469	  ind1
+  RegDataUt <- RegData[,c('Aar', "ReshId", "ShNavn", "Variabel")]
+  RegDataUt<- dplyr::rename(RegDataUt, Teller = Variabel)
+  RegDataUt$Nevner <- 1
+  RegDataUt$AarID <- paste0(RegDataUt$Aar, RegDataUt$ReshId)
+  RegDataUt$Indikator <- indID
+  write.table(RegDataUt, file = filUt, sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
+  return(invisible(RegDataUt))
 }
 
 

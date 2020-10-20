@@ -5,7 +5,7 @@
 \title{Søylediagram med andeler for hver grupperingsenhet (sykehus, RHF, ...)}
 \usage{
 RyggFigAndelerGrVar(
-  RegData,
+  RegData = 0,
   valgtVar = "alder70",
   datoFra = "2007-01-01",
   datoTil = "3000-12-31",
@@ -24,7 +24,8 @@ RyggFigAndelerGrVar(
   ktr = 0,
   Ngrense = 10,
   reshID = 0,
-  outfile = ""
+  outfile = "",
+  ...
 )
 }
 \arguments{

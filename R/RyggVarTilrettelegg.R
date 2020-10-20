@@ -866,6 +866,19 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             sortAvtagende <- F #}
       }
 
+      if (valgtVar == 'tryggKir') { #fordeling, AndelGrVar, AndelTid
+         #Legeskjema. Andel med UforetrygdPre ja og planlegger. Innført V3
+         tittel <- 'Ble "trygg kirurgi"-prosedyre gjennomført?'
+         #retn <- 'H'
+         grtxt <- c('Nei', 'Ja, ved start', 'Ja, ved avslutning', 'Ja, start/avslutn.', 'Ikke utfylt')
+         RegData$VariabelGr <- factor(RegData$SafeSurgery, levels = c(0:3,9))
+         if (figurtype %in% c('andelGrVar', 'andelTid')){
+            RegData <- RegData[which(RegData$SafeSurgery %in% 0:3), ]
+            RegData$Variabel[which(RegData$SafeSurgery %in% c(1:3))] <- 1
+            varTxt <- 'trygg kirurgi'
+            KImaalGrenser <- c(0,95,100)
+            sortAvtagende <- T}
+      }
 
       if (valgtVar == 'uforetrygdPre') { #fordeling, AndelGrVar, AndelTid
             #PasientSkjema. Andel med UforetrygdPre ja og planlegger
