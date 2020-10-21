@@ -355,15 +355,17 @@ write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
 
 #---Nøkkelinformasjon, Resultatportalen------
 #---- R Y G G
-#Til forside årsrapport:
-load('A:/Rygg/Rygg2010-2018aarsrapp.Rdata')
-RyggData <- RyggPreprosess(RegData)
+
+RyggData <- RyggPreprosess(RegData=RyggRegDataSQLV2V3())
 antSh <- colSums(table(as.character(RyggData$ShNavn),RyggData$Aar)>0)
 antOp <- table(RyggData$Aar)
 
 #Andel som svarer på oppfølging 3 og 12 mnd.
-andelSvart3mnd <- tapply(RyggData$Utfylt3Mnd,RyggData$Aar, FUN='mean', na.rm=T)
-andelSvart12mnd <- tapply(RyggData$Utfylt12Mnd,RyggData$Aar, FUN='mean', na.rm=T)
+ind <- RyggData$Ferdigstilt1b3mnd %in% 0:1
+#andelSvart3mnd <- tapply(RyggData$Ferdigstilt1b3mnd,RyggData$Aar, FUN='mean', na.rm=T)
+#andelSvart12mnd <- tapply(RyggData$Ferdigstilt1b12mnd,RyggData$Aar, FUN='mean', na.rm=T)
+andelSvart3mnd <- tapply(RyggData$Ferdigstilt1b3mnd==1, RyggData$Aar, FUN='sum', na.rm=T)
+andelSvart12mnd <- tapply(RyggData$Ferdigstilt1b12mnd==1, RyggData$Aar, FUN='sum', na.rm=T)
 
 RyggData$over70 <- 0
 RyggData$over70[RyggData$Alder>=70] <- 1
@@ -426,7 +428,7 @@ NokkeltallRygg <- rbind(
   'Verre 12 mnd. etter' = andelVerre
 )
 tabNokkeltallRygg <- cbind(row.names(NokkeltallRygg),NokkeltallRygg)
-tabNokkeltallRygg[,c('2017','2018')]
+tabNokkeltallRygg[,c('2017','2018', '2019')]
 
 #write.table(tabNokkeltallRygg, file = 'A:/Resultatportalen/NokkeltallRygg.csv', row.names=F, sep=';', fileEncoding = 'UTF-8' )
 

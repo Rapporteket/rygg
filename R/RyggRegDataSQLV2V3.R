@@ -142,7 +142,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
                              PasientID = PID, #En pasient vil skifte id fra 2019.
                              RokerV2 = Roker,
                              #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
-                             SykehusNavn = AvdNavn
+                             SykehusNavn = AvdNavn,
+                             Ferdigstilt1b3mnd = Utfylt3Mnd,
+                             Ferdigstilt1b12mnd = Utfylt12Mnd
   )
 
 
