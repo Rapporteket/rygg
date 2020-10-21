@@ -295,7 +295,6 @@ valgteAar <- 2011:2019
 DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='sympVarighUtstr', aar=valgteAar,
                              indID = 'ind1' ,
                              hovedkat=1, filUt = 'ind1_Varighet_bensmerter_Rygg')
-head(DataTilRes)
 
 #--Bensmerter mindre eller lik 3 på numerisk smerteskala
 DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='smBePreLav', aar=valgteAar, hovedkat=1,
@@ -338,7 +337,7 @@ DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='OswEndr20',
                              hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2,
                              aar=valgteAar, filUt = 'ind9_OswEndr20poengPro_Rygg')
 
-DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='OswEndr30pstSS',
+DataTilRes <- dataTilResPort(RegData = RyggData, valgtVar='OswEndr30pst',
                              indID = 'ind10',
                              hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2,
                              aar=valgteAar, filUt = 'ind10_OswEndr30pstPro_Rygg')
@@ -356,7 +355,38 @@ write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
 #---Nøkkelinformasjon, Resultatportalen------
 #---- R Y G G
 
-RyggData <- RyggPreprosess(RegData=RyggRegDataSQLV2V3())
+RyggData <- RyggPreprosess(
+  RegData=RyggRegDataSQLV2V3())
+RyggData <- RyggUtvalgEnh(RegData = RyggData, datoFra = '2019-01-01', datoTil = '2019-12-31')$RegData
+
+FornoydData <- RyggVarTilrettelegg(RegData = RyggData,
+                                   valgtVar = 'fornoydhet', ktr = 1, figurtype = 'andelGrVar')$RegData
+BedreData <- RyggVarTilrettelegg(RegData = RyggData,
+                                   valgtVar = 'nytte', ktr = 1, figurtype = 'andelGrVar')$RegData
+VerreData <- RyggVarTilrettelegg(RegData = RyggData,
+                                 valgtVar = 'verre', ktr = 1, figurtype = 'andelGrVar')$RegData
+VentetidKirData <- RyggVarTilrettelegg(RegData = RyggData,
+                                 valgtVar = 'ventetidSpesOp', ktr = 1, figurtype = 'andelGrVar')$RegData
+
+NokkeltallRygg <- rbind(
+  'Antall avdelinger' = length(unique((RyggData$ShNavn))),
+  'Antall operasjoner' = dim(RyggData)[1],
+  'Svart på oppfølging, 3 mnd.' = mean(RyggData$Ferdigstilt1b3mnd==1, na.rm=T),
+  'Andel over 70 år'	= mean(RyggData$Alder>=70, na.rm=T),
+  'Gjennomsnittsalder' = mean(RyggData$Alder, na.rm=T),
+  'Andel kvinner' = 1-mean(RyggData$ErMann, na.rm=T),
+  'Fornøyd med behandlingen, 3 mnd. etter' = mean(FornoydData$Variabel),
+  'Helt restituert/mye bedre, 3 mnd. etter' = mean(BedreData$Variabel),
+  'Verre 3 mnd. etter' = mean(VerreData$Variabel),
+  'Ventet <3 mnd fra operasjon bestemt til kirurgi utført' = mean(VentetidKirData$Variabel)
+)
+
+tabNokkeltallRygg <- cbind(row.names(NokkeltallRygg),NokkeltallRygg)
+write.table(tabNokkeltallRygg, file = 'NokkeltallRygg.csv', row.names=F, sep=';', fileEncoding = 'UTF-8' )
+
+
+
+# 2011:2018-tall
 antSh <- colSums(table(as.character(RyggData$ShNavn),RyggData$Aar)>0)
 antOp <- table(RyggData$Aar)
 
@@ -364,8 +394,8 @@ antOp <- table(RyggData$Aar)
 ind <- RyggData$Ferdigstilt1b3mnd %in% 0:1
 #andelSvart3mnd <- tapply(RyggData$Ferdigstilt1b3mnd,RyggData$Aar, FUN='mean', na.rm=T)
 #andelSvart12mnd <- tapply(RyggData$Ferdigstilt1b12mnd,RyggData$Aar, FUN='mean', na.rm=T)
-andelSvart3mnd <- tapply(RyggData$Ferdigstilt1b3mnd==1, RyggData$Aar, FUN='sum', na.rm=T)
-andelSvart12mnd <- tapply(RyggData$Ferdigstilt1b12mnd==1, RyggData$Aar, FUN='sum', na.rm=T)
+andelSvart3mnd <- tapply(RyggData$Ferdigstilt1b3mnd==1, RyggData$Aar, FUN='mean', na.rm=T)
+andelSvart12mnd <- tapply(RyggData$Ferdigstilt1b12mnd==1, RyggData$Aar, FUN='mean', na.rm=T)
 
 RyggData$over70 <- 0
 RyggData$over70[RyggData$Alder>=70] <- 1
@@ -406,31 +436,35 @@ andelEndring <- function(Data, ktr=2){
 }
 endring <- andelEndring(RyggData, ktr=1)
 andelSuksess3mnd <- andelEndring(RyggData, ktr=1)$Suksess
-andelSuksess12mnd <- andelEndring(RyggData, ktr=2)$Suksess
+#andelSuksess12mnd <- andelEndring(RyggData, ktr=2)$Suksess
 andelVerre3mnd <- andelEndring(RyggData, ktr=1)$Verre
-andelVerre12mnd <- andelEndring(RyggData, ktr=2)$Verre
+#andelVerre12mnd <- andelEndring(RyggData, ktr=2)$Verre
+RegData <- RegData[which(RegData$VentetidSpesialistTilOpr %in% 1:4),]
+RegData$Variabel[which(RegData$VentetidSpesialistTilOpr == 1)] <- 1
 
+andelVentetUnder3mnd <- RegData[which(RegData$VentetidSpesialistTilOpr %in% 1:4),]
+RegData$Variabel[which(RegData$VentetidSpesialistTilOpr == 1)] <- 1
 
 NokkeltallRygg <- rbind(
   'Antall avdelinger' = antSh,
   'Antall operasjoner' = antOp,
   'Svart på oppfølging, 3 mnd.' = andelSvart3mnd,
-  'Svart på oppfølging, 12 mnd.' = andelSvart12mnd,
+#  'Svart på oppfølging, 12 mnd.' = andelSvart12mnd,
   'Andel over 70 år'	= andel70aar,
   'Gjennomsnittsalder' = alderGjsn,
   #   'Medianalder' = alderMedian,
   'Andel kvinner' = andelKvinner,
   'Fornøyd med behandlingen, 3 mnd. etter' = andelFornoyd3mnd,
-  'Fornøyd med behandlingen, 12 mnd. etter' = andelFornoyd12mnd,
-  'Helt restituert/mye bedre, 3 mnd. etter' = andelSuksess,
-  'Helt restituert/mye bedre, 12 mnd. etter' = andelSuksess,
-  'Verre 3 mnd. etter' = andelVerre,
-  'Verre 12 mnd. etter' = andelVerre
+#  'Fornøyd med behandlingen, 12 mnd. etter' = andelFornoyd12mnd,
+  'Helt restituert/mye bedre, 3 mnd. etter' = andelSuksess3mnd,
+#  'Helt restituert/mye bedre, 12 mnd. etter' = andelSuksess12mnd,
+  'Verre 3 mnd. etter' = andelVerre3mnd,
+#  'Verre 12 mnd. etter' = andelVerre12mnd
 )
 tabNokkeltallRygg <- cbind(row.names(NokkeltallRygg),NokkeltallRygg)
 tabNokkeltallRygg[,c('2017','2018', '2019')]
 
-#write.table(tabNokkeltallRygg, file = 'A:/Resultatportalen/NokkeltallRygg.csv', row.names=F, sep=';', fileEncoding = 'UTF-8' )
+write.table(tabNokkeltallRygg, file = 'NokkeltallRygg.csv', row.names=F, sep=';', fileEncoding = 'UTF-8' )
 
 RyggFigAndeler(RyggData, valgtVar = 'nytte', ktr=2, aar = 2017, outfile = 'NytteFord.png')
 

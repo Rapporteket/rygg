@@ -107,6 +107,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
     'Aleris, Bergen' = 'Aleris Bergen',
     'Aleris, Oslo' = 'Aleris Oslo',
+    'Larvik' = 'Tønsberg',
     'Oslofjordklinikken Øst' = 'Oslofjordklinikken',
     'Teres Colloseum, Oslo' = 'Aleris Oslo',
     'Teres Colloseum, Stavanger'  = 'Aleris Stavanger',
