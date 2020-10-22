@@ -79,31 +79,97 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 }
 
 
-#' Generere data til Resultatportalen
+#' Generere data til Resultatportalen/SKDE-viser
 #'
 #' @param filUt tilnavn for utdatatabell (fjern?)
 #' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
 #' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
+#' @param ResPort 1-hvis data til resultatportalen (standard), 0-data til SKDE-viser
 #' @inheritParams RyggUtvalgEnh
 #' @return Datafil til Resultatportalen
 #' @export
 
-dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
-                           indID = 'indDummy', hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
+dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
+                           indID = 'indDummy', ResPort=1,
+                           hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
 
 
-  filUt <- paste0('Rygg', ifelse(filUt=='dummy',  valgtVar, filUt), '.csv')
+  filUt <- paste0('Rygg', ifelse(filUt=='dummy',  valgtVar, filUt), c('_SKDE', '_ResPort')[ResPort+1],'.csv')
   RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
   RegData <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
                               tidlOp=tidlOp, hovedkat=hovedkat)$RegData      #datoFra = datoFra) #) # #, datoTil=datoTil)
-  #RegData <- RyggUtvalg$RegData
-  # Aar	ReshId	Teller Ind1	Nevner Ind1	  AarID	   Indikator
-  #2014	103469	  0	          1	       2014103469	  ind1
-  RegDataUt <- RegData[,c('Aar', "ReshId", "ShNavn", "Variabel")]
-  RegDataUt<- dplyr::rename(RegDataUt, Teller = Variabel)
-  RegDataUt$Nevner <- 1
-  RegDataUt$AarID <- paste0(RegDataUt$Aar, RegDataUt$ReshId)
-  RegDataUt$Indikator <- indID
+
+  if (ResPort == 1){
+    #Variabler: Aar	ReshId	Teller Ind1	Nevner Ind1	  AarID	   Indikator
+    #          2014	103469	  0	          1	       2014103469	  ind1
+    RegDataUt <- RegData[,c('Aar', "ReshId", "ShNavn", "Variabel")]
+    RegDataUt<- dplyr::rename(RegDataUt, Teller = Variabel)
+    RegDataUt$AarID <- paste0(RegDataUt$Aar, RegDataUt$ReshId)
+    RegDataUt$Indikator <- indID
+    RegDataUt$Nevner <- 1
+  }
+
+  if (ResPort == 0){
+    #Variabler: year, orgnr, var, denominator, ind_id
+    RegDataUt <- RegData[,c('Aar', "ReshId", "Variabel")]
+    RegDataUt$ind_id <- indID
+    RegDataUt$denominator <- 1
+  # nytt navn = gammelt navn
+    RegDataUt <- dplyr::rename(RegDataUt,
+                           year = Aar,
+                           var = Variabel)
+
+  #Legge på orgID ("Sykehusviser")
+  #ReshId	orgnr	RapporteketNavn	SKDEnavn
+  nyID <- c('999976' = '974706490',	#Ahus	Ahus
+            '107508' = '974518821',	#Aleris Bergen	Aleris Bergen
+            '107240' = '879595762',	#Aleris Drammen	Aleris Drammen
+            '999975' = '981541499',	#Aleris Oslo	Aleris Colosseum Nobel
+            '999994' = '983896383',	#Aleris Stavanger	Aleris Colosseum Stavanger
+            '100133' = '974631091',	#Arendal	Arendal
+            '100968' = '974795361',	#Bodø	Bodø
+            '103094' = '974705788',	#Bærum	Bærum
+            '103618' = '974631326',	#Drammen	Drammen
+            '111127' = '974631768',	#Elverum	Elverum
+            '100415' = '974595214',	#Flekkefjord	Flekkefjord
+            '100316' = '974744570',	#Førde	Førde
+            '111150' = '974632535',	#Gjøvik	Gjøvik
+            '999978' = '974724774',	#Haugesund	Haugesund
+            '105588' = '974557746',	#Haukeland, nevrokir	Haukeland
+            '111961' = '974557746',	#Haukeland, ort	Haukeland
+            '4209772' = '887987122',	#Ibsensykehuset	Ibsensykehuset Porsgrunn
+            '100407' = '974733013',	#Kristiansand	Kristiansand
+            '111068' = '974746948',	#Kristiansund	Kristiansund
+            '102949' = '874743372',	#Kysthospitalet Hagevik	Kysthospitalet i Hagevik
+            '105798' = '974754118',	#Levanger	Levanger
+            '111185' = '874632562',	#Lillehammer	Lillehammer
+            '110633' = '974116588',	#Martina Hansens	Martina Hansens hospital
+            '111065' = '974745569',	#Molde	Molde
+            '105899' = '974753898',	#Namsos	Namsos
+            '104279' = '972140295',	#NIMI	NIMI
+            '999998' = '991835083',	#Oslofjordklinikken	Oslofjordklinikken Sandvika
+            '999920' = '913758862',	#Oslofjordklinikken Vest	Oslofjordklinikken Sandnes
+            '102224' = '974795515',	#Rana	Mo i Rana
+            '103469' = '874716782',	#Rikshospitalet, nevrokir	Rikshospitalet
+            '103240' = '874716782',	#Rikshospitalet, ort	Rikshospitalet
+            '1491' = '974633191',	#Skien	Skien
+            '105783' = '974749025',	#St.Olavs, nevrokir	St. Olavs
+            '102467' = '974749025',	#St.Olavs, ort	St. Olavs
+            '114288' = '974703300',	#Stavanger, nevrokir	Stavanger
+            '105403' = '974703300',	#Stavanger, ort	Stavanger
+            '601161' = '974795787',	#Tromsø	Tromsø
+            '105153' = '974633574',	#Larvik	Tønsberg
+            '109820' = '974589095',	#Ullevål, nevrokir	Ullevål
+            '999995' = '974589095',	#Ullevål, ort	Ullevål
+            '102484' = '974747545',	#Volda	Volda
+            '999999' = '953164701',	#Volvat	Volvat
+            '107981' = '974633655',	#Østfold	Askim
+            '102483' = '974747138'	#Ålesund	Ålesund
+  )
+  RegDataUt$orgnr <- as.character(nyID[as.character(RegDataUt$ReshId)])
+  RegDataUt <- RegDataUt[ ,c('year', 'orgnr', 'var', 'denominator', 'ind_id')]
+    }
+
   write.table(RegDataUt, file = filUt, sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
   return(invisible(RegDataUt))
 }
