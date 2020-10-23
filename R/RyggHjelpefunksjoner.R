@@ -111,7 +111,7 @@ dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01
 
   if (ResPort == 0){
     #Variabler: year, orgnr, var, denominator, ind_id
-    RegDataUt <- RegData[,c('Aar', "ReshId", "Variabel")]
+    RegDataUt <- RegData #[,c('Aar', "ReshId", "Variabel")]
     RegDataUt$ind_id <- indID
     RegDataUt$denominator <- 1
   # nytt navn = gammelt navn
@@ -138,6 +138,7 @@ dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01
             '105588' = '974557746',	#Haukeland, nevrokir	Haukeland
             '111961' = '974557746',	#Haukeland, ort	Haukeland
             '4209772' = '887987122',	#Ibsensykehuset	Ibsensykehuset Porsgrunn
+            '999900' = '920500234', #Kolibri Medical Group  Kolibri Sandnes
             '100407' = '974733013',	#Kristiansand	Kristiansand
             '111068' = '974746948',	#Kristiansund	Kristiansund
             '102949' = '874743372',	#Kysthospitalet Hagevik	Kysthospitalet i Hagevik
@@ -162,7 +163,7 @@ dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01
             '109820' = '974589095',	#Ullevål, nevrokir	Ullevål
             '999995' = '974589095',	#Ullevål, ort	Ullevål
             '102484' = '974747545',	#Volda	Volda
-            '999999' = '953164701',	#Volvat	Volvat
+            '110771' = '953164701',	#Volvat	Volvat
             '107981' = '974633655',	#Østfold	Askim
             '102483' = '974747138'	#Ålesund	Ålesund
   )
