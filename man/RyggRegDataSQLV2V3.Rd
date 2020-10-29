@@ -7,7 +7,7 @@
 RyggRegDataSQLV2V3(
   datoFra = "2007-01-01",
   datoTil = "2099-01-01",
-  alleVarV3 = 0
+  alleVarV3 = 1
 )
 }
 \arguments{
@@ -15,11 +15,12 @@ RyggRegDataSQLV2V3(
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
 
-\item{alleVarV3}{0: fjerner variabler som ikke er i bruk på Rapporteket (standard), 1: har med alle variabler fra V3}
+\item{alleVarV3}{0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
+1: har med alle variabler fra V3}
 }
 \value{
-RegData data frame
+RegData, dataramme med data f.o.m. 2007.
 }
 \description{
-Henter data for Degenerativ Rygg fra "staging" (?)
+Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3
 }

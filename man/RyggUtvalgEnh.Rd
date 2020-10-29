@@ -7,7 +7,7 @@
 RyggUtvalgEnh(
   RegData,
   datoFra = "2009-01-01",
-  datoTil = "3000-01-01",
+  datoTil = Sys.Date(),
   minald = 0,
   maxald = 110,
   erMann = "",
@@ -73,7 +73,7 @@ Funksjon som gjør utvalg i datagrunnlaget til registreringene for Nakke
 }
 \details{
 Funksjon som gjør utvalg av dataene, returnerer det reduserte datasettet og utvalgsteksten.
-Gjøre ingen utvalg, vil alle data vises.
+Gjøres ingen utvalg, vil alle data vises.
 
 Argumentet \emph{enhetsUtvalg} har følgende valgmuligheter:
 \itemize{

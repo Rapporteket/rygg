@@ -28,10 +28,14 @@
 
 
 RyggFigGjsnGrVar <- function(RegData, valgtVar, valgtMaal='Gjsn', datoFra='2007-01-01', datoTil='3000-12-31', aar=0,
-                             minald=0, maxald=130, erMann=99, hovedkat=99, tidlOp='', hentData=0, preprosess=1,
+                             minald=0, maxald=130, erMann=99, hovedkat=99, tidlOp=99, hentData=0, preprosess=1,
                              hastegrad=99, enhetsUtvalg=0, grVar='ShNavn', tittel=1, ktr=0, Ngrense=10, medKI=1, reshID=0,
-                             outfile='') {
+                             outfile='',...) {
 
+
+  if ("session" %in% names(list(...))) {
+    raplog::repLogger(session = list(...)[["session"]], msg = paste0("AndelGrVar: ", valgtVar))
+  }
 
 if (hentData == 1) {
   RegData <- RyggRegDataSQL()
@@ -46,16 +50,16 @@ if (preprosess == 1){
 	RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'gjsnGrVar')
 	RegData <- RyggVarSpes$RegData
     sortAvtagende <- RyggVarSpes$sortAvtagende
+    KImaal <- RyggVarSpes$KImaal
+    KImaaltxt <- RyggVarSpes$KImaaltxt
+
 
 #------- Gjøre utvalg
 RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                             minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                             hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
                             enhetsUtvalg=enhetsUtvalg) #, grType=grType
-smltxt <- RyggUtvalg$smltxt
-medSml <- RyggUtvalg$medSml
 utvalgTxt <- RyggUtvalg$utvalgTxt
-ind <- RyggUtvalg$ind
 hovedgrTxt <- RyggUtvalg$hovedgrTxt
 RegData <- RyggUtvalg$RegData
 
@@ -67,16 +71,18 @@ RegData[ ,grVar] <- as.character(RegData[ ,grVar])
 #Grupper som ikke har registreringer vil nå ikke komme med i oversikta. Gjøres dette tidligere, vil alle
 #grupper komme med uansett om de ikke har registreringer.
 
+RegData$grVar <- RegData[,grVar]
+#Ngr <- table(RegData$grVar)
+if(dim(RegData)[1]>0) {
+  Ngr <- table(RegData[ ,grVar])}	else {Ngr <- 0}
+
 t1 <- switch(valgtMaal,
 			Med = 'Median ',
 			Gjsn = 'Gjennomsnittlig ')
 
-#tittel <- paste0(t1, valgtVar, ', ', RyggUtvalg$grTypeTxt, 'sykehus')
 tittel <- paste0(t1, RyggVarSpes$tittel)
 
-RegData$grVar <- RegData[,grVar]
 N <- dim(RegData)[1]
-Ngr <- table(RegData$grVar)
 
 indGrUt <- which(Ngr < Ngrense) #Grupper som har for få observasjoner
 ShUt <- names(Ngr[indGrUt])
@@ -86,20 +92,17 @@ antGr <- length(Ngr)-antGrUt
 if (antGrUt==0) { indGrUt <- length(Ngr)+1}
 indUt <- which(RegData$grVar %in% ShUt)
 indMed <- which(!(RegData$grVar %in% ShUt))
-Nut <- ifelse(antGrUt==0, NULL, length(indUt))
-antGrUt <- ifelse(Nut==0, NULL, length(indGrUt))
+Nut <- ifelse(antGrUt==0, 0, length(indUt)) #ifelse(antGrUt==0, NULL, length(indUt))
+#antGrUt <- ifelse(Nut==0, NULL, length(indGrUt))
 Ngr <- Ngr[-indGrUt]
 GrNavn <- names(Ngr)
 
-#indGrMed <- which(Ngr >= Ngrense)
-#antGr <- length(indGrMed)	#Alle som har gyldig resultat
 
 KIHele <- c(0,0)
 KIned <- c(0,0)
 KIhele <- c(0,0)
 MidtUt <- NULL
 
-#dummy0 <- -1 #NA
 #Kommer ut ferdig sortert!
 
 if (valgtMaal=='Med') {
@@ -148,7 +151,7 @@ if (valgtMaal=='Med') {
 
 if (valgtMaal=='Gjsn') {	#Gjennomsnitt er standard, men må velges.
       Gjsn <- tapply(RegData$Variabel[indMed], RegData[indMed, grVar], mean, na.rm=T)
-	SE <- tapply(RegData$Variabel[indMed], RegData[indMed, grVar], sd, na.rm=T)/sqrt(Ngr[Ngr >= Ngrense])
+	SE <- tapply(RegData$Variabel[indMed], RegData[indMed, grVar], sd, na.rm=T)/sqrt(Ngr[Ngr >= Ngrense]) #
 
 	MidtUt <- mean(RegData$Variabel[indUt])	#mean(RegData$Variabel)
 	KIUt <- MidtUt + sd(RegData$Variabel[indUt])/sqrt(Nut)*c(-2,2)
@@ -163,7 +166,7 @@ if (valgtMaal=='Gjsn') {	#Gjennomsnitt er standard, men må velges.
 	KIopp <- c(Gjsn + 2*SE, KIUt[2])[sortInd]
 	}
 
-navnNut <- ifelse(Nut<Ngrense, NULL,'')
+#navnNut <- ifelse(Nut<Ngrense, NULL,'')
 Ngr <- c(as.character(Ngr), Nut) #Ngr[sortInd]
 Ngrtxt <- paste0(' (', Ngr[sortInd],')' ) #[-indGrUt]
 GrNavnSort <- paste0(c(GrNavn, paste0(antGrUt, ' avdelinger med N<', Ngrense))[sortInd], Ngrtxt[sortInd])
@@ -174,6 +177,7 @@ AggVerdier <- list(Hoved=Midt, Rest=0, KIned=KIned, KIopp=KIopp, KIHele=KIHele)
 
 
 
+
 #Se RyggFigSoyler for forklaring av innhold i lista GjsnGrVarData
 GjsnGrVarData <- list(AggVerdier=AggVerdier, #Endres til Soyleverdi? Evt. AggVerdier
                         AggTot=MidtHele, #Til AggVerdiTot?
@@ -181,7 +185,7 @@ GjsnGrVarData <- list(AggVerdier=AggVerdier, #Endres til Soyleverdi? Evt. AggVer
                          Ngr=Ngr,
                          grtxt2='',
 				 medKI=medKI,
-				 KImaal = RyggVarSpes$KImaal,
+				 KImaal = KImaal,
                          soyletxt=soyletxt,
                          grtxt=GrNavnSort,
 				 valgtMaal=valgtMaal,
@@ -189,11 +193,8 @@ GjsnGrVarData <- list(AggVerdier=AggVerdier, #Endres til Soyleverdi? Evt. AggVer
                          #yAkseTxt=yAkseTxt,
                          retn='H',
                          xAkseTxt=RyggVarSpes$xAkseTxt,
-                         grTypeTxt=RyggUtvalg$grTypeTxt,
                          utvalgTxt=RyggUtvalg$utvalgTxt,
-                         fargepalett=RyggUtvalg$fargepalett,
-                         medSml=RyggUtvalg$medSml,
-                         smltxt=RyggUtvalg$smltxt)
+                         fargepalett=RyggUtvalg$fargepalett)
 
 
 #FigDataParam skal inn som enkeltparametre i funksjonskallet
@@ -201,7 +202,6 @@ lagFig <- 1
 if (lagFig == 1) {
 cexgr <- 1-ifelse(length(soyletxt)>20, 0.25*length(soyletxt)/60, 0)
 AggTot <- MidtHele
-KImaal <- RyggVarSpes$KImaal
 
 #---------------------------------------FRA FIGANDELER, FigGjsnGrVar og FigAndelGrVar--------------------------
 #Hvis for få observasjoner..
@@ -210,7 +210,7 @@ if (dim(RegData)[1] < 10 )
     #|(grVar=='' & length(which(RegData$ReshId == reshID))<5 & enhetsUtvalg %in% c(1,3)))
     {
 	#-----------Figur---------------------------------------
-      FigTypUt <-figtype(outfile)  #FigTypUt <- figtype(outfile)
+      FigTypUt <- rapFigurer::figtype(outfile)  #FigTypUt <- figtype(outfile)
 	farger <- FigTypUt$farger
 	plot.new()
 	title(tittel)	#, line=-6)
@@ -225,7 +225,7 @@ if (dim(RegData)[1] < 10 )
 	#Plottspesifikke parametre:
 	#Høyde må avhenge av antall grupper
 	hoyde <- ifelse(length(AggVerdier$Hoved)>20, 3*800, 3*600)
-	FigTypUt <- figtype(outfile, height=hoyde, fargepalett=RyggUtvalg$fargepalett)
+	FigTypUt <- rapFigurer::figtype(outfile, height=hoyde, fargepalett=RyggUtvalg$fargepalett)
 	#Tilpasse marger for å kunne skrive utvalgsteksten
 	NutvTxt <- length(utvalgTxt)
 	vmarg <- switch('H', V=0.04, H=min(1,max(0, strwidth(GrNavnSort, units='figure', cex=cexgr)*0.75)))
@@ -269,7 +269,6 @@ if (dim(RegData)[1] < 10 )
 
 	if (grVar %in% c('ShNavn')) {
 	      #GrNavnSort <- rev(GrNavnSort)
-	      grTypeTxt <- smltxt
 	      mtext(at=posOver, paste0('(N)' ), side=2, las=1, cex=cexgr, adj=1, line=0.25)
 	      #Linje for hele landet/utvalget:
 	      lines(x=rep(AggTot, 2), y=c(minpos, maxpos), col=farger[1], lwd=2.5) #y=c(0, max(pos)+0.55),
@@ -300,7 +299,7 @@ if (dim(RegData)[1] < 10 )
       	             col=farger[1], cex=cexleg, seg.len=0.6, merge=TRUE, bty='n')
 	      } else {
 	            TXT <- c(paste0('totalt: ', sprintf('%.1f', AggTot), ', N=', N),
-	                     paste0('95% konf.int., ', hovedgrTxt,  ' (', #grTypeTxt, 'sykehus..
+	                     paste0('95% konf.int., ', hovedgrTxt,  ' (', # 'sykehus..
 	                            sprintf('%.1f', KIHele[1]), '-', sprintf('%.1f', KIHele[2]), ')'))
       	      legend(xmax/4, posOver+2*posDiff, TXT, fill=c(NA, farger[3]),  border=NA, lwd=2.5,  #inset=c(-0.1,0),
       	             col=c(farger[1], farger[3]), cex=cexleg, seg.len=0.6, merge=TRUE, bty='n')

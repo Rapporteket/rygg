@@ -79,53 +79,105 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 }
 
 
-#' Generere data til Resultatportalen
+#' Generere data til Resultatportalen/SKDE-viser
 #'
 #' @param filUt tilnavn for utdatatabell (fjern?)
-#' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr
-#' @inheritParams RyggFigAndeler
+#' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
+#' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
+#' @param ResPort 1-hvis data til resultatportalen (standard), 0-data til SKDE-viser
 #' @inheritParams RyggUtvalgEnh
 #' @return Datafil til Resultatportalen
 #' @export
 
-dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0,
-                                    hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
-
-#2019-09-11: hovedkategori er ikke definert! Inntil videre
-  #   if (valgtVar=='symptVarighUtstr_pro') {
-  #   valgtVar <- 'sympVarighUtstr'
-  #   hovedkat <- 1}
-  # if (valgtVar=='beinsmLavPre_pro') {
-  #   valgtVar <- 'beinsmLavPre'
-  #   hovedkat <- 1}
-  # if (valgtVar=='kpInf3Mnd_pro') {
-  #   valgtVar <- 'kpInf3Mnd'
-  #   hovedkat <- 1}
-  # if (valgtVar=='kpInf3Mnd_SS') {
-  #   valgtVar <- 'kpInf3Mnd'
-  #   hovedkat <- 8}
-  # if (valgtVar=='peropKompDura_proPrimElek') {
-  #   valgtVar <- 'peropKompDura'
-  #   hovedkat <- 1
-  #   tidlOp <- 4
-  #   hastegrad <- 1}
-  # if (valgtVar=='peropKompDura_SSPrimElek') {
-  #   valgtVar <- 'peropKompDura'
-  #   hovedkat <- 8}
-
-  filUt <- paste0('RyggTilOff', ifelse(filUt=='dummy',  valgtVar, filUt), '.csv')
-  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, figurtype = 'andelGrVar')
-  RyggUtvalg <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
-                              tidlOp=tidlOp, hovedkat=hovedkat) #datoFra = datoFra) #) # #, datoTil=datoTil)
-  RegData <- RyggUtvalg$RegData
-  RyggTilOffvalgtVar <- RegData[,c('Aar', "ShNavn", "ReshId", "Variabel")]
-  info <- c(RyggVarSpes$tittel, RyggUtvalg$utvalgTxt)
-  RyggTilOffvalgtVar$info <- c(info, rep(NA, dim(RyggTilOffvalgtVar)[1]-length(info)))
-  #write.table(RyggTilOffvalgtVar, file = paste0('A:/Resultatportalen/', filUt), sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
-  return(invisible(RyggTilOffvalgtVar))
+dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
+                           indID = 'indDummy', ResPort=1,
+                           hovedkat=99, hastegrad=99, tidlOp='', lastNedFil=0, filUt='dummy'){
 
 
-}#' Beregn andel registrereinger som er ferdigstilt viss lang tid etter operasjon.
+  filUt <- paste0('Rygg', ifelse(filUt=='dummy',  valgtVar, filUt), c('_SKDE', '_ResPort')[ResPort+1],'.csv')
+  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
+  RegData <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
+                              tidlOp=tidlOp, hovedkat=hovedkat)$RegData      #datoFra = datoFra) #) # #, datoTil=datoTil)
+
+  if (ResPort == 1){
+    #Variabler: Aar	ReshId	Teller Ind1	Nevner Ind1	  AarID	   Indikator
+    #          2014	103469	  0	          1	       2014103469	  ind1
+    RegDataUt <- RegData[,c('Aar', "ReshId", "ShNavn", "Variabel")]
+    RegDataUt<- dplyr::rename(RegDataUt, Teller = Variabel)
+    RegDataUt$AarID <- paste0(RegDataUt$Aar, RegDataUt$ReshId)
+    RegDataUt$Indikator <- indID
+    RegDataUt$Nevner <- 1
+  }
+
+  if (ResPort == 0){
+    #Variabler: year, orgnr, var, denominator, ind_id
+    RegDataUt <- RegData #[,c('Aar', "ReshId", "Variabel")]
+    RegDataUt$ind_id <- indID
+    RegDataUt$denominator <- 1
+  # nytt navn = gammelt navn
+    RegDataUt <- dplyr::rename(RegDataUt,
+                           year = Aar,
+                           var = Variabel)
+
+  #Legge på orgID ("Sykehusviser")
+  #ReshId	orgnr	RapporteketNavn	SKDEnavn
+  nyID <- c('999976' = '974706490',	#Ahus	Ahus
+            '107508' = '974518821',	#Aleris Bergen	Aleris Bergen
+            '107240' = '879595762',	#Aleris Drammen	Aleris Drammen
+            '999975' = '981541499',	#Aleris Oslo	Aleris Colosseum Nobel
+            '999994' = '983896383',	#Aleris Stavanger	Aleris Colosseum Stavanger
+            '100133' = '974631091',	#Arendal	Arendal
+            '100968' = '974795361',	#Bodø	Bodø
+            '103094' = '974705788',	#Bærum	Bærum
+            '103618' = '974631326',	#Drammen	Drammen
+            '111127' = '974631768',	#Elverum	Elverum
+            '100415' = '974595214',	#Flekkefjord	Flekkefjord
+            '100316' = '974744570',	#Førde	Førde
+            '111150' = '974632535',	#Gjøvik	Gjøvik
+            '999978' = '974724774',	#Haugesund	Haugesund
+            '105588' = '974557746',	#Haukeland, nevrokir	Haukeland
+            '111961' = '974557746',	#Haukeland, ort	Haukeland
+            '4209772' = '887987122',	#Ibsensykehuset	Ibsensykehuset Porsgrunn
+            '999900' = '920500234', #Kolibri Medical Group  Kolibri Sandnes
+            '100407' = '974733013',	#Kristiansand	Kristiansand
+            '111068' = '974746948',	#Kristiansund	Kristiansund
+            '102949' = '874743372',	#Kysthospitalet Hagevik	Kysthospitalet i Hagevik
+            '105798' = '974754118',	#Levanger	Levanger
+            '111185' = '874632562',	#Lillehammer	Lillehammer
+            '110633' = '974116588',	#Martina Hansens	Martina Hansens hospital
+            '111065' = '974745569',	#Molde	Molde
+            '105899' = '974753898',	#Namsos	Namsos
+            '104279' = '972140295',	#NIMI	NIMI
+            '999998' = '991835083',	#Oslofjordklinikken	Oslofjordklinikken Sandvika
+            '999920' = '913758862',	#Oslofjordklinikken Vest	Oslofjordklinikken Sandnes
+            '102224' = '974795515',	#Rana	Mo i Rana
+            '103469' = '874716782',	#Rikshospitalet, nevrokir	Rikshospitalet
+            '103240' = '874716782',	#Rikshospitalet, ort	Rikshospitalet
+            '1491' = '974633191',	#Skien	Skien
+            '105783' = '974749025',	#St.Olavs, nevrokir	St. Olavs
+            '102467' = '974749025',	#St.Olavs, ort	St. Olavs
+            '114288' = '974703300',	#Stavanger, nevrokir	Stavanger
+            '105403' = '974703300',	#Stavanger, ort	Stavanger
+            '601161' = '974795787',	#Tromsø	Tromsø
+            '105153' = '974633574',	#Larvik	Tønsberg
+            '109820' = '974589095',	#Ullevål, nevrokir	Ullevål
+            '999995' = '974589095',	#Ullevål, ort	Ullevål
+            '102484' = '974747545',	#Volda	Volda
+            '110771' = '953164701',	#Volvat	Volvat
+            '107981' = '974633655',	#Østfold	Askim
+            '102483' = '974747138'	#Ålesund	Ålesund
+  )
+  RegDataUt$orgnr <- as.character(nyID[as.character(RegDataUt$ReshId)])
+  RegDataUt <- RegDataUt[ ,c('year', 'orgnr', 'var', 'denominator', 'ind_id')]
+    }
+if (lastNedFil==1) {
+  write.table(RegDataUt, file = filUt, sep = ';', row.names = F)} #, fileEncoding = 'UTF-8')}
+  return(invisible(RegDataUt))
+}
+
+
+
+#' Beregn andel registrereinger som er ferdigstilt viss lang tid etter operasjon.
 #'
 #'Forsinkelse er strengt tatt registrering og ferdigstillelse etter UtskrivelseDato,
 #' men mht hva som er for sent for å sende ut oppfølgingsskjema, regnes forsinkelse
@@ -138,13 +190,15 @@ dataTilResPort <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', 
 #' @param reshID Avdelingas reshID. Benyttes til å filtrere.
 #' @return
 #' @export
-forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID){
+forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID=0){
   RegData$Diff <- as.numeric(difftime(as.Date(RegData$MedForstLukket),
                                       RegData$OpDato ,units = 'days')) #UtskrivelseDato
   Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
-    dplyr::filter(ReshId == reshID & OpDato > fraDato & (OpDato < tilDato))
+    dplyr::filter(OpDato > fraDato & (OpDato < tilDato))
+
+  if (reshID != 0) {Data <- dplyr::filter(Data, ReshId == reshID)}
   paste0(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T), ' (',
-         100*round(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
+         round(100*sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
 }
 
 

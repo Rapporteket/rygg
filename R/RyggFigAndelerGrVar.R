@@ -57,12 +57,44 @@
 #'
 #' @export
 
-RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil='3000-12-31', aar=0,
+RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-01', datoTil='3000-12-31', aar=0,
                                 minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', hentData=0,
                                 preprosess=1, hastegrad=99, enhetsUtvalg=0, grVar='ShNavn', tittel=1, ktr=0,
-                                Ngrense=10, reshID=0, outfile='') {
+                                Ngrense=10, reshID=0, outfile='', ...) {
+  if ("session" %in% names(list(...))) {
+    raplog::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrShus: ',valgtVar))
+  }
 
-      if (hentData == 1) {
+  if (length(grep('dekn',valgtVar)) == 1) { #Bruke vedlagte dekningsdata
+    #Dekningsgradsfigur
+
+    if (valgtVar == 'dekn19Rygg') {
+      RegData <- read.table('./data-raw/DG2019Rygg.csv', sep=';', header=T, stringsAsFactors = FALSE)
+      Tittel <- 'Dekningsgrad, NKR Degenerativ Rygg, 2019'}
+    if (valgtVar == 'dekn19Nakke') {
+      RegData <- read.table('./data-raw/DG2019Nakke.csv', sep=';', header=T, stringsAsFactors = FALSE)
+      Tittel <- 'Dekningsgrad, NKR Degenerativ Nakke, 2019'}
+    xAkseTxt <- 'dekningsgrad, Rygg'
+    #xAkseTxt <- RyggVarSpes$xAkseTxt
+    Ngr <- RegData$N
+    indLandet <- which(RegData$ShNavn== 'Hele landet')
+    AndelHele <- RegData$Andel[indLandet]
+    AndelerGr <- RegData$Andel[-indLandet]
+    fargepalett='BlaaOff'
+    utvalgTxt <- ''
+    medSml=0
+    sortAvtagende <- T
+    AntGr <- length(AndelerGr)
+    GrNavn <- RegData$ShNavn #paste0(RegData$ShNavn,' (',RegData$N , ')')[-indLandet]
+    hovedgrTxt <- 'Hele landet'
+    N <- RegData$N[indLandet]
+    KImaalGrenser <- c(0,60,80,100)
+    grVar <- 'ShNavn'
+    Ngrense <- 0
+
+  } else {
+
+    if (hentData == 1) {
             RegData <- RyggRegDataSQL()
       }
 
@@ -71,31 +103,14 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
             RegData <- RyggPreprosess(RegData=RegData)
       }
       #------- Tilrettelegge variable
-      RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
+      RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr,
+                                         datoTil=datoTil, figurtype = 'andelGrVar')
       RegData <- RyggVarSpes$RegData
       sortAvtagende <- RyggVarSpes$sortAvtagende
       #varTxt <- RyggVarSpes$varTxt
       KImaalGrenser <- RyggVarSpes$KImaalGrenser #c(0,20,40) #,xmax)
       #KImaal <- RyggVarSpes$KImaal
-      if (length(grep('dekn',valgtVar)) == 1) { #Bruke vedlagte dekningsdata
-            #Dekningsgradsfigur
-            #RegData <- read.table(paste0('../data/',valgtVar, '.csv'), sep=';', header=T, stringsAsFactors = FALSE)  # na.strings = "NULL", encoding = 'UTF-8',
-            #save(deknNakke17, file = '../data/deknNakke17.Rdata')
-            Ngr <- 100
-            indLandet <- which(RegData$ShNavn== 'Hele landet')
-            AndelHele <- RegData$DekningsgradNKR[indLandet]
-            AndelerGr <- RegData$DekningsgradNKR[-indLandet]
-            fargepalett='BlaaOff'
-            utvalgTxt <- ''
-            medSml=0
-            AntGr <- length(AndelerGr)
-            GrNavn <- paste0(RegData$ShNavn,' (',RegData$Totalt , ')')[-indLandet]
-            hovedgrTxt <- 'Hele landet'
-            N <- RegData$Totalt[indLandet]
-            xAkseTxt <- RyggVarSpes$xAkseTxt
-            KImaalGrenser <- c(0,60,80,100)
 
-      } else {
             #if (!is.null(dim(RegData))) {
             RegData[ ,grVar] <- factor(RegData[ ,grVar])
 
@@ -122,12 +137,13 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
                   RegData <- RegData[which(RegData[ ,grVar] != ''),] #Tar ut registreringer uten grupperingsnavn
                   RegData[ ,grVar] <- as.factor(RegData[ ,grVar])
                   Ngr <- table(RegData[ ,grVar])
+                  Ngrtxt <- as.character(Ngr)
             }	else {Ngr <- 0}
             N <- dim(RegData)[1]
             AntGr <- length(which(Ngr >= Ngrense))	#Alle som har gyldig resultat
             AndelHele <- round(100*sum(RegData$Variabel)/N, 2)
             AndelerGr <- round(100*tapply(RegData$Variabel, RegData[ ,grVar], sum, na.rm=T)/Ngr,2)
-            Ngrtxt <- as.character(Ngr)
+
             GrNavn <- names(Ngr)
             xAkseTxt <- "Andel opphold (%)"
 
@@ -137,10 +153,15 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
                   AndelerGr <- c(AndelerGr[-indGrUt],AndelGrUt) #AndelerGr[indGrUt] <- NA
                   #GrNavn <- c(names(Ngr)[-indGrUt], paste0(length(indGrUt), ' avd. med N<',Ngrense), )
                   GrUtNavn <- paste0(length(indGrUt), ' avd. med N<',Ngrense)
-                  Ngrtxt <- c(Ngrtxt[-indGrUt],sum(Ngr[indGrUt]))  #Ngrtxt[indGrUt] <- paste0('<', Ngrense)
+                  Ngrtxt <- c(Ngr[-indGrUt],sum(Ngr[indGrUt]))  #Ngrtxt[indGrUt] <- paste0('<', Ngrense)
                   GrNavn <- c(GrNavn[-indGrUt], GrUtNavn) #paste0(c(GrNavn[-indGrUt], GrUtNavn),' (',Ngrtxt , ')')
             }
-      }
+            if (tittel==0) {Tittel<-''} else {Tittel <- RyggVarSpes$tittel}
+
+            if (valgtVar == 'OswEndr20' & hovedkat == 1) {KImaalGrenser <- c(0, AndelHele, 100)}
+            if (valgtVar == 'OswEndr30pst' & hovedkat == 9) {KImaalGrenser <- c(0, AndelHele, 100)}
+            fargepalett <- RyggUtvalg$fargepalett
+  }
       sortInd <- order(as.numeric(AndelerGr), decreasing=sortAvtagende, na.last = FALSE)
       AndelerGrSort <- AndelerGr[sortInd]
       GrNavnSort <- GrNavn[sortInd]
@@ -149,22 +170,21 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
       andeltxtUsort <- paste0(sprintf('%.1f',AndelerGr), ' %')
       andeltxt <- andeltxtUsort[sortInd]
 
-      if (tittel==0) {Tittel<-''} else {Tittel <- RyggVarSpes$tittel}
 
       FigDataParam <- list(AggVerdier=AndelerGrSort,
                                AggTot=AndelHele,
                                N=N,
                                Ngr=as.numeric(Ngrtxt),
-      #                          grtxt2='',
                                 soyletxt=andeltxt,
                                 grtxt=GrNavnSort,
-                                tittel=RyggVarSpes$tittel,
+                                Tittel=Tittel,
       #                          xAkseTxt=xAkseTxt, #NIRVarSpes$xAkseTxt,
       #                          KImaal = KImaal,
       #                          KImaaltxt = KImaaltxt,
       #                          grTypeTxt=RyggUtvalg$grTypeTxt,
                                 utvalgTxt=utvalgTxt,
-                                fargepalett=RyggUtvalg$fargepalett
+      fargepalett =fargepalett
+
                                 )
 
 
@@ -186,13 +206,13 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
          #--------------------------FIGUR---------------------------------------------------
          #Innparametre: ...
          #----------- Figurparametre ------------------------------
-         cexShNavn <- 1 #0.85
+         cexShNavn <- 0.9 #0.85
 
          FigTypUt <- rapFigurer::figtype(outfile, height=3*800, fargepalett=fargepalett)
          farger <- FigTypUt$farger
          #Tilpasse marger for å kunne skrive utvalgsteksten
          NutvTxt <- length(utvalgTxt)
-         vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.7)
+         vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.8)
          #NB: strwidth oppfører seg ulikt avh. av device...
          par('fig'=c(vmarg, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
 
@@ -202,15 +222,18 @@ RyggFigAndelerGrVar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil
                             xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
                             las=1, cex.names=cexShNavn*0.9))
          #Legge på målnivå
+         #OswEndr20
          if (!is.na(KImaalGrenser[1])) {
-            antMaalNivaa <- length(KImaalGrenser)-1
+           antMaalNivaa <- length(KImaalGrenser)-1
             rekkef <- 1:antMaalNivaa
             if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
             fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
-            maalOppTxt <- c('Høy', 'Moderat', 'Lav')[rekkef]
+            maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
+            if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
             rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
                  ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
-            legend(x=0, y=-4, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
+            legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
+            legend(x=0, y=legPos, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
                    ncol=antMaalNivaa+1,
                    xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
                    legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,

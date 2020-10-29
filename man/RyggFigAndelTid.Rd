@@ -8,7 +8,7 @@ RyggFigAndelTid(
   RegData,
   valgtVar,
   datoFra = "2011-01-01",
-  datoTil = "3000-12-31",
+  datoTil = Sys.Date(),
   aar = 0,
   tidsenhet = "Aar",
   hovedkat = 99,
@@ -25,7 +25,8 @@ RyggFigAndelTid(
   preprosess = 1,
   hentData = 0,
   lagFig = 1,
-  offData = 0
+  offData = 0,
+  ...
 )
 }
 \arguments{

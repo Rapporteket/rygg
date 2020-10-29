@@ -4,7 +4,7 @@
 #' Funksjon som gjør utvalg i datagrunnlaget til registreringene for Nakke
 #'
 #' Funksjon som gjør utvalg av dataene, returnerer det reduserte datasettet og utvalgsteksten.
-#' Gjøre ingen utvalg, vil alle data vises.
+#' Gjøres ingen utvalg, vil alle data vises.
 #'
 #' Argumentet \emph{enhetsUtvalg} har følgende valgmuligheter:
 #'   \itemize{
@@ -19,7 +19,6 @@
 #'     \item 8: IKKE def - Egen region mot resten
 #'   }
 
-#' @inheritParams RyggFigAndeler
 #' @param datoFra Tidligste operasjonsdato i utvalget (vises alltid i figuren).
 #' @param datoTil Seneste operasjonsdato i utvalget (vises alltid i figuren).
 #' @param minald Alder, fra og med (Standardverdi: 0)
@@ -48,10 +47,11 @@
 #' @param enhetsUtvalg Gjør gruppeutvalg med eller uten sammenlikning. Se \strong{Details} for oversikt.
 #' @param reshID Parameter følger fra innlogging helseregister.no og angir
 #' @param fargepalett Velge fargepalett, standard:BlaaOff ("offentliggjøringsfargene")
+#' @inheritParams RyggFigAndeler
 #'
 #' @return Returnerer filtrert versjon av RegData
 #' @export
-RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil='3000-01-01', minald=0, maxald=110,
+RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil=Sys.Date(), minald=0, maxald=110,
                           erMann='', hovedkat=99, aar=0, tidlOp=99, hastegrad=99, #hastegrad=99,
                           enhetsUtvalg=0, reshID=0, fargepalett='BlaaOff') {
 
@@ -62,6 +62,8 @@ RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil='3000-01-01', m
 #trengs ikke data for hele landet:
 reshID <- as.numeric(reshID)
 indEgen1 <- match(reshID, RegData$ReshId)
+enhetsUtvalg <- ifelse(reshID==0 | is.na(indEgen1), 0, enhetsUtvalg )
+
 if (enhetsUtvalg %in% c(2,3,4,6,7)) {	#Ta med 2,4 og 7? Oppr. 3 og 6
 		RegData <- switch(as.character(enhetsUtvalg),
 						'2' = RegData[which(RegData$ReshId == reshID),],	#kun egen enhet
@@ -75,7 +77,7 @@ Ninn <- dim(RegData)[1]
 
 indAld <- which(RegData$Alder >= minald & RegData$Alder <= maxald)
 indAar <- if (aar[1] > 2000) {which(RegData$Aar %in% as.numeric(aar))} else {indAar <- 1:Ninn}
-indDato <- which(RegData$InnDato >= as.POSIXlt(datoFra) & RegData$InnDato <= as.POSIXlt(datoTil))
+indDato <- which(RegData$InnDato >= as.Date(datoFra) & RegData$InnDato <= as.Date(datoTil))
 indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
 #Hovedkategori, flervalgsutvalg
       indHovedInngr <- if (hovedkat[1] %in% 0:8) {which(RegData$HovedInngrepV2V3 %in% as.numeric(hovedkat))
