@@ -15,13 +15,11 @@ devtools::install_github("Rapporteket/rapbase", ref='rel')
 
 #------------------------------------
 #Sjekk
+library(rygg)
+library(magrittr)
 RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
-table(RegData$KpInfDyp3Mnd, RegData$Aar, useNA = 'a')
-table(RegData$KpInfOverfla3Mnd, RegData$Aar)
-
-table(RegDataV3$KpInfDyp3Mnd, useNA = 'a')
-table(RegDataV3$KpInfOverfla3Mnd, useNA = 'a')
-table(RegDataV2$KpInfDyp3Mnd, useNA = 'a')
+forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
+             tilDato=Sys.Date()-100, forsinkelse=100, reshID=601161)
 
 
 #-------------- Laste fil og evt. lagre -------------

@@ -190,13 +190,15 @@ if (lastNedFil==1) {
 #' @param reshID Avdelingas reshID. Benyttes til å filtrere.
 #' @return
 #' @export
-forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID){
+forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID=0){
   RegData$Diff <- as.numeric(difftime(as.Date(RegData$MedForstLukket),
                                       RegData$OpDato ,units = 'days')) #UtskrivelseDato
   Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
-    dplyr::filter(ReshId == reshID & OpDato > fraDato & (OpDato < tilDato))
+    dplyr::filter(OpDato > fraDato & (OpDato < tilDato))
+
+  if (reshID != 0) {Data <- dplyr::filter(Data, ReshId == reshID)}
   paste0(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T), ' (',
-         100*round(sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
+         round(100*sum(as.numeric(Data$Diff)>forsinkelse, na.rm = T)/dim(Data)[1],1), '%)')
 }
 
 
