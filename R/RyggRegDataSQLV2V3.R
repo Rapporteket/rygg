@@ -152,6 +152,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
 
 
   #-----Tilrettelegging av V3-data-------------------------
+#Fjerner ikke-ferdigstilte pasientskjema
+  RegDataV3 <- RegDataV3[RegDataV3$Ferdig1a==1 & RegDataV3$Ferdig2a==1, ]
 
   #Navneendring av V3:
   RegDataV3 <- dplyr::rename(RegDataV3,

@@ -62,6 +62,8 @@ RyggUtvalgEnh <- function(RegData, datoFra='2009-01-01', datoTil=Sys.Date(), min
 #trengs ikke data for hele landet:
 reshID <- as.numeric(reshID)
 indEgen1 <- match(reshID, RegData$ReshId)
+enhetsUtvalg <- ifelse(reshID==0 | is.na(indEgen1), 0, enhetsUtvalg )
+
 if (enhetsUtvalg %in% c(2,3,4,6,7)) {	#Ta med 2,4 og 7? Oppr. 3 og 6
 		RegData <- switch(as.character(enhetsUtvalg),
 						'2' = RegData[which(RegData$ReshId == reshID),],	#kun egen enhet

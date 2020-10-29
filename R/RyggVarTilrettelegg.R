@@ -381,7 +381,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          #               'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
          variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd', #'KpMiktProb3Mnd',
                        'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
-         grtxt <- c('Overfladisk sårinfeksjon', 'Dyp sårinfeksjon',
+         grtxt <- c('Overfl. sårinf. (mangelfull reg. 2019)', 'Dyp sårinfeksjon',
                     'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
                     'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
       }
@@ -760,7 +760,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
          #intToUtf8(2264)
          #KImaalRetn <- 'lav'
-         KImaalGrenser <- c(0,3,20)
+         KImaalGrenser <- c(0,3,100)
          varTxt <- 'med manglende indikasjon'
       }
 

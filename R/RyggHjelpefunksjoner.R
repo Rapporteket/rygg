@@ -91,7 +91,7 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 
 dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
                            indID = 'indDummy', ResPort=1,
-                           hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
+                           hovedkat=99, hastegrad=99, tidlOp='', lastNedFil=0, filUt='dummy'){
 
 
   filUt <- paste0('Rygg', ifelse(filUt=='dummy',  valgtVar, filUt), c('_SKDE', '_ResPort')[ResPort+1],'.csv')
@@ -170,8 +170,8 @@ dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01
   RegDataUt$orgnr <- as.character(nyID[as.character(RegDataUt$ReshId)])
   RegDataUt <- RegDataUt[ ,c('year', 'orgnr', 'var', 'denominator', 'ind_id')]
     }
-
-  write.table(RegDataUt, file = filUt, sep = ';', row.names = F) #, fileEncoding = 'UTF-8')
+if (lastNedFil==1) {
+  write.table(RegDataUt, file = filUt, sep = ';', row.names = F)} #, fileEncoding = 'UTF-8')}
   return(invisible(RegDataUt))
 }
 

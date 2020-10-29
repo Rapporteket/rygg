@@ -8,7 +8,8 @@
 
 RyggPreprosess <- function(RegData=RegData)
 {
-  #Kun ferdigstilte registreringer: Det skal kun leveres ferdigstilte skjema til RapportUttrekk
+  #Kun ferdigstilte registreringer: Kun ferdigstilte skjema i V2
+  #V3: Alle legeskjema ferdigstilt.
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
   #Kjonn Mangler!!
   RegData$ErMann <- RegData$Kjonn

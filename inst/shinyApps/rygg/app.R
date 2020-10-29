@@ -270,7 +270,7 @@ ui <- navbarPage(id = "tab1nivaa",
              h4('Nedlasting av data til Resultatportalen:'),
 
              selectInput(inputId = "valgtVarRes", label="Velg variabel",
-                         choices = c('Lite beinsmerte før operasjon' = 'beinsmLavPre',
+                         choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
                                      'Durarift' = 'peropKompDura',
                                      'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
              ),
@@ -430,7 +430,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Fedme (BMI>30)' = 'BMI',
                          'Flere enn to tidligere operasjoner' = 'tidlOp3',
                          'Fornøyde pasienter' = 'fornoydhet',
-                         'Fremmelspråklig' = 'morsmal',
+                         'Fremmedspråklig' = 'morsmal',
                          # 'Komplikasjoner, pasientrapportert' = 'kp3Mnd',
                          'Har degen. spondy. og spin.stenose' = 'degSponSSSten',
                          'Helt bra eller mye bedre' = 'nytte',
@@ -500,7 +500,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                       uiOutput("tittelAndel"),
                       br(),
                       #fluidRow(
-                      column(width = 3,
+                      column(width = 4,
                              h3("Sykehusvise resultater"),
                              tableOutput("andelerGrVarTab"),
                              downloadButton(outputId = 'lastNed_tabAndelGrVar', label='Last ned tabell')),
@@ -735,7 +735,7 @@ server <- function(input, output,session) {
 
   if (rolle=='SC') {
   observe({
-    tabdataTilResPort <- dataTilResPort(RegData=RegData, valgtVar = input$valgtVarRes,
+    tabdataTilResPort <- dataTilOffVisning(RegData=RegData, valgtVar = input$valgtVarRes,
                                         hovedkat = as.numeric(input$hovedInngrepRes),
                                         aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
                                         hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
@@ -917,17 +917,18 @@ server <- function(input, output,session) {
                                        hovedkat = as.numeric(input$hovedInngrepAndel),
                                        session=session) #, lagFig = 0))
 
-    tabAndelerShus <- cbind(Antall=AndelerShus$Ngr,
+    tabAndelerShus <- cbind('Antall (n)' = round(AndelerShus$Ngr*AndelerShus$AggVerdier/100),
+                            'Antall (N)' = AndelerShus$Ngr,
                             Andeler = AndelerShus$AggVerdier)
 
     output$andelerGrVarTab <- function() {
       antKol <- ncol(tabAndelerShus)
       kableExtra::kable(tabAndelerShus, format = 'html'
                         #, full_width=T
-                        , digits = c(0,1) #,0,1)[1:antKol]
+                        , digits = c(0,0,1) #,0,1)[1:antKol]
       ) %>%
-        column_spec(column = 1, width_min = '5em') %>%
-        column_spec(column = 2:(antKol+1), width = '4em') %>%
+        #column_spec(column = 1, width_min = '5em') %>%
+        column_spec(column = 1:(antKol+1), width = '5em') %>%
         row_spec(0, bold = T)
     }
     output$lastNed_tabAndelGrVar <- downloadHandler(
