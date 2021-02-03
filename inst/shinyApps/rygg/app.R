@@ -285,8 +285,10 @@ ui <- navbarPage(id = "tab1nivaa",
              # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
              #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
              #                ),
-             sliderInput(inputId="aarRes", label = "Operasjonsår", min = as.numeric(2016),
-                         max = as.numeric(year(idag)), value = c(2018, year(idag), step=1, sep="")
+             sliderInput(inputId="aarRes", label = "Operasjonsår",
+                         min = as.numeric(2016), max = as.numeric(year(idag)),
+                         value = c(2018, year(idag)),
+                         step=1, sep=""
              ),
              br(),
              downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data')),
