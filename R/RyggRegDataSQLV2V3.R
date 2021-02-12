@@ -223,7 +223,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,0,0,1,0))
 
   RegDataV3$MedForstLukket <- as.character(as.Date(RegDataV3$MedForstLukket)) #Kobling med NA fungerer ikke for datotid-var
-RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = c(2, NA), to = c(0,9))
+RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
 
   #NB:----------Sjekk ut at alle variabler har samme format - VENTER TIL ENDELIG V2-FIL PÅ RAPPORTEKET.
   #f.eks.

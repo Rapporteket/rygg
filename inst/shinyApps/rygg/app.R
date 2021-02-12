@@ -646,7 +646,7 @@ server <- function(input, output,session) {
     output$tabAntOpphSh <- renderTable(tabAntOpphSh, rownames = T, digits=0, spacing="xs")
     output$lastNed_tabAntOpphSh <- downloadHandler(
       filename = function(){'tabAntOpphSh.csv'},
-      content = function(file, filename){write.csv2(tabAntOpphSh, file, row.names = T, na = '')})
+      content = function(file, filename){write.csv2(tabAntOpphSh, file, row.names = T, fileEncoding = 'latin1', na = '')})
 
   output$undertittelReg <- renderUI({
     br()
@@ -666,7 +666,7 @@ server <- function(input, output,session) {
                                      ,rownames = T, digits=0, spacing="xs" )
   output$lastNed_tabAntSkjema <- downloadHandler(
     filename = function(){'tabAntSkjema.csv'},
-    content = function(file, filename){write.csv2(AntSkjemaAvHver, file, row.names = T, na = '')})
+    content = function(file, filename){write.csv2(AntSkjemaAvHver, file, row.names = T, fileEncoding = 'latin1', na = '')})
     })
 
 
@@ -699,7 +699,7 @@ server <- function(input, output,session) {
 
   output$lastNed_dataTilRegKtr <- downloadHandler(
     filename = function(){'dataTilKtr.csv'},
-    content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, na = '')})
+    content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
 
   variablePRM <- 'variable som skal fjernes hvis lastes ned av avdeling'
@@ -723,13 +723,13 @@ server <- function(input, output,session) {
                                      reshID=input$velgReshReg, rolle = rolle)
   output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
-      content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
+      content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
   dataDumpV2 <- rapbase::loadRegData(registryName="rygg",
                                      query='select * FROM Uttrekk_Rapport_FROM_TORE', dbType="mysql")
   output$lastNed_dataV2 <- downloadHandler(
     filename = function(){'dataDumpV2.csv'},
-    content = function(file, filename){write.csv2(dataDump, file, row.names = F, na = '')})
+    content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
   })
 #-----------Registeradministrasjon-----------
 
@@ -742,7 +742,7 @@ server <- function(input, output,session) {
 
     output$lastNed_dataTilResPort <- downloadHandler(
       filename = function(){'dataTilResPort.csv'},
-      content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, na = '')})
+      content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, fileEncoding = 'latin1', na = '')})
   })
 }
 #------------Fordelinger---------------------
@@ -825,7 +825,7 @@ server <- function(input, output,session) {
         paste0(input$valgtVar, '_fordeling.csv')
       },
       content = function(file, filename){
-        write.csv2(tab, file, row.names = F, na = '')
+        write.csv2(tabFord, file, row.names = F, fileEncoding = 'latin1', na = '')
       })
   }) #observe
 
@@ -902,7 +902,7 @@ server <- function(input, output,session) {
         paste0(input$valgtVar, '_andelTid.csv')
       },
       content = function(file, filename){
-        write.csv2(tabAndelTid, file, row.names = T, na = '')
+        write.csv2(tabAndelTid, file, row.names = T, fileEncoding = 'latin1', na = '')
       })
 
 
@@ -936,7 +936,7 @@ server <- function(input, output,session) {
         paste0(input$valgtVar, '_andelGrVar.csv')
       },
       content = function(file, filename){
-        write.csv2(tabAndelerShus, file, row.names = T, na = '')
+        write.csv2(tabAndelerShus, file, row.names = T, fileEncoding = 'latin1', na = '')
       })
 
     output$tittelAndel <- renderUI({
