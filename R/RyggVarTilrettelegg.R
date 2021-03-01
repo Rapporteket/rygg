@@ -377,31 +377,31 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          flerevar <- 1
          #Andel kun av de som har svart på 3 mnd ktr:
          RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
-         # variableV2 <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpMiktProb3Mnd','KpUVI3Mnd',
-         #               'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
-         variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd', #'KpMiktProb3Mnd',
-                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd', 'Kp3Mnd')
+         # variableV2 <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpMiktProb3mnd','KpUVI3mnd',
+         #               'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd', 'Kp3mnd')
+         variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
+                       'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd', 'Kp3mnd')
          grtxt <- c('Overfl. sårinf. (mangelfull reg. 2019)', 'Dyp sårinfeksjon',
                     'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
                     'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
       }
 
-      if (valgtVar == 'kp3Mnd') { #AndelGrVar
+      if (valgtVar == 'kp3mnd') { #AndelGrVar
          #Komplikasjoner 0:nei, 1:ja
          RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
-         variable <- c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd', #'KpMiktProb3Mnd',
-                       'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')
-         RegData$Kp3Mnd <- NULL
-         RegData$Kp3Mnd[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
-         RegData$Variabel <- RegData$Kp3Mnd
+         variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
+                       'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')
+         RegData$Kp3mnd <- NULL
+         RegData$Kp3mnd[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
+         RegData$Variabel <- RegData$Kp3mnd
          tittel <- 'Pasientrapporterte komplikasjoner (%)'
          sortAvtagende <- FALSE
       }
-      if (valgtVar == 'kpInf3Mnd') { #AndelGrVar, AndelTid
+      if (valgtVar == 'kpInf3mnd') { #AndelGrVar, AndelTid
          #Komplikasjoner 0:nei, 1:ja
          RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
          RegData$Variabel <- NULL
-         RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3Mnd', 'KpInfDyp3Mnd')], na.rm = T) > 0] <- 1
+         RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3mnd', 'KpInfDyp3mnd')], na.rm = T) > 0] <- 1
          RarTxt <- 'tilfeller'
          tittel <- 'Sårinfeksjon, pasientrapportert'
          sortAvtagende <- FALSE
