@@ -1,10 +1,10 @@
-#Generere filer og tall til årsrapport for 2019.
+#Generere filer og tall til årsrapport for 2020.
 library(rygg)
 library(xtable)
 
 #Felles parametre:
 startAar <- 2011
-rappAar <- 2019
+rappAar <- 2020
 datoFra1aar <- paste0(rappAar,'-01-01')
 datoFra2aar <- paste0(rappAar-1,'-01-01')
 datoFra3aar <- paste0(rappAar-2,'-01-01')
