@@ -931,7 +931,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             RegData$Variabel[which(RegData$VentetidHenvTilSpesialist == 1)] <- 1
             varTxt <- 'ventet <3mnd'
             tittel <- 'Ventetid < 3 mnd. fra henvisning til time på poliklinikk'
-            KImaalGrenser <- c(0,50,80,100)
          }}
       if (valgtVar == 'ventetidSpesOp') { #Fordeling, AndelGrVar, AndelTid
          grtxt <- c("< 3 mnd.","3-6 mnd","6-12 mnd.","> 12 mnd.","Ikke utfylt")

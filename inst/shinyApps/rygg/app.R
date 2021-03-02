@@ -113,7 +113,6 @@ ui <- navbarPage(id = "tab1nivaa",
              br(),
              br(),
              h3("Rapport med månedsresultater"),
-             h4("NB: Dette er en foreløpig versjon. Innholdet vil bli justert og utvidet."),
              h5('Rapporten kan man også få regelmessig på e-post.
                         Gå til fanen "Abonnement" for å bestille dette.'),
              br(),
