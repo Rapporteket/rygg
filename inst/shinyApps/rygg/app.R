@@ -360,7 +360,9 @@ tabPanel(p('Fordelinger',
                                   'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                                   #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
                                   'Trygg kirurgi-prosedyre utført' = 'tryggKir',
-                                  'Utdanning (høyeste fullførte)' = 'utd'
+                                  'Utdanning (høyeste fullførte)' = 'utd',
+                                  'Ventetid fra henvisning til time på poliklinikk' = 'ventetidHenvTimePol',
+                                  'Ventetid fra operasjon bestemt til utført' = 'ventetidSpesOp'
                       ),
                       selected = c('Registreringsforsinkelse' = 'regForsinkelse')
                     ),
@@ -450,7 +452,8 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
                         'Søkt erstatning før operasjon' = 'erstatningPre',
                         'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
-                        'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl'
+                        'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl',
+                        'Ventetid fra henvisning til time på poliklinikk' = 'ventetidHenvTimePol'
              )
            ),
            #uiOutput("datovalgAndel"),

@@ -47,6 +47,8 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Versjon[RegData$OpDato < '2009-09-01'] <- 1
 	RegData$Versjon[RegData$OpDato >= '2019-01-01'] <- 3
 
+	#RegData$Dod30 <- ifelse(RegData$Morsdato)
+
   return(invisible(RegData))
 }
 

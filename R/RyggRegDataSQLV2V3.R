@@ -210,6 +210,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
                                          'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
                            na.rm = T) > 0] <- 1
+  RegDataV3$KpInf3Mnd <- NULL
+  RegDataV3$KpInf3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd')], na.rm = T) > 0] <- 1
+
 
   #TidlOp. V2: 1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
   #TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv

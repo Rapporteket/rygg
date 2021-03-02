@@ -388,21 +388,27 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
 
       if (valgtVar == 'kp3mnd') { #AndelGrVar
          #Komplikasjoner 0:nei, 1:ja
-         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
-         variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
+         ind <- switch(as.character(ktr),
+                       '1' = which(RegData$Ferdigstilt1b3mnd==1),
+                       '2' = which(RegData$Ferdigstilt1b12mnd == 1))
+         RegData <- RegData[ind, ]
+         if (ktr==1) {
+            variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
                        'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')
-         RegData$Kp3mnd <- NULL
-         RegData$Kp3mnd[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
-         RegData$Variabel <- RegData$Kp3mnd
+         }
+         RegData$Variabel[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
+         VarTxt <- 'tilfeller'
          tittel <- 'Pasientrapporterte komplikasjoner (%)'
          sortAvtagende <- FALSE
       }
-      if (valgtVar == 'kpInf3mnd') { #AndelGrVar, AndelTid
+      if (valgtVar == 'kpInf') { #AndelGrVar, AndelTid
          #Komplikasjoner 0:nei, 1:ja
-         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd ==1), ]
-         RegData$Variabel <- NULL
+         ind <- switch(as.character(ktr),
+                       '1' = which(RegData$Ferdigstilt1b3mnd==1),
+                       '2' = which(RegData$Ferdigstilt1b12mnd == 1))
+         RegData <- RegData[ind, ]
          RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3mnd', 'KpInfDyp3mnd')], na.rm = T) > 0] <- 1
-         RarTxt <- 'tilfeller'
+         VarTxt <- 'tilfeller'
          tittel <- 'Sårinfeksjon, pasientrapportert'
          sortAvtagende <- FALSE
          xAkseTxt <- 'Andel sårinfeksjoner (%)'
@@ -915,6 +921,18 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             }}
 
 
+      if (valgtVar == 'ventetidHenvTimePol') { #Fordeling, AndelGrVar, AndelTid
+         grtxt <- c("< 3 mnd.","3-6 mnd","6-12 mnd.","> 12 mnd.","Ikke utfylt")
+         RegData$VariabelGr <- factor(RegData$VentetidHenvTilSpesialist, levels = c(1:4,9))
+         retn <- 'H'
+         tittel <- 'Ventetid fra henvisning til time på poliklinikk'
+         if (figurtype %in% c('andelGrVar', 'andelTid')) {
+            RegData <- RegData[which(RegData$VentetidHenvTilSpesialist %in% 1:4),]
+            RegData$Variabel[which(RegData$VentetidHenvTilSpesialist == 1)] <- 1
+            varTxt <- 'ventet <3mnd'
+            tittel <- 'Ventetid < 3 mnd. fra henvisning til time på poliklinikk'
+            KImaalGrenser <- c(0,50,80,100)
+         }}
       if (valgtVar == 'ventetidSpesOp') { #Fordeling, AndelGrVar, AndelTid
          grtxt <- c("< 3 mnd.","3-6 mnd","6-12 mnd.","> 12 mnd.","Ikke utfylt")
          RegData$VariabelGr <- factor(RegData$VentetidSpesialistTilOpr, levels = c(1:4,9))
@@ -927,6 +945,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
             tittel <- 'Ventetid < 3 mnd. fra operasjon bestemt til utført'
             KImaalGrenser <- c(0,50,80,100)
          }}
+
 
       if (valgtVar == 'verre') { #AndelGrVar		#%in% c('Verre3mnd','Verre12mnd')) {
             #3/12mndSkjema. Andel med helt mye verre og noen sinne (6:7)
