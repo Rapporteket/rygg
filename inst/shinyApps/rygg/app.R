@@ -388,7 +388,10 @@ tabPanel(p('Fordelinger',
                     br(),
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
-                    actionButton("reset_fordValg", label="Tilbakestill valg")
+                    actionButton("reset_fordValg", label="Tilbakestill valg"),
+                    selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
+                                selected = 0,
+                                choices = sykehusValg)
                   ),
                   mainPanel(
                     tabsetPanel(
@@ -554,6 +557,7 @@ server <- function(input, output,session) {
   #reshID <- reactive({ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)),
   #                           601161)})
   reshID <- ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)), 601161)
+  output$reshID <- renderText(reshID)
   #rolle <- reactive({ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'SC')})
   rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
   output$rolle <- renderText(rolle)
@@ -564,6 +568,7 @@ server <- function(input, output,session) {
 
   observe({if (rolle != 'SC') { #
     shinyjs::hide(id = 'velgReshReg')
+    shinyjs::hide(id = 'velgReshFord')
     shinyjs::hide(id = 'lastNed_dataDump')
     #hideTab(inputId = "tabs", target = "Foo")
     shiny::hideTab(inputId = "tab1nivaa",
@@ -759,9 +764,10 @@ server <- function(input, output,session) {
     shinyjs::reset("alder")
   })
   output$fordelinger <- renderPlot({
+    reshIDford <- ifelse(rolle=='SC', input$velgReshFord, reshID)
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
-                  reshID=reshID,
+                  reshID=reshIDford,
                    enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                    datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                    minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
