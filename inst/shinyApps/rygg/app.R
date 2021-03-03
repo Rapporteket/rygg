@@ -261,12 +261,28 @@ ui <- navbarPage(id = "tab1nivaa",
     tabPanel(p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
              value = "Registeradministrasjon",
              h3('Egen side for registeradministratorer. Siden er bare synlig for SC-bruker'),
-             #uiOutput('rolle'),
-             h4('Det er også mulig å ha elementer på andre sider som bare er synlig for SC-brukere'),
            br(),
            br(),
            sidebarPanel(
+             h4('Lage abonnementslister for utsendinger'),
+             uiOutput("reportUts"),
+             uiOutput("freqUts"),
+             uiOutput("ReshUts"),
+             h5('E-postmottagere legges inn en og en. Trykk legg til e-postmottager for hver gang.
+                           Når du har lagt til alle, trykker du på lag utsending. '),
+             textInput("email", "Epostmottakere:"),
+             uiOutput("editEmail"),
+             htmlOutput("recipients"),
+             tags$hr(),
+             uiOutput("makeDispatchment"), #utsending
+             br(),
+             br(),
+             h3('Last ned data fra versjon 2.0:'),
+             downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
+             br(),
+             br(),
              h4('Nedlasting av data til Resultatportalen:'),
+             h5('Fjernes eller erstattes av data til sykehusviser'),
 
              selectInput(inputId = "valgtVarRes", label="Velg variabel",
                          choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
@@ -290,21 +306,14 @@ ui <- navbarPage(id = "tab1nivaa",
                          step=1, sep=""
              ),
              br(),
-             downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data')),
+             downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data'),
+     ),
 
-           fluidRow(
-             h3('Last ned data fra versjon 2.0:'),
-             downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
+mainPanel(
+  uiOutput("dispatchmentContent")
+)
 
-             br(),
-             br(),
-             h3('Hva mer skal med her...?'),
-                    # tags$div(
-                    #   tags$li("Andel ikke besvart 3 mnd.?"),
-                    #   tags$li("Andel ikke besvart 12 mnd.?"),
-                    #   tags$li("Andel purringer 3 mnd.?"),
-                    #   tags$li("Andel purringer 12 mnd.?"))
-             )
+
   ), #tab SC
 
 #-------------Fordelinger---------------------
@@ -752,6 +761,8 @@ server <- function(input, output,session) {
     output$lastNed_dataTilResPort <- downloadHandler(
       filename = function(){'dataTilResPort.csv'},
       content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, fileEncoding = 'latin1', na = '')})
+
+
   })
 }
 #------------Fordelinger---------------------
@@ -960,29 +971,53 @@ server <- function(input, output,session) {
     #------------------ Abonnement ----------------------------------------------
   ## reaktive verdier for å holde rede på endringer som skjer mens
   ## applikasjonen kjører
-  rv <- reactiveValues(
-    subscriptionTab = rapbase::makeUserSubscriptionTab(session))
-
+  # rv <- reactiveValues(
+  #   subscriptionTab = rapbase::makeUserSubscriptionTab(session))
+  #
+  #
+  # ## lag tabell over gjeldende status for abonnement
+  # output$activeSubscriptions <- DT::renderDataTable(
+  #   rv$subscriptionTab, server = FALSE, escape = FALSE, selection = 'none',
+  #   rownames = FALSE, options = list(dom = 't')
+  # )
 
   ## lag tabell over gjeldende status for abonnement
   output$activeSubscriptions <- DT::renderDataTable(
-    rv$subscriptionTab, server = FALSE, escape = FALSE, selection = 'none',
-    rownames = FALSE, options = list(dom = 't')
+    subscription$tab, server = FALSE, escape = FALSE, selection = 'none',
+    options = list(dom = 'tp', ordning = FALSE,
+                   columnDefs = list(list(visible = FALSE, targets = 6))), #Fjerner kolonne
+    rownames = FALSE
   )
 
+
+  ## lag side som viser status for abonnement, også når det ikke finnes noen
+  # output$subscriptionContent <- renderUI({
+  #   fullName <- rapbase::getUserFullName(session)
+  #   if (length(rv$subscriptionTab) == 0) {
+  #     p(paste("Ingen aktive abonnement for", fullName))
+  #   } else {
+  #     tagList(
+  #       p(paste("Aktive abonnement for", fullName, "som sendes per epost til ",
+  #               rapbase::getUserEmail(session), ":")),
+  #       DT::dataTableOutput("activeSubscriptions")
+  #     )
+  #   }
+  # })
   ## lag side som viser status for abonnement, også når det ikke finnes noen
   output$subscriptionContent <- renderUI({
-    fullName <- rapbase::getUserFullName(session)
-    if (length(rv$subscriptionTab) == 0) {
-      p(paste("Ingen aktive abonnement for", fullName))
+    userFullName <- rapbase::getUserFullName(session)
+    userEmail <- rapbase::getUserEmail(session)
+    if (length(subscription$tab) == 0) {
+      p(paste("Ingen aktive abonnement for", userFullName))
     } else {
       tagList(
-        p(paste("Aktive abonnement for", fullName, "som sendes per epost til ",
-                rapbase::getUserEmail(session), ":")),
+        p(paste0("Aktive abonnement som sendes per epost til ", userFullName,
+                 ":")),
         DT::dataTableOutput("activeSubscriptions")
       )
     }
   })
+
   ## nye abonnement
   observeEvent (input$subscribe, { #MÅ HA
     owner <- rapbase::getUserName(session)
@@ -1009,17 +1044,209 @@ server <- function(input, output,session) {
                               email = email, organization = organization,
                               runDayOfYear = runDayOfYear, interval = interval,
                               intervalName = intervalName)
-    rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+    #rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+    subscription$tab <-
+      rapbase::makeAutoReportTab(session, type = "subscription")
   })
+
+  # ## slett eksisterende abonnement
+  # observeEvent(input$del_button, {
+  #   selectedRepId <- strsplit(input$del_button, "_")[[1]][2]
+  #   rapbase::deleteAutoReport(selectedRepId)
+  #   rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  # })
+
+
+  #----- Utsending -----------------
+  ## reaktive verdier for å holde rede på endringer som skjer mens
+  ## applikasjonen kjører
+  dispatchment <- reactiveValues(
+    tab = rapbase::makeAutoReportTab(session = session, type = "dispatchment"),
+    report = "RyggMndRapp",
+    freq = "Månedlig-month",
+    email = vector()
+  )
+  ## observér og foreta endringer mens applikasjonen kjører
+  observeEvent(input$addEmail, {
+    dispatchment$email <- c(dispatchment$email, input$email)
+  })
+  observeEvent(input$delEmail, {
+    dispatchment$email <-
+      dispatchment$email[!dispatchment$email == input$email]
+  })
+  observeEvent (input$dispatch, {
+    package <- "rygg"
+    type <- "dispatchment"
+    owner <- rapbase::getUserName(session)
+    ownerName <- rapbase::getUserFullName(session)
+    interval <- strsplit(input$dispatchmentFreq, "-")[[1]][2]
+    intervalName <- strsplit(input$dispatchmentFreq, "-")[[1]][1]
+    runDayOfYear <- rapbase::makeRunDayOfYearSequence(
+      interval = interval)
+
+    email <- dispatchment$email
+
+    # fun <- "abonnementRygg"  #"henteSamlerapporter"
+
+    if (input$dispatchmentRep == "Månedsrapport") {
+      synopsis <- "Månedsrapport, Rygg"
+      fun <- "abonnementRygg"
+      rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
+      reshIDuts <- input$dispatchmentResh
+      organization <- reshIDuts #rapbase::getUserReshId(session)
+      #print(reshIDuts)
+      indReshUts <- match(reshIDuts, RegData$ReshId) #Velger sykehusresh
+      paramNames <- c('rnwFil', 'brukernavn', "reshID")
+      paramValues <- c(rnwFil, brukernavn, reshIDuts)
+    }
+
+    rapbase::createAutoReport(synopsis = synopsis, package = package,
+                              type = type, fun = fun, paramNames = paramNames,
+                              paramValues = paramValues, owner = owner,
+                              ownerName = ownerName,
+                              email = email, organization = organization,
+                              runDayOfYear = runDayOfYear,
+                              interval = interval, intervalName = intervalName)
+    dispatchment$tab <- rapbase::makeAutoReportTab(session, type = "dispatchment")
+    test <- dimnames(dispatchment$tab)
+    # print(test[[]])
+    # print(attributes(dispatchment$tab))
+    #Author DataFlair
+
+    alleAutorapporter <- rapbase::readAutoReportData()
+    egneUts <-  rapbase::filterAutoRep(
+      rapbase::filterAutoRep(alleAutorapporter, by = 'package', pass = 'rygg'),
+      by = 'type', pass = 'dispatchment')
+
+    # ider <- names(egneUts)
+    # roller <- egneUts[[1]][['params']][[6]]$rolle
+    # for (k in 2:length(ider)) {
+    #   roller <- c(roller, egneUts[[k]][['params']][[6]]$rolle)
+    # }
+    # koblRoller <- cbind(ID = ider,
+    #                     roller = roller)
+
+    dispatchment$email <- vector()
+  })
+
+
+  ## ui: velg rapport
+  output$reportUts <- renderUI({
+    selectInput("dispatchmentRep", "Rapport:",
+                c("Månedsrapport"),
+                selected = dispatchment$report)
+  })
+  ## ui: velg rolle
+  # output$rolleUts <- renderUI({
+  #   selectInput("dispatchmentRole", "Rolle/nivå:",
+  #               c("LU", "LC", "SC"),
+  #               selected = dispatchment$rolle)
+  # })
+  ## ui: velg enhet
+  output$ReshUts <- renderUI({
+    selectInput("dispatchmentResh", "Avdelingstilhørighet:",
+                sykehusValg[-1],
+                selected = dispatchment$Resh)
+  })
+
+  ## ui: velg frekvens
+  output$freqUts <- renderUI({
+    selectInput("dispatchmentFreq", "Frekvens:",
+                list(Årlig = "Årlig-year",
+                      Kvartalsvis = "Kvartalsvis-quarter",
+                      Månedlig = "Månedlig-month",
+                      Ukentlig = "Ukentlig-week",
+                      Daglig = "Daglig-DSTday"),
+                selected = dispatchment$freq)
+  })
+
+  ## ui: legg til gyldig- og slett epost
+  output$editEmail <- renderUI({
+    if (!grepl("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+               input$email)) {
+      tags$p("Angi mottaker over")
+    } else {
+      if (input$email %in% dispatchment$email) {
+        actionButton("delEmail", "Slett epostmottaker",
+                     icon = shiny::icon("trash"))
+      } else {
+        actionButton("addEmail", "Legg til epostmottaker",
+                     icon = shiny::icon("pencil"))
+      }
+    }
+  })
+
+  ## ui: vis valgte mottakere
+  output$recipients <- renderText(paste(dispatchment$email, sep = "<br>"))
+
+  ## ui: lag ny utsending
+  output$makeDispatchment <- renderUI({
+    if (length(dispatchment$email) == 0) {
+      NULL
+    } else {
+      actionButton("dispatch", "Lag utsending",
+                   icon = shiny::icon("save"))
+    }
+  })
+
+  ## lag tabell over gjeldende status for utsending
+  output$activeDispatchments <- DT::renderDataTable(
+    dispatchment$tab, server = FALSE, escape = FALSE, selection = 'none',
+    options = list(dom = 'tp', ordning = FALSE, columnDefs = list(list(visible = FALSE, targets = 9))),
+    rownames = FALSE
+  )
+
+  ## ui: lag side som viser status for utsending, også når det ikke finnes noen
+  output$dispatchmentContent <- renderUI({
+    if (length(dispatchment$tab) == 0) {
+      p("Det finnes ingen utsendinger")
+    } else {
+      tagList(
+        h4("Aktive utsendinger:"),
+        h5("Når du trykker på knappen for å gjøre endringer i ei utsending,
+           slettes utsendinga fra lista og alle valg UNNTATT sykehustilhørighet/resh legger seg inn i skjemaet til venstre
+           slik at du f.eks. kan legge til/slette e-postmottagere og endre frekvens."),
+        DT::dataTableOutput("activeDispatchments")
+      )
+    }
+  })
+
+  # Rediger eksisterende auto rapport (alle typer)
+  observeEvent(input$edit_button, {
+    repId <- strsplit(input$edit_button, "_")[[1]][2]
+    rep <- rapbase::readAutoReportData()[[repId]]
+    if (rep$type == "subscription") {#abonnement
+
+    }
+    if (rep$type == "dispatchment") { #utsending
+      dispatchment$freq <- paste0(rep$intervalName, "-", rep$interval)
+      dispatchment$email <- rep$email
+      rapbase::deleteAutoReport(repId)
+      dispatchment$tab <-
+        rapbase::makeAutoReportTab(session, type = "dispatchment")
+      dispatchment$report <- rep$synopsis
+    }
+    if (rep$type == "bulletin") {
+
+    }
+  })
+
 
   ## slett eksisterende abonnement
+  # observeEvent(input$del_button, {
+  #   selectedRepId <- strsplit(input$del_button, "_")[[1]][2]
+  #   rapbase::deleteAutoReport(selectedRepId)
+  #   rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)})
+
+  # Slett eksisterende auto rapport (alle typer)
   observeEvent(input$del_button, {
-    selectedRepId <- strsplit(input$del_button, "_")[[1]][2]
-    rapbase::deleteAutoReport(selectedRepId)
-    rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+    repId <- strsplit(input$del_button, "_")[[1]][2]
+    rapbase::deleteAutoReport(repId)
+    subscription$tab <-
+      rapbase::makeAutoReportTab(session, type = "subscription")
+    dispatchment$tab <-
+      rapbase::makeAutoReportTab(session, type = "dispatchment")
   })
-
-
 
 
 
