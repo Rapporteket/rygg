@@ -495,7 +495,7 @@ UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='uforetrygdPre', preprosess
 ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='erstatningPre', preprosess = 0, outfile='FigErstatTid.pdf')
 
 RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='roker', outfile='FigRokerTid.pdf')
-Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='Utd', datoFra=datoFra1aar, datoTil=datoTil,
+Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='utd', datoFra=datoFra1aar, datoTil=datoTil,
                             outfile='FigUtd.pdf')
 
 
@@ -508,15 +508,15 @@ HovedInngrep <- RyggFigAndeler(RegData=RegData1aar, valgtVar='hovedInngrep', dat
 
 TidlOp3 <- RyggFigAndelTid(RegData=RegData, hovedkat = 1, valgtVar = 'tidlOp3', outfile = 'FigTidlOpAnt3.pdf')
 
-KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='KpInf3mnd',
+KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='kpInf3mnd',
                                    hovedkat = 1, outfile='FigKpInf3mndTidPro.pdf')
-KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='KpInf3mnd',
+KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='kpInf3mnd',
                                    hovedkat=9, outfile='FigKpInf3mndTidSS.pdf')
 
-DuraPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='PeropKompDura',
+DuraPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
                                aar=(rappAar-1):rappAar, Ngrense = 20,
                                hastegrad = 1, tidlOp = 4, hovedkat = 1, outfile='FigDuraPro.pdf')
-DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='PeropKompDura',
+DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
                               aar=(rappAar-1):rappAar, Ngrense = 20,
                               hastegrad = 1, tidlOp = 4, hovedkat=9, outfile='FigDuraSS.pdf')
 # sjekket

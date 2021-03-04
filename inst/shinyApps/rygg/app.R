@@ -204,8 +204,6 @@ ui <- navbarPage(id = "tab1nivaa",
 
                         br(),
                         br(),
-                        br(),
-                        br(),
                         h4('Last ned egne data'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
@@ -222,6 +220,8 @@ ui <- navbarPage(id = "tab1nivaa",
            mainPanel(
              tabsetPanel(id='ark',
                          tabPanel('Antall operasjoner',
+                                  uiOutput('OppsumAntReg'),
+                                  br(),
                                   uiOutput("undertittelReg"),
                                   p("Velg tidsperiode ved å velge sluttdato/tidsenhet i menyen til venstre"),
                                   br(),
@@ -657,6 +657,15 @@ server <- function(input, output,session) {
 
 #------Registreringsoversikter---------------------
   observe({
+    output$OppsumAntReg <- renderUI({
+      Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PasientID']
+      antallReg <- length(Registreringer)
+      antallPers <- length(unique(Registreringer))
+      HTML(paste0('<b> I perioden ',format.Date(input$datovalgRegKtr[1], '%d. %B %Y'), ' - ', format.Date(input$datovalgRegKtr[2], '%d. %B %Y'),
+             ' er det totalt registrert ', antallReg, ' operasjoner. Disse er utført på tilsammen ',
+             antallPers, ' personer.', '</b>' ))})
+
+
     tabAntOpphSh <- switch(input$tidsenhetReg,
            Mnd=tabAntOpphShMnd(RegData=RegData, datoTil=input$sluttDatoReg, antMnd=12), #input$datovalgTab[2])
            Aar=tabAntOpphSh5Aar(RegData=RegData, datoTil=input$sluttDatoReg))
@@ -711,6 +720,9 @@ server <- function(input, output,session) {
   observe({
     reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
+    uiOutput({
+
+    })
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
                                 as.Date(InnDato) >= input$datovalgRegKtr[1],
                                 as.Date(InnDato) <= input$datovalgRegKtr[2])
