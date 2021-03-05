@@ -34,7 +34,7 @@ if (paaServer) {
   RegData <- RyggRegDataSQLV2V3()  #RyggRegDataSQL(alle = 1)
   qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
   SkjemaOversikt <- rapbase::loadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
-  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
+  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, AvdodDato, BasisRegStatus from ForlopsOversikt'
   RegOversikt <- rapbase::loadRegData(registryName="rygg", query=qForlop, dbType="mysql")
   RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
 } else {
@@ -654,7 +654,6 @@ server <- function(input, output,session) {
 
 
 #------Registreringsoversikter---------------------
-  observe({
     output$OppsumAntReg <- renderUI({
       Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PasientID']
       antallReg <- length(Registreringer)
@@ -664,7 +663,8 @@ server <- function(input, output,session) {
              antallPers, ' personer.', '</b>' ))})
 
 
-    tabAntOpphSh <- switch(input$tidsenhetReg,
+    observe({
+      tabAntOpphSh <- switch(input$tidsenhetReg,
            Mnd=tabAntOpphShMnd(RegData=RegData, datoTil=input$sluttDatoReg, antMnd=12), #input$datovalgTab[2])
            Aar=tabAntOpphSh5Aar(RegData=RegData, datoTil=input$sluttDatoReg))
 

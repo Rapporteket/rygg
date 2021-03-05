@@ -451,7 +451,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          grtxt <- c(0:6, '7+')
          xAkseTxt <- 'Antall liggedøgn' #(subtxt
          subtxt <- 'døgn'
-         if (figurtype=='gjsnGrVar') {tittel <- 'liggetid'}
+         if (figurtype=='gjsnGrVar') {tittel <- 'liggetid etter operasjon'}
          sortAvtagende <- 'F'
          TittelVar <- 'Liggetid etter operasjon'
          ytxt1 <- 'liggetid'

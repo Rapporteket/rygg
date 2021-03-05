@@ -217,9 +217,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             soyleFarger <- farger[4] #rep(farger[3], AntGrNgr)
             prikkFarge <- farger[3]
             #Hvis Norge egen søyle: soyleFarger[which(names(AndelerSisteSort)=='Norge')] <- farger[4]
-            #fargerMaalNiva <-  c('#4fc63f', '#fbf850','#c6312a') #c('green','yellow', 'red')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
-            fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713')[rekkef] #Grønn, gul, rød Likt med sykehusviser
-            #Tilpasse marger for å kunne skrive utvalgsteksten
+             #Tilpasse marger for å kunne skrive utvalgsteksten
             NutvTxt <- length(utvalgTxt)
             vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.8)
             #NB: strwidth oppfører seg ulikt avh. av device...
@@ -233,6 +231,8 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
                            xlim=c(0,xmax), ylim=c(0.05, 1.32)*length(GrNavnSort), font.main=1, #xlab=xAkseTxt,
                            las=1, cex.names=cexShNavn*0.9)
             #Legge på målnivå
+            #fargerMaalNiva <-  c('#4fc63f', '#fbf850','#c6312a') #c('green','yellow', 'red')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
+            fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713') #[rekkef] #Grønn, gul, rød Likt med sykehusviser
             KImaalGrenser <- RyggVarSpes$KImaalGrenser #c(0,20,40) #,xmax)
             antMaalNivaa <- length(KImaalGrenser)-1
             maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')
