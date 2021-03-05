@@ -153,8 +153,8 @@ if (valgtMaal=='Gjsn') {	#Gjennomsnitt er standard, men må velges.
       Gjsn <- tapply(RegData$Variabel[indMed], RegData[indMed, grVar], mean, na.rm=T)
 	SE <- tapply(RegData$Variabel[indMed], RegData[indMed, grVar], sd, na.rm=T)/sqrt(Ngr[Ngr >= Ngrense]) #
 
-	MidtUt <- mean(RegData$Variabel[indUt])	#mean(RegData$Variabel)
-	KIUt <- MidtUt + sd(RegData$Variabel[indUt])/sqrt(Nut)*c(-2,2)
+	MidtUt <- ifelse(length(indUt>0), mean(RegData$Variabel[indUt]), NA)
+	KIUt <- ifelse(length(indUt>0), MidtUt + sd(RegData$Variabel[indUt])/sqrt(Nut)*c(-2,2), 0)
 
 	sortInd <- order(c(Gjsn, MidtUt), decreasing=RyggVarSpes$sortAvtagende, na.last = FALSE)
 
@@ -168,7 +168,7 @@ if (valgtMaal=='Gjsn') {	#Gjennomsnitt er standard, men må velges.
 
 #navnNut <- ifelse(Nut<Ngrense, NULL,'')
 Ngr <- c(as.character(Ngr), Nut) #Ngr[sortInd]
-Ngrtxt <- paste0(' (', Ngr[sortInd],')' ) #[-indGrUt]
+Ngrtxt <- paste0(' (', Ngr,')' ) #[-indGrUt]
 GrNavnSort <- paste0(c(GrNavn, paste0(antGrUt, ' avdelinger med N<', Ngrense))[sortInd], Ngrtxt[sortInd])
 soyletxt <- sprintf('%.1f', Midt)
 antGr <- length(GrNavnSort)

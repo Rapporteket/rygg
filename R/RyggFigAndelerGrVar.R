@@ -104,7 +104,7 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
       }
       #------- Tilrettelegge variable
       RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr,
-                                         datoTil=datoTil, figurtype = 'andelGrVar')
+                                         hovedkat= hovedkat, datoTil=datoTil, figurtype = 'andelGrVar')
       RegData <- RyggVarSpes$RegData
       sortAvtagende <- RyggVarSpes$sortAvtagende
       #varTxt <- RyggVarSpes$varTxt

@@ -413,8 +413,9 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          sortAvtagende <- FALSE
          xAkseTxt <- 'Andel sårinfeksjoner (%)'
          #KImaalRetn <- 'lav'
-         if (hovedkat == 1) {KImaalGrenser <- c(0,2)}
-         if (hovedkat == 8) {KImaalGrenser <- c(0,3)}
+         if (hovedkat == 1) {KImaalGrenser <- c(0,2,100)}
+         if (hovedkat == 5) {KImaalGrenser <- c(0,3,100)}
+         if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
       }
 
       if (valgtVar=='liggedogn') {#fordeling, gjsnGrVar, andeler, gjsnTid
@@ -452,7 +453,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          subtxt <- 'døgn'
          if (figurtype=='gjsnGrVar') {tittel <- 'liggetid'}
          sortAvtagende <- 'F'
-         TittelVar <- 'Liggetid ved operasjon'
+         TittelVar <- 'Liggetid etter operasjon'
          ytxt1 <- 'liggetid'
          KIekstrem <- c(0, 20)
       }
