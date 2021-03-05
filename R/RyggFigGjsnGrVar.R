@@ -154,7 +154,7 @@ if (valgtMaal=='Gjsn') {	#Gjennomsnitt er standard, men må velges.
 	SE <- tapply(RegData$Variabel[indMed], RegData[indMed, grVar], sd, na.rm=T)/sqrt(Ngr[Ngr >= Ngrense]) #
 
 	MidtUt <- ifelse(length(indUt>0), mean(RegData$Variabel[indUt]), NA)
-	KIUt <- ifelse(length(indUt>0), MidtUt + sd(RegData$Variabel[indUt])/sqrt(Nut)*c(-2,2), 0)
+	KIUt <- if (length(indUt)>0) {MidtUt + sd(RegData$Variabel[indUt])/sqrt(Nut)*c(-2,2)} else {0}
 
 	sortInd <- order(c(Gjsn, MidtUt), decreasing=RyggVarSpes$sortAvtagende, na.last = FALSE)
 
@@ -285,14 +285,16 @@ if (dim(RegData)[1] < 10 )
 
 
 	if (medKI == 1) {	#Legge på konf.int for hver enkelt gruppe/sykehus
-	      arrows(x0=AggVerdier$Hoved, y0=pos, x1=AggVerdier$KIopp, y1=pos,
-	             length=0.5/max(pos), code=2, angle=90, lwd=1, col=farger[1])
-	      arrows(x0=AggVerdier$Hoved, y0=pos, x1=AggVerdier$KIned, y1=pos,
-	             length=0.5/max(pos), code=2, angle=90, lwd=1, col=farger[1])
+	  #Bytte ut 0'er med NA for å unngå advarsel?
+	  arrows(x0=AggVerdier$KIned, y0=pos, x1=AggVerdier$KIopp, y1=pos,
+	         length=0.5/max(pos), code=2, angle=90, lwd=1, col=farger[1])
+	      # arrows(x0=AggVerdier$Hoved, y0=pos, x1=AggVerdier$KIopp, y1=pos,
+	      #        length=0.5/max(pos), code=2, angle=90, lwd=1, col=farger[1])
+	      # arrows(x0=AggVerdier$Hoved, y0=pos, x1=AggVerdier$KIned, y1=pos,
+	      #        length=0.5/max(pos), code=2, angle=90, lwd=1, col=farger[1])
 	}
 	#------Tegnforklaring (legend)--------
 	if (valgtMaal %in% c('Gjsn', 'Med')) { #Sentralmålfigur
-#	if (figurtype %in% c('gjsnGrVar', 'gjsnTid')) { #Sentralmålfigur
 	  if (medKI == 0) { #Hopper over hvis ikke valgtMaal er oppfylt
 	            TXT <- paste0('totalt: ', sprintf('%.1f', AggTot), ', N=', N)
       	      legend(xmax/4, posOver+posDiff, TXT, fill=NA,  border=NA, lwd=2.5, xpd=TRUE, #inset=c(-0.1,0),
