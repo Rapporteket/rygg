@@ -993,6 +993,10 @@ server <- function(input, output,session) {
   #   rownames = FALSE, options = list(dom = 't')
   # )
 
+  ## reaktive verdier for å holde rede på endringer som skjer mens
+  ## applikasjonen kjører
+  subscription <- reactiveValues(
+    tab = rapbase::makeAutoReportTab(session, type = "subscription"))
   ## lag tabell over gjeldende status for abonnement
   output$activeSubscriptions <- DT::renderDataTable(
     subscription$tab, server = FALSE, escape = FALSE, selection = 'none',

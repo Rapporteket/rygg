@@ -286,7 +286,9 @@ if (dim(RegData)[1] < 10 )
 
 	if (medKI == 1) {	#Legge på konf.int for hver enkelt gruppe/sykehus
 	  #Bytte ut 0'er med NA for å unngå advarsel?
-	  arrows(x0=AggVerdier$KIned, y0=pos, x1=AggVerdier$KIopp, y1=pos,
+	  #fjernes <- (AggVerdier$KIned==0 & AggVerdier$KIopp==0)
+	  med <- !(AggVerdier$KIned==0 & AggVerdier$KIopp==0)
+	  arrows(x0=AggVerdier$KIned[med], y0=pos[med], x1=AggVerdier$KIopp[med], y1=pos[med],
 	         length=0.5/max(pos), code=2, angle=90, lwd=1, col=farger[1])
 	      # arrows(x0=AggVerdier$Hoved, y0=pos, x1=AggVerdier$KIopp, y1=pos,
 	      #        length=0.5/max(pos), code=2, angle=90, lwd=1, col=farger[1])
