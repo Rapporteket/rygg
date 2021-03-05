@@ -120,7 +120,7 @@ dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hoved
                        Ngrense=20, aar=rappAar, tidlAar=tidlAar, outfile='SympVarighUtstrAarPro.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
                        Ngrense=20, aar=aar2, outfile='SympVarighUtstrShPro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, preprosess = 0,
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, preprosess = 0,
                     Ngrense=20, aar=aar2, outfile='SympVarighUtstrShSS.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, outfile='SympVarighUtstrTidPro.pdf')
 
