@@ -4,7 +4,7 @@
 \alias{forsinketReg}
 \title{Beregn andel registrereinger som er ferdigstilt viss lang tid etter operasjon.}
 \usage{
-forsinketReg(RegData, fraDato, tilDato, forsinkelse, reshID)
+forsinketReg(RegData, fraDato, tilDato, forsinkelse, reshID = 0)
 }
 \arguments{
 \item{RegData}{dataramme med reshID, FirstTimeClosed og operasjonsdato}

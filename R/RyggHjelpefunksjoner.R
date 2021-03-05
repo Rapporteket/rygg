@@ -241,8 +241,8 @@ henteSamlerapporter <- function(filnavn, rnwFil, reshID=0,
 abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
                             datoFra=Sys.Date()-180, datoTil=Sys.Date()) {
 
-  raplog::subLogger(author = brukernavn, registryName = 'NKR: Degenerativ Rygg',
-                    reshId = reshID[[1]], msg = "Abonnement: månedsrapport")
+  #raplog::subLogger(author = brukernavn, registryName = 'NKR: Degenerativ Rygg',
+  #                  reshId = reshID[[1]], msg = "Abonnement: månedsrapport")
 
   filbase <- substr(rnwFil, 1, nchar(rnwFil)-4)
   tmpFile <- paste0(filbase, Sys.Date(),'_',digest::digest(brukernavn), '.Rnw')
@@ -254,7 +254,7 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
   knitr::knit2pdf(input=tmpFile)
 
   utfil <- paste0(dir, '/', substr(tmpFile, 1, nchar(tmpFile)-3), 'pdf')
-  raplog::subLogger(author = brukernavn, registryName = 'NKR: Degenerativ Rygg',
-                    reshId = reshID[[1]], msg = paste("Sendt: ", utfil))
+  #raplog::subLogger(author = brukernavn, registryName = 'NKR: Degenerativ Rygg',
+  #                  reshId = reshID[[1]], msg = paste("Sendt: ", utfil))
   return(utfil)
 }

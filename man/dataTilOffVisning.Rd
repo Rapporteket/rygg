@@ -15,6 +15,7 @@ dataTilOffVisning(
   hovedkat = 99,
   hastegrad = 99,
   tidlOp = "",
+  lastNedFil = 0,
   filUt = "dummy"
 )
 }

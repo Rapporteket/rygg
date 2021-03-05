@@ -93,7 +93,7 @@ RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', d
     raplog::repLogger(session = list(...)[["session"]], msg = paste0('Fordelingsfigur: ',valgtVar))
   }
 
-  if (reshID==0){stopifnot(enhetsUtvalg ==0 )}
+  #if (reshID==0){stopifnot(enhetsUtvalg ==0 )}
 
   if (hentData == 1) {
     RegData <- RyggRegDataSQL()       #(datoFra, datoTil)
