@@ -132,15 +132,15 @@ BeinsmLavPre <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='smBePreLav', a
 
 #Infeksjoner ikke registrert i 2019
 #3 kval.ind: Prolaps, Fusjon, SS
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2,
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
                                     Ngrense = 20, hovedkat = 1, outfile='KpInf3mndPro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2,
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
                                     Ngrense = 20, hovedkat = 5, outfile='KpInf3mndFusj.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2,
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
                                    Ngrense = 20, hovedkat=9, outfile='KpInf3mndSS.pdf')
-dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2, tidlAar=tidlAar2,
+dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
                     Ngrense = 20, hovedkat = 1, outfile='KpInf3mndProAar.pdf')
-dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2, tidlAar=tidlAar2,
+dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
                     Ngrense = 20, hovedkat = 5, outfile='KpInf3mndFusjAar.pdf')
 dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
                     Ngrense = 20, hovedkat=9, outfile='KpInf3mndSSAar.pdf')
@@ -166,6 +166,7 @@ RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
                     outfile='RegForsinkelse_Sh.pdf') #RegForsinkelse_Sh.pdf
 
+<<<<<<< HEAD
 qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, AvdodDato, BasisRegStatus from ForlopsOversikt'
 
 #Død innen 30 dager
@@ -176,6 +177,8 @@ RegOversikt$Dod30[as.numeric(difftime(RegOversikt$AvdodDato,
                                          units = 'days')) < 30] <- 1
 sum(RegOversikt$Dod30, na.rm = T)/dim(RegOversikt)[1]*100
 sum(RegOversikt$Dod30, na.rm = T)
+=======
+>>>>>>> rel
 #------------------------------------------------------------------------------------
 #-----------Filer til Resultatportalen -----------------------
 #------------------------------------------------------------------------------------
@@ -189,85 +192,47 @@ library(rygg)
 library(magrittr)
 RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
 
-valgteAar <- 2011:2020
-
-# Gyldige kvalitetsindikator id-er for Nasjonalt kvalitetsregister for ryggkirurgi:
-#   1	nkr_rygg_dg
+rappAar <- 2020
+valgteAar <- 2011:rappAar
 
 
-DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='sympVarighUtstr', aar=valgteAar,
-                                hovedkat=1,
-                                ResPort=1, indID = 'ind1', filUt = 'ind1_Varighet_bensmerter')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='sympVarighUtstr', aar=valgteAar,
                                  hovedkat=1,
                                  ResPort=0, indID = 'nkr_rygg_varighet_bensmerter', filUt = 'ind1_Varighet_bensmerter')
 
 #--Bensmerter mindre eller lik 3 på numerisk smerteskala
-DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav', aar=valgteAar, hovedkat=1,
-                                ResPort=1, indID = 'ind2', filUt = 'ind2_lav_bensmerte_prolaps')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav', aar=valgteAar, hovedkat=1,
                                 ResPort=0, indID = 'nkr_rygg_lav_bensmerte_prolaps', filUt = 'ind2_lav_bensmerte_prolaps')
 
 #--Sårinfeksjon, dyp og overfladisk
-# DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='kpInf3mnd', aar=valgteAar, hovedkat=1,
-#                              ResPort=1, indID = 'ind3', filUt = 'ind3_Saarinfeksjon_prolaps')
-#indID <- 'nkr_rygg_saarinfeksjon_prolaps'
+DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='kpInf3mnd', aar=rappAar, hovedkat=1,
+                             ResPort=0, indID = 'nkr_rygg_saarinfeksjon_prolaps', filUt = 'ind3_Saarinfeksjon_prolaps')
 
-
-# DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='kpInf3mnd', aar=valgteAar, hovedkat=9,
-#                              ResPort=1, indID = 'ind4', filUt = 'ind4_Saarinfeksjon_stenose')
-#indID <- 'nkr_rygg_saarinfeksjon_stenose'
+DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='kpInf3mnd', aar=rappAar, hovedkat=9,
+                             ResPort=0, indID = 'nkr_rygg_saarinfeksjon_stenose', filUt = 'ind4_Saarinfeksjon_stenose')
 
 #-----------Durarift
-DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='peropKompDura', aar=valgteAar,
-                                hovedkat=1, tidlOp=4, hastegrad=1,
-                                ResPort=1, indID = 'ind5', filUt = 'ind5_Durarift prolaps')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='peropKompDura', aar=valgteAar,
                                 hovedkat=1, tidlOp=4, hastegrad=1,
                                 ResPort=0, indID = 'nkr_rygg_durarift_prolaps', filUt = 'ind5_Durarift prolaps')
-
-DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='peropKompDura', aar=valgteAar,
-                                hovedkat=9, tidlOp=4, hastegrad=1,
-                                ResPort=1, indID = 'ind6', filUt = 'ind6_Durarift_stenose')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='peropKompDura', aar=valgteAar,
                                 hovedkat=9, tidlOp=4, hastegrad=1,
                                 ResPort=0, indID = 'nkr_rygg_durarift_stenose', filUt = 'ind6_Durarift_stenose')
 
 # IKKE? valgtVar='peropKompDura', hovedkat=5, tidlOp=4, hastegrad=1,
 
-#------Nye 2019
-#Sjekkliste, trygg kirurgi
-# DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='tryggKir', aar=valgteAar,
-#                                 hovedkat=9, tidlOp=4, hastegrad=1,
-#                                 ResPort=1, indID = 'ind7', filUt = 'ind7_TryggKirurgi')
-
 #Ventetid, operasjon bestemt til utført
-DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp', aar=valgteAar,
-                                hovedkat=9, tidlOp=4, hastegrad=1,
-                                ResPort=1, indID = 'ind8', filUt = 'ind8_VentetidOperasjon')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp', aar=valgteAar,
                                 hovedkat=9, tidlOp=4, hastegrad=1,
                                 ResPort=0, indID = 'nkr_rygg_ventetid_kirurgi', filUt = 'ind8_VentetidOperasjon')
 
 #-------Oswestry------
-DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20', aar=valgteAar,
-                             hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2,
-                             ResPort=1, indID = 'ind9', filUt = 'ind9_OswEndr20poengPro')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20', aar=valgteAar,
                                 hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2,
                                 ResPort=0, indID = 'nkr_rygg_ODI20p12mnd_prolaps', filUt = 'ind9_OswEndr20poengPro')
-
-DataTilRes <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst', aar=valgteAar,
-                             hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2,
-                             ResPort=1, indID = 'ind10', filUt = 'ind10_OswEndr30pstPro')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst', aar=valgteAar,
                                 hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2,
                                 ResPort=0, indID = 'nkr_rygg_ODI30pst12mnd_stenose', filUt = 'ind10_OswEndr30pstPro')
-
-
-# valgtVar='OswEndr', hovedkat=10,
-# valgtVar='regForsinkelse'
-
 
 
 #Alle sykehus og resh:

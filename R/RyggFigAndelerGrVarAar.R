@@ -75,6 +75,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
       RegData <- RyggVarSpes$RegData
       sortAvtagende <- !RyggVarSpes$sortAvtagende #Kan evt. bruke denne til å snu retn for kval.ind. som har "høy" som mål.
       varTxt <- RyggVarSpes$varTxt
+      KImaalGrenser <- RyggVarSpes$KImaalGrenser
       #KImaalRetn <- RyggVarSpes$KImaalRetn
 
 
@@ -109,6 +110,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
       #Hvis siste år for få reg - ta også bort resultater fra foregående år.
       N <- dim(RegData)[1] #table(RegData$Aar)      #Antall per år
 
+
       #----------------------------------------------------------------------------------------------
       #KODEN MÅ KOMPRIMERES!!!!!!!!!:
       if (tidlAar[1] != 0) { #Sammenligne med resultater for tidligere år.
@@ -117,7 +119,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             katVariable <- c('grNaa', 'grVar')
             Nvar <- tapply(RegData$Variabel, RegData[ ,katVariable], sum, na.rm=T) #Variabel er en 0/1-variabel.
             if(N > 0) {Ngr <- table(RegData[ ,katVariable])}	else {Ngr <- 0}
-
+            AntGr <- length(which(Ngr >= Ngrense))	#Alle som har gyldig resultat
             #Sjekk for AK-justering
             if (AKjust == 1) { #Alders-og kjønnsjustering
                   Nvar <- tapply(RegData$Variabel, RegData[ ,c('Aar', 'grVar')], sum, na.rm=T) #Variabel er en 0/1-variabel.
@@ -217,7 +219,11 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             soyleFarger <- farger[4] #rep(farger[3], AntGrNgr)
             prikkFarge <- farger[3]
             #Hvis Norge egen søyle: soyleFarger[which(names(AndelerSisteSort)=='Norge')] <- farger[4]
+<<<<<<< HEAD
              #Tilpasse marger for å kunne skrive utvalgsteksten
+=======
+            #Tilpasse marger for å kunne skrive utvalgsteksten
+>>>>>>> rel
             NutvTxt <- length(utvalgTxt)
             vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.8)
             #NB: strwidth oppfører seg ulikt avh. av device...
@@ -231,6 +237,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
                            xlim=c(0,xmax), ylim=c(0.05, 1.32)*length(GrNavnSort), font.main=1, #xlab=xAkseTxt,
                            las=1, cex.names=cexShNavn*0.9)
             #Legge på målnivå
+<<<<<<< HEAD
             #fargerMaalNiva <-  c('#4fc63f', '#fbf850','#c6312a') #c('green','yellow', 'red')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
             fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713') #[rekkef] #Grønn, gul, rød Likt med sykehusviser
             KImaalGrenser <- RyggVarSpes$KImaalGrenser #c(0,20,40) #,xmax)
@@ -238,6 +245,38 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')
             rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
                  ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
+=======
+            # antMaalNivaa <- length(KImaalGrenser)-1
+            # rekkef <- 1:antMaalNivaa
+            # #fargerMaalNiva <-  c('#4fc63f', '#fbf850','#c6312a') #c('green','yellow', 'red')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
+            # fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713')[rekkef] #Grønn, gul, rød Likt med sykehusviser
+            # KImaalGrenser <- RyggVarSpes$KImaalGrenser #c(0,20,40) #,xmax)
+            # antMaalNivaa <- length(KImaalGrenser)-1
+            # maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')
+            # rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
+            #      ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
+
+            if (!is.na(KImaalGrenser[1])) {
+               antMaalNivaa <- length(KImaalGrenser)-1
+               rekkef <- 1:antMaalNivaa
+               if (sortAvtagende == FALSE) {rekkef <- rev(rekkef)}
+               #fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
+               fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713')[rekkef] #Grønn, gul, rød Likt med sykehusviser
+               maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
+               if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
+               rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
+                    ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
+               legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
+               # legend(x=0, y=legPos, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
+               #        ncol=antMaalNivaa+1,
+               #        xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
+               #        legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
+               legend(x=0, y=-2.5, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
+                      ncol=antMaalNivaa+1,
+                      xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
+                      legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
+            }
+>>>>>>> rel
             ybunn <- 0.1
             ytopp <- max(pos)+ 0.4 #pos[2]-pos[1] #pos[AntGrNgr]+ 0.4	#
             if (tidlAar != 0) {
@@ -259,16 +298,6 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
                                paste0(AarTxt, ' (', sprintf('%.1f', ResAar[2]), '%, ', 'N=', Naar[2],')'),
                                paste0('Hele landet, ',AarTxt))
                   )
-                  if (!is.na(KImaalGrenser[1])) {
-                  legend(x=0, y=-2.5, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
-                         ncol=antMaalNivaa+1,
-                         xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
-                         legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
-                  }
-                  # legend(x=0, y=-3, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
-                  #        ncol=antMaalNivaa+1,
-                  #        xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
-                  #        legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
 
                   mtext(xAkseTxt, side=1, las=1, cex=cexShNavn, adj=0.5, line=1.8)
                   mtext(signTxt, line=4, side=1, las=1, cex=cexShNavn, adj=0, col='#FF7260') #line=3.8,
