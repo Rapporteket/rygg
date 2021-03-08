@@ -142,7 +142,7 @@ dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2, t
                     Ngrense = 20, hovedkat = 1, outfile='KpInf3mndProAar.pdf')
 dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2, tidlAar=tidlAar2,
                     Ngrense = 20, hovedkat = 5, outfile='KpInf3mndFusjAar.pdf')
-dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=aar2, tidlAar=tidlAar2,
+dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
                     Ngrense = 20, hovedkat=9, outfile='KpInf3mndSSAar.pdf')
 
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, hastegrad=1,
