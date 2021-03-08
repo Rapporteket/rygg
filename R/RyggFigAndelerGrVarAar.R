@@ -246,7 +246,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             if (!is.na(KImaalGrenser[1])) {
                antMaalNivaa <- length(KImaalGrenser)-1
                rekkef <- 1:antMaalNivaa
-               if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
+               if (sortAvtagende == FALSE) {rekkef <- rev(rekkef)}
                #fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
                fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713')[rekkef] #Grønn, gul, rød Likt med sykehusviser
                maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
