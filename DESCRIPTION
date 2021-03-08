@@ -1,7 +1,7 @@
 Package: rygg
 Title: Degenerativ Rygg, figurer, tabeller, analyser
 Version: 2.3.0
-Date: 2021-03-05
+Date: 2021-03-08
 Authors@R: 
     person(given = "Lena Ringstad",
            family = "Olsen",
