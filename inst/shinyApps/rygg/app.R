@@ -399,7 +399,7 @@ tabPanel(p('Fordelinger',
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
                     actionButton("reset_fordValg", label="Tilbakestill valg"),
                     selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
-                                selected = 0,
+                                #selected = reshID,
                                 choices = sykehusValg)
                   ),
                   mainPanel(
@@ -803,8 +803,9 @@ server <- function(input, output,session) {
   )
 
   observe({
+    reshIDford <- ifelse(rolle=='SC', input$velgReshFord, reshID)
     UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0, valgtVar=input$valgtVar,
-                                reshID=reshID, enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                                reshID=reshIDford, enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                                 datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                                 minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
                                 erMann=as.numeric(input$erMann),

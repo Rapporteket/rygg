@@ -145,6 +145,7 @@ lagTabavFigGjsnGrVar <- function(UtDataFraFig){
 tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=2, reshID=0) {
   datoFra <- switch(tidsenhet,
                     Mnd = lubridate::floor_date(as.Date(datoTil)%m-% months(12, abbreviate = T), 'month'), #as.Date(paste0(as.numeric(substr(datoTil,1,4))-1, substr(datoTil,5,8), '01'), tz='UTC')
+                    Kvartal = paste0(year(as.Date(datoTil))-4, '-01-01'),
                     Aar = paste0(year(as.Date(datoTil))-4, '-01-01')
   )
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil = datoTil,

@@ -1,7 +1,7 @@
 \documentclass[handout, xcolor=pdftex,dvipsnames,table]{beamer}  %presentation,
 %\documentclass[handout, xcolor=pdftex,dvipsnames,table]  %presentation,
 \usetheme{Hannover}
- 
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[english, norsk]{babel}
@@ -24,7 +24,7 @@ library(lubridate)
 
 dato <- as.POSIXlt(Sys.Date(), tz='UTC')
 datoTil <- as.Date(format(dato, "%Y-%m-01"))-1 #Til siste i forrige måned
-mndTxt <- c('januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 
+mndTxt <- c('januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august',
                    'september', 'oktober', 'november', 'desember')
 rappMnd <- paste0(mndTxt[ifelse(dato$mon==0, 12, dato$mon)], ' ', dato$year+1900)
 #som <- function(x) {as.Date(format(x, "%Y-%m-01"), tz='UTC')}
@@ -33,12 +33,12 @@ rappMnd <- paste0(mndTxt[ifelse(dato$mon==0, 12, dato$mon)], ' ', dato$year+1900
 datoFra1Aar <- as.Date(paste0(1900+dato$year-1,'-', ifelse(dato$mon==11, 1, dato$mon+2), '-', '01'), tz='UTC')
 #Siste 6 måneder:
 datoFra6mnd <- paste0(substr(as.character(dato %m-% months(6, abbreviate=FALSE)),1, 8),'01')  #benytter lubridate
-      
+
 datoFra <- datoFra6mnd
 #Ønsker eget datasett for forrige måned
 dato <- as.POSIXlt('2018-12-07')
 datoFraMnd <- format(datoTil, "%Y-%m-01")
-# Gir feil dato: datoFraMnd <- as.Date(paste0(1900+dato$year,'-', ifelse(dato$mon==0, 11, dato$mon), '-', '01'), tz='UTC') #dato - 
+# Gir feil dato: datoFraMnd <- as.Date(paste0(1900+dato$year,'-', ifelse(dato$mon==0, 11, dato$mon), '-', '01'), tz='UTC') #dato -
 
 tidsenhet <- 'Mnd'
 preprosess <- 0
@@ -61,7 +61,7 @@ RyggUtvalg <- RyggUtvalgEnh(RegData, reshID = reshID, enhetsUtvalg =1,
 #Fra RyggUTvalg: utvalgTxt, ind, medSml, smltxt, hovedgrTxt, grTypeTxt, RegData
 RegData <- RyggUtvalg$RegData
 shtxt <- RyggUtvalg$hovedgrTxt
-#ShTypeEgenTxt <- RyggUtvalg$grTypeTxt 
+#ShTypeEgenTxt <- RyggUtvalg$grTypeTxt
 ind <- RyggUtvalg$ind
 N <- dim(RegData)[1]
 
@@ -69,7 +69,7 @@ N <- dim(RegData)[1]
 
 RegDataEget <- RegData[ind$Hoved, ]
 RegDataEgetMnd <- RegDataEget[which(as.Date(RegDataEget$InnDato, tz='UTC') >= datoFraMnd), ]
-#RegDataShType <- RegData[ind$ShTypeEgen,] 
+#RegDataShType <- RegData[ind$ShTypeEgen,]
 RegDataResten <- RegData[setdiff(1:N,ind$Hoved), ]
 RegDataMnd <- RegData[which(as.Date(RegData$InnDato, tz='UTC') >= datoFraMnd), ]
 
@@ -82,7 +82,7 @@ tabKjPstEget <- round(table(RegDataEget$erMann)/Neget*100, digits=1)
 \begin{document}
 
 \title[Rygg\\\Sexpr{shtxt} \\\today]{\textit{NKR: Degenerativ rygg} \\
-Månadsrapport, \Sexpr{rappMnd} \\
+Månedsrapport, \Sexpr{rappMnd} \\
 \Sexpr{shtxt} }
 %{\today}\\[2cm] % Date, change the \today to a set date if you want to be precise \date{}
 \maketitle
@@ -92,107 +92,176 @@ Månadsrapport, \Sexpr{rappMnd} \\
 
 \begin{frame}[fragile] {Ansvar og bruk av data}
 
-Fagrådet for NKR er ansvarlig for alle vurderingar og tolkninger av data, og også feil i resultat som skyldes feil i datagrunnlaget. Den viktigste feilkilden i rapporten vil trolig være ufullstendige datasett for mange av de registrerende enheter – det vil si at ikke alle data er ferdigstilte for aktuell månad. Dette etterslepet vil variere markert både i tid og volum, og gjør at data blir mer eller mindre representative for de ulike enhetene.
-Rapporten har følgelig usikkert datagrunnlag og er ment til internt bruk i enhetene. 
-Rapporten inneholder anonymiserte samledata. I tilfeller der utvalget inneholder få 
-registreringer kombinert med eksempelvis demografiske data, kan det ikke utelukkes at rapporterte data kan tilbakeidentifiseres til enkeltpersoner. 
+Fagrådet for NKR er ansvarlig for alle vurderinger og tolkninger av data, og også feil i resultat som skyldes feil i datagrunnlaget. Den viktigste feilkilden i rapporten vil trolig være ufullstendige datasett for mange av de registrerende enheter – det vil si at ikke alle data er ferdigstilte for aktuell månad. Dette etterslepet vil variere markert både i tid og volum, og gjør at data blir mer eller mindre representative for de ulike enhetene.
+Rapporten har følgelig usikkert datagrunnlag og er ment til internt bruk i enhetene.
+Rapporten inneholder anonymiserte samledata. I tilfeller der utvalget inneholder få
+registreringer kombinert med eksempelvis demografiske data, kan det ikke utelukkes at rapporterte data kan tilbakeidentifiseres til enkeltpersoner.
 
-\textit{\textbf{Av ovenfor nevnte årsaker, ber NKR om at denne rapporten ikke blir brukt 
+\textit{\textbf{Av ovenfor nevnte årsaker, ber NKR om at denne rapporten ikke blir brukt
 offentlig i noen sammenheng eller på noe vis blir offentliggjort.}}
 
 \end{frame}
 
 
-%\section{Innhald}
+\section{Datagrunnlag og innhold}
 
-\begin{frame}[fragile] {Datagrunnlag og innhold}
+\begin{frame}[fragile] {Innhold}
 
 Denne rapporten er utarbeidet på oppdrag frå Norsk kvalitetsregister for ryggkirurgi (NKR) og genereres automatisk
 fra Rapporteket. Alle resultater er baserte på data fra registeret og er gyldige per rapportdato for
-opphold som er ferdigstilte t.o.m. dagen før rapportdato i QReg. 
+opphold som er ferdigstilte t.o.m. dagen før rapportdato i QReg.
 
-
-For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
+*For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
 \Sexpr{maxDatoEget}.
-%\par
 
-% \small{
-% \begin{itemize}
-% \item Nøkkeltall
-% \item Registreringsforsinkelse
-% \item Komplikasjoner, peroperativt
-% \item Liggetid etter operasjon
-% \end{itemize}
-% }
+\begin{frame}[fragile] {Innhold}
+Dette er en sammenstilling av resultater  fra Norsk Kvalitetsregister for Ryggkirurgi, Degenerativ Rygg.
+Alle registreringer er basert på registreringer i registeret per rapportdato. Data er hentet rett fra registeret og er ikke kvalitetssikret.
+Datoer/årstall er basert på operasjonsdato. Resultatene som vises er i all hovedsak for de siste 12 måneder.
+Tidsutvalg for rapportene er spesifisert øverst i hver enkelt figur.
+
+Rapporten viser følgende:
+\begin{itemize}
+\item Registreringsoversikt
+\item Registreingsforsinkelse (egen sammenlignet med resten)
+\item Nøkkeltall, kvartalsvis
+(fjerne eget ark på alder)
+\item Ventetid fra henvisning til time på poliklinikk, kvartalsvis
+\item Ventetid fra operasjon ble bestemt til utført, kvartalsvis
+\item Andel Ø-hjelp, (egen sammenlignet med resten), kvartalsvis
+\item Inngrepstype
+\item Postoperativ liggetid prolaps (egen sammenlignet med resten), kvartalsvis
+\item Postoperativ liggetid spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Symptomvarighet
+\item Durarift prolaps (egen sammenlignet med resten), kvartalsvis
+\item Durarift spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Pasientrapportert sårinfeksjon 3 mnd, dyp og overflatisk, kvartalsvis
+\item Gjennomsnittlig forbedring av ODI prolaps (egen sammenlignet med resten), kvartalsvis
+\item Gjennomsnittlig forbedring av ODI spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Tilfredshet hos pasienten 3 mnd etter opr, kvartalsvis
+\item Nytte av opr. 3 mnd etter, kvartalsvis
+\end{itemize}
+
+Dette er bare et lite utvalg resultater. På Rapporteket kan du finne mer spesifikke resultater for disse og mange andre variable.
+
 \end{frame}
 
 
-%\section{Registreringsoversikter}
+\section{Registreringsoversikter}
+
+\begin{frame}[fragile] {Registreringsoversikt}
+<<'TabReg', results='asis', echo=FALSE, eval=T>>=
+tabAntOpph <- tabAntOpphShMnd(RegData=RegData, datoTil=datoTil, reshID = reshID, antMnd=12)
+
+xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
+		caption=paste0('Nøkkeltall, ', shtxt,'.'), label='tab:RegEget')
+@
+\end{frame}
+
+<<'LageFigurer', include=FALSE>>=
+dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='regForsinkelse', enhetsUtvalg = 1,
+                      reshID = reshID, outfile='RegForsinkelse.pdf')
+
+dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDura',
+                      reshID = reshID, outfile='peropKompDura.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
+#                      reshID = reshID, outfile='peropKompDura.pdf', hentData = 1)
+
+dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
+                      reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
+
+@
+
+\begin{frame}[fragile] {Registreringsforsinkelse}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{RegForsinkelse.pdf}
+\caption{Forsinket registrering av operasjoner, egen avdeling og resten av landet.}
+\end{figure}
+
+\end{frame}
 
 \begin{frame}[fragile] {Nøkkeltall}
+<<'TabNokkeltall', results='asis', echo=FALSE, eval=T>>=
+tabNokkeltall <- tabNokkeltall(RegData=RegDataEget, tidsenhet='Kvartal', datoTil=datoTil, enhetsUtvalg=2, reshID=reshID)
+xtable(tabNokkeltall, digits=0, align=c('l', rep('r', ncol(tabNokkeltall))),
+		caption=paste0('Nøkkeltall, ', shtxt,'.'), label='tab:NokkeltallEget')
+@
+\end{frame}
 
+<<'LageFigurer2', include=FALSE>>=
+dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidHenvTimePol',
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+                       outfile='ventetidHenvTimePol.pdf')
 
-<<'TabReg', results='asis', echo=FALSE, eval=T>>=
-tabNokkeltall <- tabNokkeltall(RegData=RegDataEget, tidsenhet=tidsenhet, datoTil=datoTil, enhetsUtvalg=2, reshID=reshID)
-xtable(tabNokkeltall, digits=0, align=c('l', rep('r', ncol(tabNokkeltall))), 
-		caption=paste0('Nøkkeltall, ', shtxt,'.'), label='tab:RegEget')
+dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidSpesOp',
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+                       outfile='ventetidSpesOp.pdf')
+
+dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ohjelp',
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+                       outfile='Ohjelp.pdf')
+
+dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='inngrep', enhetsUtvalg = 1,
+                      reshID = reshID, outfile='Inngrepstyper.pdf')
 
 @
 
+\begin{frame}[fragile] {Ventetid fra henvisning til time på poliklinikk}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{ventetidPoliklin.pdf}
+\caption{Ventetid fra henvisning til time på poliklinikk, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Ventetid fra operasjon ble bestemt til utført}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{ventetidPoliklin.pdf}
+\caption{Ventetid fra henvisning til time på poliklinikk, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Andel ø-hjelp}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{Ohjelp.pdf}
+\caption{Andel øyeblikkelig hjelp, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Ventetid fra operasjon ble bestemt til utført}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{ventetidPoliklin.pdf}
+\caption{Ventetid fra henvisning til time på poliklinikk, egen avd. og resten av landet.}
+\end{figure}
 \end{frame}
 
 
-%\section{Pasientkarakteristika}
 
-\begin{frame}[fragile] {Alder}
-
-<<'Alder', results='asis' >>=
-#, echo=FALSE
-Under65aar <- function(RegData){
-      Ant <- sum(RegData$Alder<65, na.rm = T)
-      Andel <- Ant/dim(RegData)[1]*100
-      paste0(Ant, ' (',sprintf('%.1f',Andel),'%)')
-      }
-
-Over80aar <- function(RegData){
-      Ant <- sum(RegData$Alder >= 80, na.rm = T)
-      Andel <- Ant/dim(RegData)[1]*100
-      paste0(Ant, ' (',sprintf('%.1f',Andel),'%)')
-      }
-
-alderTabInnhold <- function(RegData){
-           c(sprintf('%.1f', summary(RegData$Alder)[1:6]),
-             Under65aar(RegData),
-             Over80aar(RegData))
-      }
-
-alderDIV <- cbind(
-      'Egen, sist mnd.' = alderTabInnhold(RegDataEgetMnd),
-      'Egen'= alderTabInnhold(RegDataEget),
-	'Resten av landet'= alderTabInnhold(RegDataResten))
-	#,'Egen sykehustype' = alderTabInnhold(RegDataShType))
-rownames(alderDIV) <- c('Minimum:', 
-                        '25 \\% pasienter under:', 
-                        'Median:','Gjennomsnitt:',
-                        '25 \\% pasienter over:', 
-                        'Maksimum:',
-                        'Pasienter \\textless 65 år', 
-                        'Pasientar $\\geq $ 80 år')
+\item Andel Ø-hjelp, (egen sammenlignet med resten), kvartalsvis MÅ LAGES
+\item Inngrepstype
+\item Postoperativ liggetid prolaps (egen sammenlignet med resten), kvartalsvis
+\item Postoperativ liggetid spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Symptomvarighet
+\item Durarift prolaps (egen sammenlignet med resten), kvartalsvis
+\item Durarift spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Pasientrapportert sårinfeksjon 3 mnd, dyp og overflatisk, kvartalsvis
+\item Gjennomsnittlig forbedring av ODI prolaps (egen sammenlignet med resten), kvartalsvis
+\item Gjennomsnittlig forbedring av ODI spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Tilfredshet hos pasienten 3 mnd etter opr, kvartalsvis
+\item Nytte av opr. 3 mnd etter, kvartalsvis
 
 
-print(xtable(alderDIV, digits=1, align=c('l', rep('r', ncol(alderDIV))), 
-		caption='Alderskarakteristikker (alder i år), siste seks måneder.',
-		label='tab:Alderseigenskapar'), sanitize.rownames.function = identity)
-
-@
-
-\end{frame}
 
 
 \begin{frame}[fragile] {Liggetid på avdelinga}
- 
+
 Liggetida er tida fra pasienten legges inn på avdelinga til pasienten skrives ut.
-Liggetida inkluderer derfor både preoperativ og postoperativ liggetid). 
+Liggetida inkluderer derfor både preoperativ og postoperativ liggetid).
 
 <<'TabLiggetid', results='asis', echo=FALSE>>=
 finnGjsnMedKj <- function(RegData){
@@ -213,41 +282,18 @@ liggetidKj <- rbind(
 
 colnames(liggetidKj) <- c('Gj.snitt', 'Median', 'Totalsum')
 
-xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))), 
+xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))),
 		caption='Liggedøgn, siste 6 måneder.', # og andel kvinner
 		label='tab:liggetidKj')
-		
+
 @
 
 \end{frame}
 
-<<'LageFigurer', include=FALSE>>=
-dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='regForsinkelse', enhetsUtvalg = 1,
-                      reshID = reshID, outfile='RegForsinkelse.pdf')
-
-dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDura', 
-                      reshID = reshID, outfile='peropKompDura.pdf')
-# RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', 
-#                      reshID = reshID, outfile='peropKompDura.pdf', hentData = 1)
-
-dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
-                      reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
-
-@
-
-\begin{frame}[fragile] {Registreringsforsinkelse}
-
-\begin{figure}[ht]
-\centering              
-\includegraphics[scale=0.35]{RegForsinkelse.pdf}
-\caption{Forsinket registrering av operasjoner, egen avdeling og resten av landet.}
-\end{figure}
-
-\end{frame}
 
 \begin{frame}[fragile] {Durarift}
 \begin{figure}[ht]
-\centering              
+\centering
 \includegraphics[scale=0.35]{peropKompDura.pdf}
 %\caption{Peroperativ komplikasjon, durarift.}
 \caption{Peroperativ komplikasjon, durarift, egen avd og resten av landet.}
@@ -256,7 +302,7 @@ dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr',
 
 \begin{frame}[fragile] {Symptomvarighet}
 \begin{figure}[ht]
-\centering              
+\centering
 \includegraphics[scale=0.35]{SymptVarighUtstrTilBen.pdf}
 \caption{Varighet av utstrålende smerter til ben, egen avdeling og resten av landet.}
 \end{figure}
@@ -264,3 +310,47 @@ dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr',
 
 \end{tiny}
 \end{document}
+
+% \begin{frame}[fragile] {Alder}
+%
+% <<'Alder', results='asis' >>=
+% #, echo=FALSE
+% Under65aar <- function(RegData){
+%       Ant <- sum(RegData$Alder<65, na.rm = T)
+%       Andel <- Ant/dim(RegData)[1]*100
+%       paste0(Ant, ' (',sprintf('%.1f',Andel),'%)')
+%       }
+%
+% Over80aar <- function(RegData){
+%       Ant <- sum(RegData$Alder >= 80, na.rm = T)
+%       Andel <- Ant/dim(RegData)[1]*100
+%       paste0(Ant, ' (',sprintf('%.1f',Andel),'%)')
+%       }
+%
+% alderTabInnhold <- function(RegData){
+%            c(sprintf('%.1f', summary(RegData$Alder)[1:6]),
+%              Under65aar(RegData),
+%              Over80aar(RegData))
+%       }
+%
+% alderDIV <- cbind(
+%       'Egen, sist mnd.' = alderTabInnhold(RegDataEgetMnd),
+%       'Egen'= alderTabInnhold(RegDataEget),
+% 	'Resten av landet'= alderTabInnhold(RegDataResten))
+% 	#,'Egen sykehustype' = alderTabInnhold(RegDataShType))
+% rownames(alderDIV) <- c('Minimum:',
+%                         '25 \\% pasienter under:',
+%                         'Median:','Gjennomsnitt:',
+%                         '25 \\% pasienter over:',
+%                         'Maksimum:',
+%                         'Pasienter \\textless 65 år',
+%                         'Pasientar $\\geq $ 80 år')
+%
+%
+% print(xtable(alderDIV, digits=1, align=c('l', rep('r', ncol(alderDIV))),
+% 		caption='Alderskarakteristikker (alder i år), siste seks måneder.',
+% 		label='tab:Alderseigenskapar'), sanitize.rownames.function = identity)
+%
+% @
+%
+% \end{frame}
