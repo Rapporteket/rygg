@@ -8,8 +8,8 @@ library(tools)
 library(knitr)
 library(nkr)
 
-Sys.setenv(http_proxy="www-proxy.helsenord.no:8080")
-Sys.setenv(https_proxy="www-proxy.helsenord.no:8080")
+# Sys.setenv(http_proxy="www-proxy.helsenord.no:8080")
+# Sys.setenv(https_proxy="www-proxy.helsenord.no:8080")
 devtools::install_github("Thinkr-open/golem", ref='master')
 devtools::install_github("Rapporteket/rapbase", ref='rel')
 
@@ -153,7 +153,8 @@ texi2pdf('SamleRappNKR.tex')
 reshID <- 601161
 library(rygg)
 setwd('/home/rstudio/rygg/inst')
-knit('RyggMndRapp.Rnw')
+knitr::knit('RyggMndRapp.Rnw')
+tools::texi2pdf('RyggMndRapp.tex')
 knitr::knit2pdf('RyggMndRapp.Rnw')
 
 library(knitr)

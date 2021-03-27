@@ -1,57 +1,7 @@
-\documentclass[handout, xcolor=pdftex,dvipsnames,table]{beamer}\usepackage[]{graphicx}\usepackage[]{color}
-% maxwidth is the original width if it is less than linewidth
-% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
-\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
-\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
-\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
-\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
-\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
-\let\hlipl\hlkwb
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}  %presentation,
+\documentclass[handout, xcolor=pdftex,dvipsnames,table]{beamer}  %presentation,
 %\documentclass[handout, xcolor=pdftex,dvipsnames,table]  %presentation,
 \usetheme{Hannover}
- 
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[english, norsk]{babel}
@@ -65,12 +15,11 @@
 
 
 
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 
-\title[Rygg\\UNN, nevrokir \\\today]{\textit{NKR: Degenerativ rygg} \\
-Månadsrapport, januar 2020 \\
-UNN, nevrokir }
+\title[Rygg\\Tromsø \\\today]{\textit{NKR: Degenerativ rygg} \\
+Månedsrapport, februar 2021 \\
+Tromsø }
 %{\today}\\[2cm] % Date, change the \today to a set date if you want to be precise \date{}
 \maketitle
 
@@ -79,120 +28,168 @@ UNN, nevrokir }
 
 \begin{frame}[fragile] {Ansvar og bruk av data}
 
-Fagrådet for NKR er ansvarlig for alle vurderingar og tolkninger av data, og også feil i resultat som skyldes feil i datagrunnlaget. Den viktigste feilkilden i rapporten vil trolig være ufullstendige datasett for mange av de registrerende enheter – det vil si at ikke alle data er ferdigstilte for aktuell månad. Dette etterslepet vil variere markert både i tid og volum, og gjør at data blir mer eller mindre representative for de ulike enhetene.
-Rapporten har følgelig usikkert datagrunnlag og er ment til internt bruk i enhetene. 
-Rapporten inneholder anonymiserte samledata. I tilfeller der utvalget inneholder få 
-registreringer kombinert med eksempelvis demografiske data, kan det ikke utelukkes at rapporterte data kan tilbakeidentifiseres til enkeltpersoner. 
+Denne rapporten er utarbeidet på oppdrag fra Norsk kvalitetsregister for ryggkirurgi (NKR) og genereres automatisk
+fra Rapporteket.
 
-\textit{\textbf{Av ovenfor nevnte årsaker, ber NKR om at denne rapporten ikke blir brukt 
+Fagrådet for NKR er ansvarlig for alle vurderinger og tolkninger av data, og også feil i resultat som skyldes feil i datagrunnlaget. Den viktigste feilkilden i rapporten vil trolig være ufullstendige datasett for mange av de registrerende enheter – det vil si at ikke alle data er ferdigstilte for aktuell månad. Dette etterslepet vil variere markert både i tid og volum, og gjør at data blir mer eller mindre representative for de ulike enhetene.
+Rapporten har følgelig usikkert datagrunnlag og er ment til internt bruk i enhetene.
+Rapporten inneholder anonymiserte samledata. I tilfeller der utvalget inneholder få
+registreringer kombinert med eksempelvis demografiske data, kan det ikke utelukkes at rapporterte data kan tilbakeidentifiseres til enkeltpersoner.
+
+\textit{\textbf{Av ovenfor nevnte årsaker, ber NKR om at denne rapporten ikke blir brukt
 offentlig i noen sammenheng eller på noe vis blir offentliggjort.}}
 
 \end{frame}
 
 
-%\section{Innhald}
+\section{Datagrunnlag og innhold}
 
-\begin{frame}[fragile] {Datagrunnlag og innhold}
+\begin{frame}[fragile] {Innhold}
+Dette er en sammenstilling av resultater  fra Norsk Kvalitetsregister for Ryggkirurgi, Degenerativ Rygg.
+Alle resultater er baserte på data fra registeret og er gyldige per rapportdato for
+opphold som er ferdigstilte t.o.m. dagen før rapportdato i QReg. Data er hentet rett fra registeret og er ikke kvalitetssikret.
 
-Denne rapporten er utarbeidet på oppdrag frå Norsk kvalitetsregister for ryggkirurgi (NKR) og genereres automatisk
-fra Rapporteket. Alle resultater er baserte på data fra registeret og er gyldige per rapportdato for
-opphold som er ferdigstilte t.o.m. dagen før rapportdato i QReg. 
+Datoer/årstall er basert på operasjonsdato. Resultatene som vises er i all hovedsak for de siste 12 måneder.
+Tidsutvalg for rapportene er spesifisert øverst i hver enkelt figur.
 
+Rapporten viser følgende:
+\begin{itemize}
+\item Registreringsoversikt
+\item Registreingsforsinkelse (egen sammenlignet med resten)
+\item Nøkkeltall, kvartalsvis
+\item Ventetid fra henvisning til time på poliklinikk, kvartalsvis
+\item Ventetid fra operasjon ble bestemt til utført, kvartalsvis
+\item Andel Ø-hjelp, (egen sammenlignet med resten), kvartalsvis
+\item Inngrepstype
+\item Postoperativ liggetid prolaps (egen sammenlignet med resten), kvartalsvis
+\item Postoperativ liggetid spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Symptomvarighet
+\item Durarift prolaps (egen sammenlignet med resten), kvartalsvis
+\item Durarift spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Pasientrapportert sårinfeksjon 3 mnd, dyp og overflatisk, kvartalsvis
+\item Gjennomsnittlig forbedring av ODI prolaps (egen sammenlignet med resten), kvartalsvis
+\item Gjennomsnittlig forbedring av ODI spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Tilfredshet hos pasienten 3 mnd etter opr, kvartalsvis
+\item Nytte av opr. 3 mnd etter, kvartalsvis
+\end{itemize}
 
-For UNN, nevrokir er siste ferdigstilte operasjonsdato i denne rapporten
-18.12.2019.
-%\par
+Dette er bare et lite utvalg resultater. På Rapporteket kan du finne mer spesifikke resultater for disse og mange andre variable.
 
-% \small{
-% \begin{itemize}
-% \item Nøkkeltall
-% \item Registreringsforsinkelse
-% \item Komplikasjoner, peroperativt
-% \item Liggetid etter operasjon
-% \end{itemize}
-% }
 \end{frame}
 
 
-%\section{Registreringsoversikter}
+\section{Registreringsoversikter}
 
-\begin{frame}[fragile] {Nøkkeltall}
+\begin{frame}[fragile] {Registreringsoversikt og nøkkeltall}
+For Tromsø er siste ferdigstilte operasjonsdato i denne rapporten
+23.02.2021.
 
-
-% latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Wed Feb 12 11:06:26 2020
+% latex table generated in R 4.0.4 by xtable 1.8-4 package
+% Sat Mar 27 10:10:31 2021
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrrrr}
+  \hline
+ & sep. 20 & okt. 20 & nov. 20 & des. 20 & jan. 21 & feb. 21 \\ 
+  \hline
+Tromsø & 53 & 36 & 37 & 28 & 35 & 25 \\ 
+   \hline
+\end{tabular}
+\caption{Antall registreringer, Tromsø.} 
+\label{tab:RegEget}
+\end{table}
+% latex table generated in R 4.0.4 by xtable 1.8-4 package
+% Sat Mar 27 10:10:31 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrrrr}
   \hline
- & aug 19 & sep 19 & okt 19 & nov 19 & des 19 \\ 
+ & 20-1 & 20-2 & 20-3 & 20-4 & 21-1 \\ 
   \hline
-Antall operasjoner & 17 & 13 & 18 & 9 & 6 \\ 
-  Alder $>$ 70 år & 12 & 23 & 33 & 33 & 0 \\ 
-  Alder (gj.sn) & 54 & 54 & 59 & 56 & 50 \\ 
-  Kvinneandel (\%) & 47 & 31 & 39 & 44 & 17 \\ 
-  Liggedøgn, totalt & 48 & 55 & 143 & 32 & 19 \\ 
-  Liggetid, postop., (gj.sn.) & 2 & 3 & 2 & 3 & 2 \\ 
-  Reg.forsinkelse (gj.sn., dager) & 61 & 54 & 45 & 42 & 39 \\ 
+Antall operasjoner & 59 & 59 & 89 & 101 & 60 \\ 
+  Alder $>$ 70 år & 22 & 25 & 22 & 16 & 35 \\ 
+  Alder (gj.sn) & 55 & 57 & 58 & 53 & 55 \\ 
+  Kvinneandel (\%) & 46 & 53 & 40 & 48 & 53 \\ 
+  Liggedøgn, totalt & 180 & 181 & 177 & 126 & 110 \\ 
+  Liggetid, postop., (gj.sn.) & 2 & 2 & 1 & 1 & 1 \\ 
+  Reg.forsinkelse (gj.sn., dager) & 54 & 59 & 23 & 21 & 8 \\ 
    \hline
 \end{tabular}
-\caption{Nøkkeltall, UNN, nevrokir.} 
-\label{tab:RegEget}
+\caption{Nøkkeltall, Tromsø.} 
+\label{tab:NokkeltallEget}
 \end{table}
-
 
 \end{frame}
 
 
-%\section{Pasientkarakteristika}
+@
+\end{frame}
 
-\begin{frame}[fragile] {Alder}
 
-% latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Wed Feb 12 11:06:27 2020
+
+\begin{frame}[fragile] {Registreringsforsinkelse}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{RegForsinkelse.pdf}
+\caption{Forsinket registrering av operasjoner, egen avdeling og resten av landet.}
+\end{figure}
+
+\end{frame}
+
+
+
+
+\begin{frame}[fragile] {Ventetid fra henvisning til time på poliklinikk}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{VentetidHenvTimePol.pdf}
+\caption{Ventetid fra henvisning til time på poliklinikk, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Ventetid fra operasjon ble bestemt til utført}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{VentetidSpesOp.pdf}
+\caption{Ventetid fra operasjon ble bestemt til utført, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Andel ø-hjelp}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{Ohjelp.pdf}
+\caption{Andel øyeblikkelig hjelp, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Inngrepstyper}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{Inngrepstyper.pdf}
+\caption{Inngrepstyper, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
+
+
+\begin{frame}[fragile] {Liggetid på avdelinga}
+
+Liggetida er tida fra pasienten legges inn på avdelinga til pasienten skrives ut.
+Liggetida inkluderer derfor både preoperativ og postoperativ liggetid).
+
+% latex table generated in R 4.0.4 by xtable 1.8-4 package
+% Sat Mar 27 10:10:33 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{lrrr}
   \hline
- & Egen, sist mnd. & Egen & Resten av landet \\ 
+ & Gj.snitt & Median & Totalsum \\ 
   \hline
-Minimum: & NA & 17.0 & 15.0 \\ 
-  25 \% pasienter under: & NA & 44.0 & 46.0 \\ 
-  Median: & NA & 57.0 & 59.0 \\ 
-  Gjennomsnitt: & NaN & 55.4 & 57.7 \\ 
-  25 \% pasienter over: & NA & 68.5 & 71.0 \\ 
-  Maksimum: & NA & 79.0 & 94.0 \\ 
-  Pasienter \textless 65 år & 0 (NaN\%) & 42 (66.7\%) & 1294 (61.5\%) \\ 
-  Pasientar $\geq $ 80 år & 0 (NaN\%) & 0 (0.0\%) & 151 (7.2\%) \\ 
-   \hline
-\end{tabular}
-\caption{Alderskarakteristikker (alder i år), siste seks måneder.} 
-\label{tab:Alderseigenskapar}
-\end{table}
-
-
-\end{frame}
-
-
-\begin{frame}[fragile] {Liggetid på avdelinga}
- 
-Liggetida er tida fra pasienten legges inn på avdelinga til pasienten skrives ut.
-Liggetida inkluderer derfor både preoperativ og postoperativ liggetid). 
-
-\begin{kframe}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in dimnames(x) <- dn: length of 'dimnames' [2] not equal to array extent}}\end{kframe}% latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Wed Feb 12 11:06:27 2020
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-  \hline
- & x \\ 
-  \hline
-Egen, siste måned & 0.0 \\ 
-  Egen & 297.0 \\ 
-  Resten av landet & 4471.0 \\ 
+Egen, siste måned & 2.3 & 2.0 & 57 \\ 
+  Egen & 1.6 & 1.0 & 349 \\ 
+  Resten av landet & 2.0 & 1.0 & 5403 \\ 
    \hline
 \end{tabular}
 \caption{Liggedøgn, siste 6 måneder.} 
@@ -202,34 +199,46 @@ Egen, siste måned & 0.0 \\
 
 \end{frame}
 
-
-
-\begin{frame}[fragile] {Registreringsforsinkelse}
-
+\begin{frame}[fragile] {Postoperativ liggetid, prolaps}
 \begin{figure}[ht]
-\centering              
-\includegraphics[scale=0.35]{RegForsinkelse.pdf}
-\caption{Forsinket registrering av operasjoner, egen avdeling og resten av landet.}
-\end{figure}
-
-\end{frame}
-
-\begin{frame}[fragile] {Durarift}
-\begin{figure}[ht]
-\centering              
-\includegraphics[scale=0.35]{peropKompDura.pdf}
-%\caption{Peroperativ komplikasjon, durarift.}
-\caption{Peroperativ komplikasjon, durarift, egen avd og resten av landet.}
+\centering
+\includegraphics[scale=0.35]{LiggetidPostOp_pro.pdf}
+\caption{Postoperativ liggetid, prolaps, egen avd. og resten av landet.}
 \end{figure}
 \end{frame}
+
+\begin{frame}[fragile] {Postoperativ liggetid, spinal stenose}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{LiggetidPostOp_SS.pdf}
+\caption{Postoperativ liggetid, spinal stenose, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
+
 
 \begin{frame}[fragile] {Symptomvarighet}
 \begin{figure}[ht]
-\centering              
+\centering
 \includegraphics[scale=0.35]{SymptVarighUtstrTilBen.pdf}
 \caption{Varighet av utstrålende smerter til ben, egen avdeling og resten av landet.}
 \end{figure}
 \end{frame}
 
-\end{tiny}
-\end{document}
+\begin{frame}[fragile] {Durarift prolaps}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{peropKompDura_pro.pdf}
+\caption{Peroperativ komplikasjon, durarift, prolapsopererte, egen avd og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Durarift spinal stenose}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{peropKompDura_SS.pdf}
+\caption{Peroperativ komplikasjon, durarift, spinal stenose, egen avd og resten av landet.}
+\end{figure}
+\end{frame}
+
+
+
