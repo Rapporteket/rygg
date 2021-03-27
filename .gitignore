@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 *.png
-*.pdf
+
 *.tex
 *.toc
 *.vrb

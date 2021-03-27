@@ -244,18 +244,6 @@ ui <- navbarPage(id = "tab1nivaa",
              )))
            ), #tab
 
-  #----------------Kvalitetsindikatorer----------------------------------
-  # tabPanel(p("Kvalitetsindikatorer", title='Kval.ind.: Per sykehus og utvikling over tid'),
-  #          h2('Side som bare viser kvalitetsindikatorer', align='center'),
-  #
-  #          sidebarPanel(
-  #          h4('Kan gjøre utvalg på: tidsperiode og tidsenhet')),
-  #          mainPanel(
-  #            h4('Viser to figurer/tabeller per indikator: Utvikling over tid og per sykehus'),
-  #            br(),
-  #            h2('På vent til hovedkategorier er definert')
-  #                    )
-  # ), #tab, KI
 
 #-------Registeradministrasjon----------
     tabPanel(p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
@@ -394,6 +382,9 @@ tabPanel(p('Fordelinger',
                     selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
                     ),
+                    selectInput(inputId = "bildeformatFord",
+                                label = "Velg format for nedlasting av figur",
+                                choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
                     br(),
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
@@ -409,6 +400,7 @@ tabPanel(p('Fordelinger',
                         h3('Fordelingsfigurer'),
                         h5('Høyreklikk på figuren for å laste den ned'),
                         plotOutput('fordelinger')),
+                      downloadButton('LastNedFigFord', label='Velg format (til venstre) og last ned figur'),
                       tabPanel(
                         'Tabell',
                         uiOutput("tittelFord"),
@@ -823,21 +815,27 @@ server <- function(input, output,session) {
         h5(HTML(paste0(UtDataFord$utvalgTxt, '<br />')))
       )}) #, align='center'
 
-    # output$fordelingTab <- function() { #gr1=UtDataFord$hovedgrTxt, gr2=UtDataFord$smltxt renderTable(
-    #
-    #   #       kable_styling("hover", full_width = F)
-    #   antKol <- ncol(tab)
-    #   print(antKol)
-    #   print(tab)
-    #   kableExtra::kable(tab, format = 'html'
-    #                     , full_width=F
-    #                     , digits = c(0,1,0,1)[1:antKol]
-    #   ) %>%
-    #     add_header_above(c(" "=1, 'Egen enhet/gruppe' = 2, 'Resten' = 2)[1:(antKol/2+1)]) %>%
-    #     column_spec(column = 1, width_min = '7em') %>%
-    #     column_spec(column = 2:(ncol(tab)+1), width = '7em') %>%
-    #     row_spec(0, bold = T)
-    # }
+    output$LastNedFigFord <- downloadHandler(
+      filename = function(){
+        paste0('FordelingsFig_', valgtVar=input$valgtVar, '_', Sys.Date(), '.', input$bildeformatFord)
+      },
+      content = function(file){
+        KoronaFigAndeler(RegData=KoroData,
+                         RegData=RegData, preprosess = 0,
+                         valgtVar=input$valgtVar,
+                         reshID=reshIDford,
+                         enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                         datoFra=input$datovalg[1], datoTil=input$datovalg[2],
+                         minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
+                         erMann=as.numeric(input$erMann),
+                         hastegrad = as.numeric(input$hastegrad),
+                         tidlOp = as.numeric(input$tidlOp),
+                         hovedkat = as.numeric(input$hovedInngrep),
+                         #session = session,
+                         outfile = file)
+      })
+print(paste0('FordelingsFigur', valgtVar=input$valgtVar, '_', Sys.time(), '.', input$bildeformatFord))
+
 
     kolGruppering <- c(1,3,3)
     names(kolGruppering) <- c(' ', UtDataFord$hovedgrTxt, UtDataFord$smltxt)
