@@ -176,7 +176,7 @@ RyggFigAndelerGrVar(RegData = RegData, valgtVar='Morsmal', outfile = '')
 #----------------------------------------------------------------
 valgtVar <- 'fornoydhet'	#Må velge...
 #NB: Hvis variabel='Underkat', MÅ hovedkat velges, dvs. ikke 99.
-outfile <- ''	#paste(valgtVar, '.pdf', sep='')	#Navn angis av Jasper ''
+outfile <- FordelingsFigurregForsinkelse_2021-03-27.pdf
 FordUt <- RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil,
 		minald=minald, maxald=maxald, erMann=erMann, hovedkat=hovedkat, preprosess=1,
 		 enhetsUtvalg=enhetsUtvalg, reshID=reshID, outfile=outfile)

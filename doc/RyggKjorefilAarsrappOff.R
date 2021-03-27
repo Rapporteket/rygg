@@ -44,8 +44,8 @@ setwd('/home/rstudio/rygg/Aarsrapp')
 #---------FIGURER, årsrapport 2020--------------
 
 # Dekningsgrad for hvert sykehus, Se tidligere figurer. IKKE FÅTT DEKN.GRADSANALYSE FOR 2020 (1.mar 2021)
-RyggFigAndelerGrVar(RegData=0, valgtVar='dekn19Rygg', outfile='DGrygg.pdf')
-RyggFigAndelerGrVar(RegData=0, valgtVar='dekn19Nakke', outfile='DGnakke.pdf') #
+#RyggFigAndelerGrVar(RegData=0, valgtVar='dekn19Rygg', outfile='DGrygg.pdf')
+#RyggFigAndelerGrVar(RegData=0, valgtVar='dekn19Nakke', outfile='DGnakke.pdf') #
 
 
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20,
@@ -134,20 +134,26 @@ BeinsmLavPre <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='smBePreLav', a
 #Infeksjoner ikke registrert i 2019
 #3 kval.ind: Prolaps, Fusjon, SS
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
-                                    Ngrense = 20, hovedkat = 1, outfile='KpInf3mndPro.pdf')
+                                    Ngrense = 30, hovedkat = 1, outfile='KpInf3mndPro.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
-                                    Ngrense = 20, hovedkat = 5, outfile='KpInf3mndFusj.pdf')
+                                    Ngrense = 30, hovedkat = 5, outfile='KpInf3mndFusj.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
-                                   Ngrense = 20, hovedkat=9, outfile='KpInf3mndSS.pdf')
+                                   Ngrense = 30, hovedkat=9, outfile='KpInf3mndSS.pdf')
 dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
-                    Ngrense = 20, hovedkat = 1, outfile='KpInf3mndProAar.pdf')
+                    Ngrense = 30, hovedkat = 1, outfile='KpInf3mndProAar.pdf')
 dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
-                    Ngrense = 20, hovedkat = 5, outfile='KpInf3mndFusjAar.pdf')
+                    Ngrense = 30, hovedkat = 5, outfile='KpInf3mndFusjAar.pdf')
 dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
-                    Ngrense = 20, hovedkat=9, outfile='KpInf3mndSSAar.pdf')
+                    Ngrense = 30, hovedkat=9, outfile='KpInf3mndSSAar.pdf')
 
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
+                    Ngrense = 30, hovedkat = 1, outfile='PeropKompDuraPro.pdf')
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
+                    Ngrense = 30, hovedkat = 5, outfile='PeropKompDuraFusj.pdf')
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
+                    Ngrense = 30, hovedkat=9, outfile='PeropKompDuraSS.pdf')
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, hastegrad=1,
-                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarPro.pdf')
+                       Ngrense = 30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarPro.pdf')
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, tidlOp=4, hastegrad=1,
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarFusj.pdf')
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, hastegrad=1,

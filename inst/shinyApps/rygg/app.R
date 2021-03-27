@@ -399,8 +399,9 @@ tabPanel(p('Fordelinger',
                         'Figur',
                         h3('Fordelingsfigurer'),
                         h5('Høyreklikk på figuren for å laste den ned'),
-                        plotOutput('fordelinger')),
-                      downloadButton('LastNedFigFord', label='Velg format (til venstre) og last ned figur'),
+                        plotOutput('fordelinger', height = 'auto'),
+                      downloadButton('LastNedFigFord', label='Velg format (til venstre) og last ned figur')
+                      ),
                       tabPanel(
                         'Tabell',
                         uiOutput("tittelFord"),
@@ -480,11 +481,10 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
            selectInput(inputId = 'hovedInngrepAndel', label='Hovedinngrepstype',
                        choices = hovedkatValg
            ),
-           # selectInput(inputId = 'alvorlighetKomplAndel',
-           #             label='Alvorlighetsgrad, postoperative komplikasjoner',
-           #             multiple = T, #selected=0,
-           #             choices = alvorKompl
-           # ),
+           selectInput(inputId = "bildeformatAndel",
+                       label = "Velg format for nedlasting av figur",
+                       choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
+           br(),
            br(),
            p(em('Følgende utvalg gjelder bare figuren/tabellen som viser utvikling over tid')),
            selectInput(inputId = 'enhetsUtvalgAndel', label='Egen enhet og/eller landet',
@@ -500,9 +500,11 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                       h3(em("Utvikling over tid")),
                       br(),
                       plotOutput("andelTid", height = 'auto'),
+                      downloadButton('LastNedFigAndelTid', label='Velg format (til venstre) og last ned figur'),
                       br(),
                       h3(em("Sykehusvise resultater")),
-                      plotOutput("andelerGrVar", height='auto')
+                      plotOutput("andelerGrVar", height='auto'),
+             downloadButton('LastNedFigAndelGrVar', label='Velg format (til venstre) og last ned figur')
              ),
              tabPanel("Tabeller",
                       uiOutput("tittelAndel"),
@@ -820,8 +822,7 @@ server <- function(input, output,session) {
         paste0('FordelingsFig_', valgtVar=input$valgtVar, '_', Sys.Date(), '.', input$bildeformatFord)
       },
       content = function(file){
-        KoronaFigAndeler(RegData=KoroData,
-                         RegData=RegData, preprosess = 0,
+        RyggFigAndeler(RegData=RegData, preprosess = 0,
                          valgtVar=input$valgtVar,
                          reshID=reshIDford,
                          enhetsUtvalg=as.numeric(input$enhetsUtvalg),
@@ -831,11 +832,9 @@ server <- function(input, output,session) {
                          hastegrad = as.numeric(input$hastegrad),
                          tidlOp = as.numeric(input$tidlOp),
                          hovedkat = as.numeric(input$hovedInngrep),
-                         #session = session,
+                         session = session,
                          outfile = file)
       })
-print(paste0('FordelingsFigur', valgtVar=input$valgtVar, '_', Sys.time(), '.', input$bildeformatFord))
-
 
     kolGruppering <- c(1,3,3)
     names(kolGruppering) <- c(' ', UtDataFord$hovedgrTxt, UtDataFord$smltxt)
@@ -884,6 +883,23 @@ print(paste0('FordelingsFigur', valgtVar=input$valgtVar, '_', Sys.time(), '.', i
                         session=session)
   }, height = 800, width=700 #height = function() {session$clientData$output_andelerGrVarFig_width} #})
   )
+
+  output$LastNedFigAndelGrVar <- downloadHandler(
+    filename = function(){
+      paste0('AndelTid_', valgtVar=input$valgtVarAndel, '_', Sys.Date(), '.', input$bildeformatAndel)
+    },
+    content = function(file){
+      RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
+                          datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
+                          minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                          ktr = as.numeric(input$ktrAndel),
+                          erMann=as.numeric(input$erMannAndel),
+                          hastegrad = as.numeric(input$hastegradAndel),
+                          tidlOp = as.numeric(input$tidlOpAndel),
+                          hovedkat = as.numeric(input$hovedInngrepAndel),
+                          session=session,
+                      outfile = file)
+    })
 
   output$andelTid <- renderPlot({
 
@@ -935,6 +951,26 @@ print(paste0('FordelingsFigur', valgtVar=input$valgtVar, '_', Sys.time(), '.', i
       },
       content = function(file, filename){
         write.csv2(tabAndelTid, file, row.names = T, fileEncoding = 'latin1', na = '')
+      })
+
+    output$LastNedFigAndelTid <- downloadHandler(
+      filename = function(){
+        paste0('AndelTid_', valgtVar=input$valgtVarAndel, '_', Sys.Date(), '.', input$bildeformatAndel)
+      },
+      content = function(file){
+        RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
+                        reshID= reshID,
+                        datoFra=as.Date(input$datovalgAndel[1]), datoTil=input$datovalgAndel[2],
+                        minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                        ktr = as.numeric(input$ktrAndel),
+                        erMann=as.numeric(input$erMannAndel),
+                        hastegrad = as.numeric(input$hastegradAndel),
+                        tidlOp = as.numeric(input$tidlOpAndel),
+                        hovedkat = as.numeric(input$hovedInngrepAndel),
+                        enhetsUtvalg = input$enhetsUtvalgAndel,
+                        tidsenhet = input$tidsenhetAndel,
+                        session=session,
+                       outfile = file)
       })
 
 
