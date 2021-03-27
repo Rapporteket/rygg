@@ -410,7 +410,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          RegData <- RegData[ind, ]
          RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3mnd', 'KpInfDyp3mnd')], na.rm = T) > 0] <- 1
          VarTxt <- 'tilfeller'
-         tittel <- 'Sårinfeksjon, pasientrapportert'
+         tittel <- paste0('Sårinfeksjon, pasientrapportert', ktrtxt)
          sortAvtagende <- FALSE
          xAkseTxt <- 'Andel sårinfeksjoner (%)'
          #KImaalRetn <- 'lav'

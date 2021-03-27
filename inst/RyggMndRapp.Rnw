@@ -86,6 +86,10 @@ Månedsrapport, \Sexpr{rappMnd} \\
 Denne rapporten er utarbeidet på oppdrag fra Norsk kvalitetsregister for ryggkirurgi (NKR) og genereres automatisk
 fra Rapporteket.
 
+Den inneholder en sammenstilling av resultater  fra Norsk Kvalitetsregister for Ryggkirurgi, Degenerativ Rygg.
+Alle resultater er baserte på data fra registeret og er gyldige per rapportdato for
+opphold som er ferdigstilte t.o.m. dagen før rapportdato i QReg.
+
 Fagrådet for NKR er ansvarlig for alle vurderinger og tolkninger av data, og også feil i resultat som skyldes feil i datagrunnlaget. Den viktigste feilkilden i rapporten vil trolig være ufullstendige datasett for mange av de registrerende enheter – det vil si at ikke alle data er ferdigstilte for aktuell månad. Dette etterslepet vil variere markert både i tid og volum, og gjør at data blir mer eller mindre representative for de ulike enhetene.
 Rapporten har følgelig usikkert datagrunnlag og er ment til internt bruk i enhetene.
 Rapporten inneholder anonymiserte samledata. I tilfeller der utvalget inneholder få
@@ -100,32 +104,27 @@ offentlig i noen sammenheng eller på noe vis blir offentliggjort.}}
 \section{Datagrunnlag og innhold}
 
 \begin{frame}[fragile] {Innhold}
-Dette er en sammenstilling av resultater  fra Norsk Kvalitetsregister for Ryggkirurgi, Degenerativ Rygg.
-Alle resultater er baserte på data fra registeret og er gyldige per rapportdato for
-opphold som er ferdigstilte t.o.m. dagen før rapportdato i QReg. Data er hentet rett fra registeret og er ikke kvalitetssikret.
 
-Datoer/årstall er basert på operasjonsdato. Resultatene som vises er i all hovedsak for de siste 12 måneder.
-Tidsutvalg for rapportene er spesifisert øverst i hver enkelt figur.
+Datoer/årstall er basert på operasjonsdato. Tidsutvalg for rapportene er spesifisert øverst i hver enkelt figur.
 
 Rapporten viser følgende:
 \begin{itemize}
-\item Registreringsoversikt
-\item Registreingsforsinkelse (egen sammenlignet med resten)
-\item Nøkkeltall, kvartalsvis
-\item Ventetid fra henvisning til time på poliklinikk, kvartalsvis
-\item Ventetid fra operasjon ble bestemt til utført, kvartalsvis
-\item Andel Ø-hjelp, (egen sammenlignet med resten), kvartalsvis
+\item Registreringsoversikt og nøkkeltall
+\item Registreingsforsinkelse
+\item Ventetid fra henvisning til time på poliklinikk
+\item Ventetid fra operasjon ble bestemt til utført
+\item Andel Ø-hjelp
 \item Inngrepstype
-\item Postoperativ liggetid prolaps (egen sammenlignet med resten), kvartalsvis
-\item Postoperativ liggetid spinal stenose (egen sammenlignet med resten), kvartalsvis
+\item Postoperativ liggetid prolaps
+\item Postoperativ liggetid spinal stenose
 \item Symptomvarighet
-\item Durarift prolaps (egen sammenlignet med resten), kvartalsvis
-\item Durarift spinal stenose (egen sammenlignet med resten), kvartalsvis
-\item Pasientrapportert sårinfeksjon 3 mnd, dyp og overflatisk, kvartalsvis
-\item Gjennomsnittlig forbedring av ODI prolaps (egen sammenlignet med resten), kvartalsvis
-\item Gjennomsnittlig forbedring av ODI spinal stenose (egen sammenlignet med resten), kvartalsvis
-\item Tilfredshet hos pasienten 3 mnd etter opr, kvartalsvis
-\item Nytte av opr. 3 mnd etter, kvartalsvis
+\item Durarift prolaps
+\item Durarift spinal stenose
+\item Pasientrapportert sårinfeksjon, dyp og overflatisk
+\item Gjennomsnittlig forbedring av ODI prolaps
+\item Gjennomsnittlig forbedring av ODI spinal stenose
+\item Tilfredshet hos pasienten
+\item Nytte av operasjon
 \end{itemize}
 
 Dette er bare et lite utvalg resultater. På Rapporteket kan du finne mer spesifikke resultater for disse og mange andre variable.
@@ -148,16 +147,13 @@ xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
 RegDataNokkelt <- RyggUtvalgEnh(RegData = RegDataEget, datoFra = datoFraKvart)$RegData
 tabNokkeltall <- tabNokkeltall(RegData=RegDataNokkelt, tidsenhet='Kvartal', datoTil=datoTil, enhetsUtvalg=2, reshID=reshID)
 xtable(tabNokkeltall, digits=0, align=c('l', rep('r', ncol(tabNokkeltall))),
-		caption=paste0('Nøkkeltall, ', shtxt,'.'), label='tab:NokkeltallEget')
+		caption=paste0('Kvartalsvise nøkkeltall, ', shtxt,'.'), label='tab:NokkeltallEget')
 @
 \end{frame}
 
-
-@
-\end{frame}
 
 <<'LageFigurer', include=FALSE>>=
-dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='regForsinkelse', enhetsUtvalg = 1,
+dum <- RyggFigAndeler(RegData=RegData1aar, preprosess=0, valgtVar='regForsinkelse', enhetsUtvalg = 1,
                       reshID = reshID, outfile='RegForsinkelse.pdf')
 
 dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
@@ -321,7 +317,7 @@ xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))),
 <<'LageFigurer4', include=FALSE>>=
 
 datoFraInf <- max(datoFra, '2020-01-01')
-dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='kpInf', datoFra = datoFraInf,
+dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='kpInf3mnd', datoFra = datoFraInf,
                         enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                         outfile='KpInf.pdf')
 RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
@@ -330,13 +326,6 @@ RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
 RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                hovedkat = 9, outfile='OswEndr_SS.pdf')
-
-#
-# dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='kpInf',
-#                       reshID = reshID, tidsenhet = 'Kvartal', hovedkat = 1,
-#                       outfile='PeropKompDura_pro.pdf')
-dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='kpInf', enhetsUtvalg = 1,
-                       reshID = reshID, outfile='KpInf.pdf')
 
 dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='fornoydhet', ktr = 1,
                         enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
