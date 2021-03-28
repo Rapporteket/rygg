@@ -73,7 +73,7 @@ tabKjPstEget <- round(table(RegDataEget6mnd$ErMann)/Neget*100, digits=1)
 \begin{document}
 
 \title[Rygg\\\Sexpr{shtxt} \\\today]{\textit{NKR: Degenerativ rygg} \\
-Månedsrapport, \Sexpr{rappMnd} \\
+Kvartalsrapport, \Sexpr{rappMnd} \\
 \Sexpr{shtxt} }
 %{\today}\\[2cm] % Date, change the \today to a set date if you want to be precise \date{}
 \maketitle
@@ -301,7 +301,7 @@ xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))),
 \begin{frame}[fragile] {Durarift prolaps}
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=0.35]{peropKompDura_pro.pdf}
+\includegraphics[scale=0.35]{PeropKompDura_pro.pdf}
 \caption{Peroperativ komplikasjon, durarift, prolapsopererte, egen avd og resten av landet.}
 \end{figure}
 \end{frame}
@@ -309,7 +309,7 @@ xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))),
 \begin{frame}[fragile] {Durarift spinal stenose}
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=0.35]{peropKompDura_SS.pdf}
+\includegraphics[scale=0.35]{PeropKompDura_SS.pdf}
 \caption{Peroperativ komplikasjon, durarift, spinal stenose, egen avd og resten av landet.}
 \end{figure}
 \end{frame}

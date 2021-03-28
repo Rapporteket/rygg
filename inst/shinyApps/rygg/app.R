@@ -112,11 +112,11 @@ ui <- navbarPage(id = "tab1nivaa",
              #                Man kan velge om man vil se gjennomsnitt eller median.'),
              br(),
              br(),
-             h3("Rapport med månedsresultater"),
+             h3("Rapport med kvartalsresultater"),
              h5('Rapporten kan man også få regelmessig på e-post.
                         Gå til fanen "Abonnement" for å bestille dette.'),
              br(),
-             downloadButton(outputId = 'mndRapp.pdf', label='Last ned månedsrapport', class = "butt"),
+             downloadButton(outputId = 'mndRapp.pdf', label='Last ned kvartalsrapport', class = "butt"),
              tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color
              br(),
              br(),
@@ -532,7 +532,7 @@ tabPanel(p("Abonnement",
          sidebarLayout(
            sidebarPanel(width = 3,
                         selectInput("subscriptionRep", "Rapport:",
-                                    c("Månedsrapport")), #, "Samlerapport", "Influensaresultater")),
+                                    c("Kvartalsrapport")), #, "Samlerapport", "Influensaresultater")),
                         selectInput("subscriptionFreq", "Frekvens:",
                                     list(Årlig="Årlig-year",
                                           Kvartalsvis="Kvartalsvis-quarter",
@@ -1077,8 +1077,8 @@ server <- function(input, output,session) {
     organization <- rapbase::getUserReshId(session)
     runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
     email <- rapbase::getUserEmail(session)
-    if (input$subscriptionRep == "Månedsrapport") {
-      synopsis <- "rygg/Rapporteket: månedsrapport"
+    if (input$subscriptionRep == "Kvartalsrapport") {
+      synopsis <- "rygg/Rapporteket: kvartalsrapport"
       rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
       #print(rnwFil)
     }
@@ -1139,8 +1139,8 @@ server <- function(input, output,session) {
 
     # fun <- "abonnementRygg"  #"henteSamlerapporter"
 
-    if (input$dispatchmentRep == "Månedsrapport") {
-      synopsis <- "Månedsrapport, Rygg"
+    if (input$dispatchmentRep == "Kvartalsrapport") {
+      synopsis <- "Kvartalsrapport, Rygg"
       fun <- "abonnementRygg"
       rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
       reshIDuts <- input$dispatchmentResh
@@ -1184,7 +1184,7 @@ server <- function(input, output,session) {
   ## ui: velg rapport
   output$reportUts <- renderUI({
     selectInput("dispatchmentRep", "Rapport:",
-                c("Månedsrapport"),
+                c("Kvartalsrapport"),
                 selected = dispatchment$report)
   })
   ## ui: velg rolle
