@@ -232,46 +232,46 @@ RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='liggetidPostOp',
                hovedkat = 9, outfile='LiggetidPostOp_SS.pdf')
 
 dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDura',
-                      reshID = reshID, tidsenhet = 'Kvartal', hovedkat = 1,
+                      datoFra = datoFra1Aar, reshID = reshID, hovedkat = 1,
                       outfile='PeropKompDura_pro.pdf')
 dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDura',
-                      reshID = reshID, tidsenhet = 'Kvartal', hovedkat = 9,
+                      datoFra = datoFra1Aar, reshID = reshID, hovedkat = 9,
                       outfile='PeropKompDura_SS.pdf')
 
 
 @
 
-\begin{frame}[fragile] {Liggetid på avdelinga}
-
-Liggetida er tida fra pasienten legges inn på avdelinga til pasienten skrives ut.
-Liggetida inkluderer derfor både preoperativ og postoperativ liggetid).
-
-<<'TabLiggetid', results='asis', echo=FALSE>>=
-finnGjsnMedKj <- function(RegData){
-      Gjsn <- sprintf("%.1f", mean(RegData$Liggedogn, na.rm=T))
-      Med <- sprintf("%.1f", median(RegData$Liggedogn, na.rm=T))
-      Sum <- sprintf("%.0f", sum(RegData$Liggedogn, na.rm=T))
-      #Kvinner <- sprintf("%.0f", 100*prop.table(table(RegData$ErMann))[1])
-      #Ut <- paste0(c(Gjsn, Med, Kvinner), c('', '', '%'))
-      Ut <- paste0(c(Gjsn, Med, Sum)) #, c('', '', '%'))
-      #paste0(sprintf("%.1f %.1f %+.f", Gjsn, Med, Kvinner), '%')
-      }
-
-liggetidKj <- rbind(
-      'Egen, siste måned' = finnGjsnMedKj(RegDataEgetMnd),
-      'Egen'= finnGjsnMedKj(RegDataEget6mnd),
-	'Resten av landet'= finnGjsnMedKj(RegDataResten6mnd)) #,
-#	'Eigen sjukehustype' = finnGjsnMedKj(RegDataShType))
-
-colnames(liggetidKj) <- c('Gj.snitt', 'Median', 'Totalsum')
-
-xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))),
-		caption='Liggedøgn, siste 6 måneder.', # og andel kvinner
-		label='tab:liggetidKj')
-
-@
-
-\end{frame}
+% \begin{frame}[fragile] {Liggetid på avdelinga}
+%
+% Liggetida er tida fra pasienten legges inn på avdelinga til pasienten skrives ut.
+% Liggetida inkluderer derfor både preoperativ og postoperativ liggetid).
+%
+% <<'TabLiggetid', results='asis', echo=FALSE>>=
+% finnGjsnMedKj <- function(RegData){
+%       Gjsn <- sprintf("%.1f", mean(RegData$Liggedogn, na.rm=T))
+%       Med <- sprintf("%.1f", median(RegData$Liggedogn, na.rm=T))
+%       Sum <- sprintf("%.0f", sum(RegData$Liggedogn, na.rm=T))
+%       #Kvinner <- sprintf("%.0f", 100*prop.table(table(RegData$ErMann))[1])
+%       #Ut <- paste0(c(Gjsn, Med, Kvinner), c('', '', '%'))
+%       Ut <- paste0(c(Gjsn, Med, Sum)) #, c('', '', '%'))
+%       #paste0(sprintf("%.1f %.1f %+.f", Gjsn, Med, Kvinner), '%')
+%       }
+%
+% liggetidKj <- rbind(
+%       'Egen, siste måned' = finnGjsnMedKj(RegDataEgetMnd),
+%       'Egen'= finnGjsnMedKj(RegDataEget6mnd),
+% 	'Resten av landet'= finnGjsnMedKj(RegDataResten6mnd)) #,
+% #	'Eigen sjukehustype' = finnGjsnMedKj(RegDataShType))
+%
+% colnames(liggetidKj) <- c('Gj.snitt', 'Median', 'Totalsum')
+%
+% xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))),
+% 		caption='Liggedøgn, siste 6 måneder.', # og andel kvinner
+% 		label='tab:liggetidKj')
+%
+% @
+%
+% \end{frame}
 
 \begin{frame}[fragile] {Postoperativ liggetid, prolaps}
 \begin{figure}[ht]
