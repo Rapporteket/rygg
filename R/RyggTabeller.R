@@ -13,7 +13,7 @@
 tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       #RegData må inneholde ..
   if (reshID!=0){RegData <- RegData[which(RegData$ReshId==reshID), ]}
-      datoFra <- lubridate::floor_date(as.Date(datoTil)- months(antMnd, abbreviate = T), unit='month')
+      datoFra <- lubridate::floor_date(as.Date(datoTil) %m-% months(antMnd), unit='month')
       aggVar <-  c('ShNavn', 'InnDato')
       RegDataDum <- RegData[intersect(which(as.Date(RegData$InnDato) <= as.Date(datoTil, tz='UTC')),
                                which(as.Date(RegData$InnDato, tz='uTC') > as.Date(datoFra, tz='UTC'))), aggVar]
@@ -27,7 +27,6 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       tabAvdMnd1 <- xtable::xtable(tabAvdMnd1, digits=0)
 	return(tabAvdMnd1)
 }
-
 
 #' Tabell som viser antall opphold per sykehus og år, siste 5 år.
 #'

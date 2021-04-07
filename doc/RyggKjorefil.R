@@ -155,7 +155,7 @@ library(rygg)
 setwd('/home/rstudio/rygg/inst')
 knitr::knit('RyggMndRapp.Rnw')
 tools::texi2pdf('RyggMndRapp.tex')
-knitr::knit2pdf('RyggMndRapp.Rnw')
+#knitr::knit2pdf('RyggMndRapp.Rnw')
 
 library(knitr)
 knit('C:/ResultattjenesteGIT/nkr/AarsrappOff/ResultaterAarsrapp.Rnw') #, encoding = 'UTF-8')

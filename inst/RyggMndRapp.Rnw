@@ -178,6 +178,7 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidHenvTime
                        outfile='VentetidHenvTimePol.pdf')
 
 dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidSpesOp',
+                       hastegrad = 1,
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                        outfile='VentetidSpesOp.pdf')
 
@@ -202,7 +203,7 @@ dum <- RyggFigAndeler(RegData=RegData1aar, preprosess=0, valgtVar='inngrep', enh
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.35]{VentetidSpesOp.pdf}
-\caption{Ventetid fra operasjon ble bestemt til utført, egen avd. og resten av landet.}
+\caption{Ventetid fra operasjon ble bestemt til utført, elektive pasienter, egen avd. og resten av landet.}
 \end{figure}
 \end{frame}
 
