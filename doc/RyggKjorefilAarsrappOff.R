@@ -224,10 +224,10 @@ DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp', 
 #-------Oswestry------
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20', aar=valgteAar,
                                 hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2,
-                                lastNedFil=1, indID = 'nkr_rygg_ODI20p12mnd_prolaps', filUt = 'ind9_OswEndr20poengPro')
+                                lastNedFil=1, indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind9_OswEndr20poengPro')
 DataTilSKDE <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst', aar=valgteAar,
                                 hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2,
-                                lastNedFil=1, indID = 'nkr_rygg_ODI30pst12mnd_stenose', filUt = 'ind10_OswEndr30pstPro')
+                                lastNedFil=1, indID = 'nkr_rygg_odi30pst12mnd_stenose', filUt = 'ind10_OswEndr30pstPro')
 
 
 #Alle sykehus og resh:

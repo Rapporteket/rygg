@@ -156,7 +156,7 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
 
   tabNokkeltall <- rbind(
     'Antall operasjoner' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=length),
-    'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
+    'Alder > 70 år (%)' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
       'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean, na.rm=T),
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
     'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum, na.rm=T),
