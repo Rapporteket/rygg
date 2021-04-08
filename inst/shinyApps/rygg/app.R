@@ -112,11 +112,11 @@ ui <- navbarPage(id = "tab1nivaa",
              #                Man kan velge om man vil se gjennomsnitt eller median.'),
              br(),
              br(),
-             h3("Rapport med månedsresultater"),
+             h3("Rapport med kvartalsresultater"),
              h5('Rapporten kan man også få regelmessig på e-post.
                         Gå til fanen "Abonnement" for å bestille dette.'),
              br(),
-             downloadButton(outputId = 'mndRapp.pdf', label='Last ned månedsrapport', class = "butt"),
+             downloadButton(outputId = 'mndRapp.pdf', label='Last ned kvartalsrapport', class = "butt"),
              tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color
              br(),
              br(),
@@ -244,18 +244,6 @@ ui <- navbarPage(id = "tab1nivaa",
              )))
            ), #tab
 
-  #----------------Kvalitetsindikatorer----------------------------------
-  # tabPanel(p("Kvalitetsindikatorer", title='Kval.ind.: Per sykehus og utvikling over tid'),
-  #          h2('Side som bare viser kvalitetsindikatorer', align='center'),
-  #
-  #          sidebarPanel(
-  #          h4('Kan gjøre utvalg på: tidsperiode og tidsenhet')),
-  #          mainPanel(
-  #            h4('Viser to figurer/tabeller per indikator: Utvikling over tid og per sykehus'),
-  #            br(),
-  #            h2('På vent til hovedkategorier er definert')
-  #                    )
-  # ), #tab, KI
 
 #-------Registeradministrasjon----------
     tabPanel(p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
@@ -394,12 +382,15 @@ tabPanel(p('Fordelinger',
                     selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
                     ),
+                    selectInput(inputId = "bildeformatFord",
+                                label = "Velg format for nedlasting av figur",
+                                choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
                     br(),
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
                     actionButton("reset_fordValg", label="Tilbakestill valg"),
                     selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
-                                selected = 0,
+                                #selected = reshID,
                                 choices = sykehusValg)
                   ),
                   mainPanel(
@@ -408,7 +399,9 @@ tabPanel(p('Fordelinger',
                         'Figur',
                         h3('Fordelingsfigurer'),
                         h5('Høyreklikk på figuren for å laste den ned'),
-                        plotOutput('fordelinger')),
+                        plotOutput('fordelinger', height = 'auto'),
+                      downloadButton('LastNedFigFord', label='Velg format (til venstre) og last ned figur')
+                      ),
                       tabPanel(
                         'Tabell',
                         uiOutput("tittelFord"),
@@ -434,9 +427,9 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
              inputId = "valgtVarAndel", label="Velg variabel",
              choices = c('Kval.ind: For sen registrering' = 'regForsinkelse',
                          'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
+                         'Kval.ind: Trygg kirurgi-prosedyre utført' = 'tryggKir',
                          'Kval.ind: Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
                          'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
-                         'Kval.ind: Trygg kirurgi-prosedyre utført' = 'tryggKir',
                          'Alder over 70 år' = 'alder70',
                          'Antibiotika' = 'antibiotika',
                          'Arbeidsstatus' = 'arbstatus',
@@ -444,6 +437,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Degen. spondy. op. m/fusjon' = 'degSponFusj',
                          'Fedme (BMI>30)' = 'BMI',
                          'Flere enn to tidligere operasjoner' = 'tidlOp3',
+                         'Forbedring av Oswestry-skår >= 20p' = 'OswEndr20',
                          'Fornøyde pasienter' = 'fornoydhet',
                          'Fremmedspråklig' = 'morsmal',
                          # 'Komplikasjoner, pasientrapportert' = 'kp3Mnd',
@@ -453,9 +447,8 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Komplikasjoner ved operasjon' = 'peropKomp',
                          'Komplikasjon ved op.: Durarift' = 'peropKompDura',
                          'Misfornøyde pasienter' = 'misfornoyd',
-                         'Mye verre/verre enn noen gang' = 'verre',
-                         'Forbedring av Oswestry-skår >= 20p' = 'OswEndr20',
                          'Minst 30% forbedring av Oswestry-skår' = 'OswEndr30pst',
+                         'Mye verre/verre enn noen gang' = 'verre',
                          'Oswestry-skår < 23 poeng' = 'Osw22',
                          'Oswestry-skår > 48 poeng' = 'Osw48',
                          'Røykere' = 'roker',
@@ -488,11 +481,10 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
            selectInput(inputId = 'hovedInngrepAndel', label='Hovedinngrepstype',
                        choices = hovedkatValg
            ),
-           # selectInput(inputId = 'alvorlighetKomplAndel',
-           #             label='Alvorlighetsgrad, postoperative komplikasjoner',
-           #             multiple = T, #selected=0,
-           #             choices = alvorKompl
-           # ),
+           selectInput(inputId = "bildeformatAndel",
+                       label = "Velg format for nedlasting av figur",
+                       choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
+           br(),
            br(),
            p(em('Følgende utvalg gjelder bare figuren/tabellen som viser utvikling over tid')),
            selectInput(inputId = 'enhetsUtvalgAndel', label='Egen enhet og/eller landet',
@@ -508,9 +500,11 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                       h3(em("Utvikling over tid")),
                       br(),
                       plotOutput("andelTid", height = 'auto'),
+                      downloadButton('LastNedFigAndelTid', label='Velg format (til venstre) og last ned figur'),
                       br(),
                       h3(em("Sykehusvise resultater")),
-                      plotOutput("andelerGrVar", height='auto')
+                      plotOutput("andelerGrVar", height='auto'),
+             downloadButton('LastNedFigAndelGrVar', label='Velg format (til venstre) og last ned figur')
              ),
              tabPanel("Tabeller",
                       uiOutput("tittelAndel"),
@@ -538,7 +532,7 @@ tabPanel(p("Abonnement",
          sidebarLayout(
            sidebarPanel(width = 3,
                         selectInput("subscriptionRep", "Rapport:",
-                                    c("Månedsrapport")), #, "Samlerapport", "Influensaresultater")),
+                                    c("Kvartalsrapport")), #, "Samlerapport", "Influensaresultater")),
                         selectInput("subscriptionFreq", "Frekvens:",
                                     list(Årlig="Årlig-year",
                                           Kvartalsvis="Kvartalsvis-quarter",
@@ -803,8 +797,9 @@ server <- function(input, output,session) {
   )
 
   observe({
+    reshIDford <- ifelse(rolle=='SC', input$velgReshFord, reshID)
     UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0, valgtVar=input$valgtVar,
-                                reshID=reshID, enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                                reshID=reshIDford, enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                                 datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                                 minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
                                 erMann=as.numeric(input$erMann),
@@ -822,21 +817,24 @@ server <- function(input, output,session) {
         h5(HTML(paste0(UtDataFord$utvalgTxt, '<br />')))
       )}) #, align='center'
 
-    # output$fordelingTab <- function() { #gr1=UtDataFord$hovedgrTxt, gr2=UtDataFord$smltxt renderTable(
-    #
-    #   #       kable_styling("hover", full_width = F)
-    #   antKol <- ncol(tab)
-    #   print(antKol)
-    #   print(tab)
-    #   kableExtra::kable(tab, format = 'html'
-    #                     , full_width=F
-    #                     , digits = c(0,1,0,1)[1:antKol]
-    #   ) %>%
-    #     add_header_above(c(" "=1, 'Egen enhet/gruppe' = 2, 'Resten' = 2)[1:(antKol/2+1)]) %>%
-    #     column_spec(column = 1, width_min = '7em') %>%
-    #     column_spec(column = 2:(ncol(tab)+1), width = '7em') %>%
-    #     row_spec(0, bold = T)
-    # }
+    output$LastNedFigFord <- downloadHandler(
+      filename = function(){
+        paste0('FordelingsFig_', valgtVar=input$valgtVar, '_', Sys.Date(), '.', input$bildeformatFord)
+      },
+      content = function(file){
+        RyggFigAndeler(RegData=RegData, preprosess = 0,
+                         valgtVar=input$valgtVar,
+                         reshID=reshIDford,
+                         enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                         datoFra=input$datovalg[1], datoTil=input$datovalg[2],
+                         minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
+                         erMann=as.numeric(input$erMann),
+                         hastegrad = as.numeric(input$hastegrad),
+                         tidlOp = as.numeric(input$tidlOp),
+                         hovedkat = as.numeric(input$hovedInngrep),
+                         session = session,
+                         outfile = file)
+      })
 
     kolGruppering <- c(1,3,3)
     names(kolGruppering) <- c(' ', UtDataFord$hovedgrTxt, UtDataFord$smltxt)
@@ -885,6 +883,23 @@ server <- function(input, output,session) {
                         session=session)
   }, height = 800, width=700 #height = function() {session$clientData$output_andelerGrVarFig_width} #})
   )
+
+  output$LastNedFigAndelGrVar <- downloadHandler(
+    filename = function(){
+      paste0('AndelTid_', valgtVar=input$valgtVarAndel, '_', Sys.Date(), '.', input$bildeformatAndel)
+    },
+    content = function(file){
+      RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
+                          datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
+                          minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                          ktr = as.numeric(input$ktrAndel),
+                          erMann=as.numeric(input$erMannAndel),
+                          hastegrad = as.numeric(input$hastegradAndel),
+                          tidlOp = as.numeric(input$tidlOpAndel),
+                          hovedkat = as.numeric(input$hovedInngrepAndel),
+                          session=session,
+                      outfile = file)
+    })
 
   output$andelTid <- renderPlot({
 
@@ -936,6 +951,26 @@ server <- function(input, output,session) {
       },
       content = function(file, filename){
         write.csv2(tabAndelTid, file, row.names = T, fileEncoding = 'latin1', na = '')
+      })
+
+    output$LastNedFigAndelTid <- downloadHandler(
+      filename = function(){
+        paste0('AndelTid_', valgtVar=input$valgtVarAndel, '_', Sys.Date(), '.', input$bildeformatAndel)
+      },
+      content = function(file){
+        RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
+                        reshID= reshID,
+                        datoFra=as.Date(input$datovalgAndel[1]), datoTil=input$datovalgAndel[2],
+                        minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
+                        ktr = as.numeric(input$ktrAndel),
+                        erMann=as.numeric(input$erMannAndel),
+                        hastegrad = as.numeric(input$hastegradAndel),
+                        tidlOp = as.numeric(input$tidlOpAndel),
+                        hovedkat = as.numeric(input$hovedInngrepAndel),
+                        enhetsUtvalg = input$enhetsUtvalgAndel,
+                        tidsenhet = input$tidsenhetAndel,
+                        session=session,
+                       outfile = file)
       })
 
 
@@ -1042,8 +1077,8 @@ server <- function(input, output,session) {
     organization <- rapbase::getUserReshId(session)
     runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
     email <- rapbase::getUserEmail(session)
-    if (input$subscriptionRep == "Månedsrapport") {
-      synopsis <- "rygg/Rapporteket: månedsrapport"
+    if (input$subscriptionRep == "Kvartalsrapport") {
+      synopsis <- "rygg/Rapporteket: kvartalsrapport"
       rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
       #print(rnwFil)
     }
@@ -1104,8 +1139,8 @@ server <- function(input, output,session) {
 
     # fun <- "abonnementRygg"  #"henteSamlerapporter"
 
-    if (input$dispatchmentRep == "Månedsrapport") {
-      synopsis <- "Månedsrapport, Rygg"
+    if (input$dispatchmentRep == "Kvartalsrapport") {
+      synopsis <- "Kvartalsrapport, Rygg"
       fun <- "abonnementRygg"
       rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
       reshIDuts <- input$dispatchmentResh
@@ -1149,7 +1184,7 @@ server <- function(input, output,session) {
   ## ui: velg rapport
   output$reportUts <- renderUI({
     selectInput("dispatchmentRep", "Rapport:",
-                c("Månedsrapport"),
+                c("Kvartalsrapport"),
                 selected = dispatchment$report)
   })
   ## ui: velg rolle

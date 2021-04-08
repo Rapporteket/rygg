@@ -8,8 +8,8 @@ library(tools)
 library(knitr)
 library(nkr)
 
-Sys.setenv(http_proxy="www-proxy.helsenord.no:8080")
-Sys.setenv(https_proxy="www-proxy.helsenord.no:8080")
+# Sys.setenv(http_proxy="www-proxy.helsenord.no:8080")
+# Sys.setenv(https_proxy="www-proxy.helsenord.no:8080")
 devtools::install_github("Thinkr-open/golem", ref='master')
 devtools::install_github("Rapporteket/rapbase", ref='rel')
 
@@ -153,8 +153,9 @@ texi2pdf('SamleRappNKR.tex')
 reshID <- 601161
 library(rygg)
 setwd('/home/rstudio/rygg/inst')
-knit('RyggMndRapp.Rnw')
-knitr::knit2pdf('RyggMndRapp.Rnw')
+knitr::knit('RyggMndRapp.Rnw')
+tools::texi2pdf('RyggMndRapp.tex')
+#knitr::knit2pdf('RyggMndRapp.Rnw')
 
 library(knitr)
 knit('C:/ResultattjenesteGIT/nkr/AarsrappOff/ResultaterAarsrapp.Rnw') #, encoding = 'UTF-8')
@@ -175,7 +176,7 @@ RyggFigAndelerGrVar(RegData = RegData, valgtVar='Morsmal', outfile = '')
 #----------------------------------------------------------------
 valgtVar <- 'fornoydhet'	#Må velge...
 #NB: Hvis variabel='Underkat', MÅ hovedkat velges, dvs. ikke 99.
-outfile <- ''	#paste(valgtVar, '.pdf', sep='')	#Navn angis av Jasper ''
+outfile <- FordelingsFigurregForsinkelse_2021-03-27.pdf
 FordUt <- RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil,
 		minald=minald, maxald=maxald, erMann=erMann, hovedkat=hovedkat, preprosess=1,
 		 enhetsUtvalg=enhetsUtvalg, reshID=reshID, outfile=outfile)

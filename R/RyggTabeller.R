@@ -13,7 +13,7 @@
 tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       #RegData må inneholde ..
   if (reshID!=0){RegData <- RegData[which(RegData$ReshId==reshID), ]}
-      datoFra <- lubridate::floor_date(as.Date(datoTil)- months(antMnd, abbreviate = T), unit='month')
+      datoFra <- lubridate::floor_date(as.Date(datoTil) %m-% months(antMnd), unit='month')
       aggVar <-  c('ShNavn', 'InnDato')
       RegDataDum <- RegData[intersect(which(as.Date(RegData$InnDato) <= as.Date(datoTil, tz='UTC')),
                                which(as.Date(RegData$InnDato, tz='uTC') > as.Date(datoFra, tz='UTC'))), aggVar]
@@ -27,7 +27,6 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       tabAvdMnd1 <- xtable::xtable(tabAvdMnd1, digits=0)
 	return(tabAvdMnd1)
 }
-
 
 #' Tabell som viser antall opphold per sykehus og år, siste 5 år.
 #'
@@ -145,6 +144,7 @@ lagTabavFigGjsnGrVar <- function(UtDataFraFig){
 tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=2, reshID=0) {
   datoFra <- switch(tidsenhet,
                     Mnd = lubridate::floor_date(as.Date(datoTil)%m-% months(12, abbreviate = T), 'month'), #as.Date(paste0(as.numeric(substr(datoTil,1,4))-1, substr(datoTil,5,8), '01'), tz='UTC')
+                    Kvartal = paste0(year(as.Date(datoTil))-4, '-01-01'),
                     Aar = paste0(year(as.Date(datoTil))-4, '-01-01')
   )
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil = datoTil,
@@ -156,7 +156,7 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
 
   tabNokkeltall <- rbind(
     'Antall operasjoner' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=length),
-    'Alder > 70 år' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
+    'Alder > 70 år (%)' = tapply(RegData$Alder>70, RegData$TidsEnhet, FUN=prosent),
       'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean, na.rm=T),
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
     'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum, na.rm=T),

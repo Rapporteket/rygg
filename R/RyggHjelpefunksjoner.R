@@ -84,13 +84,13 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 #' @param filUt tilnavn for utdatatabell (fjern?)
 #' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
 #' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
-#' @param ResPort 1-hvis data til resultatportalen (standard), 0-data til SKDE-viser
+#' @param ResPort 1-hvis data til resultatportalen , 0-data til SKDE-viser (standard)
 #' @inheritParams RyggUtvalgEnh
 #' @return Datafil til Resultatportalen
 #' @export
 
 dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
-                           indID = 'indDummy', ResPort=1,
+                           indID = 'indDummy', ResPort=0,
                            hovedkat=99, hastegrad=99, tidlOp='', lastNedFil=0, filUt='dummy'){
 
 

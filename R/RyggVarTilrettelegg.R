@@ -23,7 +23,7 @@
 #'
 
 
-RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
+RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01-01',
                                  datoTil=Sys.Date(), hovedkat=99, figurtype='andeler'){ #grVar='',
 
 
@@ -372,6 +372,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
 
       if (valgtVar=='komplPost') {
          tittel <- 'Pasientrapporterte komplikasjoner'
+         datoFra <- max(datoFra, '2020-01-01')
          datoTil <- min(datoTil, as.character(Sys.Date()-90))
          retn <- 'H'
          flerevar <- 1
@@ -409,7 +410,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
          RegData <- RegData[ind, ]
          RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3mnd', 'KpInfDyp3mnd')], na.rm = T) > 0] <- 1
          VarTxt <- 'tilfeller'
-         tittel <- 'Sårinfeksjon, pasientrapportert'
+         tittel <- paste0('Sårinfeksjon, pasientrapportert', ktrtxt)
          sortAvtagende <- FALSE
          xAkseTxt <- 'Andel sårinfeksjoner (%)'
          #KImaalRetn <- 'lav'
@@ -528,12 +529,19 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
       #       RegData$VariabelGr[indDum] <- RegData$OpIndSmeType[indDum]
       #       RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(1:3,9))
       # }
-      if (valgtVar == 'opKat') { #fordeling
+      if (valgtVar == 'opKat') { #fordeling, andel øhjelp
             #retn <- 'H'
             tittel <- 'Operasjonskategori'
             grtxt <- c('Elektiv', 'Akutt', '1/2-Akutt', 'Ikke utfylt')
             RegData$VariabelGr <- factor(RegData$OpKat, levels = c(1:3,9))
+            if (figurtype %in% c('andelTid', 'andelGrVar')) {
+               RegData <- RegData[which(RegData$OpKat %in% 1:3), ]
+               RegData$Variabel[which(RegData$OpKat ==2)] <- 1
+               tittel <- 'Øyeblikkelig hjelp'
+               varTxt <- 'ø-hjelp'
+               sortAvtagende <- F}
       }
+
 
       if (valgtVar == 'OswEndr') {
          #Forbedring=lavere Oswestry
@@ -661,9 +669,9 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                           andeler='Tid fra utskriving til ferdigstilt registrering',
                           andelGrVar = 'Mer enn 30 dager fra utskriving til ferdig registrering') #
          subtxt <- 'døgn'
-         gr <- c(0,1,7,14,30,90,365,5000) #gr <- c(seq(0, 90, 10), 1000)
-         RegData$VariabelGr <- cut(RegData$DiffUtFerdig, breaks = gr, include.lowest = TRUE, right = TRUE)
-         grtxt <- c('1', '(1-7]', '(7-14]', '(14-30]', '(30-90]', '(90-365]', '>365')
+         # gr <- c(0,1,7,14,30,90,365,5000) #gr <- c(seq(0, 90, 10), 1000)
+         # RegData$VariabelGr <- cut(RegData$DiffUtFerdig, breaks = gr, include.lowest = TRUE, right = TRUE)
+         # grtxt <- c('1', '(1-7]', '(7-14]', '(14-30]', '(30-90]', '(90-365]', '>365')
          cexgr <- 0.9
          xAkseTxt <- 'dager'
          sortAvtagende <- FALSE

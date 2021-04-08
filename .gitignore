@@ -3,3 +3,8 @@
 .RData
 *.png
 
+*.tex
+*.toc
+*.vrb
+*.snm
+
