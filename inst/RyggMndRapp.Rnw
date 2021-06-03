@@ -101,7 +101,7 @@ offentlig i noen sammenheng eller på noe vis blir offentliggjort.}}
 \end{frame}
 
 
-\section{Datagrunnlag og innhold}
+%\section{Datagrunnlag og innhold}
 
 \begin{frame}[fragile] {Innhold}
 
@@ -132,7 +132,7 @@ Dette er bare et lite utvalg resultater. På Rapporteket kan du finne mer spesif
 \end{frame}
 
 
-\section{Registreringsoversikter}
+%\section{Registreringsoversikter}
 
 \begin{frame}[fragile] {Registreringsoversikt og nøkkeltall}
 For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
