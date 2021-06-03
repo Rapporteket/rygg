@@ -101,7 +101,7 @@ offentlig i noen sammenheng eller på noe vis blir offentliggjort.}}
 \end{frame}
 
 
-\section{Datagrunnlag og innhold}
+%\section{Datagrunnlag og innhold}
 
 \begin{frame}[fragile] {Innhold}
 
@@ -132,7 +132,7 @@ Dette er bare et lite utvalg resultater. På Rapporteket kan du finne mer spesif
 \end{frame}
 
 
-\section{Registreringsoversikter}
+%\section{Registreringsoversikter}
 
 \begin{frame}[fragile] {Registreringsoversikt og nøkkeltall}
 For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
@@ -352,13 +352,23 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='nytte', ktr = 1,
 \end{figure}
 \end{frame}
 
-\begin{frame}[fragile] {Gjennomsnittlig forbedring av ODI prolaps}
+\begin{frame}[fragile] {Gjennomsnittlig forbedring av ODI spinal stenose}
 \begin{figure}[ht]
 \centering
-\includegraphics[scale=0.35]{OswEndr_pro.pdf}
-\caption{Gjennomsnittlig forbedring av ODI prolaps, egen avd og resten av landet.}
+\includegraphics[scale=0.35]{OswEndr_SS.pdf}
+\caption{Gjennomsnittlig forbedring av ODI spinal stenose, egen avd og resten av landet.}
 \end{figure}
 \end{frame}
+
+
+\begin{frame}[fragile] {Tilfredshet hos pasientene}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{Fornoydhet.pdf}
+\caption{Pasientenes tilfredshet, egen avd og resten av landet.}
+\end{figure}
+\end{frame}
+
 
 \begin{frame}[fragile] {Nytte av operasjonen}
 \begin{figure}[ht]
