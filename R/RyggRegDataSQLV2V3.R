@@ -15,8 +15,16 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
 
   RegDataV2 <- rapbase::loadRegData(registryName="rygg",
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
-  RegDataV3 <- rapbase::loadRegData(registryName="rygg",
-                                    query='SELECT * FROM AlleVarNum')
+  # RegDataV3 <- rapbase::loadRegData(registryName="rygg",
+  #                                   query='SELECT * FROM AlleVarNum')
+  RegDataV3 <- rapbase::loadRegData(
+    registryName="rygg",
+    query='SELECT * FROM AlleVarNum
+    INNER JOIN ForlopsOversikt
+    ON AlleVarNum.ForlopsID = ForlopsOversikt.ForlopsID')
+#  WHERE HovedDato >= \'', datoFra, '\' AND HovedDato <= \'', datoTil, '\'')
+
+#  test <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM ForlopsOversikt')
 
   # RegDataV2$Aar <- lubridate::year(RegDataV2$OpDato)
   # tapply(RegDataV2$OswTot3mnd, RegDataV2$Aar, FUN = 'median', na.rm=T)
