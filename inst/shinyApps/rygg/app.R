@@ -308,10 +308,10 @@ shiny::tabPanel(
   "Eksport",
   shiny::sidebarLayout(
     shiny::sidebarPanel(
-      rapbase::exportUCInput("koronaExport")
+      rapbase::exportUCInput("ryggExport")
     ),
     shiny::mainPanel(
-      rapbase::exportGuideUI("koronaExportGuide")
+      rapbase::exportGuideUI("ryggExportGuide")
     )
   )
 ),
@@ -785,7 +785,19 @@ server <- function(input, output,session) {
 
 
   })
-}
+  }
+
+  #----------- Eksport ----------------
+  registryName <- "rygg"
+  ## brukerkontroller
+  rapbase::exportUCServer("ryggExport", registryName)
+  ## veileding
+  rapbase::exportGuideServer("ryggExportGuide", registryName)
+
+
+
+
+
 #------------Fordelinger---------------------
 
   observeEvent(input$reset, {
@@ -1313,16 +1325,6 @@ server <- function(input, output,session) {
     dispatchment$tab <-
       rapbase::makeAutoReportTab(session, type = "dispatchment")
   })
-
-
-  #----------- Eksport ----------------
-  registryName <- "korona"
-  ## brukerkontroller
-  rapbase::exportUCServer("koronaExport", registryName)
-  ## veileding
-  rapbase::exportGuideServer("koronaExportGuide", registryName)
-
-
 
 
 
