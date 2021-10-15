@@ -303,6 +303,19 @@ mainPanel(
 
 
   ), #tab SC
+#), #tab registeradm.
+shiny::tabPanel(
+  "Eksport",
+  shiny::sidebarLayout(
+    shiny::sidebarPanel(
+      rapbase::exportUCInput("koronaExport")
+    ),
+    shiny::mainPanel(
+      rapbase::exportGuideUI("koronaExportGuide")
+    )
+  )
+),
+
 
 #-------------Fordelinger---------------------
 tabPanel(p('Fordelinger',
@@ -549,6 +562,8 @@ tabPanel(p("Abonnement",
            )
          )
 )
+
+
 
 ) #fluidpage, dvs. alt som vises på skjermen
 
@@ -1298,6 +1313,14 @@ server <- function(input, output,session) {
     dispatchment$tab <-
       rapbase::makeAutoReportTab(session, type = "dispatchment")
   })
+
+
+  #----------- Eksport ----------------
+  registryName <- "korona"
+  ## brukerkontroller
+  rapbase::exportUCServer("koronaExport", registryName)
+  ## veileding
+  rapbase::exportGuideServer("koronaExportGuide", registryName)
 
 
 
