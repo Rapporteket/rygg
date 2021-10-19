@@ -213,7 +213,8 @@ ui <- navbarPage(id = "tab1nivaa",
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
                         br(),
                         br(),
-                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
+                        h4('Datadumpen inneholder alle variabler fra begge versjoner')
 
            ),
 
@@ -756,7 +757,7 @@ server <- function(input, output,session) {
   #   } #else {
   #     #DataDump[which(DataDump$ReshId == reshID), -variablePRM]} #Tar bort PROM/PREM til egen avdeling
 
-  RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV3=1)
+  RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1)
     #rapbase::loadRegData(registryName="rygg", query='SELECT * FROM AlleVarNum')
   RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
   dataDump <- tilretteleggDataDumper(data=RegDataV2V3, datovalg = input$datovalgRegKtr,
