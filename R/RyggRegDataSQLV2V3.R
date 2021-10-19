@@ -1,30 +1,34 @@
 #' Henter data registrert for Degenerativ Rygg
 #'
-#' Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3
+#' Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3.
+#' Registeret ønsker også en versjon hvor variabler som bare er i versjon 2 er med i det
+#' felles uttrekket. Lager en egen versjon for dette.
 #'
 #' @param alleVarV3 0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
 #'                  1: har med alle variabler fra V3
+#' @param alleVarV2 0: Bare variabler som også finnes i V3 med (standard),
+#'                  1: har med alle variabler fra V2
 #' @inheritParams RyggUtvalgEnh
 #'
 #' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
 
-RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alleVarV3=1){
+RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alleVarV3=1, alleVarV2=0){
 #NB: datovalg har ingen effekt foreløpig!!
 #Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
   RegDataV2 <- rapbase::loadRegData(registryName="rygg",
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
-  # RegDataV3 <- rapbase::loadRegData(registryName="rygg",
-  #                                   query='SELECT * FROM AlleVarNum')
-  RegDataV3 <- rapbase::loadRegData(
-    registryName="rygg",
-    query='SELECT * FROM AlleVarNum
-    INNER JOIN ForlopsOversikt
-    ON AlleVarNum.ForlopsID = ForlopsOversikt.ForlopsID')
-#  WHERE HovedDato >= \'', datoFra, '\' AND HovedDato <= \'', datoTil, '\'')
+   RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
+                                     query='SELECT * FROM AlleVarNum')
+   RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
+                                       query='SELECT * FROM ForlopsOversikt')
+   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
+                "Avdod", "AvdodDato", "BasisRegStatus")
+   #varBegge <- intersect(sort(names(RegDataV3AV)), sort(names(RegDataV3For)))
 
-#  test <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM ForlopsOversikt')
+
+   RegDataV3 <- merge(RegDataV3AVN, RegDataV3Forl[varForl], by='ForlopsID', all.x = TRUE, all.y = FALSE)
 
   # RegDataV2$Aar <- lubridate::year(RegDataV2$OpDato)
   # tapply(RegDataV2$OswTot3mnd, RegDataV2$Aar, FUN = 'median', na.rm=T)
@@ -49,7 +53,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   #Funker ikke ReshTab <- merge(reshV3, reshV2, by.x = 'sykehusNavn', by.y = 'AvdNavn', all=TRUE)
   #unique(RegData[ ,c("SykehusNavn", "AvdRESH")])
 
-  if (alleVarV3 == 0) {
+  if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
   fjernesV3 <-
     c("Adresse", "Adressetype",
@@ -248,15 +252,20 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
   #setdiff(VarV2, VarV3) #Sjekk på nytt når gått gjennom.
 
   V2ogV3 <- intersect(VarV2, VarV3)
-  RegDataV2 <- RegDataV2[ , V2ogV3]
   V3ikkeV2 <- setdiff(VarV3, V2ogV3)
-  #V2ikkeV3 <- setdiff(VarV2, V2ogV3)
-  RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
-  #BlodfortynnendeSepDato-ok, InnlagtDato-ok, UtfyltDato-ok, UtskrivelseDato-ok, MedForstLukket
-  #OprDato?? ok
+  V2ikkeV3 <- setdiff(VarV2, V2ogV3)
+  if (alleVarV2 == 0){
+    RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
+    RegDataV2 <- RegDataV2[ , V2ogV3]
+    RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
+                         RegDataV3[ ,VarV3])
+  } else {
+    RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
+    RegDataV3[, V2ikkeV3] <- NA
+    RegDataV2V3 <- rbind(RegDataV2,
+                         RegDataV3)
 
-  RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
-                       RegDataV3[ ,VarV3])
+}
   #19.aug: 101 variabler i både V2 og V3. 128 i tillegg i V3
   #9.sept: 130 var i begge. 98 i tillegg i V3
 

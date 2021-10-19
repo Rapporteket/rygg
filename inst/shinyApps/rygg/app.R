@@ -249,72 +249,73 @@ ui <- navbarPage(id = "tab1nivaa",
     tabPanel(p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
              value = "Registeradministrasjon",
              h3('Egen side for registeradministratorer. Siden er bare synlig for SC-bruker'),
-           br(),
-           br(),
-           sidebarPanel(
-             h4('Lage abonnementslister for utsendinger'),
-             uiOutput("reportUts"),
-             uiOutput("freqUts"),
-             uiOutput("ReshUts"),
-             h5('E-postmottagere legges inn en og en. Trykk legg til e-postmottager for hver gang.
+             tabsetPanel(
+               tabPanel('Utsending',
+                 sidebarPanel(
+                   h4('Lage abonnementslister for utsendinger'),
+                   uiOutput("reportUts"),
+                   uiOutput("freqUts"),
+                   uiOutput("ReshUts"),
+                   h5('E-postmottagere legges inn en og en. Trykk legg til e-postmottager for hver gang.
                            Når du har lagt til alle, trykker du på lag utsending. '),
-             textInput("email", "Epostmottakere:"),
-             uiOutput("editEmail"),
-             htmlOutput("recipients"),
-             tags$hr(),
-             uiOutput("makeDispatchment"), #utsending
-             br(),
-             br(),
-             h3('Last ned data fra versjon 2.0:'),
-             downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
-             br(),
-             br(),
-             h4('Nedlasting av data til Resultatportalen:'),
-             h5('Fjernes eller erstattes av data til sykehusviser'),
+                   textInput("email", "Epostmottakere:"),
+                   uiOutput("editEmail"),
+                   htmlOutput("recipients"),
+                   tags$hr(),
+                   uiOutput("makeDispatchment"), #utsending
+                   br(),
+                   br(),
+                   h3('Last ned data fra versjon 2.0:'),
+                   downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
+                   br(),
+                   br(),
+                   h4('Nedlasting av data til Resultatportalen:'),
+                   h5('Fjernes eller erstattes av data til sykehusviser'),
 
-             selectInput(inputId = "valgtVarRes", label="Velg variabel",
-                         choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
-                                     'Durarift' = 'peropKompDura',
-                                     'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
-             ),
-             selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
-                         choices = hovedkatValg
-             ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
-                         choices = hastegradValg
-             ),
-             selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
-                         choices = tidlOprValg
-             ),
-             # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
-             #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
-             #                ),
-             sliderInput(inputId="aarRes", label = "Operasjonsår",
-                         min = as.numeric(2007), max = as.numeric(year(idag)),
-                         value = c(2018, year(idag)),
-                         step=1, sep=""
-             ),
-             br(),
-             downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data'),
-     ),
+                   selectInput(inputId = "valgtVarRes", label="Velg variabel",
+                               choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
+                                           'Durarift' = 'peropKompDura',
+                                           'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
+                   ),
+                   selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
+                               choices = hovedkatValg
+                   ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
+                                 choices = hastegradValg
+                   ),
+                   selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
+                               choices = tidlOprValg
+                   ),
+                   # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
+                   #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
+                   #                ),
+                   sliderInput(inputId="aarRes", label = "Operasjonsår",
+                               min = as.numeric(2007), max = as.numeric(year(idag)),
+                               value = c(2018, year(idag)),
+                               step=1, sep=""
+                   ),
+                   br(),
+                   downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data'),
+                 ),
 
-mainPanel(
-  uiOutput("dispatchmentContent")
-)
+                 mainPanel(
+                   h3('Oversikt over aktive utsendinger'),
+                   uiOutput("dispatchmentContent"))
+                 ), #Utsendingstab
 
 
-  ), #tab SC
-#), #tab registeradm.
-shiny::tabPanel(
-  "Eksport",
-  shiny::sidebarLayout(
-    shiny::sidebarPanel(
-      rapbase::exportUCInput("ryggExport")
-    ),
-    shiny::mainPanel(
-      rapbase::exportGuideUI("ryggExportGuide")
-    )
-  )
-),
+                 shiny::tabPanel(
+                   "Eksport",
+                   #shiny::sidebarLayout(
+                     shiny::sidebarPanel(
+                       rapbase::exportUCInput("ryggExport")
+                     ),
+                     shiny::mainPanel(
+                       rapbase::exportGuideUI("ryggExportGuide")
+                     )
+                   #)
+                 ) #Eksport-tab
+               ) #tabsetPanel
+), #Registeradm-tab
 
 
 #-------------Fordelinger---------------------
