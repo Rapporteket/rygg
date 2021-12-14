@@ -136,7 +136,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
                              #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
                              SykehusNavn = AvdNavn,
                              Ferdigstilt1b3mnd = Utfylt3Mnd,
-                             Ferdigstilt1b12mnd = Utfylt12Mnd
+                             Ferdigstilt1b12mnd = Utfylt12Mnd,
+                             #SykdVaskularClaudicatio = SykdVaskulærClaudicatio,
+                             SykDprebetesMellitus = SykdDiabetesMellitus
   )
 
 
@@ -153,7 +155,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
   #Legge til underkategori for hovedkategori.
-  ny <- kategoriserInngrep(RegData=RegDataV3)
+  ny <- rygg::kategoriserInngrep(RegData=RegDataV3)
   RegDataV3 <- ny$RegData
 
   #--------Definasjon av diagnosegrupper prolaps og spinal stenose V3
@@ -239,11 +241,12 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
     RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
                          RegDataV3[ ,VarV3])
   } else {
+    RegDataV3$AvdodDato <- as.Date(RegDataV3$AvdodDato)
     RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
     RegDataV3[, V2ikkeV3] <- NA
     RegDataV2V3 <- rbind(RegDataV2,
                          RegDataV3)
-
+    RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
 }
   #19.aug: 101 variabler i både V2 og V3. 128 i tillegg i V3
   #9.sept: 130 var i begge. 98 i tillegg i V3
