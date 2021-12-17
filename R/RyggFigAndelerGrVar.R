@@ -62,7 +62,7 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
                                 preprosess=1, hastegrad=99, enhetsUtvalg=0, grVar='ShNavn', tittel=1, ktr=0,
                                 Ngrense=10, reshID=0, outfile='', ...) {
   if ("session" %in% names(list(...))) {
-    raplog::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrShus: ',valgtVar))
+    rapbase::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrShus: ',valgtVar))
   }
 
   if (length(grep('dekn',valgtVar)) == 1) { #Bruke vedlagte dekningsdata

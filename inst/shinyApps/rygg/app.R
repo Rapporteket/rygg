@@ -573,7 +573,7 @@ tabPanel(p("Abonnement",
 #----------------- Define server logic required  -----------------------
 server <- function(input, output,session) {
 
-  raplog::appLogger(session, msg = 'Starter Rapporteket-Rygg')
+  rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
   #reshID <- reactive({ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)),
   #                           601161)})
   reshID <- ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)), 601161)

@@ -24,7 +24,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
                         enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, offData=0,... ) {
 
    if ("session" %in% names(list(...))) {
-      raplog::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
+      rapbase::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
    }
 
       if (hentData == 1) {
