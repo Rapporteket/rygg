@@ -11,7 +11,7 @@ dataTilOffVisning(
   aar = 0,
   ktr = 0,
   indID = "indDummy",
-  ResPort = 1,
+  ResPort = 0,
   hovedkat = 99,
   hastegrad = 99,
   tidlOp = "",
@@ -34,7 +34,7 @@ dataTilOffVisning(
 
 \item{indID}{indikator-id, eks. 'ind1', 'ind2', osv.}
 
-\item{ResPort}{1-hvis data til resultatportalen (standard), 0-data til SKDE-viser}
+\item{ResPort}{1-hvis data til resultatportalen , 0-data til SKDE-viser (standard)}
 
 \item{hovedkat}{Hvilken type hovedinngrep, numerisk 0-9, standard: 99, dvs. alle. Valgmuligheter:
 \itemize{

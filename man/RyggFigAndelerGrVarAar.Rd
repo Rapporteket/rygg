@@ -100,7 +100,7 @@ Figur med...
 \description{
 Funksjon som genererer en figur med andeler av en variabel for en valgt grupperingsvariabel,
 f.eks. sykehus.
-Funksjonen er delvis skrevet for å kunne brukes til andre grupperingsvariable enn sykehus
+Funksjonen er klargjort for å kunne brukes til andre grupperingsvariable enn sykehus
 }
 \details{
 Andel som mottar sykepenger er definert som svaralternativene: 'Sykemeldt',
