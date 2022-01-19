@@ -523,8 +523,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
       if (valgtVar %in% c('oppf3m', 'oppf12m', 'oppf3og12m')) { #AndelGrVar
         #Oppfølgingsskjema. Gjelder kun fra V3, dvs. innleggelser etter 2019
         #"Ferdig1a", "Ferdig2a", "Ferdigstilt1b12mnd", "Ferdigstilt1b3mnd"
-        datoFra <- '2019-01-01'
-        RegData <- RegData[RegData$InnDato >= as.Date(datoFra), ]
+        #datoFra <- '2019-01-01'
+        #RegData <- RegData[RegData$InnDato >= as.Date(datoFra), ]
         ind <- switch(valgtVar,
                       oppf3m = which(RegData$Ferdigstilt1b3mnd==1),
                       oppf12m = which(RegData$Ferdigstilt1b12mnd==1),
