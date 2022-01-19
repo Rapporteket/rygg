@@ -520,6 +520,25 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(0:5,9))
       }
 
+      if (valgtVar %in% c('oppf3m', 'oppf12m', 'oppf3og12m')) { #AndelGrVar
+        #Oppfølgingsskjema. Gjelder kun fra V3, dvs. innleggelser etter 2019
+        #"Ferdig1a", "Ferdig2a", "Ferdigstilt1b12mnd", "Ferdigstilt1b3mnd"
+        datoFra <- '2019-01-01'
+        RegData <- RegData[RegData$InnDato >= as.Date(datoFra), ]
+        ind <- switch(valgtVar,
+                      oppf3m = which(RegData$Ferdigstilt1b3mnd==1),
+                      oppf12m = which(RegData$Ferdigstilt1b12mnd==1),
+                      oppf3og12m = which(RegData$Ferdigstilt1b3mnd==1 & RegData$Ferdigstilt1b12mnd==1 ))
+
+        RegData$Variabel[ind] <- 1
+
+        tittel <- paste0('Svart på oppfølging, ',
+                         switch(valgtVar,
+                                oppf3m = '3 mnd. etter',
+                                oppf12m = '12 mnd. etter',
+                                oppf3og12m = 'både 3 og 12 mnd. etter'))
+        sortAvtagende <- T
+      }
       # if (valgtVar == 'opIndSmeType') {#fordeling
       #       tittel <- 'Operasjonsindikasjon, smertetype'
       #       grtxt <- c('Rygg/hofte', 'Bein', 'Begge deler', 'Ukjent')
