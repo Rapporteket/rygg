@@ -14,7 +14,7 @@ License: What license it uses
 Encoding: UTF-8
 LazyData: true
 Remotes: 
-    Rapporteket/rapbase,
+     Rapporteket/rapbase@*release,
     Rapporteket/rapFigurer,
     Rapporteket/raplog,
     Rapporteket/rapsodi
