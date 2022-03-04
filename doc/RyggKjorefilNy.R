@@ -231,8 +231,8 @@ for (var in variable) {
 RegData <- RyggRegDataSQLV2V3() #read.table('A:/Rygg/AlleVarNum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
 
 
-DataUt <- RyggFigAndelerGrVar(valgtVar='roker', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
-                    datoFra='2017-01-01', datoTil = '2019-02-01',ktr=1, outfile='')
+DataUt <- RyggFigAndelerGrVar(valgtVar='oppf3mnd', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
+                    datoFra='2019-01-01', datoTil = '2021-02-01',ktr=1, outfile='')
 
 DataUt <- RyggFigAndelTid(RegData=RegData, outfile='', valgtVar='nytte', datoFra = '2017-01-01', ktr = 1)
 tab <- lagTabavFig(UtDataFraFig=DataUt, figurtype='andelTid')

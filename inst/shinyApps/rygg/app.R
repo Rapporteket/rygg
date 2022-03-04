@@ -120,9 +120,6 @@ ui <- navbarPage(id = "tab1nivaa",
              tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color
              br(),
              br(),
-             #br(),
-             #br(),
-             #h4('Her Kan det komme nedlastbare dokumenter med samling av resultater'),
           br()
            ),
            mainPanel(
@@ -154,9 +151,7 @@ ui <- navbarPage(id = "tab1nivaa",
                h4('Antall skjema i kladd'),
                uiOutput("iKladdPas"),
                uiOutput("iKladdLege")
-               #h5(paste('Pasientskjema:', uiOutput("iKladdPas"))),
-               #h5(paste('Lengeskjema:', uiOutput("iKladdLege")))
-             ),
+              ),
              column(6,
                     h4('Registreringsforsinkelse'),
                     uiOutput('forSen3mnd'),
@@ -270,32 +265,32 @@ ui <- navbarPage(id = "tab1nivaa",
                    downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
                    br(),
                    br(),
-                   h4('Nedlasting av data til Resultatportalen:'),
-                   h5('Fjernes eller erstattes av data til sykehusviser'),
-
-                   selectInput(inputId = "valgtVarRes", label="Velg variabel",
-                               choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
-                                           'Durarift' = 'peropKompDura',
-                                           'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
-                   ),
-                   selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
-                               choices = hovedkatValg
-                   ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
-                                 choices = hastegradValg
-                   ),
-                   selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
-                               choices = tidlOprValg
-                   ),
-                   # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
-                   #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
-                   #                ),
-                   sliderInput(inputId="aarRes", label = "Operasjonsår",
-                               min = as.numeric(2007), max = as.numeric(year(idag)),
-                               value = c(2018, year(idag)),
-                               step=1, sep=""
-                   ),
-                   br(),
-                   downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data'),
+                   # h4('Nedlasting av data til Resultatportalen:'),
+                   # h5('Fjernes eller erstattes av data til sykehusviser'),
+                   #
+                   # selectInput(inputId = "valgtVarRes", label="Velg variabel",
+                   #             choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
+                   #                         'Durarift' = 'peropKompDura',
+                   #                         'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
+                   # ),
+                   # selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
+                   #             choices = hovedkatValg
+                   # ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
+                   #               choices = hastegradValg
+                   # ),
+                   # selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
+                   #             choices = tidlOprValg
+                   # ),
+                   # # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
+                   # #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
+                   # #                ),
+                   # sliderInput(inputId="aarRes", label = "Operasjonsår",
+                   #             min = as.numeric(2007), max = as.numeric(year(idag)),
+                   #             value = c(2018, year(idag)),
+                   #             step=1, sep=""
+                   # ),
+                   # br(),
+                   # downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data'),
                  ),
 
                  mainPanel(
@@ -465,9 +460,9 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Misfornøyde pasienter' = 'misfornoyd',
                          'Minst 30% forbedring av Oswestry-skår' = 'OswEndr30pst',
                          'Mye verre/verre enn noen gang' = 'verre',
-                         'Oppfølging, 3 mnd.' = 'oppf3m',
-                         'Oppfølging, 12 mnd.' = 'oppf12m',
-                         'Oppfølging, 3 og 12 mnd.' = 'oppf3og12m',
+                         'Oppfølging, 3 mnd.' = 'oppf3mnd',
+                         'Oppfølging, 12 mnd.' = 'oppf12mnd',
+                         'Oppfølging, 3 og 12 mnd.' = 'oppf3og12mnd',
                          'Oswestry-skår < 23 poeng' = 'Osw22',
                          'Oswestry-skår > 48 poeng' = 'Osw48',
                          'Røykere' = 'roker',
@@ -779,18 +774,18 @@ server <- function(input, output,session) {
 #-----------Registeradministrasjon-----------
 
   if (rolle=='SC') {
-  observe({
-    tabdataTilResPort <- dataTilOffVisning(RegData=RegData, valgtVar = input$valgtVarRes,
-                                        hovedkat = as.numeric(input$hovedInngrepRes),
-                                        aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
-                                        hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
-
-    output$lastNed_dataTilResPort <- downloadHandler(
-      filename = function(){'dataTilResPort.csv'},
-      content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, fileEncoding = 'latin1', na = '')})
-
-
-  })
+  # observe({
+  #   tabdataTilResPort <- dataTilOffVisning(RegData=RegData, valgtVar = input$valgtVarRes,
+  #                                       hovedkat = as.numeric(input$hovedInngrepRes),
+  #                                       aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
+  #                                       hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
+  #
+  #   output$lastNed_dataTilResPort <- downloadHandler(
+  #     filename = function(){'dataTilResPort.csv'},
+  #     content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, fileEncoding = 'latin1', na = '')})
+  #
+  #
+  # })
   }
 
   #----------- Eksport ----------------

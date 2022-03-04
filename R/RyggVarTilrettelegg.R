@@ -53,28 +53,21 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
 
       #----Filtrere på at oppfølgigsskjema finnes
       #ktr kan ha verdiene 0, 1 eller 2
-      #valgtVar <- 'arbstatus3mnd'
+valgtVarTest <- valgtVar
       if (length(grep('3mnd', valgtVar)) == 1) {
          ktr <- 1
-         valgtVar <- sub('3mnd', '', valgtVar)}
+         valgtVarTest <- sub('3mnd', '', valgtVar)
+         }
       if (length(grep('12mnd', valgtVar) == 1)) {
          ktr <- 2
-         valgtVar <- sub('12mnd', '', valgtVar)}
+         valgtVarTest <- sub('12mnd', '', valgtVar)
+         }
       varPrePost <- c('fornoydhet', 'nytte', 'EQ5DEndr','EQ5DEndr',
                       'OswEndr', 'SmBeinEndr', 'SmRyggEndr',
                       'OswEndrPre', 'SmBeinEndrPre', 'SmRyggEndrPre')
-      if ((valgtVar %in% varPrePost) & (ktr==0)) {ktr <- 1}
-      # Ferdig1a - pasientskjema
-      # Ferdigstilt1b3mnd
-      # Ferdigstilt1b12mnd
-      # Ferdig2a - legeskjema
-      #FILTRERING PÅ DENNE BLIR DET SAMME SOM Å FILTRERE PÅ VERSJON 3...!
-      # if (valgtVar %in% varPrePost){
-      #       if (ktr == 1) {RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]}
-      #       if (ktr == 2) {RegData <- RegData[which(RegData$Ferdigstilt1b12mnd==1), ]}
-      # }
-      ktrtxt <- c(' før operasjon', ' (3 mnd etter)', ' (12 mnd. etter)')[ktr+1]
-      trekkfraDager <- c(0,90,365)[ktr+1]
+      if ((valgtVarTest %in% varPrePost) & (ktr==0)) {ktr <- 1}
+     ktrtxt <- c(' før operasjon', ' (3 mnd etter)', ' (12 mnd. etter)')[ktr+1]
+      trekkfraDager <- c(0,100,380)[ktr+1]
 
 
       #-------------------------------------
@@ -156,11 +149,11 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          retn <- 'H'
       }
 
-      if (valgtVar == 'arbstatus') { #Fordeling, AndelGrVar, AndelTid
+      if (valgtVar %in% c('arbstatus', 'arbstatus3mnd', 'arbstatus12mnd')) { #Fordeling, AndelGrVar, AndelTid
             # Andel i kategori 6 tom 9, mottar sykepenger Av 1-9, (ikke bare de som sykemeldt fra før)
             #  Gml: grtxt <- c('I arbeid','Hjemmeværende', 'Studie/skole', 'Pensjonist', 'Arbeidsledig', 'Sykemeldt',
             #		'Aktiv sykemeldt', 'Delvis sykemeldt', 'Attføring/rehab.', 'Uføretrygdet', 'Ukjent')
-            datoTil <- min(datoTil, as.character(Sys.Date()-trekkfraDager))
+            datoTil <- min(datoTil, Sys.Date()-trekkfraDager)
             RegData$Arbstatus <- switch(as.character(ktr),
                                         '0' = RegData$ArbstatusPreV3,
                                         '1'= RegData$Arbstatus3mndV3,
@@ -245,7 +238,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             KIekstrem <- c(-0.6, 1)
       }
 
-      if (valgtVar == 'EQ5DEndr') {#gjsnPre (gjsnBox)
+      if (valgtVar %in% c('EQ5DEndr', 'EQ5DEndr3mnd', 'EQ5DEndr12mnd')) {#gjsnPre (gjsnBox)
             tittel <- paste0('forbedring av EQ5D', ktrtxt)
             RegData$Variabel <- switch(as.character(ktr),
                                        '1'= (RegData$EQ5DV33mnd - RegData$EQ5DV3Pre),
@@ -291,7 +284,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             sortAvtagende <- FALSE}
       }
 
-      if (valgtVar =='fornoydhet') { #fordeling, AndelGrVar
+      if (valgtVar %in% c('fornoydhet', 'fornoydhet3mnd', 'fornoydhet12mnd')) { #fordeling, AndelGrVar
          #3/12mndSkjema. Andel med helt Fornøyd (1)
          #Kode 1:5,9: 'Fornøyd', 'Litt fornøyd', 'Verken eller', 'Litt misfornøyd', 'Misfornøyd', 'Ukjent')
          tittel <- paste('Fornøydhet', ktrtxt)
@@ -307,7 +300,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          if (figurtype %in% c('andelGrVar', 'andelTid')) {
             RegData <- RegData[which(RegData$Fornoyd %in% 1:5), ]
             RegData$Variabel[which(RegData$Fornoyd %in% 1:2)] <- 1 #
-            #RegData$Variabel[which(RegData$Fornoyd ==1)] <- 1 #%in% 1:2
             tittel <- paste0('Fornøyde pasienter', ktrtxt)
          }
       }
@@ -389,14 +381,10 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
 
       if (valgtVar == 'kp3mnd') { #AndelGrVar
          #Komplikasjoner 0:nei, 1:ja
-         ind <- switch(as.character(ktr),
-                       '1' = which(RegData$Ferdigstilt1b3mnd==1),
-                       '2' = which(RegData$Ferdigstilt1b12mnd == 1))
+         ind <- which(RegData$Ferdigstilt1b3mnd==1)
          RegData <- RegData[ind, ]
-         if (ktr==1) {
-            variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
+        variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
                        'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')
-         }
          RegData$Variabel[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
          VarTxt <- 'tilfeller'
          tittel <- 'Pasientrapporterte komplikasjoner (%)'
@@ -458,7 +446,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          ytxt1 <- 'liggetid'
          KIekstrem <- c(0, 20)
       }
-      if (valgtVar == 'misfornoyd') { #AndelGrVar	#%in% c('Misfor3mnd','Misfor12mnd')) { #AndelGrVar
+      if (valgtVar %in% c('misfornoyd', 'misfornoyd3mnd', 'misfornoyd12mnd')) { #AndelGrVar	#%in% c('Misfor3mnd','Misfor12mnd')) { #AndelGrVar
             #3/12mndSkjema. Andel med Misfornøyd/litt misfornøyd (1,2)
             #Kode 1:5,9: 'Fornøyd', 'Litt fornøyd', 'Verken eller', 'Litt misfornøyd', 'Misfornøyd', 'Ukjent')
             RegData$Misfornoyd <- switch(as.character(ktr),
@@ -481,7 +469,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
                   sortAvtagende <- F}
       }
 
-      if (valgtVar == 'nytte') { #fordeling, AndelGrVar
+      if (valgtVar %in% c('nytte', 'nytte3mnd', 'nytte12mnd')) { #fordeling, AndelGrVar
             #Andel med helt bra/mye bedre (1:2)
             #Kode 1:7: ''Helt bra', 'Mye bedre', 'Litt bedre', 'Uendret', 'Litt verre', 'Mye verre',
             #				'Verre enn noen gang', 'Ukjent')
@@ -489,7 +477,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             RegData$Nytte <- switch(as.character(ktr),
                                     '1'=RegData$Nytte3mnd,
                                     '2'=RegData$Nytte12mnd)
-            datoTil <- min(datoTil, as.character(Sys.Date()-trekkfraDager))
+            datoTil <- min(datoTil, Sys.Date()-trekkfraDager)
             retn <- 'H'
             RegData$VariabelGr <- 9
             indDum <- which(RegData$Nytte %in% 1:7)
@@ -520,34 +508,24 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(0:5,9))
       }
 
-      if (valgtVar %in% c('oppf3m', 'oppf12m', 'oppf3og12m')) { #AndelGrVar
-        #Oppfølgingsskjema. Gjelder kun fra V3, dvs. innleggelser etter 2019
+      if (valgtVar %in% c('oppf3mnd', 'oppf12mnd', 'oppf3og12mnd')) { #AndelGrVar
+        #Oppfølgingsskjema.
         #"Ferdig1a", "Ferdig2a", "Ferdigstilt1b12mnd", "Ferdigstilt1b3mnd"
-        #datoFra <- '2019-01-01'
-        #RegData <- RegData[RegData$InnDato >= as.Date(datoFra), ]
+        datoTil <- min(datoTil, Sys.Date()-trekkfraDager)
         ind <- switch(valgtVar,
-                      oppf3m = which(RegData$Ferdigstilt1b3mnd==1),
-                      oppf12m = which(RegData$Ferdigstilt1b12mnd==1),
-                      oppf3og12m = which(RegData$Ferdigstilt1b3mnd==1 & RegData$Ferdigstilt1b12mnd==1 ))
+                      oppf3mnd = which(RegData$Ferdigstilt1b3mnd==1),
+                      oppf12mnd = which(RegData$Ferdigstilt1b12mnd==1),
+                      oppf3og12mnd = which(RegData$Ferdigstilt1b3mnd==1 & RegData$Ferdigstilt1b12mnd==1 ))
 
         RegData$Variabel[ind] <- 1
 
         tittel <- paste0('Svart på oppfølging, ',
                          switch(valgtVar,
-                                oppf3m = '3 mnd. etter',
-                                oppf12m = '12 mnd. etter',
-                                oppf3og12m = 'både 3 og 12 mnd. etter'))
+                                oppf3mnd = '3 mnd. etter',
+                                oppf12mnd = '12 mnd. etter',
+                                oppf3og12mnd = 'både 3 og 12 mnd. etter'))
         sortAvtagende <- T
       }
-      # if (valgtVar == 'opIndSmeType') {#fordeling
-      #       tittel <- 'Operasjonsindikasjon, smertetype'
-      #       grtxt <- c('Rygg/hofte', 'Bein', 'Begge deler', 'Ukjent')
-      #       RegData <- RegData[which(RegData$OpIndSme ==1),]
-      #       indDum <- which(RegData$OpIndSmeType %in% 1:3)
-      #       RegData$VariabelGr <- 9
-      #       RegData$VariabelGr[indDum] <- RegData$OpIndSmeType[indDum]
-      #       RegData$VariabelGr <- factor(RegData$VariabelGr, levels = c(1:3,9))
-      # }
       if (valgtVar == 'opKat') { #fordeling, andel øhjelp
             #retn <- 'H'
             tittel <- 'Operasjonskategori'
@@ -562,7 +540,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
       }
 
 
-      if (valgtVar == 'OswEndr') {
+      if (valgtVar %in% c('OswEndr', 'OswEndr3mnd', 'OswEndr12mnd')) {
          #Forbedring=lavere Oswestry
          tittel <- paste0('forbedring av ODI', ktrtxt)
          RegData$Variabel <- switch(as.character(ktr),
@@ -571,7 +549,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          RegData <- RegData[which(!is.na(RegData$Variabel)),]
          KIekstrem <- c(-100, 100)
       }
-      if (valgtVar == 'OswEndrPre') { #Sammenligner endring og prescore
+
+      if (valgtVar %in% c('OswEndrPre', 'OswEndrPre3mnd', 'OswEndrPre12mnd')) { #Sammenligner endring og prescore
          #Forbedring=lavere Oswestry
          tittel <- paste0('forbedring av ODI', ktrtxt)
          RegData$Variabel <- switch(as.character(ktr),
@@ -597,7 +576,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             tittel <- paste0('Forbedring av Oswestry-skår < 13 poeng', ktrtxt)
             sortAvtagende <- F
       }
-      if (valgtVar == 'OswEndr20') { #AndelGrVar, andelTid
+      if (valgtVar %in% c('OswEndr20', 'OswEndr203mnd', 'OswEndr2012mnd')) { #AndelGrVar, andelTid
             #Mislykkede operasjoner
             RegData$OswEndr <- switch(as.character(ktr),
                                       '1'= (RegData$OswTotPre - RegData$OswTot3mnd),
@@ -609,7 +588,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
 
       }
 
-      if (valgtVar == 'OswEndr30pst') { #AndelGrVar, andelTid
+      if (valgtVar %in% c('OswEndr30pst', 'OswEndr30pst3mnd', 'OswEndr30pst12mnd')) { #AndelGrVar, andelTid
             #Andel med klinisk signifikant forbedring i Oswestry-skår.
             #Forbedring = nedgang
             RegData$OswPst <- switch(as.character(ktr),
@@ -620,7 +599,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             varTxt <- 'med \u2265 30 % forbedring'
             tittel <- paste0('Minst 30% forbedring av Oswestry-skår', ktrtxt)
       }
-      if (valgtVar == 'Osw22') { #AndelGrVar
+      if (valgtVar %in% c('Osw22', 'Osw223mnd', 'Osw2212mnd')) { #AndelGrVar
             #Andel med Oswestry-skår under 23 etter op.
             RegData$OswPost <- switch(as.character(ktr),
                                       '1' = RegData$OswTot3mnd,
@@ -629,7 +608,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             RegData$Variabel[which(RegData$OswPost <= 22)] <- 1
             tittel <- paste0('Oswestry-skår < 23 poeng', ktrtxt)
       }
-      if (valgtVar == 'Osw48') { #AndelGrVar
+      if (valgtVar %in% c('Osw48', 'Osw483mnd', 'Osw4812mnd')) { #AndelGrVar
             #Andel med Oswestry-skår fortsatt over 48.
             RegData$OswPost <- switch(as.character(ktr),
                                       '1' = RegData$OswTot3mnd,
@@ -639,7 +618,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             tittel <- paste0('Oswestry-skår > 48 poeng', ktrtxt)
             sortAvtagende <- F
       }
-
       if (valgtVar == 'OswTotPre') { #fordeling, gjsnBox, gjsnGrVar
          RegData$Variabel <- RegData$OswTotPre
          RegData <- RegData[which(!is.na(RegData$Variabel)),]
@@ -694,7 +672,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          cexgr <- 0.9
          xAkseTxt <- 'dager'
          sortAvtagende <- FALSE
-         datoTil <- min(datoTil, as.character(Sys.Date()-trekkfraDager))
+         datoTil <- min(datoTil, Sys.Date()-trekkfraDager)
 
          if (figurtype == 'andeler') {	#Fordelingsfigur
             gr <- c(seq(0,98,7), 2000)
@@ -760,7 +738,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          retn <- 'H'
       }
 
-      if (valgtVar == 'smBeinEndr') {
+      if (valgtVar %in% c('smBeinEndr', 'smBeinEndr3mnd', 'smBeinEndr12mnd')) {
          tittel <- paste0('bedring av beinsmerter ',ktrtxt)
          RegData <- RegData[which((RegData$SmBePre %in% 0:10) &
                                      (RegData$SmBe3mnd %in% 0:10) & (RegData$SmBe3mnd %in% 0:10)), ]
@@ -798,7 +776,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          varTxt <- 'med manglende indikasjon'
       }
 
-      if (valgtVar == 'smRyggEndr') {#gjsn
+      if (valgtVar %in% c('smRyggEndr', 'smRyggEndr3mnd', 'smRyggEndr12mnd')) {#gjsn
          tittel <- paste0('forbedring av  ryggsmerter', ktrtxt)
          RegData <- RegData[which((RegData$SmRyPre %in% 0:10) &
                                      (RegData$SmRy3mnd %in% 0:10) & (RegData$SmRy12mnd %in% 0:10)), ]
@@ -859,17 +837,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             tittel <- 'Tidligere ryggoperert?'
             retn <- 'H'
             grtxt <- c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon') #, 'Ukjent')
-            #Versjon 2:  RegData$VariabelGr <- 9
-            # indDum <- which(RegData$TidlOpr %in% 1:4)
-            # RegData$VariabelGr[indDum] <- RegData$TidlOpr[indDum]
-            #Definert i preprosess: RegData$TidlOp <- 9
-            # RegData$TidlOp[RegData$TidlIkkeOp==1] <- 4
-            # RegData$TidlOp[RegData$TidlOpsammeNiv==1] <- 1
-            # RegData$TidlOp[RegData$TidlOpAnnetNiv==1] <- 2
-            # RegData$TidlOp[RegData$TidlOpsammeNiv==1 & RegData$TidlOpAnnetNiv==1] <- 3
             RegData$VariabelGr <- factor(RegData$TidlOpr, levels = c(1:4))
-            #test <- rowSums(RegData[,var])
-            #RegData[test>1,var]
       }
       if (valgtVar=='tidlOprAntall') {
             tittel <- 'Antall tidligere operasjoner'
@@ -888,7 +856,6 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             tittel <- 'Flere enn to tidligere operasjoner'
             sortAvtagende <- F
       }
-
 
       if (valgtVar == 'trombProfyl') { #AndelGrVar, AndelTid
          #Legeskjema
@@ -974,7 +941,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
          }}
 
 
-      if (valgtVar == 'verre') { #AndelGrVar		#%in% c('Verre3mnd','Verre12mnd')) {
+      if (valgtVar %in% c('verre', 'verre3mnd', 'verre12mnd')) { #AndelGrVar		#%in% c('Verre3mnd','Verre12mnd')) {
             #3/12mndSkjema. Andel med helt mye verre og noen sinne (6:7)
             #Kode 1:7,9: ''Helt bra', 'Mye bedre', 'Litt bedre', 'Uendret', 'Litt verre', 'Mye verre',
             #				'Verre enn noen gang', 'Ukjent')
@@ -987,9 +954,8 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
             sortAvtagende <- F
       }
 
-
-
       RegData <- RegData[which(!is.na(RegData$Variabel)),]
+      RegData <- RegData[RegData$InnDato < datoTil,]
 
       UtData <- list(RegData=RegData, grtxt=grtxt, cexgr=cexgr, varTxt=varTxt, xAkseTxt=xAkseTxt,
                      KImaalGrenser=KImaalGrenser, KIekstrem=KIekstrem, #KImaal=KImaalRetn,
