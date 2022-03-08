@@ -260,11 +260,6 @@ ui <- navbarPage(id = "tab1nivaa",
                    tags$hr(),
                    uiOutput("makeDispatchment"), #utsending
                    br(),
-                   br(),
-                   h3('Last ned data fra versjon 2.0:'),
-                   downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
-                   br(),
-                   br(),
                    # h4('Nedlasting av data til Resultatportalen:'),
                    # h5('Fjernes eller erstattes av data til sykehusviser'),
                    #
@@ -298,6 +293,35 @@ ui <- navbarPage(id = "tab1nivaa",
                    uiOutput("dispatchmentContent"))
                  ), #Utsendingstab
 
+               shiny::tabPanel(
+                 "Datakvalitet",
+                 #shiny::sidebarLayout(
+                 sidebarPanel(
+                   numericInput(inputId = 'valgtTidsavvik',
+                                label = 'Dager mellom registrerte operasjoner:',
+                                value = 30,
+                                min = 0,
+                                max = NA,
+                                step = 1
+                                , width = '100px'
+                   ),
+                   br(),
+                   br(),
+                   h3('Last ned data fra versjon 2.0:'),
+                   downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
+                   br(),
+
+                 ),
+                 mainPanel(
+                   h3('Potensielle dobbeltregistreringer'),
+                   br(),
+                   downloadButton(outputId = 'lastNed_tabDblReg', label='Last ned tabell med mulige dobbeltregistreringer'),
+                   br(),
+
+
+                   tableOutput("tabDblReg")
+                 )
+               ), #Datakvalitet-tab
 
                  shiny::tabPanel(
                    "Eksport",
@@ -787,6 +811,16 @@ server <- function(input, output,session) {
   #
   # })
   }
+
+#Datakvalitet (dobbeltregistreringer)
+  observe({
+    tabDblReg <- tabPasMdblReg(RegData=RegData, tidsavvik=input$valgtTidsavvik)
+    output$tabDblReg <- renderTable(tabDblReg, digits=0)
+
+    output$lastNed_tabDblReg <- downloadHandler(
+      filename = function(){paste0('MuligeDobbeltReg.csv')},
+      content = function(file, filename){write.csv2(tabDblReg, file, row.names = F, fileEncoding = 'latin1', na = '')})
+  })
 
   #----------- Eksport ----------------
   registryName <- "rygg"
