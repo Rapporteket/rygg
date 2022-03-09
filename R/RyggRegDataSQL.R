@@ -1,6 +1,6 @@
 #' Henter data registrert for Degenerativ Rygg
 #'
-#' Henter data for Degenerativ Rygg fra "staging" (?)
+#' Henter data for Degenerativ Rygg V3, dvs. fra ca 1.jan. 2019
 #'
 #'
 #' @return RegData data frame

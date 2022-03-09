@@ -406,6 +406,22 @@ valgtVarTest <- valgtVar
          if (hovedkat == 5) {KImaalGrenser <- c(0,3,100)}
          if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
       }
+      if (valgtVar == 'kpInfOverfl') { #AndelGrVar, AndelTid
+        #Komplikasjoner 0:nei, 1:ja
+        ind <- switch(as.character(ktr),
+                      '1' = which(RegData$Ferdigstilt1b3mnd==1),
+                      '2' = which(RegData$Ferdigstilt1b12mnd == 1))
+        RegData <- RegData[ind, ]
+        RegData$Variabel[RegData$KpInfOverfla3mnd == 1] <- 1
+        VarTxt <- 'tilfeller'
+        tittel <- paste0('Overfladisk sårinfeksjon, pasientrapportert', ktrtxt)
+        sortAvtagende <- FALSE
+        xAkseTxt <- 'Andel sårinfeksjoner (%)'
+        #KImaalRetn <- 'lav'
+        if (hovedkat == 1) {KImaalGrenser <- c(0,2,100)}
+        if (hovedkat == 5) {KImaalGrenser <- c(0,3,100)}
+        if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
+      }
 
       if (valgtVar=='liggedogn') {#fordeling, gjsnGrVar, andeler, gjsnTid
             #liggedogn
@@ -955,6 +971,7 @@ valgtVarTest <- valgtVar
       }
 
       RegData <- RegData[which(!is.na(RegData$Variabel)),]
+      #print(datoTil)
       RegData <- RegData[RegData$InnDato < datoTil,]
 
       UtData <- list(RegData=RegData, grtxt=grtxt, cexgr=cexgr, varTxt=varTxt, xAkseTxt=xAkseTxt,

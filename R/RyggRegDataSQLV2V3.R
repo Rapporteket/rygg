@@ -2,7 +2,7 @@
 #'
 #' Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3.
 #' Registeret ønsker også en versjon hvor variabler som bare er i versjon 2 er med i det
-#' felles uttrekket. Lager en egen versjon for dette.
+#' felles uttrekket. (?Lager en egen versjon for dette.)
 #'
 #' @param alleVarV3 0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
 #'                  1: har med alle variabler fra V3
@@ -13,7 +13,8 @@
 #' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
 
-RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alleVarV3=1, alleVarV2=0){
+RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
+                               alleVarV3=1, alleVarV2=0){
 #NB: datovalg har ingen effekt foreløpig!!
 #Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
@@ -94,6 +95,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', a
   RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
   RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
   RegDataV2$Utd[is.na(RegDataV2$Utd)] <- 9
+  RegDataV2$KpInf3Mnd[RegDataV2$KpInf3Mnd==0] <- NA #Tilpasning til V3
+
 
   RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
     'Aleris, Bergen' = 'Aleris Bergen',
@@ -248,9 +251,6 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
                          RegDataV3)
     RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
 }
-  #19.aug: 101 variabler i både V2 og V3. 128 i tillegg i V3
-  #9.sept: 130 var i begge. 98 i tillegg i V3
-
   #Avvik? PeropKompAnnet
   #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3
 
