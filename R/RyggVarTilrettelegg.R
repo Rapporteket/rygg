@@ -390,7 +390,7 @@ valgtVarTest <- valgtVar
          tittel <- 'Pasientrapporterte komplikasjoner (%)'
          sortAvtagende <- FALSE
       }
-      if (valgtVar == 'kpInf') { #AndelGrVar, AndelTid
+      if (valgtVar == 'kpInf3mnd') { #AndelGrVar, AndelTid
          #Komplikasjoner 0:nei, 1:ja
          ind <- switch(as.character(ktr),
                        '1' = which(RegData$Ferdigstilt1b3mnd==1),

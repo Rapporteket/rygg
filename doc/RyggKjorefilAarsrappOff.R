@@ -175,16 +175,35 @@ RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, outfile='
 RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidDS.pdf', tidsenhet = 'Aar',
                valgtVar='OswEndr', hovedkat=10, ktr=ktr)
 
+#Betydelig forbedring av ODI etter prolapskirurgi og spinal stenose
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr20',  outfile='OswEndr20Pro.pdf',
                     aar=aar2_12mnd, hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
+RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr20', outfile='OswEndr20ProTid.pdf',
+                hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2)
 
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf', #OswEndr30pstSS.pdf
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf',
                     aar=aar2_12mnd, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
-
+RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSSTid.pdf',
+                hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2)
 
 # Andel skjema som er registrert innen 12 uker etter at pasienten er uskrevet, registreringsforsinkelse per sykehus.
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
                     outfile='RegForsinkelse_Sh.pdf') #RegForsinkelse_Sh.pdf
+
+
+#Andel skjema som ikke er utfylt innen 3 mnd.etter operasjon,  tidstrend
+RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
+
+#Andel operasjoner der sjekkliste for «Trygg kirurgi» er brukt, tidstrend
+RyggFigAndelTid(RegData=RegData, valgtVar='tryggKir', outfile='TryggKirurgiTid.pdf')
+
+#Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
+RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', outfile='VentetidSpesOpTid.pdf')
+
+
+
+#Andel som rapporterte betydelig forbedring av funksjon i dagliglivet (ODI) etter  kirurgi, , tidstrend
+
 
 #------------------------------------------------------------------------------------
 #-----------Filer til Resultatportalen -----------------------
