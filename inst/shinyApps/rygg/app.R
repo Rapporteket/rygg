@@ -315,6 +315,8 @@ ui <- navbarPage(id = "tab1nivaa",
                  mainPanel(
                    h3('Potensielle dobbeltregistreringer'),
                    br(),
+                   h4('Funksjonen finner alle PID med to operasjoner gjort med valgt tidsintervall eller kortere. I tabellen
+                       vises alle operasjoner for de aktuelle pasientene.'),
                    downloadButton(outputId = 'lastNed_tabDblReg', label='Last ned tabell med mulige dobbeltregistreringer'),
                    br(),
 

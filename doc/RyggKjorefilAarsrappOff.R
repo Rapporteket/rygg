@@ -33,7 +33,7 @@ RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoT
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
 AntAvd <- length(unique(RegData$ShNavn))
-setwd('/home/rstudio/rygg/Aarsrapp')
+#setwd('/home/rstudio/rygg/Aarsrapp')
 setwd('/home/rstudio/speil/aarsrapp/')
 
 #MANGLER: Alle stabelfigurer. Eks. RyggFigAndelStabelTid(RegData=RegData, outfile='TidlOp.pdf', valgtVar='TidlOp')
@@ -189,7 +189,7 @@ RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstS
 # Andel skjema som er registrert innen 12 uker etter at pasienten er uskrevet, registreringsforsinkelse per sykehus.
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', preprosess = 0,
                     outfile='RegForsinkelse_Sh.pdf') #RegForsinkelse_Sh.pdf
-
+RyggFigAndelTid(RegData=RegData, valgtVar='regForsinkelse', outfile='RegForsinkelseTid.pdf')
 
 #Andel skjema som ikke er utfylt innen 3 mnd.etter operasjon,  tidstrend
 RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
