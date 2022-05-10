@@ -28,5 +28,5 @@ RegData, dataramme med data f.o.m. 2007.
 \description{
 Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3.
 Registeret ønsker også en versjon hvor variabler som bare er i versjon 2 er med i det
-felles uttrekket. Lager en egen versjon for dette.
+felles uttrekket. (?Lager en egen versjon for dette.)
 }

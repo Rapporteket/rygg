@@ -90,9 +90,9 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
       }
 
       if (reshID==0) {enhetsUtvalg <- 0}
-      RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, aar=as.numeric(c(tidlAar, aar))
-                                  ,reshID=reshID, datoFra=datoFra, datoTil=datoTil,
-                                  minald=minald, maxald=maxald, erMann=erMann,
+      RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, aar=as.numeric(c(tidlAar, aar)),
+                                  #reshID=reshID, datoFra=datoFra, datoTil=datoTil,
+                                  #minald=minald, maxald=maxald, erMann=erMann,
                                   hovedkat=hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg)
 
       smltxt <- RyggUtvalg$smltxt
@@ -119,7 +119,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             katVariable <- c('grNaa', 'grVar')
             Nvar <- tapply(RegData$Variabel, RegData[ ,katVariable], sum, na.rm=T) #Variabel er en 0/1-variabel.
             if(N > 0) {Ngr <- table(RegData[ ,katVariable])}	else {Ngr <- 0}
-            AntGr <- length(which(Ngr >= Ngrense))	#Alle som har gyldig resultat
+            AntGr <- length(which(Ngr >= Ngrense))	#Alle som har gyldig resultat, tot. ant. grupper
             #Sjekk for AK-justering
             if (AKjust == 1) { #Alders-og kjønnsjustering
                   Nvar <- tapply(RegData$Variabel, RegData[ ,c('Aar', 'grVar')], sum, na.rm=T) #Variabel er en 0/1-variabel.
@@ -152,14 +152,14 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
 
                   GrNavn <- c(paste0(length(indGrUt2), ' avd. med N<',Ngrense), GrNavn[-indGrUt2])
                   Ngrtxt <- c(paste0(' (',sum(Ngr[2,indGrUt2]),')'), Ngrtxt)
-                  indGrUt <- indGrUt2
 
                   AndelGrUt <- rowSums(Nvar[ ,indGrUt2], na.rm = T)/rowSums(Ngr[ ,indGrUt2])*100
                   AndelerGr <- cbind(AndelGrUt, AndelerGr[,-indGrUt2])
 
                   sortInd <- order(as.numeric(AndelerGr['1',]), decreasing=sortAvtagende)
                   AndelerSisteSort <- AndelerGr['1',sortInd] #Unødvendig?
-                  indGrUt1sort <- as.numeric(which(c(Ngrense, Ngr[1,-indGrUt2])[sortInd] < Ngrense)) #Legger til dummy for gruppa <Ngrense
+                  indGr0sort <- as.numeric(which(c(Ngrense, Ngr[1,-indGrUt2])[sortInd] >= Ngrense)) #Hvilke skal med i sammenligningsgruppa
+                  #indGrUt1sort <- as.numeric(which(c(Ngrense, Ngr[1,-indGrUt2])[sortInd] < Ngrense)) #Legger til dummy for gruppa <Ngrense
             }
             AndelerGrSort <- AndelerGr[ ,sortInd]
             GrNavnSort <- paste0(GrNavn[sortInd], Ngrtxt[sortInd])  #paste0(names(Ngr)[sortInd], ', ',Ngrtxt[sortInd])
@@ -218,7 +218,6 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             farger <- FigTypUt$farger
             soyleFarger <- farger[4] #rep(farger[3], AntGrNgr)
             prikkFarge <- farger[3]
-            #Hvis Norge egen søyle: soyleFarger[which(names(AndelerSisteSort)=='Norge')] <- farger[4]
             #Tilpasse marger for å kunne skrive utvalgsteksten
             NutvTxt <- length(utvalgTxt)
             vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.8)
@@ -232,33 +231,19 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             pos <- barplot(as.numeric(AndelerSisteSort), horiz=T, border=NA, col=soyleFarger, #add=TRUE , #plot=T,
                            xlim=c(0,xmax), ylim=c(0.05, 1.32)*length(GrNavnSort), font.main=1, #xlab=xAkseTxt,
                            las=1, cex.names=cexShNavn*0.9)
-            #Legge på målnivå
-            # antMaalNivaa <- length(KImaalGrenser)-1
-            # rekkef <- 1:antMaalNivaa
-            # #fargerMaalNiva <-  c('#4fc63f', '#fbf850','#c6312a') #c('green','yellow', 'red')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
-            # fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713')[rekkef] #Grønn, gul, rød Likt med sykehusviser
-            # KImaalGrenser <- RyggVarSpes$KImaalGrenser #c(0,20,40) #,xmax)
-            # antMaalNivaa <- length(KImaalGrenser)-1
-            # maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')
-            # rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
-            #      ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
 
-            if (!is.na(KImaalGrenser[1])) {
+             if (!is.na(KImaalGrenser[1])) {
                antMaalNivaa <- length(KImaalGrenser)-1
                rekkef <- 1:antMaalNivaa
                if (sortAvtagende == FALSE) {rekkef <- rev(rekkef)}
                fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
-               #fargerMaalNiva <-  c('#3baa34', '#fd9c00', '#e30713')[rekkef] #Grønn, gul, rød Likt med sykehusviser
                maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
                if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
                rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
                     ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
+               AntGr <- length(which(Ngr >= Ngrense))	#Alle som har gyldig resultat, tot. ant. grupper
                legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
-               # legend(x=0, y=legPos, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
-               #        ncol=antMaalNivaa+1,
-               #        xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
-               #        legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
-               legend(x=0, y=-2.5, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
+              legend(x=0, y=-2.5, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
                       ncol=antMaalNivaa+1,
                       xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
                       legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
@@ -266,7 +251,6 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
             ybunn <- 0.1
             ytopp <- max(pos)+ 0.4 #pos[2]-pos[1] #pos[AntGrNgr]+ 0.4	#
             if (tidlAar != 0) {
-                  #indMed <- 1:AntGrNgr
                   AartxtTidl <- ifelse(length(tidlAar)>1, paste0(min(tidlAar),'-', max(tidlAar)), as.character(tidlAar))
                   Naar <- rowSums(Ngr, na.rm=T)
                   ResAar <- 100*rowSums(Nvar, na.rm=T)/Naar
@@ -275,7 +259,8 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
                           xlim=c(0,xmax), ylim=c(0.05, 1.27)*length(GrNavnSort), font.main=1, #xlab=xAkseTxt,
                           las=1, cex.names=cexShNavn*0.9)
                   #points(y=pos[indMed], x=AndelerGrSort[Aar1txt, indMed], cex=1.7, pch='|')    #col=farger[2],
-                  points(y=pos[-indGrUt1sort]+0.1, x=AndelerGrSort['0', -indGrUt1sort], cex=1, pch=16, col=prikkFarge) #pch='|', y=pos[indMed]+0.1, x=AndelerGrSort[AartxtTidl, indMed]
+                  #points(y=pos[-indGrUt1sort]+0.1, x=AndelerGrSort['0', -indGrUt1sort], cex=1, pch=16, col=prikkFarge) #pch='|', y=pos[indMed]+0.1, x=AndelerGrSort[AartxtTidl, indMed]
+                  points(y=pos[indGr0sort]+0.1, x=AndelerGrSort['0', indGr0sort], cex=1, pch=16, col=prikkFarge) #pch='|', y=pos[indMed]+0.1, x=AndelerGrSort[AartxtTidl, indMed]
                   legend('top', inset=c(0.1,0), xjust=1, cex=0.85, bty='o', bg='white', box.col='white',
                          lwd=c(NA,NA,2), pch=c(16,15,NA), pt.cex=c(1, 1.9, 1),  #pch=c(124,15,NA)
                          col=c(prikkFarge,soyleFarger,farger[1]),

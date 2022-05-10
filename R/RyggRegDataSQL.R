@@ -6,7 +6,7 @@
 #' @return RegData data frame
 #' @export
 #'
-RyggRegDataSQL <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alle=1){
+RyggRegDataSQLgml <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', alle=1){
 
 if (alle == 1) {
   RegData <- rapbase::loadRegData(

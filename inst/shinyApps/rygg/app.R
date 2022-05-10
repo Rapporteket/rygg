@@ -733,9 +733,6 @@ server <- function(input, output,session) {
     })
 
 
-  # #Velge ferdigstillelse og tidsintervall.
-  # output$tabAntSkjema <- renderTable({})
-
 # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
   tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
     data <- dplyr::filter(data,

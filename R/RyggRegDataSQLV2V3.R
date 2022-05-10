@@ -4,11 +4,12 @@
 #' Registeret ønsker også en versjon hvor variabler som bare er i versjon 2 er med i det
 #' felles uttrekket. (?Lager en egen versjon for dette.)
 #'
-#' @param alleVarV3 0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
-#'                  1: har med alle variabler fra V3
+#' @param alleVarV3 0: IKKE I BRUK fjerner variabler som ikke er i bruk på Rapporteket ,
+#'                  1: har med alle variabler fra V3 (foreløpig er dette standard)
 #' @param alleVarV2 0: Bare variabler som også finnes i V3 med (standard),
 #'                  1: har med alle variabler fra V2
-#' @inheritParams RyggUtvalgEnh
+#' @param datoFra P.t ikke i bruk
+#' @param datoTil P.t ikke i bruk
 #'
 #' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
@@ -35,39 +36,38 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
 
   if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
-  fjernesV3 <-
-    c("Adresse", "Adressetype",
-      "AntibiotikaAntDogn", "AntibiotikaAntDoser", "AntibiotikaDose", "AntibiotikaEvtAntDogn",
-      "AntibiotikaKunOprDag", "BenAutogrType", "BenAutoHofte", "BenAutoLokalt", "BenBank", "BenSubstitutt",
-      "BlodfortynnendeFast", "BlodfortynnendePreop", "BlodfortynnendeSepDato", "BlodfortynnendeSpes",
-      "CaudaAntDogn", "CaudaAntTimer", "CaudaAntUker", "CaudaEnUkeTilTreMnd", "CaudaOverTreMnd",
-      "CaudaUnderEnUke", "CaudaUnderEttDogn", "DekompAntNivaa", "DekomprAnnetNivaa",
-      "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "EtnKultTilhorighet", "FodtiNorge", "ForrigeInngrep",
-      "Fritekstadresse", "FusjonAntNivaa", "FusjonIleumSkrue", "FusjonKir", "FusjonKirAlif",
-      "FusjonKirPlfIkkeInstrV3", "FusjonKirPlfInstrV3", "FusjonKirPlfV3", "FusjonKirPlif", "FusjonKirTlif",
-      "FusjonKirXlif", "FusjonNedreNivaa", "FusjonOvreNivaa", "FusjonSement",
-      "FysioAnnenBeh", "FysioPsykoMotorisk", "FysioTrening", "HKirurgErfaring", "HKirurgErfaringAar",
-      "HovedSpinalKirurg", "Hoyde", "HoydeMangler", "KliniskFleksjonLindring",
-      "KliniskPosLasegue", "KnivSluttKlokkeMin", "KnivSluttKlokkeTime", "KnivStartKlokkeMin",
-      "KnivStartKlokkeTime", "KnivTidMinVarighet", "KnivTidTimerVarighet",
-      "NyAnnen12mnd", "NyAnnen3mnd", "NyHjerteKar12mnd", "NyHjerteKar3mnd", "Nykreft12mnd", "Nykreft3mnd",
-      "NyLeddSm12mnd", "NyLeddSm3mnd", "NyNerveSkyd12mnd", "NyNerveSkyd3mnd", "NyOprAnt12mnd", "NyOprAnt3mnd",
-      "NyOprNivaa12mnd", "NyOprNivaa3mnd", "NyRyggOpr12mnd", "NyRyggOpr3mnd", "NySkade12mnd", "NySkade3mnd",
-      "NySykdSkade12mnd", "NySykdSkade3mnd",
-      "OpAndreSkiveprotese", "OpAnnenOsteotomi", "OpAnnenOstetosyntSpes", "OpComputerNav",
-      "OpFusjonPerkutan", "OpFusjonUtenDekomprV3",
-      "OpKileOsteotomi", "OpKyfoseLL", "OpKyfoseLLGrader", "OpKyfosePI", "OpKyfosePIGrader",
-      "OpKyfosePT", "OpKyfosePTGrader", "OpKyfoseSVA", "OpKyfoseSVAcm", "OpKysfoseSS", "OpKysfoseSSGrader",
-      "OpL1L2", "OpL23", "OpL34", "OpL45", "OpL5S1", "OpOsteosyntFjerningV3",
-      "OpOsteosyntRevV3", "OpPonteSPOsteotomi", "OpProOsteotomi", "OpSkolioseCobb", "OpSkolioseCobbGrader",
-      "OpSkolioseKyfose", "OpTh12L1", "OpTilgangV3",
-      "PostNr", "PostopTrombProfyl", "PostSted",
-      "RfDegenListeseMM", "RfEkstrLatProl", "RfIntrforaminaltProl", "RfIstmiskLyse",
-      "RFKunDegenerasjon", "RfKyfose", "RfMeyerdingGrad", "RfModic", "RfModicTypeI",
-      "RfModicTypeII", "RfSkive", "RfSynovpre",
-      "RfTypeIAktNivaa", "RfTypeIAnnetNivaa", "RfTypeIIAktNivaa", "RfTypeIIAnnetNivaa",
-      "RvBlokadeFacett", "RvBlokadeNerverot", "RvFunksjoTranslMM", "RvFunksjoVinkelEndrGr",
-      "SpesTrombProfyl", "Utfdato12mnd", "Utfdato3mnd", "UtfyltDato")
+  fjernesV3 <- c("Adresse", "Adressetype")
+      # ,"AntibiotikaAntDogn", "AntibiotikaAntDoser", "AntibiotikaDose", "AntibiotikaEvtAntDogn",
+      # "AntibiotikaKunOprDag", "BenAutogrType", "BenAutoHofte", "BenAutoLokalt", "BenBank", "BenSubstitutt",
+      # "BlodfortynnendeFast", "BlodfortynnendePreop", "BlodfortynnendeSepDato", "BlodfortynnendeSpes",
+      # "CaudaAntDogn", "CaudaAntTimer", "CaudaAntUker", "CaudaEnUkeTilTreMnd", "CaudaOverTreMnd",
+      # "CaudaUnderEnUke", "CaudaUnderEttDogn", "DekompAntNivaa", "DekomprAnnetNivaa",
+      # "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "EtnKultTilhorighet", "FodtiNorge", "ForrigeInngrep",
+      # "Fritekstadresse", "FusjonAntNivaa", "FusjonIleumSkrue", "FusjonKir", "FusjonKirAlif",
+      # "FusjonKirPlfIkkeInstrV3", "FusjonKirPlfInstrV3", "FusjonKirPlfV3", "FusjonKirPlif", "FusjonKirTlif",
+      # "FusjonKirXlif", "FusjonNedreNivaa", "FusjonOvreNivaa", "FusjonSement",
+      # "FysioAnnenBeh", "FysioPsykoMotorisk", "FysioTrening", "HKirurgErfaring", "HKirurgErfaringAar",
+      # "HovedSpinalKirurg", "Hoyde", "HoydeMangler", "KliniskFleksjonLindring",
+      # "KliniskPosLasegue", "KnivSluttKlokkeMin", "KnivSluttKlokkeTime", "KnivStartKlokkeMin",
+      # "KnivStartKlokkeTime", "KnivTidMinVarighet", "KnivTidTimerVarighet",
+      # "NyAnnen12mnd", "NyAnnen3mnd", "NyHjerteKar12mnd", "NyHjerteKar3mnd", "Nykreft12mnd", "Nykreft3mnd",
+      # "NyLeddSm12mnd", "NyLeddSm3mnd", "NyNerveSkyd12mnd", "NyNerveSkyd3mnd", "NyOprAnt12mnd", "NyOprAnt3mnd",
+      # "NyOprNivaa12mnd", "NyOprNivaa3mnd", "NyRyggOpr12mnd", "NyRyggOpr3mnd", "NySkade12mnd", "NySkade3mnd",
+      # "NySykdSkade12mnd", "NySykdSkade3mnd",
+      # "OpAndreSkiveprotese", "OpAnnenOsteotomi", "OpAnnenOstetosyntSpes", "OpComputerNav",
+      # "OpFusjonPerkutan", "OpFusjonUtenDekomprV3",
+      # "OpKileOsteotomi", "OpKyfoseLL", "OpKyfoseLLGrader", "OpKyfosePI", "OpKyfosePIGrader",
+      # "OpKyfosePT", "OpKyfosePTGrader", "OpKyfoseSVA", "OpKyfoseSVAcm", "OpKysfoseSS", "OpKysfoseSSGrader",
+      # "OpL1L2", "OpL23", "OpL34", "OpL45", "OpL5S1", "OpOsteosyntFjerningV3",
+      # "OpOsteosyntRevV3", "OpPonteSPOsteotomi", "OpProOsteotomi", "OpSkolioseCobb", "OpSkolioseCobbGrader",
+      # "OpSkolioseKyfose", "OpTh12L1", "OpTilgangV3",
+      # "PostNr", "PostopTrombProfyl", "PostSted",
+      # "RfDegenListeseMM", "RfEkstrLatProl", "RfIntrforaminaltProl", "RfIstmiskLyse",
+      # "RFKunDegenerasjon", "RfKyfose", "RfMeyerdingGrad", "RfModic", "RfModicTypeI",
+      # "RfModicTypeII", "RfSkive", "RfSynovpre",
+      # "RfTypeIAktNivaa", "RfTypeIAnnetNivaa", "RfTypeIIAktNivaa", "RfTypeIIAnnetNivaa",
+      # "RvBlokadeFacett", "RvBlokadeNerverot", "RvFunksjoTranslMM", "RvFunksjoVinkelEndrGr",
+      # "SpesTrombProfyl", "Utfdato12mnd", "Utfdato3mnd", "UtfyltDato")
 
     RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% fjernesV3)]
   }
