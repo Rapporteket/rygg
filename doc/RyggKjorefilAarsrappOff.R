@@ -113,15 +113,15 @@ RyggFigGjsnGrVar(RegData=RegData1aar, valgtVar='liggetidPostOp', outfile='Ligget
 
 #------ KVALITETSINDIKATORER------------
 
-dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
-                       Ngrense=20, aar=rappAar, tidlAar=tidlAar, outfile='SympVarighUtstrAarPro.pdf')
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
+                       Ngrense=20, aar=rappAar, tidlAar=tidlAar, hastegrad=1, outfile='SympVarighUtstrAarPro.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
                        Ngrense=20, aar=aar2, outfile='SympVarighUtstrShPro.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, preprosess = 0,
                     Ngrense=20, aar=aar2, outfile='SympVarighUtstrShFusj.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, preprosess = 0,
                     Ngrense=20, aar=aar2, outfile='SympVarighUtstrShSS.pdf')
-RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, outfile='SympVarighUtstrTidPro.pdf')
+RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, hastegrad=1, outfile='SympVarighUtstrTidPro.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, outfile='SympVarighUtstrTidFusj.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, outfile='SympVarighUtstrTidSS.pdf')
 
@@ -158,11 +158,11 @@ RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
                     Ngrense = 30, hovedkat = 5, outfile='PeropKompDuraFusj.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
                     Ngrense = 30, hovedkat=9, outfile='PeropKompDuraSS.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, hastegrad=1,
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, #tidlOp=4, #hastegrad=1, fjernet fra -21
                        Ngrense = 30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarPro.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, tidlOp=4, hastegrad=1,
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, #tidlOp=4, #hastegrad=1, fjernet for -21
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarFusj.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, hastegrad=1, #
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, #tidlOp=4, #hastegrad=1, #fjernet fra -21
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarSS.pdf')
 
 RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, outfile='PeropKompDuraProTid.pdf')
