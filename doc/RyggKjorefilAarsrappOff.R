@@ -38,7 +38,7 @@ AntAvd <- length(unique(RegData$ShNavn))
 #MANGLER: Alle stabelfigurer. Eks. RyggFigAndelStabelTid(RegData=RegData, outfile='TidlOp.pdf', valgtVar='TidlOp')
 #NB: Sjekk om stabelfigurene er i bruk
 
-#---------FIGURER, årsrapport 2020--------------
+#---------FIGURER, årsrapport --------------
 
 # Dekningsgrad for hvert sykehus, Se tidligere figurer. IKKE FÅTT DEKN.GRADSANALYSE FOR 2020 (1.mar 2021)
 #RyggFigAndelerGrVar(RegData=0, valgtVar='dekn19Rygg', outfile='DGrygg.pdf')
@@ -51,28 +51,28 @@ RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidHenvTimePol', Ngrense = 20,
                     hastegrad=1, outfile='VentetidHenvTimePol_Sh.pdf')
 
-RyggFigAndeler(RegData = RegData1aar, valgtVar='antibiotikaMedikament',
-               preprosess = 0, outfile = 'AntibiotikaMedikament.pdf')
+# RyggFigAndeler(RegData = RegData1aar, valgtVar='antibiotikaMedikament',
+#                preprosess = 0, outfile = 'AntibiotikaMedikament.pdf')
 
 
 # Vent: PeropKompDuraTidSmlGr.pdf #linjediagram per år, ulike operasjonstyper og totalt
 
 
-RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=1, tidlOp=4, hastegrad=1, ktr=2,
-                 Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarPro.pdf')
-RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=5, tidlOp=4, hastegrad=1,  ktr=2,
-                 Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarFusj.pdf')
-RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=9, tidlOp=4, hastegrad=1,  ktr=2,
-                 Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarSS.pdf')
-RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=10, tidlOp=4, hastegrad=1,  ktr=2,
-                 Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarDS.pdf')
+# RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=1, tidlOp=4, hastegrad=1, ktr=2,
+#                  Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarPro.pdf')
+# RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=5, tidlOp=4, hastegrad=1,  ktr=2,
+#                  Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarFusj.pdf')
+# RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=9, tidlOp=4, hastegrad=1,  ktr=2,
+#                  Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarSS.pdf')
+# RyggFigGjsnGrVar(RegData=RegData, valgtVar='OswEndr', hovedkat=10, tidlOp=4, hastegrad=1,  ktr=2,
+#                  Ngrense=30, aar=aar2_12mnd, outfile='ODIendrAarDS.pdf')
 
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='Osw22', ktr=2,
-                    aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
-                    hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='Osw22Pro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='Osw22', ktr=2,
-                    aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
-                    hovedkat=9,  hastegrad=1, tidlOp=4,  outfile='Osw22SS.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='Osw22', ktr=2,
+#                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
+#                     hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='Osw22Pro.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='Osw22', ktr=2,
+#                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
+#                     hovedkat=9,  hastegrad=1, tidlOp=4,  outfile='Osw22SS.pdf')
 
 RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar='fornoydhet', ktr=ktr,
                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20
@@ -106,21 +106,20 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdPro.pdf',
                  valgtVar='liggedogn', hovedkat = 1, valgtMaal = 'Gjsn')
 RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
                  valgtVar='liggedogn', hovedkat=9, valgtMaal = 'Gjsn')
-RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='trombProfyl', outfile='TrombProfyl.pdf')
 
 
-RyggFigGjsnGrVar(RegData=RegData1aar, valgtVar='liggetidPostOp', outfile='LiggetidPostOpGjsn.pdf')
+#RyggFigGjsnGrVar(RegData=RegData1aar, valgtVar='liggetidPostOp', outfile='LiggetidPostOpGjsn.pdf')
 
 #------ KVALITETSINDIKATORER------------
 
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
                        Ngrense=20, aar=rappAar, tidlAar=tidlAar, hastegrad=1, outfile='SympVarighUtstrAarPro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
-                       Ngrense=20, aar=aar2, outfile='SympVarighUtstrShPro.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
+#                        Ngrense=20, aar=aar2, outfile='SympVarighUtstrShPro.pdf')
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, preprosess = 0,
                     Ngrense=20, aar=aar2, outfile='SympVarighUtstrShFusj.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, preprosess = 0,
-                    Ngrense=20, aar=aar2, outfile='SympVarighUtstrShSS.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, preprosess = 0,
+#                     Ngrense=20, aar=aar2, outfile='SympVarighUtstrShSS.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, hastegrad=1, outfile='SympVarighUtstrTidPro.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, outfile='SympVarighUtstrTidFusj.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, outfile='SympVarighUtstrTidSS.pdf')
@@ -128,18 +127,18 @@ RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, outfile
 
 BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='smBePreLav', aar=aar2,
                                     Ngrense = 20, preprosess = 0, hovedkat=1,   outfile='BeinsmLavPrePro.pdf')
-BeinsmLavPre <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='smBePreLav', aar=rappAar, tidlAar=tidlAar,
-                                    Ngrense = 20, preprosess = 0, hovedkat=1,   outfile='BeinsmLavPreProAar.pdf')
+# BeinsmLavPre <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='smBePreLav', aar=rappAar, tidlAar=tidlAar,
+#                                     Ngrense = 20, preprosess = 0, hovedkat=1,   outfile='BeinsmLavPreProAar.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='smBePreLav', hovedkat=1, outfile='BeinsmLavPreProTid.pdf')
 
 #Infeksjoner ikke registrert i 2019
 #3 kval.ind: Prolaps, Fusjon, SS
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
-                                    Ngrense = 30, hovedkat = 1, outfile='KpInf3mndPro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
-                                    Ngrense = 30, hovedkat = 5, outfile='KpInf3mndFusj.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
-                                   Ngrense = 30, hovedkat=9, outfile='KpInf3mndSS.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
+#                                     Ngrense = 30, hovedkat = 1, outfile='KpInf3mndPro.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
+#                                     Ngrense = 30, hovedkat = 5, outfile='KpInf3mndFusj.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar,
+#                                    Ngrense = 30, hovedkat=9, outfile='KpInf3mndSS.pdf')
 dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
                     Ngrense = 30, hovedkat = 1, outfile='KpInf3mndProAar.pdf')
 # dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
@@ -152,27 +151,24 @@ RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=5, outfile='KpIn
 RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=9, outfile='KpInf3mndSSTid.pdf')
 
 
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
-                    Ngrense = 30, hovedkat = 1, outfile='PeropKompDuraPro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
-                    Ngrense = 30, hovedkat = 5, outfile='PeropKompDuraFusj.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar, tidlOp=4,
+#                     Ngrense = 30, hovedkat = 1, outfile='PeropKompDuraPro.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar,
+#                     Ngrense = 30, hovedkat = 5, outfile='PeropKompDuraFusj.pdf')
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar, tidlOp=4,
                     Ngrense = 30, hovedkat=9, outfile='PeropKompDuraSS.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, #tidlOp=4, #hastegrad=1, fjernet fra -21
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, #hastegrad=1, fjernet fra -21
                        Ngrense = 30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarPro.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, #tidlOp=4, #hastegrad=1, fjernet for -21
-                       Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarFusj.pdf')
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, #tidlOp=4, #hastegrad=1, #fjernet fra -21
+# RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, #tidlOp=4, #hastegrad=1, fjernet for -21
+#                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarFusj.pdf')
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, #hastegrad=1, #fjernet fra -21
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarSS.pdf')
 
-RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, outfile='PeropKompDuraProTid.pdf')
+RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, outfile='PeropKompDuraProTid.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, outfile='PeropKompDuraFusjTid.pdf')
-RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, outfile='PeropKompDuraSSTid.pdf')
+RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, outfile='PeropKompDuraSSTid.pdf')
 
 
-
-RyggFigGjsnBox(RegData=RegData, outfile='OswEndrTidDS.pdf', tidsenhet = 'Aar',
-               valgtVar='OswEndr', hovedkat=10, ktr=ktr)
 
 #Betydelig forbedring av ODI etter prolapskirurgi og spinal stenose
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr20',  outfile='OswEndr20Pro.pdf',
@@ -193,15 +189,9 @@ RyggFigAndelTid(RegData=RegData, valgtVar='regForsinkelse', outfile='RegForsinke
 #Andel skjema som ikke er utfylt innen 3 mnd.etter operasjon,  tidstrend
 RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
 
-#Andel operasjoner der sjekkliste for «Trygg kirurgi» er brukt, tidstrend
-RyggFigAndelTid(RegData=RegData, valgtVar='tryggKir', outfile='TryggKirurgiTid.pdf')
-
 #Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
 RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', outfile='VentetidSpesOpTid.pdf')
 
-
-
-#Andel som rapporterte betydelig forbedring av funksjon i dagliglivet (ODI) etter  kirurgi, , tidstrend
 
 
 #------------------------------------------------------------------------------------
@@ -392,43 +382,43 @@ RyggFigAndeler(RyggData, valgtVar = 'nytte', ktr=2, aar = 2017, outfile = 'Nytte
 #-----------------------------------------------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------------
 
-#---------Figurer, utdata til videre beregninger
+#---------Figurer, utdata til videre beregninger----
 
 RyggFigAndelTid(RegData=RegData, hovedkat = 1, valgtVar = 'tidlOp3', outfile = 'TidlOpAnt3Tid.pdf') #TidlOp3 <-
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='tidlOp3', aar=rappAar, outfile='TidlOpAnt3Sh.pdf')
 
 
 UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='utd', aar = startAar:rappAar, preprosess = 0,
-                                outfile='FigUtdAar.pdf')
-UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='uforetrygdPre', preprosess = 0, outfile='FigUforTid.pdf')
-ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='erstatningPre', preprosess = 0, outfile='FigErstatTid.pdf')
+                                outfile='')
+UforTid <- RyggFigAndelTid(RegData=RegData, valgtVar='uforetrygdPre', preprosess = 0, outfile='')
+ErstatningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='erstatningPre', preprosess = 0, outfile='')
 
-RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='roker', outfile='FigRokerTid.pdf')
+RoykTid <- RyggFigAndelTid(RegData=RegData, valgtVar='roker', outfile='')
 Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='utd', datoFra=datoFra1aar, datoTil=datoTil,
-                            outfile='FigUtd.pdf')
+                            outfile='')
 
 
 
 
 HovedInngrep <- RyggFigAndeler(RegData=RegData1aar, valgtVar='hovedInngrep', datoFra=datoFra1aar,
-                               datoTil=datoTil, outfile='HovedInngrep.pdf')
+                               datoTil=datoTil, outfile='')
 
 
 
 KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='kpInf3mnd',
-                                   hovedkat = 1, outfile='FigKpInf3mndTidPro.pdf')
+                                   hovedkat = 1, outfile='')
 KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='kpInf3mnd',
-                                   hovedkat=9, outfile='FigKpInf3mndTidSS.pdf')
+                                   hovedkat=9, outfile='')
 
 DuraPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
                                aar=(rappAar-1):rappAar, Ngrense = 20,
-                               hastegrad = 1, tidlOp = 4, hovedkat = 1, outfile='FigDuraPro.pdf')
+                               hastegrad = 1, tidlOp = 4, hovedkat = 1, outfile='')
 DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
                               aar=(rappAar-1):rappAar, Ngrense = 20,
-                              hastegrad = 1, tidlOp = 4, hovedkat=9, outfile='FigDuraSS.pdf')
+                              hastegrad = 1, tidlOp = 4, hovedkat=9, outfile='')
 # sjekket
 FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = startAar:rappAar,
-                                     outfile='FigMorsmalAar.pdf', preprosess = 0)
+                                     outfile='', preprosess = 0)
 
 
 
