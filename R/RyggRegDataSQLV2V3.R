@@ -75,6 +75,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   #-----Tilrettelegging av V2-data-------------------------
     #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..
 
+   RegDataV2$PasientID <- paste0(RegDataV2$PID, 'V2')
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
   RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
@@ -134,7 +135,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
                              Bydelsnavn = Bydelsted,
                              KommuneNr = Kommunenr, #Kommunenavn ikke med i V2
                              KpInfDyp12mnd = KpInfDyp12Mnd,
-                             PasientID = PID, #En pasient vil skifte id fra 2019.
+                             #PIDV2 = PID, #Heter PasientID i V3. NB: Må ikke slås sammen.
                              RokerV2 = Roker,
                              #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
                              SykehusNavn = AvdNavn,

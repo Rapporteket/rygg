@@ -746,7 +746,24 @@ server <- function(input, output,session) {
       } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
       data <- data[ind,]
     } else {
+      #variablePRM <- 'variable som skal fjernes hvis lastes ned av avdeling'
+      #Foreløpig ikke def siden oppf.skjema ikke med i dump. Dump bare for SC.
       data <- data[which(data$ReshId == reshID), ]}
+
+    #Legg til ledende 0 i V2
+    indUten0 <- which(nchar(data$Personnummer)==10)
+    data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])
+
+    #Entydig PID
+    tidlPersNr <- intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
+    tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA)
+    hvilkePas <- which(tidlPas>0)
+    data$PasientID[hvilkePas] <- data$PasientID[tidlPas[hvilkePas]]
+
+    #SSN i en variabel
+    fraV3 <- which(is.na(data$Personnummer))
+    data$Personnummer[fraV3] <- data$SSN[fraV3]
+
     return(data)
   }
 
@@ -765,25 +782,12 @@ server <- function(input, output,session) {
     content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
 
-  variablePRM <- 'variable som skal fjernes hvis lastes ned av avdeling'
-  #Foreløpig ikke def siden oppf.skjema ikke med i dump. Dump bare for SC.
-  # observe({
-  #   DataDump <- dplyr::filter(RegData,
-  #                             as.Date(HovedDato) >= input$datovalgRegKtr[1],
-  #                             as.Date(HovedDato) <= input$datovalgRegKtr[2])
-  #   tabDataDump <- if (rolle == 'SC') {
-  #     valgtResh <- as.numeric(input$velgReshReg)
-  #     ind <- if (valgtResh == 0) {1:dim(DataDump)[1]
-  #     } else {which(as.numeric(DataDump$ReshId) %in% as.numeric(valgtResh))}
-  #     DataDump[ind,]
-  #   } #else {
-  #     #DataDump[which(DataDump$ReshId == reshID), -variablePRM]} #Tar bort PROM/PREM til egen avdeling
-
   RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1)
-    #rapbase::loadRegData(registryName="rygg", query='SELECT * FROM AlleVarNum')
   RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
   dataDump <- tilretteleggDataDumper(data=RegDataV2V3, datovalg = input$datovalgRegKtr,
                                      reshID=input$velgReshReg, rolle = rolle)
+
+
   output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
