@@ -139,12 +139,7 @@ ui <- navbarPage(id = "tab1nivaa",
              h5('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
                             innhold på Rapporteket'),
              br(),
-             #h2(paste("Drift og resultater, egen avdeling")), #,
              h2((uiOutput("egetShTxt"))),
-             # fluidRow(
-             #   h5('Registreringer siste år:'),
-             #   tableOutput("tabAntOpphEget")
-             # ),
              br(),
              fluidRow(
                column(4,
@@ -694,7 +689,7 @@ server <- function(input, output,session) {
 #------Registreringsoversikter---------------------
   observe({
     output$OppsumAntReg <- renderUI({
-      Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PasientID']
+      Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PID']
       antallReg <- length(Registreringer)
       antallPers <- length(unique(Registreringer))
       HTML(paste0('<b> I perioden ',format.Date(input$datovalgRegKtr[1], '%d. %B %Y'), ' - ', format.Date(input$datovalgRegKtr[2], '%d. %B %Y'),
@@ -758,7 +753,7 @@ server <- function(input, output,session) {
     tidlPersNr <- intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
     tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA)
     hvilkePas <- which(tidlPas>0)
-    data$PasientID[hvilkePas] <- data$PasientID[tidlPas[hvilkePas]]
+    data$PID[hvilkePas] <- data$PID[tidlPas[hvilkePas]]
 
     #SSN i en variabel
     fraV3 <- which(is.na(data$Personnummer))

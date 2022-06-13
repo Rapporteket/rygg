@@ -11,7 +11,6 @@ RyggPreprosess <- function(RegData=RegData)
   #Kun ferdigstilte registreringer: Kun ferdigstilte skjema i V2
   #V3: Alle legeskjema ferdigstilt.
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
-  #Kjonn Mangler!!
   RegData$ErMann <- RegData$Kjonn
   RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
 
@@ -19,16 +18,7 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
 
 	#Endre variabelnavn:
-	#names(RegData)[which(names(RegData) == 'OpAar')] <- 'Aar'
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
-	# if ('FistTimeClosed' %in% names(RegData)) {
-	#   RegData <- dplyr::rename(RegData, 'FirstTimeClosed' = 'FistTimeClosed')}
-	#if ('TdllOpAnnetNiv' %in% names(RegData)) {
-	#  RegData <- dplyr::rename(RegData, 'TidlOpAnnetNiv' = 'TdllOpAnnetNiv')}
-	#RegData <- dplyr::rename(RegData, 'LiggetidPostOp' = 'surgeonform_LIGGEDOEGN_POSTOPERATIV',
-	#                         'Liggedogn' = 'surgeonform_LIGGEDOEGN_TOTALT')
-
-
 
 	#Variabel som identifiserer avdelingas resh
 	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
@@ -43,12 +33,10 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days'))
-	RegData$Versjon <- 2
-	RegData$Versjon[RegData$OpDato < '2009-09-01'] <- 1
-	RegData$Versjon[RegData$OpDato >= '2019-01-01'] <- 3
+	# RegData$Versjon <- 2
+	# RegData$Versjon[RegData$OpDato < '2009-09-01'] <- 1
+	# RegData$Versjon[RegData$OpDato >= '2019-01-01'] <- 3
 
-	#RegData$Dod30 <- ifelse(RegData$Morsdato)
-
-  return(invisible(RegData))
+	  return(invisible(RegData))
 }
 

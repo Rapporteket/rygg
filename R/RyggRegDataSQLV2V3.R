@@ -75,7 +75,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   #-----Tilrettelegging av V2-data-------------------------
     #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..
 
-   RegDataV2$PasientID <- paste0(RegDataV2$PID, 'V2')
+   RegDataV2$PID <- paste0(RegDataV2$PID, 'V2')
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
   RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
@@ -118,13 +118,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
                                        '999999' =	'110771') #Volvat
 )
 
-  # >   setdiff(reshV3$SykehusNavn, reshV2$AvdNavn)
-  # [1] "Ibsensykehuset" "Skien"          "Tønsberg"
-  # >   setdiff(reshV2$AvdNavn, reshV3$SykehusNavn)
-  # "Aleris Drammen""Aleris Bergen", "Larvik","Rikshospitalet, ort, Flekkefjord", "Førde"
-  # "Molde""Bodø","Molde","Oslofjordklinikken Øst,Bodø"
-
-    # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
+  # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
   # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
   RegDataV2 <- dplyr::rename(RegDataV2,
                              AlderVedOpr = Alder,
@@ -141,7 +135,6 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
                              SykehusNavn = AvdNavn,
                              Ferdigstilt1b3mnd = Utfylt3Mnd,
                              Ferdigstilt1b12mnd = Utfylt12Mnd,
-                             #SykdVaskularClaudicatio = SykdVaskulærClaudicatio,
                              SykDprebetesMellitus = SykdDiabetesMellitus
   )
 
@@ -152,9 +145,11 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
 #Fjerner ikke-ferdigstilte pasientskjema
   RegDataV3 <- RegDataV3[RegDataV3$Ferdig1a==1 & RegDataV3$Ferdig2a==1, ]
 
+  RegDataV3$PID <- RegDataV3$PasientID #PID vil kobles med variabel PID fra V2 og tilpasses, ønsker å beholde PasientID fra V3
   #Navneendring av V3:
   RegDataV3 <- dplyr::rename(RegDataV3,
-                             OpProlap = OprProlap) #Siden Alle andre heter Op..
+                             OpProlap = OprProlap #Siden Alle andre heter Op..
+                             ) #PIDV3 = PasientID)
   #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
   RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
