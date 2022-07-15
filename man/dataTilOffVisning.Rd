@@ -2,20 +2,20 @@
 % Please edit documentation in R/RyggHjelpefunksjoner.R
 \name{dataTilOffVisning}
 \alias{dataTilOffVisning}
-\title{Generere data til Resultatportalen/SKDE-viser}
+\title{Generere data til SKDEs interaktive nettsider
+ODI er besvart ett år etter operasjon og resultatet vises for BESVARELSESÅR (Tenk over om skal filtrere på skjemadato eller ett år etter operasjonsdato.
+Det siste er kanskje best basert på konsistens og mulighet for sammenligning med resultater som har utvalg på operasjonsdato.)}
 \usage{
 dataTilOffVisning(
   RegData = RegData,
   valgtVar,
-  datoFra = "2011-01-01",
   aar = 0,
   ktr = 0,
   indID = "indDummy",
-  ResPort = 0,
+  slaaSmToAar = 0,
   hovedkat = 99,
   hastegrad = 99,
   tidlOp = "",
-  lastNedFil = 0,
   filUt = "dummy"
 )
 }
@@ -26,15 +26,15 @@ dataTilOffVisning(
 \item beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
 }}
 
-\item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
-
 \item{aar}{\itemize{
 \item Operasjonsår. Kan velge flere
 }}
 
 \item{indID}{indikator-id, eks. 'ind1', 'ind2', osv.}
 
-\item{ResPort}{1-hvis data til resultatportalen , 0-data til SKDE-viser (standard)}
+\item{slaaSmToAar}{0:nei (standard), 1:ja. Slår sammen resultater for to og to år, glidende. Dvs. 2021 viser resultat fra alle operasjoner i
+2020 og 2021, mens 2020 viser for 2020 og 2019. De fleste indikatorer vises for to år (slaaSmToAar=1). I praksis dupliseres data for hvert år.
+Dette medfører at data må leveres aggregert ellers vil det bli tull med antall for hele landet.}
 
 \item{hovedkat}{Hvilken type hovedinngrep, numerisk 0-9, standard: 99, dvs. alle. Valgmuligheter:
 \itemize{
@@ -56,11 +56,13 @@ dataTilOffVisning(
 
 \item{tidlOp}{tidligere operert? 1: samme nivå, 2: annet nivå, 3: annet og sm. nivå', 4: Primæroperasjon}
 
-\item{filUt}{tilnavn for utdatatabell (fjern?)}
+\item{filUt}{tilnavn for utdatatabell. Hvis ikke angitt, lastes ikke fil ned}
 }
 \value{
 Datafil til Resultatportalen
 }
 \description{
-Generere data til Resultatportalen/SKDE-viser
+Generere data til SKDEs interaktive nettsider
+ODI er besvart ett år etter operasjon og resultatet vises for BESVARELSESÅR (Tenk over om skal filtrere på skjemadato eller ett år etter operasjonsdato.
+Det siste er kanskje best basert på konsistens og mulighet for sammenligning med resultater som har utvalg på operasjonsdato.)
 }

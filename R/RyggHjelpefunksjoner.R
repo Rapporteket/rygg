@@ -169,22 +169,41 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
 #' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
 #' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
 #' @param slaaSmToAar 0:nei (standard), 1:ja. Slår sammen resultater for to og to år, glidende. Dvs. 2021 viser resultat fra alle operasjoner i
-#' 2020 og 2021, mens 2020 viser for 2020 og 2019. De fleste indikatorer vises for to år (slaaSmToAar=1)
+#' 2020 og 2021, mens 2020 viser for 2020 og 2019. De fleste indikatorer vises for to år (slaaSmToAar=1). I praksis dupliseres data for hvert år.
+#' Dette medfører at data må leveres aggregert ellers vil det bli tull med antall for hele landet.
 #' @inheritParams RyggUtvalgEnh
 #' @return Datafil til Resultatportalen
 #' @export
 
-dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
+dataTilOffVisning <- function(RegData = RegData, valgtVar, aar=0, ktr=0,
                               indID = 'indDummy', slaaSmToAar=0,
                               hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
 
+if (ktr==2) {
+  #For 12-mnd.ktr. vil vi benytte det året pasientetn SVARTE
+  #RegData$Aar <- as.numeric(substr(RegData$Utfdato12mnd, 1, 4))
+  #NB: Utfdato finnes bare i V3. Mye feilregistrering/ekstremverdier i Utfdato12mnd
+  RegData$Aar <-RegData$Aar+1
+  }
 
   RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
   RegData <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
                            tidlOp=tidlOp, hovedkat=hovedkat)$RegData
 
+  RegDataUt <- RegData[,c('Aar', "ReshId", "Variabel")]
+
+  aarMed <- sort(unique(RegDataUt$Aar))
+  antAar <- length(aarMed)
+  if (slaaSmToAar==1 & antAar>1) { #duplisering av data
+    RegDataDupl <- RegDataUt[RegDataUt$Aar %in% aarMed[1:(antAar-1)], ]
+    RegDataDupl$Aar <- RegDataDupl$Aar+1
+    #table(RegDataDupl$Aar)
+    #table(RegDataUt$Aar)
+    RegDataUt <- rbind(RegDataUt[-which(RegDataUt$Aar == aarMed[1]), ], RegDataDupl)
+    #table(RegDataUt$Aar)
+  }
+
   #Variabler: year, orgnr, var, denominator, ind_id
-  RegDataUt <- RegData #[,c('Aar', "ReshId", "Variabel")]
   RegDataUt$ind_id <- indID
   RegDataUt$denominator <- 1
   # nytt navn = gammelt navn
@@ -246,7 +265,7 @@ dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01
 
 
   #---Jevnlig sjekk av om vi har nye resh:
-  # nye <- setdiff(unique(RegData$ReshId), names(nyID)) #length(unique(RegData$ReshId))
+   nye <- setdiff(unique(RegData$ReshId), names(nyID)) #length(unique(RegData$ReshId))
   # RegData$ShNavn[match(nye, RegData$ReshId)]
   # table(RegData[RegData$ReshId %in% nye, c('ShNavn', 'Aar')])
 

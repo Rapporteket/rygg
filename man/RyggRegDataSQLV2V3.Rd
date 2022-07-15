@@ -12,12 +12,12 @@ RyggRegDataSQLV2V3(
 )
 }
 \arguments{
-\item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
+\item{datoFra}{P.t ikke i bruk}
 
-\item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
+\item{datoTil}{P.t ikke i bruk}
 
-\item{alleVarV3}{0: fjerner variabler som ikke er i bruk på Rapporteket (standard),
-1: har med alle variabler fra V3}
+\item{alleVarV3}{0: IKKE I BRUK fjerner variabler som ikke er i bruk på Rapporteket ,
+1: har med alle variabler fra V3 (foreløpig er dette standard)}
 
 \item{alleVarV2}{0: Bare variabler som også finnes i V3 med (standard),
 1: har med alle variabler fra V2}

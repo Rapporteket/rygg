@@ -68,17 +68,22 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
   if (length(grep('dekn',valgtVar)) == 1) { #Bruke vedlagte dekningsdata
     #Dekningsgradsfigur
 
-    if (valgtVar == 'dekn19Rygg') {
-      RegData <- read.table('./data-raw/DG2019Rygg.csv', sep=';', header=T, stringsAsFactors = FALSE)
-      Tittel <- 'Dekningsgrad, NKR Degenerativ Rygg, 2019'}
+    if (valgtVar == 'dekn21Rygg') {
+      RegData <- read.table('Rygg_dg2021.csv', sep=';', header=T, stringsAsFactors = FALSE, dec = ",")
+      Tittel <- 'Dekningsgrad, NKR Degenerativ Rygg, 2021'
+      xAkseTxt <- 'dekningsgrad, Rygg'
+    }
     if (valgtVar == 'dekn19Nakke') {
       RegData <- read.table('./data-raw/DG2019Nakke.csv', sep=';', header=T, stringsAsFactors = FALSE)
-      Tittel <- 'Dekningsgrad, NKR Degenerativ Nakke, 2019'}
-    xAkseTxt <- 'dekningsgrad, Rygg'
-    Ngr <- RegData$N
+      Tittel <- 'Dekningsgrad, NKR Degenerativ Nakke, 2019'
+      xAkseTxt <- 'dekningsgrad, Rygg'
+    }
+
+    Ngr <- RegData$Total
+    Ngrtxt <- as.character(Ngr)
     indLandet <- which(RegData$ShNavn== 'Hele landet')
-    AndelHele <- RegData$Andel[indLandet]
-    AndelerGr <- RegData$Andel[-indLandet]
+    AndelHele <- RegData$DG_nkr[indLandet]
+    AndelerGr <- RegData$DG_nkr[-indLandet]
     fargepalett='BlaaOff'
     utvalgTxt <- ''
     sortAvtagende <- T
