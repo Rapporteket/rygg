@@ -193,7 +193,7 @@ RyggData <- RyggUtvalgEnh(RegData=RyggData, aar=valgteAar)$RegData
 # ØNSKET MÅLNIVÅ: ≤ 20 %
 ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='sympVarighUtstr',
                           aar = valgteAar,
-                          slaaSmToAar=1,
+                          slaaSmToAar=0,
                           hovedkat=1,
                           hastegrad = 1,
                           indID = 'nkr_rygg_varighet_bensmerter',
@@ -260,16 +260,16 @@ ind6 <- dataTilOffVisning(RegData = RyggData, valgtVar='peropKompDura',
 ind8 <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp',
                           aar = valgteAar,
                           slaaSmToAar=0,
-                                hastegrad=1,
-                                indID = 'nkr_rygg_ventetid_kirurgi', filUt = 'ind8_VentetidOperasjon')
+                          hastegrad=1,
+                          indID = 'nkr_rygg_ventetid_kirurgi', filUt = 'ind8_VentetidOperasjon')
 
 #-------Oswestry------
 # Forbedring av fysisk funksjon i dagliglivet, prolapskirurgi
 # Andel som oppnår 20 prosentpoeng forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter prolapskirurgi
 # ØNSKET MÅLNIVÅ: ≥ 69 %
-#! SPM - for 2021, skal vi vise de som ble operert i 2021 eller de som svarte i 2021
+#! SPM - for 2021, skal vi vise de som svarte i 2021
 ind9 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
-                                hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
+                          hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
                           aar = valgteAar,
                           slaaSmToAar=1,
                                 indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind9_OswEndr20poengPro')

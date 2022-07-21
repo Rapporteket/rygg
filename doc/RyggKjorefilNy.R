@@ -20,6 +20,20 @@ forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
              tilDato=Sys.Date()-100, forsinkelse=100, reshID=601161)
 
 
+#----Sjekk av utfyltdato----
+setwd('/home/rstudio/speil/aarsrapp/Rygg')
+RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2010-01-01'))
+RegData$Diff3 <- as.integer(difftime(RegData$Utfdato3mnd, RegData$InnDato, units = 'days'))
+RegData$Diff12 <- as.integer(difftime(RegData$Utfdato12mnd, RegData$InnDato, units = 'days'))
+
+ind3 <- which(RegData$Diff3 < 70)
+feil3 <- RegData[ind3, c("ForlopsID", "ShNavn", 'InnDato',  "Utfdato3mnd", "Diff3")]
+write.table(feil3, file="Feil3mnd.csv", sep=';')
+
+ind12 <- which(RegData$Diff12 < 300)
+feil12 <- RegData[ind12, c("ForlopsID", "ShNavn", 'InnDato',  "Utfdato12mnd", "Diff12")]
+write.table(feil12, file="Feil12mnd.csv", sep=';')
+
 #-------------- Laste fil og evt. lagre -------------
 rm(list=ls())
 setwd('C:/ResultattjenesteGIT/nkr')

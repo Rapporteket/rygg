@@ -170,7 +170,6 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
 #' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
 #' @param slaaSmToAar 0:nei (standard), 1:ja. Slår sammen resultater for to og to år, glidende. Dvs. 2021 viser resultat fra alle operasjoner i
 #' 2020 og 2021, mens 2020 viser for 2020 og 2019. De fleste indikatorer vises for to år (slaaSmToAar=1). I praksis dupliseres data for hvert år.
-#' Dette medfører at data må leveres aggregert ellers vil det bli tull med antall for hele landet.
 #' @inheritParams RyggUtvalgEnh
 #' @return Datafil til Resultatportalen
 #' @export
@@ -265,7 +264,7 @@ if (ktr==2) {
 
 
   #---Jevnlig sjekk av om vi har nye resh:
-   nye <- setdiff(unique(RegData$ReshId), names(nyID)) #length(unique(RegData$ReshId))
+  # nye <- setdiff(unique(RegData$ReshId), names(nyID)) #length(unique(RegData$ReshId))
   # RegData$ShNavn[match(nye, RegData$ReshId)]
   # table(RegData[RegData$ReshId %in% nye, c('ShNavn', 'Aar')])
 
