@@ -33,8 +33,7 @@ dataTilOffVisning(
 \item{indID}{indikator-id, eks. 'ind1', 'ind2', osv.}
 
 \item{slaaSmToAar}{0:nei (standard), 1:ja. Slår sammen resultater for to og to år, glidende. Dvs. 2021 viser resultat fra alle operasjoner i
-2020 og 2021, mens 2020 viser for 2020 og 2019. De fleste indikatorer vises for to år (slaaSmToAar=1). I praksis dupliseres data for hvert år.
-Dette medfører at data må leveres aggregert ellers vil det bli tull med antall for hele landet.}
+2020 og 2021, mens 2020 viser for 2020 og 2019. De fleste indikatorer vises for to år (slaaSmToAar=1). I praksis dupliseres data for hvert år.}
 
 \item{hovedkat}{Hvilken type hovedinngrep, numerisk 0-9, standard: 99, dvs. alle. Valgmuligheter:
 \itemize{

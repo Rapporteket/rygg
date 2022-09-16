@@ -33,6 +33,7 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
 #' @return Antall opphold per sykehus og år, siste 5 år
 #' @export
 tabAntOpphSh5Aar <- function(RegData, datoTil=Sys.Date()){
+  RegData <- RegData[which(as.Date(RegData$InnDato) <= as.Date(datoTil, tz='UTC')), ]
       AarNaa <- as.numeric(format.Date(datoTil, "%Y"))
       tabAvdAarN <- addmargins(table(RegData[which(RegData$Aar %in% (AarNaa-4):AarNaa), c('ShNavn','Aar')]))
       rownames(tabAvdAarN)[dim(tabAvdAarN)[1] ]<- 'TOTALT, alle enheter:'

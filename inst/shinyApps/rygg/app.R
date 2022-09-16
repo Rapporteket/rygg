@@ -172,7 +172,7 @@ ui <- navbarPage(id = "tab1nivaa",
   tabPanel(p('Registreringsoversikter', title="Tabeller med registreringsoversikter"),
            value = 'Registreringsoversikter',
            sidebarPanel(width=3,
-                        h3('Valgmuligheter'),
+                        h3('Tabellvalg'),
                         conditionalPanel(condition = "input.ark == 'Antall operasjoner'",
                                          dateInput(inputId = 'sluttDatoReg', label = 'Velg sluttdato', language="nb",
                                                    value = Sys.Date(), max = Sys.Date() )
@@ -194,9 +194,11 @@ ui <- navbarPage(id = "tab1nivaa",
 
                         br(),
                         br(),
-                        h4('Last ned egne data'),
+                        h3('Last ned egne data'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
+                        uiOutput('OppsumAntReg'),
+                        br(),
                         selectInput(inputId = 'velgReshReg', label='Velg sykehus',
                                     selected = 0,
                                     choices = sykehusValg),
@@ -204,15 +206,13 @@ ui <- navbarPage(id = "tab1nivaa",
                         br(),
                         br(),
                         downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
-                        h4('Datadumpen inneholder alle variabler fra begge versjoner')
+                        h5('Datadumpen inneholder alle variabler fra alle elektroniske versjoner av registeret (V.1-3)')
 
            ),
 
            mainPanel(
              tabsetPanel(id='ark',
                          tabPanel('Antall operasjoner',
-                                  uiOutput('OppsumAntReg'),
-                                  br(),
                                   uiOutput("undertittelReg"),
                                   p("Velg tidsperiode ved å velge sluttdato/tidsenhet i menyen til venstre"),
                                   br(),
@@ -712,7 +712,7 @@ server <- function(input, output,session) {
     t1 <- 'Tabellen viser operasjoner '
     h4(HTML(switch(input$tidsenhetReg, #undertittel <-
                    Mnd = paste0(t1, 'siste 12 måneder før ', input$sluttDatoReg, '<br />'),
-                   Aar = paste0(t1, 'per år til og med ', valgtAar, '<br />'))
+                   Aar = paste0(t1, 'per år til og med ', input$sluttDatoReg, '<br />'))
     ))})
 
   #RegData som har tilknyttede skjema av ulik type. Fra NGER!
