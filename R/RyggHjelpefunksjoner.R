@@ -148,7 +148,7 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
   #                  reshId = reshID[[1]], msg = "Abonnement: månedsrapport")
 
   filbase <- substr(rnwFil, 1, nchar(rnwFil)-4)
-  tmpFile <- paste0(filbase, Sys.Date(),'_',digest::digest(brukernavn), '.Rnw')
+  tmpFile <- paste0(filbase, Sys.Date(),'_',digest::digest(reshID), '.Rnw')
   src <- normalizePath(system.file(rnwFil, package='rygg'))
   # gå til tempdir. Har ikke skriverettigheter i arbeidskatalog
   setwd(tempdir())
