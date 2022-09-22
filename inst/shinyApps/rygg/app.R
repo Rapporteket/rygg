@@ -253,46 +253,6 @@ ui <- navbarPage(id = "tab1nivaa",
                  #)
                ), #Utsending-tab
 
-               # tabPanel('Utsending',
-               #   sidebarPanel(
-               #     h4('Lage abonnementslister for utsendinger'),
-               #     uiOutput("reportUts"),
-               #     uiOutput("freqUts"),
-               #     uiOutput("ReshUts"),
-               #     h5('E-postmottagere legges inn en og en. Trykk legg til e-postmottager for hver gang.
-               #             Når du har lagt til alle, trykker du på lag utsending. '),
-               #     textInput("email", "Epostmottakere:"),
-               #     uiOutput("editEmail"),
-               #     htmlOutput("recipients"),
-               #     tags$hr(),
-               #     uiOutput("makeDispatchment"), #utsending
-               #     br(),
-               #
-               #     # h4('Nedlasting av data til Nettsider:'),
-               #     # h5('dvs.. data til sykehusviser'),
-               #     # Skal kun velge indikatorer. UTvalg for disse på være statiske
-               #     # selectInput(inputId = "valgtVarRes", label="Velg variabel",
-               #     #             choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
-               #     #                         'Durarift' = 'peropKompDura',
-               #     #                         'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
-               #     # ),
-               #     # # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
-               #     # #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
-               #     # #                ),
-               #     # sliderInput(inputId="aarRes", label = "Operasjonsår",
-               #     #             min = as.numeric(2007), max = as.numeric(year(idag)),
-               #     #             value = c(2018, year(idag)),
-               #     #             step=1, sep=""
-               #     # ),
-               #     # br(),
-               #     # downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data'),
-               #   ),
-               #
-               #   mainPanel(
-               #     h3('Oversikt over aktive utsendinger'),
-               #     uiOutput("dispatchmentContent"))
-               #   ), #Utsendingstab
-
                shiny::tabPanel(
                  "Datakvalitet",
                  #shiny::sidebarLayout(
@@ -582,27 +542,6 @@ tabPanel(p("Abonnement",
            )
          )
 ) #tab abonnement
-# tabPanel(p("Abonnement",
-#            title='Bestill automatisk utsending av rapporter på e-post'),
-#          sidebarLayout(
-#            sidebarPanel(width = 3,
-#                         selectInput("subscriptionRep", "Rapport:",
-#                                     c("Kvartalsrapport")), #, "Samlerapport", "Influensaresultater")),
-#                         selectInput("subscriptionFreq", "Frekvens:",
-#                                     list(Årlig="Årlig-year",
-#                                           Kvartalsvis="Kvartalsvis-quarter",
-#                                           Månedlig="Månedlig-month",
-#                                           Ukentlig="Ukentlig-week",
-#                                           Daglig="Daglig-DSTday"),
-#                                     selected = "Månedlig-month"),
-#                         #selectInput("subscriptionFileFormat", "Format:",
-#                         #            c("html", "pdf")),
-#                         actionButton("subscribe", "Bestill!")
-#            ),
-#            mainPanel(
-#              uiOutput("subscriptionContent")
-#            )
-#          ) )
 
 
 
@@ -1161,14 +1100,13 @@ server <- function(input, output,session) {
 
   ## make a list for report metadata
   reports <- list(
-    MndRapp = list(
-      synopsis = "NKR_Rygg/Rapporteket: Månedsrapport, abonnement",
+    Kvartalsrapp = list(
+      synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
       fun = "abonnementRygg", #Lag egen funksjon for utsending
       paramNames = c('rnwFil', 'reshID', 'brukernavn'),
       paramValues = c('RyggMndRapp.Rnw', reshID, brukernavn) #'Alle')
     )
   )
-  #c("Månedsrapport", "Samlerapport")
   #test <- rygg::abonnementRygg(rnwFil="RyggMndRapp.Rnw", reshID=105460)
   autoReportServer(
     id = "RyggAbb", registryName = "rygg", type = "subscription",
@@ -1183,8 +1121,8 @@ server <- function(input, output,session) {
 
     ## liste med metadata for rapport
     reports <- list(
-      MndRapp = list(
-        synopsis = "Rapporteket-Degenerativ Rygg: Månedsrapport",
+      KvartalsRapp = list(
+        synopsis = "Rapporteket-Degenerativ Rygg: Kvartalsrapport",
         fun = "abonnementRygg",
         paramNames = c('rnwFil', "reshID"),
         paramValues = c('RyggMndRapp.Rnw', 0)
