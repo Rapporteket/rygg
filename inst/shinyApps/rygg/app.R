@@ -567,28 +567,42 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
 
 #------------------Abonnement-------------------------
 
+#----------Abonnement-----------------
+
 tabPanel(p("Abonnement",
            title='Bestill automatisk utsending av rapporter på e-post'),
+         value = 'Abonnement',
+
          sidebarLayout(
-           sidebarPanel(width = 3,
-                        selectInput("subscriptionRep", "Rapport:",
-                                    c("Kvartalsrapport")), #, "Samlerapport", "Influensaresultater")),
-                        selectInput("subscriptionFreq", "Frekvens:",
-                                    list(Årlig="Årlig-year",
-                                          Kvartalsvis="Kvartalsvis-quarter",
-                                          Månedlig="Månedlig-month",
-                                          Ukentlig="Ukentlig-week",
-                                          Daglig="Daglig-DSTday"),
-                                    selected = "Månedlig-month"),
-                        #selectInput("subscriptionFileFormat", "Format:",
-                        #            c("html", "pdf")),
-                        actionButton("subscribe", "Bestill!")
+           sidebarPanel(
+             autoReportInput("RyggAbb")
            ),
-           mainPanel(
-             uiOutput("subscriptionContent")
+           shiny::mainPanel(
+             autoReportUI("RyggAbb")
            )
          )
-)
+) #tab abonnement
+# tabPanel(p("Abonnement",
+#            title='Bestill automatisk utsending av rapporter på e-post'),
+#          sidebarLayout(
+#            sidebarPanel(width = 3,
+#                         selectInput("subscriptionRep", "Rapport:",
+#                                     c("Kvartalsrapport")), #, "Samlerapport", "Influensaresultater")),
+#                         selectInput("subscriptionFreq", "Frekvens:",
+#                                     list(Årlig="Årlig-year",
+#                                           Kvartalsvis="Kvartalsvis-quarter",
+#                                           Månedlig="Månedlig-month",
+#                                           Ukentlig="Ukentlig-week",
+#                                           Daglig="Daglig-DSTday"),
+#                                     selected = "Månedlig-month"),
+#                         #selectInput("subscriptionFileFormat", "Format:",
+#                         #            c("html", "pdf")),
+#                         actionButton("subscribe", "Bestill!")
+#            ),
+#            mainPanel(
+#              uiOutput("subscriptionContent")
+#            )
+#          ) )
 
 
 
@@ -1081,86 +1095,86 @@ server <- function(input, output,session) {
 
 
     #------------------ Abonnement ----------------------------------------------
-  ## reaktive verdier for å holde rede på endringer som skjer mens
-  ## applikasjonen kjører
-  subscription <- reactiveValues(
-    tab = rapbase::makeAutoReportTab(session, type = "subscription"))
-  ## lag tabell over gjeldende status for abonnement
-  output$activeSubscriptions <- DT::renderDataTable(
-    subscription$tab, server = FALSE, escape = FALSE, selection = 'none',
-    options = list(dom = 'tp', ordning = FALSE,
-                   columnDefs = list(list(visible = FALSE, targets = 6))), #Fjerner kolonne
-    rownames = FALSE
-  )
-
-
-  ## lag side som viser status for abonnement, også når det ikke finnes noen
-  output$subscriptionContent <- renderUI({
-    userFullName <- rapbase::getUserFullName(session)
-    userEmail <- rapbase::getUserEmail(session)
-    if (length(subscription$tab) == 0) {
-      p(paste("Ingen aktive abonnement for", userFullName))
-    } else {
-      tagList(
-        p(paste0("Aktive abonnement som sendes per epost til ", userFullName,
-                 ":")),
-        DT::dataTableOutput("activeSubscriptions")
-      )
-    }
-  })
-
-  ## nye abonnement
-  observeEvent (input$subscribe, { #MÅ HA
-    owner <- rapbase::getUserName(session)
-    interval <- strsplit(input$subscriptionFreq, "-")[[1]][2]
-    intervalName <- strsplit(input$subscriptionFreq, "-")[[1]][1]
-    organization <- rapbase::getUserReshId(session)
-    runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
-    email <- rapbase::getUserEmail(session)
-    if (input$subscriptionRep == "Kvartalsrapport") {
-      synopsis <- "rygg/Rapporteket: kvartalsrapport"
-      rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
-      #print(rnwFil)
-    }
-
-    fun <- "abonnementRygg"  #"henteSamlerapporter"
-    paramNames <- c('rnwFil', 'brukernavn', "reshID")
-    paramValues <- c(rnwFil, brukernavn, reshID) #input$subscriptionFileFormat)
-
-    #abonnementRygg(rnwFil = 'RyggMndRapp.Rnw', brukernavn='hei', reshID=601161, datoTil=Sys.Date())
-
-    rapbase::createAutoReport(synopsis = synopsis, package = 'rygg',
-                              fun = fun, paramNames = paramNames,
-                              paramValues = paramValues, owner = owner,
-                              email = email, organization = organization,
-                              runDayOfYear = runDayOfYear, interval = interval,
-                              intervalName = intervalName)
-    #rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
-    subscription$tab <-
-      rapbase::makeAutoReportTab(session, type = "subscription")
-  })
+  # ## reaktive verdier for å holde rede på endringer som skjer mens
+  # ## applikasjonen kjører
+  # subscription <- reactiveValues(
+  #   tab = rapbase::makeAutoReportTab(session, type = "subscription"))
+  # ## lag tabell over gjeldende status for abonnement
+  # output$activeSubscriptions <- DT::renderDataTable(
+  #   subscription$tab, server = FALSE, escape = FALSE, selection = 'none',
+  #   options = list(dom = 'tp', ordning = FALSE,
+  #                  columnDefs = list(list(visible = FALSE, targets = 6))), #Fjerner kolonne
+  #   rownames = FALSE
+  # )
+  #
+  #
+  # ## lag side som viser status for abonnement, også når det ikke finnes noen
+  # output$subscriptionContent <- renderUI({
+  #   userFullName <- rapbase::getUserFullName(session)
+  #   userEmail <- rapbase::getUserEmail(session)
+  #   if (length(subscription$tab) == 0) {
+  #     p(paste("Ingen aktive abonnement for", userFullName))
+  #   } else {
+  #     tagList(
+  #       p(paste0("Aktive abonnement som sendes per epost til ", userFullName,
+  #                ":")),
+  #       DT::dataTableOutput("activeSubscriptions")
+  #     )
+  #   }
+  # })
+  #
+  # ## nye abonnement
+  # observeEvent (input$subscribe, { #MÅ HA
+  #   owner <- rapbase::getUserName(session)
+  #   interval <- strsplit(input$subscriptionFreq, "-")[[1]][2]
+  #   intervalName <- strsplit(input$subscriptionFreq, "-")[[1]][1]
+  #   organization <- rapbase::getUserReshId(session)
+  #   runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
+  #   email <- rapbase::getUserEmail(session)
+  #   if (input$subscriptionRep == "Kvartalsrapport") {
+  #     synopsis <- "rygg/Rapporteket: kvartalsrapport"
+  #     rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
+  #     #print(rnwFil)
+  #   }
+  #
+  #   fun <- "abonnementRygg"  #"henteSamlerapporter"
+  #   paramNames <- c('rnwFil', 'brukernavn', "reshID")
+  #   paramValues <- c(rnwFil, brukernavn, reshID) #input$subscriptionFileFormat)
+  #
+  #   #abonnementRygg(rnwFil = 'RyggMndRapp.Rnw', brukernavn='hei', reshID=601161, datoTil=Sys.Date())
+  #
+  #   rapbase::createAutoReport(synopsis = synopsis, package = 'rygg',
+  #                             fun = fun, paramNames = paramNames,
+  #                             paramValues = paramValues, owner = owner,
+  #                             email = email, organization = organization,
+  #                             runDayOfYear = runDayOfYear, interval = interval,
+  #                             intervalName = intervalName)
+  #   #rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  #   subscription$tab <-
+  #     rapbase::makeAutoReportTab(session, type = "subscription")
+  # })
 
   #------------------ Abonnement ----------------------------------------------
 
   #--------Start modul, abonnement
   orgs <- as.list(sykehusValg[-1])
 
-  # ## make a list for report metadata
-  # reports <- list(
-  #   MndRapp = list(
-  #     synopsis = "NKR_Rygg/Rapporteket: Månedsrapport, abonnement",
-  #     fun = "abonnementRygg", #Lag egen funksjon for utsending
-  #     paramNames = c('rnwFil', 'reshID', 'brukernavn'),
-  #     paramValues = c('RyggMndRapp.Rnw', reshID, brukernavn) #'Alle')
-  #   )
-  # )
-  # #c("Månedsrapport", "Samlerapport")
-  # #test <- nger::abonnementRygg(rnwFil="RyggMndRapp.Rnw", reshID=105460)
-  # autoReportServer(
-  #   id = "ngerAbb", registryName = "nger", type = "subscription",
-  #   paramNames = paramNames, paramValues = paramValues, #org = orgAbb$value,
-  #   reports = reports, orgs = orgs, eligible = TRUE
-  # )
+  ## make a list for report metadata
+  reports <- list(
+    MndRapp = list(
+      synopsis = "NKR_Rygg/Rapporteket: Månedsrapport, abonnement",
+      fun = "abonnementRygg", #Lag egen funksjon for utsending
+      paramNames = c('rnwFil', 'reshID', 'brukernavn'),
+      paramValues = c('RyggMndRapp.Rnw', reshID, brukernavn) #'Alle')
+    )
+  )
+  #c("Månedsrapport", "Samlerapport")
+  #test <- rygg::abonnementRygg(rnwFil="RyggMndRapp.Rnw", reshID=105460)
+  autoReportServer(
+    id = "RyggAbb", registryName = "rygg", type = "subscription",
+    paramNames = paramNames, paramValues = paramValues, #org = orgAbb$value,
+    reports = reports, orgs = orgs, eligible = TRUE
+  )
 
 
   #-----Utsendinger (kok fra NGER)
