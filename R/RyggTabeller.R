@@ -200,3 +200,5 @@ tabPasMdblReg <- function(RegData, tidsavvik=30){
     tabUt <- TabDbl[order(TabDbl$PasientID, TabDbl$InnDato), ]
   } else {tabUt <- paste0('Ingen registreringer med mindre enn ', tidsavvik, 'minutter mellom registreringene for samme pasient.')}
 }
+
+

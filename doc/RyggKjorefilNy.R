@@ -19,7 +19,6 @@ RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
 forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
              tilDato=Sys.Date()-100, forsinkelse=100, reshID=601161)
 
-
 #----Sjekk av utfyltdato----
 setwd('/home/rstudio/speil/aarsrapp/Rygg')
 RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2010-01-01'))
@@ -64,40 +63,60 @@ load('A:/Rygg/RyggData.RData')
 RegData <- RyggRegDataSQLV2V3()
 
 
-#----------------------------- Parametre-------------
-library(nkr)
-#  Laste data og parametre
-load('A:/Rygg/Rygg2010-2018aarsrapp.Rdata') #TESTER FØRST MED gamle data
-#__Inndata til RyggFigAndeler.R:
-tittel=1
-reshID <- 601161 #999999	#601161 #100133	#111065 #105783	#103618	#102949	#   #Må sendes med til funksjon
-datoFra <- '2018-01-01'
-datoTil <- '2019-12-31'
-minald <- 0		#alder, fra og med
-maxald <- 130	#alder, til og med
-erMann <- 99			#kjønn, 1-menn, 0-kvinner, standard: '' (alt annet enn 0 og 1), dvs. begge
-hovedkat <- 99		#HovedInngrep, 0-7, Standard: 99, dvs alle op
-hastegrad <- 1 #Elektivt/Akutt, 1-2
-enhetsUtvalg <- 0 #	0: hele landet, 1:egen enhet-resten, 2:egen enhet, 3:egen-egen shgr,
-    #4:egen shusgr, 5:egen shgr-resten, 6:egen enhet- egen region, 7:egen region, 8:egen reg - resten
-ktr <- 0			#1. el 2. kontroll. '3mnd' - 3mnd kontroll, '12mnd' - 12 mnd kontroll
-tittel <- 1
-tidlOp <- 0		#Tidl.operert: 1-sm, 2-annet, 3, sm+annet, 4-primær, Standard: 0, dvs. alle operasjoner
-grVar <- 'ShNavn'  #ShNavn, Fylke, BoHF, BoRHF
-valgtMaal <- 'gjsn'
-aar <- 0	#Standard: 0, dvs. alle år
-tidsenhet <- 'Aar' #'Halvaar', 'Kvartal','Mnd'
-offData <- 0
-Ngrense <- 10
-medKI <- 1
-outfile <- ''
+#--------------Kompletthet---------------------------
 
+# RyggDataRaa <- read.table('C:/Registerdata/Rygg/RyggdataDump2022-12-09fra2018.csv',
+#                           sep=';', header=T, encoding = 'UTF-8')
+RyggDataRaa <- read.table('C:/Registerdata/Rygg/RyggdataDump2022-12-09fra2018.csv',
+                      sep=';', header=T, encoding = 'latin1', dec = ',')
+#RyggDataRaa <- RyggDataRaa[-which(RyggDataRaa$ForlopsID == 8274),]
+RyggData <- RyggPreprosess(RyggDataRaa)
+
+Variabler <- c('AntibiotikaV3',	'ASA',	'TidlOpr',	'OpKat',	'BMI',	'SympVarighUtstr',
+               'SmRyPre',	'SmBePre',	'SmStiPre',	'ArbstatusPre')
+
+
+tab <- prop.table(table(RyggData[,c('Aar','AntibiotikaV3')], useNA = 'a'), margin=1)
+AntibiotikaV3 <- 1-tab[1:4,'9']
+
+tab <- prop.table(table(RyggData[,c('Aar','ASA')], useNA = 'a'), margin=1)
+ASA <- 1-tab[1:4,'9']
+
+tab <- prop.table(table(RyggData[,c('Aar','TidlOpr')], useNA = 'a'), margin=1)
+TidlOpr <- 1-tab[1:4,'9']
+
+tab <- prop.table(table(RyggData[,c('Aar','OpKat')], useNA = 'a'), margin=1)
+OpKat <- 1-tab[1:4,'9'] #Ser bort fra NA..
+
+data <- data.frame(Aar=RyggData$Aar, BMI=is.na(RyggData$BMI))
+tab <- prop.table(table(data, useNA = 'a'), margin=1)
+BMI <- 1-tab[1:4,'TRUE']
+
+tab <- prop.table(table(RyggData[,c('Aar','SympVarighUtstr')], useNA = 'a'), margin=1)
+SympVarighUtstr <- 1-rowSums(tab[1:4, 6:7])
+
+tab <- prop.table(table(RyggData[,c('Aar','SmRyPre')], useNA = 'a'), margin=1)
+SmRyPre <- 1-tab[1:4,'99']
+
+tab <- prop.table(table(RyggData[,c('Aar','SmBePre')], useNA = 'a'), margin=1)
+SmBePre <- 1-tab[1:4,'99']
+
+tab <- prop.table(table(RyggData[,c('Aar','SmStiPre')], useNA = 'a'), margin=1)
+SmStiPre <- 1-rowSums(tab[1:4,3:4])
+
+tab <- prop.table(table(RyggData[,c('Aar','ArbstatusPreV3')], useNA = 'a'), margin=1)
+ArbstatusPreV3 <- 1-tab[1:4,'99']
+
+Kompletthet <- cbind(AntibiotikaV3,	ASA,	TidlOpr,	OpKat,	BMI,	SympVarighUtstr,
+  SmRyPre,	SmBePre,	SmStiPre,	ArbstatusPreV3)
+
+write.csv2(Kompletthet, file = 'c:/Registerdata/rygg/RyggKompl.csv', fileEncoding = 'UTF-8')
 
 #_________________________________________________________________________________________
 #Registreringsoversikter for 2019-data
 #_________________________________________________________________________________________
 
-SkjemaOversikt <- read.table('A:/Rygg/SkjemaOversikt2019-11-04.csv',
+SkjemaOversikt <- read.table('A:\Rygg\SkjemaOversikt2019-11-04.csv',
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
 #SkjemaOversikt$Skjemanavn <- SkjemaOversikt$X.U.FEFF.Skjemanavn
 SkjemaOversikt$MndAar <- format(as.Date(SkjemaOversikt$HovedDato), '%y.%m')
@@ -188,7 +207,7 @@ RyggFigAndelerGrVar(RegData = RegData, valgtVar='Morsmal', outfile = '')
 #----------------------------------------------------------------
 valgtVar <- 'fornoydhet'	#Må velge...
 #NB: Hvis variabel='Underkat', MÅ hovedkat velges, dvs. ikke 99.
-outfile <- FordelingsFigurregForsinkelse_2021-03-27.pdf
+outfile <- 'FordelingsFigurregForsinkelse_2021-03-27.pdf'
 FordUt <- RyggFigAndeler(RegData=RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil,
 		minald=minald, maxald=maxald, erMann=erMann, hovedkat=hovedkat, preprosess=1,
 		 enhetsUtvalg=enhetsUtvalg, reshID=reshID, outfile=outfile)

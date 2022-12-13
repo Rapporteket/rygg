@@ -32,7 +32,7 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Kvartal <- ceiling(RegData$MndNum/3)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
-	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), RegData$UtskrivelseDato,units = 'days'))
+	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtskrivelseDato), units = 'days'))
 	# RegData$Versjon <- 2
 	# RegData$Versjon[RegData$OpDato < '2009-09-01'] <- 1
 	# RegData$Versjon[RegData$OpDato >= '2019-01-01'] <- 3

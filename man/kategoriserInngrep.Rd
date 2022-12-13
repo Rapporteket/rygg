@@ -9,9 +9,6 @@ kategoriserInngrep(RegData)
 \arguments{
 \item{RegData}{}
 }
-\value{
-
-}
 \description{
 Kategorisere inngrep og hovedinngrep av operasjoner
 }
