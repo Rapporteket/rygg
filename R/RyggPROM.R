@@ -43,13 +43,16 @@ names(promData1)
 # 6 = HelsenorgeOnly
 # 7 = DigitalMailboxOnly
 # 8 = UnsecureOnly
+
 # #EpromStatus er definert av oss, og den som er viktigst med tanke på svarprosent.
-# #Det er altså verdi 3 her som betyr at pasienten har besvart. OBS at den skiller seg litt fra tilsvarende variabel i Hemit-definisjonen. Denne er for deg og oss definert slik:
+# #Det er altså verdi 3 her som betyr at pasienten har besvart.
+#OBS at den skiller seg litt fra tilsvarende variabel i Hemit-definisjonen. Denne er for deg og oss definert slik:
 #   0 = Created
 # 1 = Ordered
 # 2 = Expired
 # 3 = Completed
 # 4 = Failed
+
 # EpromFeilKode er definert av Hemit som de to litt lenger opp. En vanlig kombo er EpromStatus=4 og EpromFeilKode=1. Dette er digitalt ikke-nåbare pasienter:
 #   0 = None
 # 1 = PatientUnreachable

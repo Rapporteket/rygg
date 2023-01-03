@@ -162,6 +162,42 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
   return(utfil)
 }
 
+
+
+#' Identifisere reoperasjoner
+#' Legger på operasjonsnummer(OpNr), tid til neste operasjon (DagerNesteOp)
+#' og identifiserer reoperasjoner innen 90 dager (Reop)
+#'
+#' @param RegData
+#'
+#' @return Legger på operasjonsnummer, tid til neste og identifiserer reoperasjoner
+#' @export
+
+finnReoperasjoner <- function(RegData){
+
+  antPas <- length(names(table(RegData$PID)))
+RegDataSort <-RegData[order(RegData$PID, RegData$OpDato), ]
+
+N <- dim(RegData)[1]
+RegDataSort$OpNr <- ave(RegDataSort$PID, RegDataSort$PID, FUN=seq_along)
+indPasFlereOp <- which(RegDataSort$OpNr>1)
+RegDataSort$DagerNesteOp <- NA
+RegDataSort$DagerNesteOp[indPasFlereOp-1] <-
+  difftime(as.POSIXlt(RegDataSort$OpDato[indPasFlereOp], tz= 'UTC', format="%Y-%m-%d"),
+           as.POSIXlt(RegDataSort$OpDato[indPasFlereOp-1], tz= 'UTC', format="%Y-%m-%d"),
+           units = 'days')
+RegDataSort$ReopEtterOp <- 0
+indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d)
+RegDataSort$ReopEtterOp[indReop] <- 1
+# RegDataSort <-
+#   RegDataSort %>%
+#   dplyr::mutate(Reop2 =
+#            ifelse(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d,
+#                   1,0))
+
+# table(RegDataSort$Reop2)
+}
+
 #' Generere data til SKDEs interaktive nettsider
 #' ODI er besvart ett år etter operasjon og resultatet vises for BESVARELSESÅR (Tenk over om skal filtrere på skjemadato eller ett år etter operasjonsdato.
 #' Det siste er kanskje best basert på konsistens og mulighet for sammenligning med resultater som har utvalg på operasjonsdato.)
