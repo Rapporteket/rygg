@@ -166,7 +166,7 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
 
 #' Identifisere reoperasjoner
 #' Legger på operasjonsnummer(OpNr), tid til neste operasjon (DagerNesteOp)
-#' og identifiserer reoperasjoner innen 90 dager (Reop)
+#' og identifiserer reoperasjoner innen 90 dager (Reop90dEtterOp)
 #'
 #' @param RegData
 #'
@@ -186,9 +186,9 @@ RegDataSort$DagerNesteOp[indPasFlereOp-1] <-
   difftime(as.POSIXlt(RegDataSort$OpDato[indPasFlereOp], tz= 'UTC', format="%Y-%m-%d"),
            as.POSIXlt(RegDataSort$OpDato[indPasFlereOp-1], tz= 'UTC', format="%Y-%m-%d"),
            units = 'days')
-RegDataSort$ReopEtterOp <- 0
-indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d)
-RegDataSort$ReopEtterOp[indReop] <- 1
+RegDataSort$Reop90dEtterOp <- 0
+indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d==1)
+RegDataSort$Reop90dEtterOp[indReop] <- 1
 # RegDataSort <-
 #   RegDataSort %>%
 #   dplyr::mutate(Reop2 =

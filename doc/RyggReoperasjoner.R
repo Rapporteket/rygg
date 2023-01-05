@@ -1,10 +1,9 @@
 #Alle data
 AlleDataSml <- read.table(file = 'C:/Registerdata/rygg/RyggV2V3_2023_01_01.csv', sep=';', header=T) #'UTF-8', stringsAsFactors = FALSE, na.strings = "NULL",
 AlleData <- read.table(file = 'C:/Registerdata/rygg/RyggV2V3_2023_01_03.csv', sep=';', header=T) #'UTF-8', stringsAsFactors = FALSE, na.strings = "NULL",
-AlleData$OpDato <- as.Date(AlleData$OpDato, format='%d.%m.%Y')
-#AlleData <- AlleData[ ,-which(names(AlleData) %in% fritxtVar)]
-#dataDump <- tilretteleggDataDumper(data=AlleData, datovalg = '2022-01-01', rolle = 'SC') #, reshID=input$velgReshReg)
-dataDump <- finnReoperasjoner(RegData = AlleData)
+#AlleData$OpDato <- as.Date(AlleData$OpDato, format='%d.%m.%Y')
+AlleData <- AlleData[ ,-which(names(AlleData) %in% fritxtVar)]
+#dataDump <- finnReoperasjoner(RegData = AlleData)
 
 N2 <- sort(names(AlleData))
 N1 <- sort(names(AlleDataSml))
@@ -16,17 +15,18 @@ setdiff(sort(names(AlleData)), sort(names(AlleDataSml)))
 # Variabler: ErReop, BlittReop eller noe sånt.
 
 RegData <- rygg::finnReoperasjoner(AlleData)
-test <- RegDataSort[ ,c('OpDato', 'PID', 'OpNr', "DagerNesteOp",
-                         "NyRyggOpr3mnd", "Reop90d", "Reop", "Reop2")]
+test <- FusjFlereOp[ ,c('OpDato', 'PID', 'OpNr', "DagerNesteOp",
+                         "NyRyggOpr3mnd", "Reop90d", "Reop90dEtterOp")]
 library(magrittr)
 library(tidyverse)
 
 #Se nærmere på fusjonskirurgi. Hvilke typer operasjon ETTER fusjon.
 PIDflereop <- unique(RegData$PID[RegData$OpNr>1])
 PIDfusj <- unique(RegData$PID[RegData$HovedInngrepV2V3==5])
-PIDfusjFlereOp <- intersect( unique(RegData$PID[RegData$OpNr>1]),  unique(RegData$PID[RegData$HovedInngrepV2V3>1]))
+PIDfusjFlereOp <- intersect(PIDflereop, PIDfusj)
 
 FusjFlereOp <- RegData[RegData$PID %in% PIDfusjFlereOp, ]
+write.csv2(FusjFlereOp, file = 'FusjFlereOp.csv')
 
 #Finne de som har fusjon før annen operasjon
 Nok å Fjerne de som har fusj bare i siste op?
