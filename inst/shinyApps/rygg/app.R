@@ -743,6 +743,7 @@ server <- function(input, output,session) {
   RegDataV2V3 <- RegDataV2V3[ ,-which(names(RegDataV2V3) %in% fritxtVar)]
   dataDump <- tilretteleggDataDumper(data=RegDataV2V3, datovalg = input$datovalgRegKtr,
                                      reshID=input$velgReshReg, rolle = rolle)
+  dataDump <- finnReoperasjoner(RegData = dataDump)
 
 
   output$lastNed_dataDump <- downloadHandler(

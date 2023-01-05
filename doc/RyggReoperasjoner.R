@@ -24,7 +24,9 @@ PIDfusj <- unique(RegData$PID[RegData$HovedInngrepV2V3==5])
 PIDfusjFlereOp <- intersect( unique(RegData$PID[RegData$OpNr>1]),  unique(RegData$PID[RegData$HovedInngrepV2V3>1]))
 
 FusjFlereOp <- RegData[RegData$PID %in% PIDfusjFlereOp, ]
+
 #Finne de som har fusjon før annen operasjon
+Nok å Fjerne de som har fusj bare i siste op?
 
 
 table(table(FusjFlereOp$PID))
