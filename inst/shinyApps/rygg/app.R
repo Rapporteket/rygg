@@ -26,7 +26,7 @@ addResourcePath('rap', system.file('www', package='rapbase'))
 
 context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
 paaServer <- (context %in% c("DEV", "TEST", "QA", "PRODUCTION")) #rapbase::isRapContext()
-regTitle = ifelse(paaServer, 'NKR: Nasjonalt Kvalitetsregister for Ryggkirurgi',
+regTitle = ifelse(paaServer, 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi',
                   'Nasjonalt Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
 
 
@@ -205,7 +205,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
                         br(),
                         br(),
-                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump, V2+V3'),
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump, V2 og V3'),
                         h5('Datadumpen inneholder alle variabler fra alle elektroniske versjoner av registeret (V.1-3)')
 
            ),
