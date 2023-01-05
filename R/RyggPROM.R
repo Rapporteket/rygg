@@ -1,20 +1,23 @@
 # promData <- read.table('C:/Registerdata/rygg/proms2022-12-09.csv',
 #            sep=';', header=T, encoding = 'UTF-8')
-promData <- readr::read_csv2('C:/Registerdata/Rygg/proms2022-12-09.csv')
 
-promData1 <- dplyr::rename(promData,
-              EpromRegType = REGISTRATION_TYPE,
-              EpromUtlopDato = EXPIRY_DATE,
-              EpromPurreDato = REMINDER_DATE,
-              EpromSendt = TSSENDT,
-              EpromMottatt = TSRECEIVED,
-              EpromVarslingsKanal = NOTIFICATION_CHANNEL,
-              EpromUtsendRegel = DISTRIBUTION_RULE,
-              EpromStatus = STATUS,
-              EpromFeilKode = FORM_ORDER_STATUS_ERROR_CODE,
-              EpromOppdatert = TSUPDATED)
+# promData <- readr::read_csv2('C:/Registerdata/Rygg/proms2022-12-09.csv')
+#
+# promData1 <- dplyr::rename(promData,
+#               EpromRegType = REGISTRATION_TYPE,
+#               EpromUtlopDato = EXPIRY_DATE,
+#               EpromPurreDato = REMINDER_DATE,
+#               EpromSendt = TSSENDT,
+#               EpromMottatt = TSRECEIVED,
+#               EpromVarslingsKanal = NOTIFICATION_CHANNEL,
+#               EpromUtsendRegel = DISTRIBUTION_RULE,
+#               EpromStatus = STATUS,
+#               EpromFeilKode = FORM_ORDER_STATUS_ERROR_CODE,
+#               EpromOppdatert = TSUPDATED)
+#
+# names(promData1)
 
-names(promData1)
+
 #E-prombesvarelser
 # EpromRegType er enten:
 #   PATIENTFOLLOWUP: 3-mnd ePROM
