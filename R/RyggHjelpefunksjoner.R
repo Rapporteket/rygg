@@ -196,6 +196,7 @@ RegDataSort$ReopEtterOp[indReop] <- 1
 #                   1,0))
 
 # table(RegDataSort$Reop2)
+return(invisible(RegDataSort))
 }
 
 #' Generere data til SKDEs interaktive nettsider
