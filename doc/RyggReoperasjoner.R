@@ -2,6 +2,9 @@
 AlleDataSml <- read.table(file = 'C:/Registerdata/rygg/RyggV2V3_2023_01_01.csv', sep=';', header=T) #'UTF-8', stringsAsFactors = FALSE, na.strings = "NULL",
 AlleData <- read.table(file = 'C:/Registerdata/rygg/RyggV2V3_2023_01_03.csv', sep=';', header=T) #'UTF-8', stringsAsFactors = FALSE, na.strings = "NULL",
 AlleData$OpDato <- as.Date(AlleData$OpDato, format='%d.%m.%Y')
+#AlleData <- AlleData[ ,-which(names(AlleData) %in% fritxtVar)]
+#dataDump <- tilretteleggDataDumper(data=AlleData, datovalg = '2022-01-01', rolle = 'SC') #, reshID=input$velgReshReg)
+dataDump <- finnReoperasjoner(RegData = AlleData)
 
 N2 <- sort(names(AlleData))
 N1 <- sort(names(AlleDataSml))

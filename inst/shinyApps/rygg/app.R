@@ -205,7 +205,7 @@ ui <- navbarPage(id = "tab1nivaa",
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
                         br(),
                         br(),
-                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump, V2+V3'),
                         h5('Datadumpen inneholder alle variabler fra alle elektroniske versjoner av registeret (V.1-3)')
 
            ),
