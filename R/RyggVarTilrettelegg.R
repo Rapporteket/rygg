@@ -128,10 +128,7 @@ valgtVarTest <- valgtVar
 
       if (valgtVar == 'antibiotika') { #fordeling, AndelGrVar, AndelTid
             grtxt <- c('Nei', 'Ja', 'Ikke utfylt')
-            #indKodeb <- which(KodebokRygg[,'Navn i Rapporteket']=='AntibiotikaV3'
-            #grtxt <- KodebokRygg$Listetekst[indKodeb]
             RegData$VariabelGr <- factor(RegData$AntibiotikaV3, levels = c(0,1,9))
-            #levels(RegData$VariabelGr) <- KodebokRygg$Listeverdier[indKodeb]
             tittel <- 'Er det gitt antibiotikaprofylakse?'
             if (figurtype %in% c('andelGrVar', 'andelTid')) {
                RegData <- RegData[which(RegData$AntibiotikaV3 %in% 0:1), ]
@@ -882,6 +879,23 @@ valgtVarTest <- valgtVar
             varTxt <- 'fått tromboseprofylakse'
             sortAvtagende <- F #}
       }
+      if (valgtVar == 'trombProfylLettKI') { #AndelGrVar, AndelTid
+        #Legeskjema
+        #Spesifisering: (BlodfortynnendeFast = 0 &  ASA grad< 3 & Kjønn = 1 (mann)) & (HovedInngrepV2V3=1 eller HovedInngrepV2V3=2)
+        #Mål: < landsgjennomsnittet høy måloppnåelse (grønt), ≥ landsgjennomsnittet moderat/lav (gult)
+
+        indUtv <- which((RegData$ASA<3) & (RegData$ErMann==1) & (RegData$HovedInngrepV2V3 %in% 1:2) & (RegData$BlodfortynnendeFast==0))
+        #(RegData$ErMann==1) & (RegData$HovedInngrepV2V3 %in% 1:2) er også hardkodet utvalg i andelsfigurene.
+        RegData <- RegData[indUtv,]
+        tittel <- 'Tromboseprofylakse gitt, ASA<3'
+        RegData <- RegData[which(RegData$PostopTrombProfyl %in% 0:1), ]
+        RegData$Variabel <- RegData$PostopTrombProfyl
+        varTxt <- 'fått tromboseprofylakse'
+        sortAvtagende <- F
+        landsgj <- round(100*prop.table(table(RegData$Variabel))[2], 1)
+        KImaalGrenser <- c(0,landsgj,100)
+      }
+
 
       if (valgtVar == 'tryggKir') { #fordeling, AndelGrVar, AndelTid
          #Legeskjema. Andel med UforetrygdPre ja og planlegger. Innført V3

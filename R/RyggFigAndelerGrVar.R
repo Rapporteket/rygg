@@ -117,6 +117,9 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     #------- Gjøre utvalg
 
     if (reshID==0) {enhetsUtvalg <- 0}
+    if (valgtVar == 'trombProfylLettKI') {
+      erMann=1
+      hovedkat <- 1:2}
     RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                                 minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                                 hovedkat=hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg)
@@ -154,8 +157,8 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     }
     if (tittel==0) {Tittel<-''} else {Tittel <- RyggVarSpes$tittel}
 
-    if (valgtVar == 'OswEndr20' & hovedkat == 1) {KImaalGrenser <- c(0, AndelHele, 100)}
-    if (valgtVar == 'OswEndr30pst' & hovedkat == 9) {KImaalGrenser <- c(0, AndelHele, 100)}
+    if (valgtVar == 'OswEndr20' & hovedkat[1] == 1 & length(hovedkat)==1) {KImaalGrenser <- c(0, AndelHele, 100)}
+    if (valgtVar == 'OswEndr30pst' & hovedkat[1] == 9 & length(hovedkat)==1) {KImaalGrenser <- c(0, AndelHele, 100)}
     fargepalett <- RyggUtvalg$fargepalett
   }
   sortInd <- order(as.numeric(AndelerGr), decreasing=sortAvtagende, na.last = FALSE)

@@ -67,6 +67,10 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
 
       if (offData == 0) {
             if (reshID==0) {enhetsUtvalg <- 0}
+        if (valgtVar == 'trombProfylLettKI') {
+          erMann=1
+          hovedkat <- 1:2
+        }
             RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                                       minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                                       hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
@@ -137,12 +141,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
 
 
       if (lagFig == 1) {
-#            RyggFigTidAndel(RegData, AggVerdier, Ngr, tittel=tittel, hovedgrTxt=RyggUtvalg$hovedgrTxt,
-#                           smltxt=RyggUtvalg$smltxt, Ngr = Ngr, KImaal = KImaal, N=N, retn='V',
-#                           utvalgTxt=utvalgTxt, tidtxt=tidtxt, varTxt=varTxt, grtxt2=grtxt2, medSml=medSml,
-#                           xAkseTxt=xAkseTxt, yAkseTxt=yAkseTxt,
-#                           outfile=outfile)
-
 
                   #-----------Figur---------------------------------------
                   #Hvis for f? observasjoner..
@@ -196,6 +194,10 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
                         if (valgtVar=='SympVarighUtstr') {
                         lines(xskala, rep(KImaal[2],length(xskala)), col= '#FF7260', lwd=3)
                         text(max(xskala), KImaal[2], pos=4, 'Mål', cex=0.9, col='#FF7260')
+                        }
+                        if (valgtVar=='trombProfylLettKI') {
+                          lines(xskala, rep(KImaal[2],length(xskala)), col= '#FF7260', lwd=3)
+                          text(max(xskala), KImaal[2], pos=4, 'Mål', cex=0.9, col='#FF7260')
                         }
 
                         Ttxt <- paste0('(Tall ved punktene angir antall ', varTxt, ')')
