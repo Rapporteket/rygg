@@ -3,13 +3,11 @@ library(dplyr)
 library(kableExtra)
 library(knitr)
 library(lubridate)
-#ibrary(shinyBS) # Additional Bootstrap Controls
 library(rapbase)
 library(rygg)
 library(rapFigurer)
-library(shiny)
-library(shinyjs)
-#library(tools)
+#library(shiny)
+#library(shinyjs)
 library(zoo)
 
 idag <- Sys.Date()
@@ -423,14 +421,13 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
              inputId = "valgtVarAndel", label="Velg variabel",
              choices = c('Kval.ind: For sen registrering' = 'regForsinkelse',
                          'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
-                         'Kval.ind: Trygg kirurgi-prosedyre utført' = 'tryggKir',
-                         'Kval.ind: Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
                          'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
                          'Alder over 70 år' = 'alder70',
                          'Antibiotika' = 'antibiotika',
                          'Arbeidsstatus' = 'arbstatus',
                          'ASA-grad > II' = 'ASA',
                          'Degen. spondy. op. m/fusjon' = 'degSponFusj',
+                         'Degen. spondy. 1. op. m/fusjon' = 'degSponFusj1op',
                          'Fedme (BMI>30)' = 'BMI',
                          'Flere enn to tidligere operasjoner' = 'tidlOp3',
                          'Forbedring av Oswestry-skår >= 20p' = 'OswEndr20',
@@ -453,10 +450,12 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Oswestry-skår > 48 poeng' = 'Osw48',
                          'Røykere' = 'roker',
                          'Smertestillende før operasjon' = 'smStiPre',
-                         'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
-                        'Søkt erstatning før operasjon' = 'erstatningPre',
+                         'Søkt erstatning før operasjon' = 'erstatningPre',
                         'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                         'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl',
+                        'Trygg kirurgi-prosedyre utført' = 'tryggKir',
+                        'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
+                        'Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
                         'Ventetid fra henvisning til time på poliklinikk' = 'ventetidHenvTimePol'
              )
            ),
@@ -723,9 +722,9 @@ server <- function(input, output,session) {
   observe({
     reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
-    uiOutput({
-
-    })
+    # uiOutput({
+    #
+    # })
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
                                 as.Date(InnDato) >= input$datovalgRegKtr[1],
                                 as.Date(InnDato) <= input$datovalgRegKtr[2])

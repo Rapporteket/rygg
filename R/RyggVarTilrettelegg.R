@@ -205,13 +205,29 @@ valgtVarTest <- valgtVar
             }}
 
       if (valgtVar == 'degSponFusj') { #AndelGrVar, AndelTid
-            #hovedkat=10 #Degen. spondylolistese
-            RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
-            RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
-            varTxt <- 'tilfeller'
-            tittel <- 'Degen. spondylolistese operert med fusjonskirurgi'
-            sortAvtagende <- F
-            xAkseTxt <- 'Andel med fusjonskirurgi (%)'
+        #hovedkat=10 #Degen. spondylolistese
+        RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
+        RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
+        varTxt <- 'tilfeller'
+        tittel <- 'Degen. spondylolistese operert med fusjonskirurgi'
+        sortAvtagende <- F
+        xAkseTxt <- 'Andel med fusjonskirurgi (%)'
+      }
+      if (valgtVar == 'degSponFusj1op') { #AndelGrVar, AndelTid
+        # Kl 5. Andel pasienter med degenerativ spondylolistese som blir operert med
+        # fusjonskirurgi ved første operasjon
+        # Mål: ≤ landsgjennomsnittet høy måloppnåelse (grønt), &gt; landsgjennomsnittet moderat/lav (gult)
+        # Hensikt: Redusere andel pasienter med degenerativ spondylolistese som blir operert
+        # med fusjonskirurgi ved første operasjon
+        #hovedkat=10 #Degen. spondylolistese
+        #RegData <- finnReoperasjoner(RegData = RegData)
+        RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
+        RegData <- RegData[which(RegData$TidlOpr == 4), ]
+        RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1 # & RegData$TidlOpr == 4
+        varTxt <- 'tilfeller'
+        tittel <- 'Degen. spondylolistese, fusjonskirurgi ved første operasjon'
+        sortAvtagende <- F
+        xAkseTxt <- 'Andel med fusjonskirurgi i første operasjon (%)'
       }
       if (valgtVar == 'degSponSSSten') { #AndelGrVar
             #(Først og fremst fusjonskirurgi)
@@ -398,10 +414,9 @@ valgtVarTest <- valgtVar
          tittel <- paste0('Sårinfeksjon, pasientrapportert', ktrtxt)
          sortAvtagende <- FALSE
          xAkseTxt <- 'Andel sårinfeksjoner (%)'
-         #KImaalRetn <- 'lav'
-         if (hovedkat == 1) {KImaalGrenser <- c(0,2,100)}
-         if (hovedkat == 5) {KImaalGrenser <- c(0,3,100)}
-         if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
+         # if (hovedkat == 1) {KImaalGrenser <- c(0,2,100)}
+         # if (hovedkat == 5) {KImaalGrenser <- c(0,3,100)}
+         # if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
       }
       if (valgtVar == 'kpInfOverfl') { #AndelGrVar, AndelTid
         #Komplikasjoner 0:nei, 1:ja
@@ -659,9 +674,8 @@ valgtVarTest <- valgtVar
             sortAvtagende <- FALSE
             xAkseTxt <- 'Andel durarift (%)'
             varTxt <- 'med durarift'
-            #KImaalRetn <- 'lav'
-            if (hovedkat == 1) {KImaalGrenser <- c(0,2,20)}
-            if (hovedkat %in% c(5,9)) {KImaalGrenser <- c(0,3,20)}
+            # if (hovedkat == 1) {KImaalGrenser <- c(0,2,20)}
+            # if (hovedkat %in% c(5,9)) {KImaalGrenser <- c(0,3,20)}
       }
       if (valgtVar=='radUnders') { #fordeling
             tittel <- 'Radiologisk undersøkelse'
@@ -700,7 +714,7 @@ valgtVarTest <- valgtVar
             tittel <- 'Registrert for sent for 3 mnd. oppfølging'
             varTxt <- 'for sent registrert'
             sortAvtagende <- F}
-         KImaalGrenser <- c(0,3,10,100)
+         #KImaalGrenser <- c(0,3,10,100)
       }
 
       if (valgtVar=='roker') { #fordeling, AndelGrVar, #AndelTid
@@ -842,7 +856,7 @@ valgtVarTest <- valgtVar
                                    symptVarighRyggHof ='Varighet av rygg-/hoftesmerter minst ett år',
                                    sympVarighUtstr = 'Varighet av utstrålende smerter minst ett år')
                   sortAvtagende <- F}
-            if (valgtVar == 'sympVarighUtstr') {KImaalGrenser <- c(0,20,100)}
+           # if (valgtVar == 'sympVarighUtstr') {KImaalGrenser <- c(0,20,100)}
       }
 
 

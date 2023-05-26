@@ -16,7 +16,7 @@
 
 RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
                                alleVarV3=1, alleVarV2=0){
-#NB: datovalg har ingen effekt foreløpig!!
+#NB: datovalg har ingen effekt foreløpig!! - bør hente alle for å få f.eks. operasjonsnummer riktig...
 #Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
   RegDataV2 <- rapbase::loadRegData(registryName="rygg",
