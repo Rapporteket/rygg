@@ -13,6 +13,9 @@ tabPasMdblReg(RegData, tidsavvik = 30)
 \item maks tidsavvik (dager) mellom to påfølgende registreringer som sjekkes
 }}
 }
+\value{
+mulig dobbeltregistrerte skjema
+}
 \description{
 Finner pasienter med potensielt dobbeltregistrerte skjema
 }

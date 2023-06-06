@@ -12,15 +12,12 @@ library(zoo)
 
 idag <- Sys.Date()
 startDato <- paste0(as.numeric(format(idag-120, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
-sluttDato <- idag
-datoTil <- as.POSIXlt(idag)
-datofra12 <- lubridate::floor_date(as.Date(datoTil)- months(12, abbreviate = T), unit='month')
-idag <- Sys.Date()
+#sluttDato <- idag
+#datoTil <- as.POSIXlt(idag)
+datofra12 <- lubridate::floor_date(as.Date(idag)- months(12, abbreviate = T), unit='month')
 
 # gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
 addResourcePath('rap', system.file('www', package='rapbase'))
-
-
 
 context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
 paaServer <- (context %in% c("DEV", "TEST", "QA", "PRODUCTION")) #rapbase::isRapContext()
@@ -30,8 +27,16 @@ regTitle = ifelse(paaServer, 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi',
 
 if (paaServer) {
   RegData <- RyggRegDataSQLV2V3()  #RyggRegDataSQL(alle = 1)
+  qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
+                    DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
+  ePROMadmTab <- rapbase::loadRegData(registryName="rygg", query=qEprom)
+  ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
+  ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
+#test <- ePROMadmTab$MCEID[intersect(ind3mndeprom, which(ePROMadmTab$STATUS==3))]
   qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
-  SkjemaOversikt <- rapbase::loadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
+  SkjemaOversikt_orig <- rapbase::loadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
+  SkjemaOversikt <- merge(SkjemaOversikt_orig, ePROMadmTab,
+                          by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
   qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
   RegOversikt <- rapbase::loadRegData(registryName="rygg", query=qForlop, dbType="mysql")
   RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
@@ -41,9 +46,6 @@ if (paaServer) {
 
 RegData <- RyggPreprosess(RegData = RegData)
 SkjemaOversikt <- dplyr::rename(.data=SkjemaOversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
-
-
-
 
 #Definere innhold i felles rullegardinmenyer:
 kjonn <- c("Begge"=2, "Menn"=1, "Kvinner"=0)
@@ -182,12 +184,11 @@ ui <- navbarPage(id = "tab1nivaa",
                         conditionalPanel(
                           condition = "input.ark == 'Antall skjema'",
                           dateRangeInput(inputId = 'datovalgReg', start = startDato, end = Sys.Date(),
-                                         label = "Tidsperiode", separator="t.o.m.", language="nb"),
-                          selectInput(inputId = 'skjemastatus', label='Velg skjemastatus',
-                                      choices = c("Ferdigstilt"=1,
-                                                  "Kladd"=0,
-                                                  "Åpen"=-1)
-                          )
+                                         label = "Tidsperiode", separator="t.o.m.", language="nb")
+                          # ,selectInput(inputId = 'skjemastatus', label='Velg skjemastatus'
+                          #             choices = c("Ferdigstilt"=1,
+                          #                         "Kladd"=0,
+                          #                         "Åpen"=-1)
                         ),
 
                         br(),
@@ -557,6 +558,7 @@ server <- function(input, output,session) {
   output$reshID <- renderText(reshID)
   #rolle <- reactive({ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'SC')})
   rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
+  rolle <- ifelse(rolle %in% c('LU', 'SC'), rolle, 'LU')
   output$rolle <- renderText(rolle)
   brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
   output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(reshID, RegData$ReshId)]))
@@ -628,7 +630,7 @@ server <- function(input, output,session) {
   }
 
     output$tabAntOpphEget <- renderTable(
-      tabAntOpphShMnd(RegData=RegData, datoTil=datoTil, reshID = reshID, antMnd=12)
+      tabAntOpphShMnd(RegData=RegData, datoTil=idag, reshID = reshID, antMnd=12)
       ,rownames = T, digits=0, spacing="xs" )
 
     #-------Samlerapporter--------------------
@@ -672,11 +674,9 @@ server <- function(input, output,session) {
                    Aar = paste0(t1, 'per år til og med ', input$sluttDatoReg, '<br />'))
     ))})
 
-  #RegData som har tilknyttede skjema av ulik type. Fra NGER!
-  AntSkjemaAvHver <- tabAntSkjema(SkjemaOversikt=SkjemaOversikt, datoFra = input$datovalgReg[1], datoTil=input$datovalgReg[2],
-                                  skjemastatus=as.numeric(input$skjemastatus))
-  tabAntSkjema(SkjemaOversikt)
-
+  AntSkjemaAvHver <- tabAntSkjema(RegData=RegData,
+                                  datoFra = input$datovalgReg[1], datoTil=input$datovalgReg[2])
+                                  #skjemastatus=as.numeric(input$skjemastatus))
   output$tabAntSkjema <- renderTable(AntSkjemaAvHver
                                      ,rownames = T, digits=0, spacing="xs" )
   output$lastNed_tabAntSkjema <- downloadHandler(

@@ -91,7 +91,7 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 #' @param tilDato sluttdato for perioden en ønsker å se på
 #' @param forsinkelse minste antall dager fra operasjon til ferdigstillelse
 #' @param reshID Avdelingas reshID. Benyttes til å filtrere.
-#' @return
+#' @return registreringsforsinkelse
 #' @export
 forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID=0){
   RegData$Diff <- as.numeric(difftime(as.Date(RegData$MedForstLukket),

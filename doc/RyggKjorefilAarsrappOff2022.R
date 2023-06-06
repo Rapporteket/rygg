@@ -13,10 +13,10 @@ datoTil12mnd <- paste0(rappAar-1,'-12-31')
 datoFra <- as.Date(paste0(startAar,'-01-01'))
 datoTil <- as.Date(paste0(rappAar,'-12-31'))
 
-aar2 <- (rappAar-1):rappAar  #2015:2016
+aar2 <- (rappAar-1):rappAar
 aar2_12mnd <- aar2-1
 tidlAar <- rappAar-1
-tidlAar2 <- (rappAar-3):(rappAar-2) #2013:2014
+tidlAar2 <- (rappAar-3):(rappAar-2)
 Ngrense <- 20
 AKjust <- 0
 ktr <- 2
@@ -25,10 +25,16 @@ RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 Ntot07 <- dim(RegData)[1]
 
+RegDataV3 <- RegData[RegData$Aar >2018, ]
+table(RegData[,c('Aar', "Ferdigstilt1b3mnd")])
+test <- RegData[ ,c('Aar', "Ferdigstilt1b3mnd", 'Utfdato3mnd', "Nytte3mnd")]
+table(RegData[,c('Aar', "KpInfDyp3mnd")], useNA = 'a')
+
+
 #Gjør utvalg/tilrettelegge årsfiler
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData #RegData[which(RegData$InnDato>= as.Date(datoFra) & RegData$InnDato <= as.Date(datoTil)), ] #
 RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoTil)$RegData
-#write.table(RegData, file = 'RyggAarsrapp2021.csv', sep = ';', row.names = F, fileEncoding = 'latin1', na = '')
+write.table(RegData, file = 'RyggAarsrapp2022.csv', sep = ';', row.names = F, fileEncoding = 'latin1', na = '')
 
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
@@ -156,10 +162,13 @@ RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstS
 #Betyr at variabelen operasjonsnummer må beregnes i preprosess
 
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='degSponFusj1op', preprosess = 0,
-                    Ngrense=20, aar=rappAar, outfile='degSponFusj1opKISh.pdf')
+                    Ngrense=20, aar=(rappAar-1):rappAar, outfile='degSponFusj1opKISh.pdf')
 
 RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='degSponFusj1op',
                 datoFra = '01-01-2019', outfile='degSponFusj1opKITid.pdf')
+
+PROMadm <- rapbase::loadRegData(registryName="rygg",
+                     query='SELECT * FROM proms')
 
 #Ny, mars 2023
 # K6 Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi.

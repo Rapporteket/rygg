@@ -17,6 +17,9 @@ forsinketReg(RegData, fraDato, tilDato, forsinkelse, reshID = 0)
 
 \item{reshID}{Avdelingas reshID. Benyttes til å filtrere.}
 }
+\value{
+registreringsforsinkelse
+}
 \description{
 Forsinkelse er strengt tatt registrering og ferdigstillelse etter UtskrivelseDato,
 men mht hva som er for sent for å sende ut oppfølgingsskjema, regnes forsinkelse

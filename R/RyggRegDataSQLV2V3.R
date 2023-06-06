@@ -21,18 +21,57 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
 
   RegDataV2 <- rapbase::loadRegData(registryName="rygg",
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
-   RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
+  RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
                                      query='SELECT * FROM AlleVarNum')
-   RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
+  RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
                                        query='SELECT * FROM ForlopsOversikt')
-   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
+  varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
                 "Avdod", "AvdodDato", "BasisRegStatus")
    #varBegge <- intersect(sort(names(RegDataV3AV)), sort(names(RegDataV3For)))
+  RegDataV3 <- merge(RegDataV3AVN, RegDataV3Forl[varForl], by='ForlopsID', all.x = TRUE, all.y = FALSE)
 
+  ePROMadmTab <- rapbase::loadRegData(registryName="rygg",
+                                   query='SELECT * FROM proms')
+  ePROMvar <- c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
+                'REGISTRATION_TYPE')
+  # «EpromStatus» er definert av oss, og den som er viktigst med tanke på svarprosent. Det er altså verdi 3 her som betyr at pasienten har besvart. OBS at den skiller seg litt fra tilsvarende variabel i Hemit-definisjonen. Denne er for deg og oss definert slik:
+  # 0 = Created, 1 = Ordered, 2 = Expired, 3 = Completed, 4 = Failed
+  ind3mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
+                         c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
+                   #& ePROMadmTab$STATUS==3)
 
-   RegDataV3 <- merge(RegDataV3AVN, RegDataV3Forl[varForl], by='ForlopsID', all.x = TRUE, all.y = FALSE)
+  ind12mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
+                      c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
+                       #& ePROMadmTab$STATUS==3)
 
-  # RegDataV2$Aar <- lubridate::year(RegDataV2$OpDato)
+  ePROM3mnd <- ePROMadmTab[intersect(ind3mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
+  names(ePROM3mnd) <- paste0(ePROMvar, '3mnd')
+
+  #MCEdbl <- names(table(ePROM3mnd$MCEID3mnd)[table(ePROM3mnd$MCEID3mnd) == 2])
+  #ePROM3mnd[ePROM3mnd$MCEID %in% MCEdbl, ]
+
+  ePROM12mnd <- ePROMadmTab[intersect(ind12mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
+  names(ePROM12mnd) <- paste0(ePROMvar, '12mnd')
+
+  # RegDataV3 <- merge(RegDataV3, ePROM3mnd ,
+  #                          by.x='ForlopsID', by.y='MCEID3mnd', all.x = TRUE, all.y = FALSE)
+  # RegDataV3 <- merge(RegDataV3, ePROM12mnd,
+  #                           by.x='ForlopsID', by.y='MCEID12mnd', all.x = TRUE, all.y = FALSE)
+
+  indIkkeEprom3mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
+  #indEprom <-  which((RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
+  RegDataV3$Ferdig1b3mndGML <- RegDataV3$Ferdigstilt1b3mnd
+    RegDataV3$Ferdigstilt1b3mnd <- 0
+    RegDataV3$Ferdigstilt1b3mnd[RegDataV3$ForlopsID %in% ePROM3mnd$MCEID] <- 1
+    RegDataV3$Ferdigstilt1b3mnd[intersect(which(RegDataV3$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
+#table(RegDataV3[ ,c('Aar', 'Ferdigstilt1b3mnd')])
+#table(RegDataV3$Aar, is.na(RegDataV3$OswTot3mnd))
+
+   # RegDataV3$Aar <- lubridate::year(RegDataV3$OpDato)
+   # test <- RegDataV3[which(RegDataV3$Aar==2021 & RegDataV3$Ferdigstilt1b3mnd==1), c("OpDato", "Utfdato3mnd", "ForstLukket3mnd")]
+   # test$forsinkelse3mnd <- as.Date(test$Utfdato3mnd) - as.Date(test$OpDato)
+   # mean(test$forsinkelse3mnd)
+
 
   if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES

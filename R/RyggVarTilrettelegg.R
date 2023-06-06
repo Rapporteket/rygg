@@ -381,23 +381,27 @@ valgtVarTest <- valgtVar
          datoTil <- min(datoTil, as.character(Sys.Date()-90))
          retn <- 'H'
          flerevar <- 1
-         #Andel kun av de som har svart på 3 mnd ktr:
-         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
-         # variableV2 <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpMiktProb3mnd','KpUVI3mnd',
-         #               'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd', 'Kp3mnd')
          variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
                        'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd', 'Kp3mnd')
          grtxt <- c('Overfl. sårinf. (mangelfull reg. 2019)', 'Dyp sårinfeksjon',
                     'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
                     'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
-      }
+         #Andel kun av de som har svart på 3 mnd ktr:
+         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
+         indNA <- which(rowSums(is.na(RegData[ ,variable])) == length(variable))
+         if (length(indNA)>0){ #Fjerner rader hvor alle Kp-variabler er NA
+           RegData <- RegData[-indNA, ] }
+         }
 
       if (valgtVar == 'kp3mnd') { #AndelGrVar
          #Komplikasjoner 0:nei, 1:ja
-         ind <- which(RegData$Ferdigstilt1b3mnd==1)
-         RegData <- RegData[ind, ]
+         #ind <- which(RegData$Ferdigstilt1b3mnd==1)
+         #RegData <- RegData[ind, ]
         variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
                        'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')
+        indNA <- which(rowSums(is.na(RegData[ ,variable])) == length(variable))
+        if (length(indNA)>0){ #Fjerner rader hvor alle Kp-variabler er NA
+        RegData <- RegData[-indNA, ] }
          RegData$Variabel[rowSums(RegData[ ,variable], na.rm = T) > 0] <- 1
          VarTxt <- 'tilfeller'
          tittel <- 'Pasientrapporterte komplikasjoner (%)'
@@ -405,10 +409,10 @@ valgtVarTest <- valgtVar
       }
       if (valgtVar == 'kpInf3mnd') { #AndelGrVar, AndelTid
          #Komplikasjoner 0:nei, 1:ja
-         ind <- switch(as.character(ktr),
-                       '1' = which(RegData$Ferdigstilt1b3mnd==1),
-                       '2' = which(RegData$Ferdigstilt1b12mnd == 1))
-         RegData <- RegData[ind, ]
+        #Holder ikke å bare filtrere på ferdigstilte. Ikke obligatorisk å fylle ut alt.
+         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
+         indTomme <- which(is.na(RegData$KpInfDyp3mnd) & is.na(RegData$KpInfOverfla3mnd))
+         RegData <- RegData[-indTomme, ]
          RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3mnd', 'KpInfDyp3mnd')], na.rm = T) > 0] <- 1
          VarTxt <- 'tilfeller'
          tittel <- paste0('Sårinfeksjon, pasientrapportert', ktrtxt)
@@ -419,12 +423,13 @@ valgtVarTest <- valgtVar
          # if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
       }
       if (valgtVar == 'kpInfOverfl') { #AndelGrVar, AndelTid
+        #Lena: Tilpass ktr
         #Komplikasjoner 0:nei, 1:ja
         ind <- switch(as.character(ktr),
                       '1' = which(RegData$Ferdigstilt1b3mnd==1),
                       '2' = which(RegData$Ferdigstilt1b12mnd == 1))
-        RegData <- RegData[ind, ]
-        RegData$Variabel[RegData$KpInfOverfla3mnd == 1] <- 1
+        RegData <- RegData[RegData$KpInfOverfla3mnd %in% 0:1, ]
+        RegData$Variabel <- RegData$KpInfOverfla3mnd
         VarTxt <- 'tilfeller'
         tittel <- paste0('Overfladisk sårinfeksjon, pasientrapportert', ktrtxt)
         sortAvtagende <- FALSE

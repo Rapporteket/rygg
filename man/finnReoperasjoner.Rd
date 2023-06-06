@@ -4,7 +4,7 @@
 \alias{finnReoperasjoner}
 \title{Identifisere reoperasjoner
 Legger på operasjonsnummer(OpNr), tid til neste operasjon (DagerNesteOp)
-og identifiserer reoperasjoner innen 90 dager (Reop)}
+og identifiserer reoperasjoner innen 90 dager (Reop90dEtterOp)}
 \usage{
 finnReoperasjoner(RegData)
 }
@@ -17,5 +17,5 @@ Legger på operasjonsnummer, tid til neste og identifiserer reoperasjoner
 \description{
 Identifisere reoperasjoner
 Legger på operasjonsnummer(OpNr), tid til neste operasjon (DagerNesteOp)
-og identifiserer reoperasjoner innen 90 dager (Reop)
+og identifiserer reoperasjoner innen 90 dager (Reop90dEtterOp)
 }
