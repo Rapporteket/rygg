@@ -421,6 +421,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
            selectInput(
              inputId = "valgtVarAndel", label="Velg variabel",
              choices = c('Kval.ind: For sen registrering' = 'regForsinkelse',
+                         'Kval.ind: Tromboseprofylakse ved lett kirurig' = 'trombProfylLettKI',
                          'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
                          'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
                          'Alder over 70 år' = 'alder70',

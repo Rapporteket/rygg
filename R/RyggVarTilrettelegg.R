@@ -409,11 +409,11 @@ valgtVarTest <- valgtVar
       }
       if (valgtVar == 'kpInf3mnd') { #AndelGrVar, AndelTid
          #Komplikasjoner 0:nei, 1:ja
-        #Holder ikke å bare filtrere på ferdigstilte. Ikke obligatorisk å fylle ut alt.
+        #Antar at de som ikke har fylt ut ikke har hatt infeksjon
          RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
-         indTomme <- which(is.na(RegData$KpInfDyp3mnd) & is.na(RegData$KpInfOverfla3mnd))
-         RegData <- RegData[-indTomme, ]
          RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3mnd', 'KpInfDyp3mnd')], na.rm = T) > 0] <- 1
+         indIkkeSaarInf <- which(RegData$OpDato >= '2019-01-01' & RegData$OpDato <= '2021-12-31')
+         RegData$Variabel[indIkkeSaarInf] <- NA
          VarTxt <- 'tilfeller'
          tittel <- paste0('Sårinfeksjon, pasientrapportert', ktrtxt)
          sortAvtagende <- FALSE
@@ -428,8 +428,10 @@ valgtVarTest <- valgtVar
         ind <- switch(as.character(ktr),
                       '1' = which(RegData$Ferdigstilt1b3mnd==1),
                       '2' = which(RegData$Ferdigstilt1b12mnd == 1))
-        RegData <- RegData[RegData$KpInfOverfla3mnd %in% 0:1, ]
-        RegData$Variabel <- RegData$KpInfOverfla3mnd
+        RegData <- RegData[ind, ]
+        RegData$Variabel[RegData$KpInfOverfla3mnd==1] <- 1
+        indIkkeSaarInf <- which(RegData$OpDato >= '2019-01-01' & RegData$OpDato <= '2021-12-31')
+        RegData$Variabel[indIkkeSaarInf] <- NA
         VarTxt <- 'tilfeller'
         tittel <- paste0('Overfladisk sårinfeksjon, pasientrapportert', ktrtxt)
         sortAvtagende <- FALSE

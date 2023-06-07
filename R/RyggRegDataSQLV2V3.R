@@ -23,6 +23,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
   RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
                                      query='SELECT * FROM AlleVarNum')
+  #test <- RegDataV3[ ,c("DodsDato", 'AvdodDato', 'Avdod')]
   RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
                                        query='SELECT * FROM ForlopsOversikt')
   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
@@ -38,40 +39,45 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   # 0 = Created, 1 = Ordered, 2 = Expired, 3 = Completed, 4 = Failed
   ind3mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
                          c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
-                   #& ePROMadmTab$STATUS==3)
 
   ind12mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
                       c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
-                       #& ePROMadmTab$STATUS==3)
 
   ePROM3mnd <- ePROMadmTab[intersect(ind3mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
   names(ePROM3mnd) <- paste0(ePROMvar, '3mnd')
-
-  #MCEdbl <- names(table(ePROM3mnd$MCEID3mnd)[table(ePROM3mnd$MCEID3mnd) == 2])
-  #ePROM3mnd[ePROM3mnd$MCEID %in% MCEdbl, ]
-
   ePROM12mnd <- ePROMadmTab[intersect(ind12mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
   names(ePROM12mnd) <- paste0(ePROMvar, '12mnd')
 
-  # RegDataV3 <- merge(RegDataV3, ePROM3mnd ,
-  #                          by.x='ForlopsID', by.y='MCEID3mnd', all.x = TRUE, all.y = FALSE)
-  # RegDataV3 <- merge(RegDataV3, ePROM12mnd,
-  #                           by.x='ForlopsID', by.y='MCEID12mnd', all.x = TRUE, all.y = FALSE)
-
-  indIkkeEprom3mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
-  #indEprom <-  which((RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
-  RegDataV3$Ferdig1b3mndGML <- RegDataV3$Ferdigstilt1b3mnd
+    indIkkeEprom3mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
+    indIkkeEprom12mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind12mnd]))
+    #indEprom <-  which((RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
+    RegDataV3$Ferdig1b3mndGML <- RegDataV3$Ferdigstilt1b3mnd
     RegDataV3$Ferdigstilt1b3mnd <- 0
     RegDataV3$Ferdigstilt1b3mnd[RegDataV3$ForlopsID %in% ePROM3mnd$MCEID] <- 1
     RegDataV3$Ferdigstilt1b3mnd[intersect(which(RegDataV3$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
-#table(RegDataV3[ ,c('Aar', 'Ferdigstilt1b3mnd')])
-#table(RegDataV3$Aar, is.na(RegDataV3$OswTot3mnd))
+
+    RegDataV3$Ferdig1b12mndGML <- RegDataV3$Ferdigstilt1b12mnd
+    RegDataV3$Ferdigstilt1b12mnd <- 0
+    RegDataV3$Ferdigstilt1b12mnd[RegDataV3$ForlopsID %in% ePROM12mnd$MCEID] <- 1
+    RegDataV3$Ferdigstilt1b12mnd[intersect(which(RegDataV3$Ferdig1b12mndGML ==1), indIkkeEprom12mnd)] <- 1
+
+    # table(RegDataV3$Ferdig1b3mndGML)
+    # table(RegDataV3$Ferdigstilt1b12mnd)
+    #
+    # table(RegDataV3[ ,c('Aar', 'Ferdigstilt1b12mnd')])
+    # table(RegDataV3$Aar, !is.na(RegDataV3$OswTot12mnd))
 
    # RegDataV3$Aar <- lubridate::year(RegDataV3$OpDato)
    # test <- RegDataV3[which(RegDataV3$Aar==2021 & RegDataV3$Ferdigstilt1b3mnd==1), c("OpDato", "Utfdato3mnd", "ForstLukket3mnd")]
    # test$forsinkelse3mnd <- as.Date(test$Utfdato3mnd) - as.Date(test$OpDato)
    # mean(test$forsinkelse3mnd)
 
+    #I 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
+    indIkkeSaarInf <- which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31')
+    RegDataV3$KpInfOverfla3Mnd[indIkkeSaarInf] <- NA
+    RegDataV3$KpInfOverfla12mnd[indIkkeSaarInf] <- NA
+    RegDataV3$KpInfDyp3Mnd[indIkkeSaarInf] <- NA
+    RegDataV3$KpInfDyp12mnd[indIkkeSaarInf] <- NA
 
   if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
@@ -264,11 +270,11 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
   #head(RegDataV2[, V2ogV3])
   #head(RegDataV3[, V2ogV3])
 
-  VarV2 <- sort(names(RegDataV2))
-  VarV3 <- sort(names(RegDataV3))
 
   #Variabler i V2 som ikke er i V3. Noen er bevisst fjernet fra V3, se vektor fjernesV3
   #setdiff(VarV2, VarV3) #Sjekk på nytt når gått gjennom.
+  VarV2 <- names(RegDataV2) #sort
+  VarV3 <- names(RegDataV3) #sort
 
   V2ogV3 <- intersect(VarV2, VarV3)
   V3ikkeV2 <- setdiff(VarV3, V2ogV3)
@@ -297,6 +303,12 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
   #Mars 2021: KpInf-variabler, 3mnd er navngitt ..3Mnd i begge versjoner. Endrer navngiving
   EndreNavnInd <- grep('3Mnd', names(RegDataV2V3)) #names(RyggData)[grep('3Mnd', names(RyggData))]
   names(RegDataV2V3)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2V3)[EndreNavnInd])
+
+  #En desimal
+  RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)
+  RegDataV2V3$OswTotPre <- round(RegDataV2V3$OswTotPre,1)
+  RegDataV2V3$OswTot3mnd <- round(RegDataV2V3$OswTot3mnd,1)
+  RegDataV2V3$OswTot12mnd <- round(RegDataV2V3$OswTot12mnd,1)
 
   return(RegDataV2V3)
 }

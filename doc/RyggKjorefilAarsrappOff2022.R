@@ -25,11 +25,10 @@ RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 Ntot07 <- dim(RegData)[1]
 
-RegDataV3 <- RegData[RegData$Aar >2018, ]
-table(RegData[,c('Aar', "Ferdigstilt1b3mnd")])
-test <- RegData[ ,c('Aar', "Ferdigstilt1b3mnd", 'Utfdato3mnd', "Nytte3mnd")]
-table(RegData[,c('Aar', "KpInfDyp3mnd")], useNA = 'a')
-
+# RegDataV3 <- RegData[RegData$Aar >2018, ]
+table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
+# test <- RegData[ ,c('Aar', "Ferdigstilt1b3mnd", 'Utfdato3mnd', "Nytte3mnd")]
+table(RegData$Aar, !is.na(RegData$OswTot12mnd), useNA = 'a')
 
 #Gjør utvalg/tilrettelegge årsfiler
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData #RegData[which(RegData$InnDato>= as.Date(datoFra) & RegData$InnDato <= as.Date(datoTil)), ] #
