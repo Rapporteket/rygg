@@ -183,13 +183,14 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
 
 #' Finner pasienter med potensielt dobbeltregistrerte skjema
 #'
-#' @param RegData dataramme fra nakkeregisteret
+#' @param RegData dataramme fra nakkeregisteret, tidligst fra 01-01-2019
 #' @param tidssavik - maks tidsavvik (dager) mellom to påfølgende registreringer som sjekkes
 #'
 #' @return mulig dobbeltregistrerte skjema
 #' @export
-tabPasMdblReg <- function(RegData, tidsavvik=30){
+tabPasMdblReg <- function(RegData, datoFra = '2019-01-01', tidsavvik=30){
 
+  RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra)$RegData
 
   FlereReg <- RegData %>% dplyr::group_by(PasientID) %>%
     dplyr::summarise(N = length(PasientID), #n(),
