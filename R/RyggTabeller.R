@@ -188,7 +188,7 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
 #'
 #' @return mulig dobbeltregistrerte skjema
 #' @export
-tabPasMdblReg <- function(RegData, datoFra = '2019-01-01', tidsavvik=30){
+tabPasMdblReg <- function(RegData, datoFra = '2019-03-01', tidsavvik=30){
 
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra)$RegData
 
