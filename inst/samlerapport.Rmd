@@ -35,7 +35,7 @@ Tabellen under er kjedelig, men illustrerer poenget:
 ```{r eksTab}
 dt <- mtcars[1:6, ][params$var]
 kable(dt) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 

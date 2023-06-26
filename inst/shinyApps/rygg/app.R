@@ -1,14 +1,14 @@
 #library(magrittr)
-library(dplyr)
-library(kableExtra)
-library(knitr)
-library(lubridate)
-library(rapbase)
+#library(dplyr)
+#library(kableExtra)
+#library(knitr)
+#library(lubridate)
+#library(rapbase)
 library(rygg)
-library(rapFigurer)
+#library(rapFigurer)
 #library(shiny)
 #library(shinyjs)
-library(zoo)
+#library(zoo)
 
 idag <- Sys.Date()
 startDato <- paste0(as.numeric(format(idag-120, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
@@ -420,9 +420,9 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
 
            selectInput(
              inputId = "valgtVarAndel", label="Velg variabel",
-             choices = c('Kval.ind: For sen registrering' = 'regForsinkelse',
-                         'Kval.ind: Tromboseprofylakse ved lett kirurig' = 'trombProfylLettKI',
+             choices = c('Kval.ind: Degen. spond, fusj. ved første operasjon' = 'degSponFusj1op',
                          'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
+                         'Kval.ind: Tromboseprofylakse ved lett kirurig' = 'trombProfylLettKI',
                          'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
                          'Alder over 70 år' = 'alder70',
                          'Antibiotika' = 'antibiotika',
@@ -432,6 +432,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Degen. spondy. 1. op. m/fusjon' = 'degSponFusj1op',
                          'Fedme (BMI>30)' = 'BMI',
                          'Flere enn to tidligere operasjoner' = 'tidlOp3',
+                         'For sen registrering' = 'regForsinkelse',
                          'Forbedring av Oswestry-skår >= 20p' = 'OswEndr20',
                          'Fornøyde pasienter' = 'fornoydhet',
                          'Fremmedspråklig' = 'morsmal',
@@ -459,7 +460,8 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                         'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
                         'Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
                         'Ventetid fra henvisning til time på poliklinikk' = 'ventetidHenvTimePol'
-             )
+             ),
+             selected = 'regForsinkelse'
            ),
            #uiOutput("datovalgAndel"),
            dateRangeInput(inputId = 'datovalgAndel', start = startDato, end = idag,
@@ -536,10 +538,10 @@ tabPanel(p("Abonnement",
 
          sidebarLayout(
            sidebarPanel(
-             autoReportInput("RyggAbb")
+             rapbase::autoReportInput("RyggAbb")
            ),
            shiny::mainPanel(
-             autoReportUI("RyggAbb")
+             rapbase::autoReportUI("RyggAbb")
            )
          )
 ) #tab abonnement
@@ -624,10 +626,10 @@ server <- function(input, output,session) {
                       full_width=F,
                       digits = c(0,0,1,1,1,1,0)
     ) %>%
-      column_spec(column = 1, width_min = '5em', width_max = '10em') %>%
-      column_spec(column = 2:(ncol(tab)), width = '7em')  %>%
-      row_spec(0, bold = T, align = 'c') %>%
-      kable_styling(full_width = FALSE, position = 'left') #"hover",
+      kableExtra::column_spec(column = 1, width_min = '5em', width_max = '10em') %>%
+      kableExtra::column_spec(column = 2:(ncol(tab)), width = '7em')  %>%
+      kableExtra::row_spec(0, bold = T, align = 'c') %>%
+      kableExtra::kable_styling(full_width = FALSE, position = 'left') #"hover",
   }
 
     output$tabAntOpphEget <- renderTable(
@@ -867,11 +869,11 @@ server <- function(input, output,session) {
                         , full_width=F
                         , digits = c(0,0,1,0,0,1)[1:antKol]
       ) %>%
-        add_header_above(kolGruppering[1:(2+UtDataFord$medSml)]) %>%
-        #add_header_above(c(" "=1, tittelKolGr[1] = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
-        column_spec(column = 1, width='5em') %>% #width_min = '3em', width_max = '10em') %>%
-        column_spec(column = 2:(ncol(tabFord)+1), width = '7em') %>%
-        row_spec(0, bold = T)
+        kableExtra::add_header_above(kolGruppering[1:(2+UtDataFord$medSml)]) %>%
+        #kableExtra::add_header_above(c(" "=1, tittelKolGr[1] = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
+        kableExtra::column_spec(column = 1, width='5em') %>% #width_min = '3em', width_max = '10em') %>%
+        kableExtra::column_spec(column = 2:(ncol(tabFord)+1), width = '7em') %>%
+        kableExtra::row_spec(0, bold = T)
     }
 
     output$lastNed_tabFord <- downloadHandler(
@@ -963,10 +965,10 @@ server <- function(input, output,session) {
                         , full_width=F
                         , digits = c(0,0,1,0,0,1)[1:antKol]
       ) %>%
-        add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
-        column_spec(column = 1, width_min = '7em') %>%
-        column_spec(column = 2:(antKol+1), width = '7em') %>%
-        row_spec(0, bold = T)
+        kableExtra::add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
+        kableExtra::column_spec(column = 1, width_min = '7em') %>%
+        kableExtra::column_spec(column = 2:(antKol+1), width = '7em') %>%
+        kableExtra::row_spec(0, bold = T)
     }
     output$lastNed_tabAndelTid <- downloadHandler(
       filename = function(){
@@ -1018,9 +1020,9 @@ server <- function(input, output,session) {
                         #, full_width=T
                         , digits = c(0,0,1) #,0,1)[1:antKol]
       ) %>%
-        #column_spec(column = 1, width_min = '5em') %>%
-        column_spec(column = 1:(antKol+1), width = '5em') %>%
-        row_spec(0, bold = T)
+        #kableExtra::column_spec(column = 1, width_min = '5em') %>%
+        kableExtra::column_spec(column = 1:(antKol+1), width = '5em') %>%
+        kableExtra::row_spec(0, bold = T)
     }
     output$lastNed_tabAndelGrVar <- downloadHandler(
       filename = function(){
@@ -1113,7 +1115,7 @@ server <- function(input, output,session) {
     )
   )
   #test <- rygg::abonnementRygg(rnwFil="RyggMndRapp.Rnw", reshID=105460)
-  autoReportServer(
+  rapbase::autoReportServer(
     id = "RyggAbb", registryName = "rygg", type = "subscription",
     paramNames = paramNames, paramValues = paramValues, #org = orgAbb$value,
     reports = reports, orgs = orgs, eligible = TRUE
