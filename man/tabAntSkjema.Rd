@@ -4,21 +4,14 @@
 \alias{tabAntSkjema}
 \title{Hvor mange skjema av hver type (lege, pasient, oppfølging)}
 \usage{
-tabAntSkjema(
-  SkjemaOversikt,
-  datoFra = "2019-01-01",
-  datoTil = Sys.Date(),
-  skjemastatus = 1
-)
+tabAntSkjema(RegData, datoFra = "2019-01-01", datoTil = Sys.Date())
 }
 \arguments{
-\item{SkjemaOversikt}{Tabellen skjemaoversikt}
+\item{RegData}{Tabellen skjemaoversikt}
 
 \item{datoFra}{angi start for tidsperioden}
 
 \item{datoTil}{angi slutt for tidsperioden}
-
-\item{skjemastatus}{0: Kladd, 1:ferdigstilt}
 }
 \description{
 Tabell som viser oversikt over antall skjema av hver type. Kan velge kladd/ferdigstilt

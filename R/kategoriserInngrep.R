@@ -3,7 +3,7 @@
 #'
 #' @param RegData
 #'
-#' @return
+#' @return Variabler for inngrepskategorisering lagt til i RegData
 #' @export
 #'
 kategoriserInngrep <- function(RegData){

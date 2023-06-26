@@ -10,7 +10,7 @@ kategoriserInngrep(RegData)
 \item{RegData}{}
 }
 \value{
-
+Variabler for inngrepskategorisering lagt til i RegData
 }
 \description{
 Kategorisere inngrep og hovedinngrep av operasjoner

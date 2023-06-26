@@ -92,7 +92,8 @@ indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1
       #Degenerativ spondylolistese:
       if (is.element(10, hovedkat)) {indHovedInngr <- union(indHovedInngr,
                                                            intersect(which(RegData$LSSopr==1), which(RegData$RfSpondtypeDegen==1)))}
-      if (!(hovedkat %in% 0:10)) {indHovedInngr <- 1:Ninn}
+      #if (!(hovedkat %in% 0:10)) {indHovedInngr <- 1:Ninn}
+      if (length(intersect(hovedkat, 0:10))==0) {indHovedInngr <- 1:Ninn}
 
 indTidlOp <- if (tidlOp %in% 1:4) {which(RegData$TidlOpr==tidlOp)} else {indTidlOp <- 1:Ninn}
 indhastegrad <- if (hastegrad %in% 1:2) {

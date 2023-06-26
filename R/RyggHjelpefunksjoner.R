@@ -79,103 +79,6 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 }
 
 
-#' Generere data til Resultatportalen/SKDE-viser
-#'
-#' @param filUt tilnavn for utdatatabell (fjern?)
-#' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
-#' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
-#' @param ResPort 1-hvis data til resultatportalen , 0-data til SKDE-viser (standard)
-#' @inheritParams RyggUtvalgEnh
-#' @return Datafil til Resultatportalen
-#' @export
-
-dataTilOffVisning <- function(RegData = RegData, valgtVar, datoFra = '2011-01-01', aar=0, ktr=0,
-                           indID = 'indDummy', ResPort=0,
-                           hovedkat=99, hastegrad=99, tidlOp='', lastNedFil=0, filUt='dummy'){
-
-
-  filUt <- paste0('Rygg', ifelse(filUt=='dummy',  valgtVar, filUt), c('_SKDE', '_ResPort')[ResPort+1],'.csv')
-  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
-  RegData <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
-                              tidlOp=tidlOp, hovedkat=hovedkat)$RegData      #datoFra = datoFra) #) # #, datoTil=datoTil)
-
-  if (ResPort == 1){
-    #Variabler: Aar	ReshId	Teller Ind1	Nevner Ind1	  AarID	   Indikator
-    #          2014	103469	  0	          1	       2014103469	  ind1
-    RegDataUt <- RegData[,c('Aar', "ReshId", "ShNavn", "Variabel")]
-    RegDataUt<- dplyr::rename(RegDataUt, Teller = Variabel)
-    RegDataUt$AarID <- paste0(RegDataUt$Aar, RegDataUt$ReshId)
-    RegDataUt$Indikator <- indID
-    RegDataUt$Nevner <- 1
-  }
-
-  if (ResPort == 0){
-    #Variabler: year, orgnr, var, denominator, ind_id
-    RegDataUt <- RegData #[,c('Aar', "ReshId", "Variabel")]
-    RegDataUt$ind_id <- indID
-    RegDataUt$denominator <- 1
-  # nytt navn = gammelt navn
-    RegDataUt <- dplyr::rename(RegDataUt,
-                           year = Aar,
-                           var = Variabel)
-
-  #Legge på orgID ("Sykehusviser")
-  #ReshId	orgnr	RapporteketNavn	SKDEnavn
-  nyID <- c('999976' = '974706490',	#Ahus	Ahus
-            '107508' = '974518821',	#Aleris Bergen	Aleris Bergen
-            '107240' = '879595762',	#Aleris Drammen	Aleris Drammen
-            '999975' = '981541499',	#Aleris Oslo	Aleris Colosseum Nobel
-            '999994' = '983896383',	#Aleris Stavanger	Aleris Colosseum Stavanger
-            '100133' = '974631091',	#Arendal	Arendal
-            '100968' = '974795361',	#Bodø	Bodø
-            '103094' = '974705788',	#Bærum	Bærum
-            '103618' = '974631326',	#Drammen	Drammen
-            '111127' = '974631768',	#Elverum	Elverum
-            '100415' = '974595214',	#Flekkefjord	Flekkefjord
-            '100316' = '974744570',	#Førde	Førde
-            '111150' = '974632535',	#Gjøvik	Gjøvik
-            '999978' = '974724774',	#Haugesund	Haugesund
-            '105588' = '974557746',	#Haukeland, nevrokir	Haukeland
-            '111961' = '974557746',	#Haukeland, ort	Haukeland
-            '4209772' = '887987122',	#Ibsensykehuset	Ibsensykehuset Porsgrunn
-            '999900' = '920500234', #Kolibri Medical Group  Kolibri Sandnes
-            '100407' = '974733013',	#Kristiansand	Kristiansand
-            '111068' = '974746948',	#Kristiansund	Kristiansund
-            '102949' = '874743372',	#Kysthospitalet Hagevik	Kysthospitalet i Hagevik
-            '105798' = '974754118',	#Levanger	Levanger
-            '111185' = '874632562',	#Lillehammer	Lillehammer
-            '110633' = '974116588',	#Martina Hansens	Martina Hansens hospital
-            '111065' = '974745569',	#Molde	Molde
-            '105899' = '974753898',	#Namsos	Namsos
-            '104279' = '972140295',	#NIMI	NIMI
-            '999998' = '991835083',	#Oslofjordklinikken	Oslofjordklinikken Sandvika
-            '999920' = '913758862',	#Oslofjordklinikken Vest	Oslofjordklinikken Sandnes
-            '102224' = '974795515',	#Rana	Mo i Rana
-            '103469' = '874716782',	#Rikshospitalet, nevrokir	Rikshospitalet
-            '103240' = '874716782',	#Rikshospitalet, ort	Rikshospitalet
-            '1491' = '974633191',	#Skien	Skien
-            '105783' = '974749025',	#St.Olavs, nevrokir	St. Olavs
-            '102467' = '974749025',	#St.Olavs, ort	St. Olavs
-            '114288' = '974703300',	#Stavanger, nevrokir	Stavanger
-            '105403' = '974703300',	#Stavanger, ort	Stavanger
-            '601161' = '974795787',	#Tromsø	Tromsø
-            '105153' = '974633574',	#Larvik	Tønsberg
-            '109820' = '974589095',	#Ullevål, nevrokir	Ullevål
-            '999995' = '974589095',	#Ullevål, ort	Ullevål
-            '102484' = '974747545',	#Volda	Volda
-            '110771' = '953164701',	#Volvat	Volvat
-            '107981' = '974633655',	#Østfold	Askim
-            '102483' = '974747138'	#Ålesund	Ålesund
-  )
-  RegDataUt$orgnr <- as.character(nyID[as.character(RegDataUt$ReshId)])
-  RegDataUt <- RegDataUt[ ,c('year', 'orgnr', 'var', 'denominator', 'ind_id')]
-    }
-if (lastNedFil==1) {
-  write.table(RegDataUt, file = filUt, sep = ';', row.names = F)} #, fileEncoding = 'UTF-8')}
-  return(invisible(RegDataUt))
-}
-
-
 
 #' Beregn andel registrereinger som er ferdigstilt viss lang tid etter operasjon.
 #'
@@ -188,7 +91,7 @@ if (lastNedFil==1) {
 #' @param tilDato sluttdato for perioden en ønsker å se på
 #' @param forsinkelse minste antall dager fra operasjon til ferdigstillelse
 #' @param reshID Avdelingas reshID. Benyttes til å filtrere.
-#' @return
+#' @return registreringsforsinkelse
 #' @export
 forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID=0){
   RegData$Diff <- as.numeric(difftime(as.Date(RegData$MedForstLukket),
@@ -245,7 +148,7 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
   #                  reshId = reshID[[1]], msg = "Abonnement: månedsrapport")
 
   filbase <- substr(rnwFil, 1, nchar(rnwFil)-4)
-  tmpFile <- paste0(filbase, Sys.Date(),'_',digest::digest(brukernavn), '.Rnw')
+  tmpFile <- paste0(filbase, Sys.Date(),'_',digest::digest(reshID), '.Rnw')
   src <- normalizePath(system.file(rnwFil, package='rygg'))
   # gå til tempdir. Har ikke skriverettigheter i arbeidskatalog
   setwd(tempdir())
@@ -258,3 +161,158 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
   #                  reshId = reshID[[1]], msg = paste("Sendt: ", utfil))
   return(utfil)
 }
+
+
+
+#' Identifisere reoperasjoner
+#' Legger på operasjonsnummer(OpNr), tid til neste operasjon (DagerNesteOp)
+#' og identifiserer reoperasjoner innen 90 dager (Reop90dEtterOp)
+#'
+#' @param RegData
+#'
+#' @return Legger på operasjonsnummer, tid til neste og identifiserer reoperasjoner
+#' @export
+
+finnReoperasjoner <- function(RegData){
+
+  antPas <- length(names(table(RegData$PID)))
+RegDataSort <-RegData[order(RegData$PID, RegData$OpDato), ]
+
+N <- dim(RegData)[1]
+RegDataSort$OpNr <- ave(RegDataSort$PID, RegDataSort$PID, FUN=seq_along)
+indPasFlereOp <- which(RegDataSort$OpNr>1)
+RegDataSort$DagerNesteOp <- NA
+RegDataSort$DagerNesteOp[indPasFlereOp-1] <-
+  difftime(as.POSIXlt(RegDataSort$OpDato[indPasFlereOp], tz= 'UTC', format="%Y-%m-%d"),
+           as.POSIXlt(RegDataSort$OpDato[indPasFlereOp-1], tz= 'UTC', format="%Y-%m-%d"),
+           units = 'days')
+RegDataSort$Reop90dEtterOp <- 0
+indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d==1)
+RegDataSort$Reop90dEtterOp[indReop] <- 1
+# RegDataSort <-
+#   RegDataSort %>%
+#   dplyr::mutate(Reop2 =
+#            ifelse(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d,
+#                   1,0))
+
+# table(RegDataSort$Reop2)
+return(invisible(RegDataSort))
+}
+
+#' Generere data til SKDEs interaktive nettsider
+#' ODI er besvart ett år etter operasjon og resultatet vises for BESVARELSESÅR (Tenk over om skal filtrere på skjemadato eller ett år etter operasjonsdato.
+#' Det siste er kanskje best basert på konsistens og mulighet for sammenligning med resultater som har utvalg på operasjonsdato.)
+#' @param filUt tilnavn for utdatatabell. Hvis ikke angitt, lastes ikke fil ned
+#' @param valgtVar - beinsmLavPre, peropKompDura, sympVarighUtstr, p.t. 10 kvalitetsind.
+#' @param indID indikator-id, eks. 'ind1', 'ind2', osv.
+#' @param slaaSmToAar 0:nei (standard), 1:ja. Slår sammen resultater for to og to år, glidende. Dvs. 2021 viser resultat fra alle operasjoner i
+#' 2020 og 2021, mens 2020 viser for 2020 og 2019. De fleste indikatorer vises for to år (slaaSmToAar=1). I praksis dupliseres data for hvert år.
+#' @inheritParams RyggUtvalgEnh
+#' @return Datafil til Resultatportalen
+#' @export
+
+dataTilOffVisning <- function(RegData = RegData, valgtVar, aar=0, ktr=0,
+                              indID = 'indDummy', slaaSmToAar=0,
+                              hovedkat=99, hastegrad=99, tidlOp='', filUt='dummy'){
+
+if (ktr==2) {
+  #For 12-mnd.ktr. vil vi benytte det året pasientetn SVARTE
+  #RegData$Aar <- as.numeric(substr(RegData$Utfdato12mnd, 1, 4))
+  #NB: Utfdato finnes bare i V3. Mye feilregistrering/ekstremverdier i Utfdato12mnd
+  RegData$Aar <-RegData$Aar+1
+  }
+
+  RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar, ktr=ktr, figurtype = 'andelGrVar')
+  RegData <- RyggUtvalgEnh(RegData=RyggVarSpes$RegData, aar=aar, hastegrad = hastegrad,
+                           tidlOp=tidlOp, hovedkat=hovedkat)$RegData
+
+  RegDataUt <- RegData[,c('Aar', "ReshId", "Variabel")]
+
+  aarMed <- sort(unique(RegDataUt$Aar))
+  antAar <- length(aarMed)
+  if (slaaSmToAar==1 & antAar>1) { #duplisering av data
+    RegDataDupl <- RegDataUt[RegDataUt$Aar %in% aarMed[1:(antAar-1)], ]
+    RegDataDupl$Aar <- RegDataDupl$Aar+1
+    #table(RegDataDupl$Aar)
+    #table(RegDataUt$Aar)
+    RegDataUt <- rbind(RegDataUt[-which(RegDataUt$Aar == aarMed[1]), ], RegDataDupl)
+    #table(RegDataUt$Aar)
+  }
+
+  #Variabler: year, orgnr, var, denominator, ind_id
+  RegDataUt$ind_id <- indID
+  RegDataUt$denominator <- 1
+  # nytt navn = gammelt navn
+  RegDataUt <- dplyr::rename(RegDataUt,
+                             year = Aar,
+                             var = Variabel)
+
+  #Legge på orgID ("Sykehusviser") 943545634
+  #ReshId	orgnr	RapporteketNavn	SKDEnavn
+  nyID <- c('999976' = '974706490',	#Ahus	Ahus
+            '4211883' = '943545634', #Aleris Bodø
+            '107508' = '943545634',	#Aleris Bergen	Aleris Bergen
+            '107240' = '943545634',	#Aleris Drammen	Aleris Drammen
+            '107511' = '943545634',  #Aleris Oslo
+            '999975' = '943545634',	#Aleris Oslo	Aleris Colosseum Nobel
+            '999994' = '943545634',	#Aleris Stavanger	Aleris Colosseum Stavanger
+            '100133' = '974631091',	#Arendal	Arendal
+            '100968' = '974795361',	#Bodø	Bodø
+            '103094' = '974705788',	#Bærum	Bærum
+            '103618' = '974631326',	#Drammen	Drammen
+            '111127' = '974631768',	#Elverum	Elverum
+            '100415' = '974595214',	#Flekkefjord	Flekkefjord
+            '100316' = '974744570',	#Førde	Førde
+            '111150' = '974632535',	#Gjøvik	Gjøvik
+            '999978' = '974724774',	#Haugesund	Haugesund
+            '105588' = '974557746',	#Haukeland, nevrokir	Haukeland
+            '111961' = '974557746',	#Haukeland, ort	Haukeland
+            '4209772' = '887987122',	#Ibsensykehuset	Ibsensykehuset Porsgrunn
+            '999900' = '920500234', #Kolibri Medical Group  Kolibri Sandnes
+            '100407' = '974733013',	#Kristiansand	Kristiansand
+            '111068' = '974746948',	#Kristiansund	Kristiansund
+            '102949' = '874743372',	#Kysthospitalet Hagevik	Kysthospitalet i Hagevik
+            '105798' = '974754118',	#Levanger	Levanger
+            '111185' = '874632562',	#Lillehammer	Lillehammer
+            '4217275' = '924547715', #Majorstuen Spesialistsenter AS
+            '110633' = '974116588',	#Martina Hansens	Martina Hansens hospital
+            '111065' = '974745569',	#Molde	Molde
+            '105899' = '974753898',	#Namsos	Namsos
+            '104279' = '972140295',	#NIMI	NIMI
+            '999998' = '991835083',	#Oslofjordklinikken	Oslofjordklinikken Sandvika
+            '999920' = '913758862',	#Oslofjordklinikken Vest	Oslofjordklinikken Sandnes
+            '102224' = '974795515',	#Rana	Mo i Rana
+            '103469' = '874716782',	#Rikshospitalet, nevrokir	Rikshospitalet
+            '103240' = '874716782',	#Rikshospitalet, ort	Rikshospitalet
+            '1491' = '974633191',	#Skien	Skien
+            '105783' = '974749025',	#St.Olavs, nevrokir	St. Olavs
+            '102467' = '974749025',	#St.Olavs, ort	St. Olavs
+            '114288' = '974703300',	#Stavanger, nevrokir	Stavanger
+            '105403' = '974703300',	#Stavanger, ort	Stavanger
+            '601161' = '974795787',	#Tromsø	Tromsø
+            '105153' = '974633574',	#Larvik	Tønsberg
+            '109820' = '974589095',	#Ullevål, nevrokir	Ullevål
+            '999995' = '974589095',	#Ullevål, ort	Ullevål
+            '102484' = '974747545',	#Volda	Volda
+            '110771' = '953164701',	#Volvat	Volvat
+            '107981' = '974633655',	#Østfold	Askim
+            '102483' = '974747138'	#Ålesund	Ålesund
+  )
+
+
+  #---Jevnlig sjekk av om vi har nye resh:
+  # nye <- setdiff(unique(RegData$ReshId), names(nyID)) #length(unique(RegData$ReshId))
+  # RegData$ShNavn[match(nye, RegData$ReshId)]
+  # table(RegData[RegData$ReshId %in% nye, c('ShNavn', 'Aar')])
+
+  RegDataUt$orgnr <- as.character(nyID[as.character(RegDataUt$ReshId)])
+  RegDataUt <- RegDataUt[ ,c('year', 'orgnr', 'var', 'denominator', 'ind_id')]
+  RegDataUt$context <- 'caregiver'
+
+  if (filUt != 'dummy') {
+    filUt <- paste0('Rygg_', filUt, '.csv')
+    write.table(RegDataUt, file = filUt, sep = ';', row.names = F)} #, fileEncoding = 'UTF-8')}
+  return(invisible(RegDataUt))
+}
+
+

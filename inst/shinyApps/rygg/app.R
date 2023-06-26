@@ -1,40 +1,44 @@
 #library(magrittr)
-library(dplyr)
-library(kableExtra)
-library(knitr)
-library(lubridate)
-#ibrary(shinyBS) # Additional Bootstrap Controls
-library(rapbase)
+#library(dplyr)
+#library(kableExtra)
+#library(knitr)
+#library(lubridate)
+#library(rapbase)
 library(rygg)
-library(rapFigurer)
-library(shiny)
-library(shinyjs)
-#library(tools)
-library(zoo)
+#library(rapFigurer)
+#library(shiny)
+#library(shinyjs)
+#library(zoo)
 
 idag <- Sys.Date()
 startDato <- paste0(as.numeric(format(idag-120, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
-sluttDato <- idag
-datoTil <- as.POSIXlt(idag)
-datofra12 <- lubridate::floor_date(as.Date(datoTil)- months(12, abbreviate = T), unit='month')
-idag <- Sys.Date()
+#sluttDato <- idag
+#datoTil <- as.POSIXlt(idag)
+datofra12 <- lubridate::floor_date(as.Date(idag)- months(12, abbreviate = T), unit='month')
 
 # gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
 addResourcePath('rap', system.file('www', package='rapbase'))
 
-
-
 context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
 paaServer <- (context %in% c("DEV", "TEST", "QA", "PRODUCTION")) #rapbase::isRapContext()
-regTitle = ifelse(paaServer, 'NKR: Nasjonalt Kvalitetsregister for Ryggkirurgi',
+regTitle = ifelse(paaServer, 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi',
                   'Nasjonalt Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
 
 
 if (paaServer) {
   RegData <- RyggRegDataSQLV2V3()  #RyggRegDataSQL(alle = 1)
+  qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
+                    DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
+  ePROMadmTab <- rapbase::loadRegData(registryName="rygg", query=qEprom)
+  ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
+  ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
+#test <- ePROMadmTab$MCEID[intersect(ind3mndeprom, which(ePROMadmTab$STATUS==3))]
   qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
-  SkjemaOversikt <- rapbase::loadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
-  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, AvdodDato, BasisRegStatus from ForlopsOversikt'
+  SkjemaOversikt_orig <- rapbase::loadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
+  SkjemaOversikt <- merge(SkjemaOversikt_orig, ePROMadmTab,
+                          by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
+  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
+
   RegOversikt <- rapbase::loadRegData(registryName="rygg", query=qForlop, dbType="mysql")
   RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
 } else {
@@ -43,9 +47,6 @@ if (paaServer) {
 
 RegData <- RyggPreprosess(RegData = RegData)
 SkjemaOversikt <- dplyr::rename(.data=SkjemaOversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
-
-
-
 
 #Definere innhold i felles rullegardinmenyer:
 kjonn <- c("Begge"=2, "Menn"=1, "Kvinner"=0)
@@ -120,9 +121,6 @@ ui <- navbarPage(id = "tab1nivaa",
              tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color
              br(),
              br(),
-             #br(),
-             #br(),
-             #h4('Her Kan det komme nedlastbare dokumenter med samling av resultater'),
           br()
            ),
            mainPanel(
@@ -142,21 +140,14 @@ ui <- navbarPage(id = "tab1nivaa",
              h5('Gi gjerne innspill og tilbakemeldinger til registerledelsen vedrørende
                             innhold på Rapporteket'),
              br(),
-             #h2(paste("Drift og resultater, egen avdeling")), #,
              h2((uiOutput("egetShTxt"))),
-             # fluidRow(
-             #   h5('Registreringer siste år:'),
-             #   tableOutput("tabAntOpphEget")
-             # ),
              br(),
              fluidRow(
                column(4,
                h4('Antall skjema i kladd'),
                uiOutput("iKladdPas"),
                uiOutput("iKladdLege")
-               #h5(paste('Pasientskjema:', uiOutput("iKladdPas"))),
-               #h5(paste('Lengeskjema:', uiOutput("iKladdLege")))
-             ),
+              ),
              column(6,
                     h4('Registreringsforsinkelse'),
                     uiOutput('forSen3mnd'),
@@ -182,7 +173,7 @@ ui <- navbarPage(id = "tab1nivaa",
   tabPanel(p('Registreringsoversikter', title="Tabeller med registreringsoversikter"),
            value = 'Registreringsoversikter',
            sidebarPanel(width=3,
-                        h3('Valgmuligheter'),
+                        h3('Tabellvalg'),
                         conditionalPanel(condition = "input.ark == 'Antall operasjoner'",
                                          dateInput(inputId = 'sluttDatoReg', label = 'Velg sluttdato', language="nb",
                                                    value = Sys.Date(), max = Sys.Date() )
@@ -194,34 +185,34 @@ ui <- navbarPage(id = "tab1nivaa",
                         conditionalPanel(
                           condition = "input.ark == 'Antall skjema'",
                           dateRangeInput(inputId = 'datovalgReg', start = startDato, end = Sys.Date(),
-                                         label = "Tidsperiode", separator="t.o.m.", language="nb"),
-                          selectInput(inputId = 'skjemastatus', label='Velg skjemastatus',
-                                      choices = c("Ferdigstilt"=1,
-                                                  "Kladd"=0,
-                                                  "Åpen"=-1)
-                          )
+                                         label = "Tidsperiode", separator="t.o.m.", language="nb")
+                          # ,selectInput(inputId = 'skjemastatus', label='Velg skjemastatus'
+                          #             choices = c("Ferdigstilt"=1,
+                          #                         "Kladd"=0,
+                          #                         "Åpen"=-1)
                         ),
 
                         br(),
                         br(),
-                        h4('Last ned egne data'),
+                        h3('Last ned egne data'),
                         dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                                        label = "Tidsperiode", separator="t.o.m.", language="nb"),
+                        uiOutput('OppsumAntReg'),
+                        br(),
                         selectInput(inputId = 'velgReshReg', label='Velg sykehus',
                                     selected = 0,
                                     choices = sykehusValg),
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
                         br(),
                         br(),
-                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump, V2 og V3'),
+                        h5('Datadumpen inneholder alle variabler fra alle elektroniske versjoner av registeret (V.1-3)')
 
            ),
 
            mainPanel(
              tabsetPanel(id='ark',
                          tabPanel('Antall operasjoner',
-                                  uiOutput('OppsumAntReg'),
-                                  br(),
                                   uiOutput("undertittelReg"),
                                   p("Velg tidsperiode ved å velge sluttdato/tidsenhet i menyen til venstre"),
                                   br(),
@@ -249,60 +240,65 @@ ui <- navbarPage(id = "tab1nivaa",
     tabPanel(p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
              value = "Registeradministrasjon",
              h3('Egen side for registeradministratorer. Siden er bare synlig for SC-bruker'),
-           br(),
-           br(),
-           sidebarPanel(
-             h4('Lage abonnementslister for utsendinger'),
-             uiOutput("reportUts"),
-             uiOutput("freqUts"),
-             uiOutput("ReshUts"),
-             h5('E-postmottagere legges inn en og en. Trykk legg til e-postmottager for hver gang.
-                           Når du har lagt til alle, trykker du på lag utsending. '),
-             textInput("email", "Epostmottakere:"),
-             uiOutput("editEmail"),
-             htmlOutput("recipients"),
-             tags$hr(),
-             uiOutput("makeDispatchment"), #utsending
-             br(),
-             br(),
-             h3('Last ned data fra versjon 2.0:'),
-             downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
-             br(),
-             br(),
-             h4('Nedlasting av data til Resultatportalen:'),
-             h5('Fjernes eller erstattes av data til sykehusviser'),
+             tabsetPanel(
+               tabPanel(
+                 h4("Utsending av rapporter"),
+                 sidebarPanel(
+                   rapbase::autoReportOrgInput("RyggUtsending"),
+                   rapbase::autoReportInput("RyggUtsending")
+                 ),
+                 mainPanel(
+                   rapbase::autoReportUI("RyggUtsending")
+                 )
+                 #)
+               ), #Utsending-tab
 
-             selectInput(inputId = "valgtVarRes", label="Velg variabel",
-                         choices = c('Lite beinsmerter før operasjon' = 'beinsmLavPre',
-                                     'Durarift' = 'peropKompDura',
-                                     'Utstrålende smerter i mer enn ett år' = 'sympVarighUtstr')
-             ),
-             selectInput(inputId = 'hovedInngrepRes', label='Hovedinngrepstype',
-                         choices = hovedkatValg
-             ),selectInput(inputId = 'hastegradRes', label='Operasjonskategori (hastegrad)',
-                         choices = hastegradValg
-             ),
-             selectInput(inputId = 'tidlOpRes', label='Tidligere operert?',
-                         choices = tidlOprValg
-             ),
-             # dateRangeInput(inputId = 'aarRes', start = startDato, end = Sys.Date(),
-             #                label = "Operasjonaår", separator="t.o.m.", language="nb", format = 'yyyy'
-             #                ),
-             sliderInput(inputId="aarRes", label = "Operasjonsår",
-                         min = as.numeric(2007), max = as.numeric(year(idag)),
-                         value = c(2018, year(idag)),
-                         step=1, sep=""
-             ),
-             br(),
-             downloadButton(outputId = 'lastNed_dataTilResPort', label='Last ned data'),
-     ),
+               shiny::tabPanel(
+                 "Datakvalitet",
+                 #shiny::sidebarLayout(
+                 sidebarPanel(
+                   numericInput(inputId = 'valgtTidsavvik',
+                                label = 'Dager mellom registrerte operasjoner:',
+                                value = 30,
+                                min = 0,
+                                max = NA,
+                                step = 1
+                                , width = '100px'
+                   ),
+                   br(),
+                   br(),
+                   h3('Last ned data fra versjon 2.0:'),
+                   downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
+                   br(),
 
-mainPanel(
-  uiOutput("dispatchmentContent")
-)
+                 ),
+                 mainPanel(
+                   h3('Potensielle dobbeltregistreringer'),
+                   br(),
+                   h4('Funksjonen finner alle PID med to operasjoner gjort med valgt tidsintervall eller kortere. I tabellen
+                       vises alle operasjoner for de aktuelle pasientene.'),
+                   downloadButton(outputId = 'lastNed_tabDblReg', label='Last ned tabell med mulige dobbeltregistreringer'),
+                   br(),
 
 
-  ), #tab SC
+                   tableOutput("tabDblReg")
+                 )
+               ), #Datakvalitet-tab
+
+                 shiny::tabPanel(
+                   "Eksport",
+                   #shiny::sidebarLayout(
+                     shiny::sidebarPanel(
+                       rapbase::exportUCInput("ryggExport")
+                     ),
+                     shiny::mainPanel(
+                       rapbase::exportGuideUI("ryggExportGuide")
+                     )
+                   #)
+                 ) #Eksport-tab
+               ) #tabsetPanel
+), #Registeradm-tab
+
 
 #-------------Fordelinger---------------------
 tabPanel(p('Fordelinger',
@@ -425,18 +421,19 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
 
            selectInput(
              inputId = "valgtVarAndel", label="Velg variabel",
-             choices = c('Kval.ind: For sen registrering' = 'regForsinkelse',
+             choices = c('Kval.ind: Degen. spond, fusj. ved første operasjon' = 'degSponFusj1op',
                          'Kval.ind: Lite beinsmerter, ingen parese' = 'smBePreLav',
-                         'Kval.ind: Trygg kirurgi-prosedyre utført' = 'tryggKir',
-                         'Kval.ind: Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
+                         'Kval.ind: Tromboseprofylakse ved lett kirurig' = 'trombProfylLettKI',
                          'Kval.ind: Ventetid < 3 mnd. fra op. bestemt til utført' = 'ventetidSpesOp',
                          'Alder over 70 år' = 'alder70',
                          'Antibiotika' = 'antibiotika',
                          'Arbeidsstatus' = 'arbstatus',
                          'ASA-grad > II' = 'ASA',
                          'Degen. spondy. op. m/fusjon' = 'degSponFusj',
+                         'Degen. spondy. 1. op. m/fusjon' = 'degSponFusj1op',
                          'Fedme (BMI>30)' = 'BMI',
                          'Flere enn to tidligere operasjoner' = 'tidlOp3',
+                         'For sen registrering' = 'regForsinkelse',
                          'Forbedring av Oswestry-skår >= 20p' = 'OswEndr20',
                          'Fornøyde pasienter' = 'fornoydhet',
                          'Fremmedspråklig' = 'morsmal',
@@ -444,21 +441,28 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Har degen. spondy. og spin.stenose' = 'degSponSSSten',
                          'Helt bra eller mye bedre' = 'nytte',
                          'Høyere utdanning' = 'utd',
+                         'Komplikasjon, sårinfeksjon' = 'kpInf3mnd',
                          'Komplikasjoner ved operasjon' = 'peropKomp',
                          'Komplikasjon ved op.: Durarift' = 'peropKompDura',
                          'Misfornøyde pasienter' = 'misfornoyd',
                          'Minst 30% forbedring av Oswestry-skår' = 'OswEndr30pst',
                          'Mye verre/verre enn noen gang' = 'verre',
+                         'Oppfølging, 3 mnd.' = 'oppf3mnd',
+                         'Oppfølging, 12 mnd.' = 'oppf12mnd',
+                         'Oppfølging, 3 og 12 mnd.' = 'oppf3og12mnd',
                          'Oswestry-skår < 23 poeng' = 'Osw22',
                          'Oswestry-skår > 48 poeng' = 'Osw48',
                          'Røykere' = 'roker',
                          'Smertestillende før operasjon' = 'smStiPre',
-                         'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
-                        'Søkt erstatning før operasjon' = 'erstatningPre',
+                         'Søkt erstatning før operasjon' = 'erstatningPre',
                         'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                         'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl',
+                        'Trygg kirurgi-prosedyre utført' = 'tryggKir',
+                        'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',
+                        'Varighet av utstrålende smerter >1 år' = 'sympVarighUtstr',
                         'Ventetid fra henvisning til time på poliklinikk' = 'ventetidHenvTimePol'
-             )
+             ),
+             selected = 'regForsinkelse'
            ),
            #uiOutput("datovalgAndel"),
            dateRangeInput(inputId = 'datovalgAndel', start = startDato, end = idag,
@@ -527,28 +531,23 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
 
 #------------------Abonnement-------------------------
 
+#----------Abonnement-----------------
+
 tabPanel(p("Abonnement",
            title='Bestill automatisk utsending av rapporter på e-post'),
+         value = 'Abonnement',
+
          sidebarLayout(
-           sidebarPanel(width = 3,
-                        selectInput("subscriptionRep", "Rapport:",
-                                    c("Kvartalsrapport")), #, "Samlerapport", "Influensaresultater")),
-                        selectInput("subscriptionFreq", "Frekvens:",
-                                    list(Årlig="Årlig-year",
-                                          Kvartalsvis="Kvartalsvis-quarter",
-                                          Månedlig="Månedlig-month",
-                                          Ukentlig="Ukentlig-week",
-                                          Daglig="Daglig-DSTday"),
-                                    selected = "Månedlig-month"),
-                        #selectInput("subscriptionFileFormat", "Format:",
-                        #            c("html", "pdf")),
-                        actionButton("subscribe", "Bestill!")
+           sidebarPanel(
+             rapbase::autoReportInput("RyggAbb")
            ),
-           mainPanel(
-             uiOutput("subscriptionContent")
+           shiny::mainPanel(
+             rapbase::autoReportUI("RyggAbb")
            )
          )
-)
+) #tab abonnement
+
+
 
 ) #fluidpage, dvs. alt som vises på skjermen
 
@@ -556,13 +555,14 @@ tabPanel(p("Abonnement",
 #----------------- Define server logic required  -----------------------
 server <- function(input, output,session) {
 
-  raplog::appLogger(session, msg = 'Starter Rapporteket-Rygg')
+  rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
   #reshID <- reactive({ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)),
   #                           601161)})
   reshID <- ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)), 601161)
   output$reshID <- renderText(reshID)
   #rolle <- reactive({ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'SC')})
   rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
+  rolle <- ifelse(rolle %in% c('LU', 'SC'), rolle, 'LU')
   output$rolle <- renderText(rolle)
   brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
   output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(reshID, RegData$ReshId)]))
@@ -627,14 +627,14 @@ server <- function(input, output,session) {
                       full_width=F,
                       digits = c(0,0,1,1,1,1,0)
     ) %>%
-      column_spec(column = 1, width_min = '5em', width_max = '10em') %>%
-      column_spec(column = 2:(ncol(tab)), width = '7em')  %>%
-      row_spec(0, bold = T, align = 'c') %>%
-      kable_styling(full_width = FALSE, position = 'left') #"hover",
+      kableExtra::column_spec(column = 1, width_min = '5em', width_max = '10em') %>%
+      kableExtra::column_spec(column = 2:(ncol(tab)), width = '7em')  %>%
+      kableExtra::row_spec(0, bold = T, align = 'c') %>%
+      kableExtra::kable_styling(full_width = FALSE, position = 'left') #"hover",
   }
 
     output$tabAntOpphEget <- renderTable(
-      tabAntOpphShMnd(RegData=RegData, datoTil=datoTil, reshID = reshID, antMnd=12)
+      tabAntOpphShMnd(RegData=RegData, datoTil=idag, reshID = reshID, antMnd=12)
       ,rownames = T, digits=0, spacing="xs" )
 
     #-------Samlerapporter--------------------
@@ -651,7 +651,7 @@ server <- function(input, output,session) {
 
 #------Registreringsoversikter---------------------
     output$OppsumAntReg <- renderUI({
-      Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PasientID']
+      Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PID']
       antallReg <- length(Registreringer)
       antallPers <- length(unique(Registreringer))
       HTML(paste0('<b> I perioden ',format.Date(input$datovalgRegKtr[1], '%d. %B %Y'), ' - ', format.Date(input$datovalgRegKtr[2], '%d. %B %Y'),
@@ -675,14 +675,12 @@ server <- function(input, output,session) {
     t1 <- 'Tabellen viser operasjoner '
     h4(HTML(switch(input$tidsenhetReg, #undertittel <-
                    Mnd = paste0(t1, 'siste 12 måneder før ', input$sluttDatoReg, '<br />'),
-                   Aar = paste0(t1, 'per år til og med ', valgtAar, '<br />'))
+                   Aar = paste0(t1, 'per år til og med ', input$sluttDatoReg, '<br />'))
     ))})
 
-  #RegData som har tilknyttede skjema av ulik type. Fra NGER!
-  AntSkjemaAvHver <- tabAntSkjema(SkjemaOversikt=SkjemaOversikt, datoFra = input$datovalgReg[1], datoTil=input$datovalgReg[2],
-                                  skjemastatus=as.numeric(input$skjemastatus))
-  tabAntSkjema(SkjemaOversikt)
-
+  AntSkjemaAvHver <- tabAntSkjema(RegData=RegData,
+                                  datoFra = input$datovalgReg[1], datoTil=input$datovalgReg[2])
+                                  #skjemastatus=as.numeric(input$skjemastatus))
   output$tabAntSkjema <- renderTable(AntSkjemaAvHver
                                      ,rownames = T, digits=0, spacing="xs" )
   output$lastNed_tabAntSkjema <- downloadHandler(
@@ -690,9 +688,6 @@ server <- function(input, output,session) {
     content = function(file, filename){write.csv2(AntSkjemaAvHver, file, row.names = T, fileEncoding = 'latin1', na = '')})
     })
 
-
-  # #Velge ferdigstillelse og tidsintervall.
-  # output$tabAntSkjema <- renderTable({})
 
 # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
   tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
@@ -707,16 +702,33 @@ server <- function(input, output,session) {
       } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
       data <- data[ind,]
     } else {
+      #variablePRM <- 'variable som skal fjernes hvis lastes ned av avdeling'
+      #Foreløpig ikke def siden oppf.skjema ikke med i dump. Dump bare for SC.
       data <- data[which(data$ReshId == reshID), ]}
+
+    #Legg til ledende 0 i V2
+    indUten0 <- which(nchar(data$Personnummer)==10)
+    data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])
+
+    #Entydig PID
+    tidlPersNr <- intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
+    tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA)
+    hvilkePas <- which(tidlPas>0)
+    data$PID[hvilkePas] <- data$PID[tidlPas[hvilkePas]]
+
+    #SSN i en variabel
+    fraV3 <- which(is.na(data$Personnummer))
+    data$Personnummer[fraV3] <- data$SSN[fraV3]
+
     return(data)
   }
 
   observe({
     reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
-    uiOutput({
-
-    })
+    # uiOutput({
+    #
+    # })
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
                                 as.Date(InnDato) >= input$datovalgRegKtr[1],
                                 as.Date(InnDato) <= input$datovalgRegKtr[2])
@@ -726,25 +738,17 @@ server <- function(input, output,session) {
     content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
 
-  variablePRM <- 'variable som skal fjernes hvis lastes ned av avdeling'
-  #Foreløpig ikke def siden oppf.skjema ikke med i dump. Dump bare for SC.
-  # observe({
-  #   DataDump <- dplyr::filter(RegData,
-  #                             as.Date(HovedDato) >= input$datovalgRegKtr[1],
-  #                             as.Date(HovedDato) <= input$datovalgRegKtr[2])
-  #   tabDataDump <- if (rolle == 'SC') {
-  #     valgtResh <- as.numeric(input$velgReshReg)
-  #     ind <- if (valgtResh == 0) {1:dim(DataDump)[1]
-  #     } else {which(as.numeric(DataDump$ReshId) %in% as.numeric(valgtResh))}
-  #     DataDump[ind,]
-  #   } #else {
-  #     #DataDump[which(DataDump$ReshId == reshID), -variablePRM]} #Tar bort PROM/PREM til egen avdeling
-
-  RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV3=1)
-    #rapbase::loadRegData(registryName="rygg", query='SELECT * FROM AlleVarNum')
+  RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1)
   RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
+  fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
+                 "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
+                 "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
+  RegDataV2V3 <- RegDataV2V3[ ,-which(names(RegDataV2V3) %in% fritxtVar)]
   dataDump <- tilretteleggDataDumper(data=RegDataV2V3, datovalg = input$datovalgRegKtr,
                                      reshID=input$velgReshReg, rolle = rolle)
+  dataDump <- finnReoperasjoner(RegData = dataDump)
+
+
   output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
@@ -758,19 +762,41 @@ server <- function(input, output,session) {
 #-----------Registeradministrasjon-----------
 
   if (rolle=='SC') {
+  # observe({
+  #   tabdataTilResPort <- dataTilOffVisning(RegData=RegData, valgtVar = input$valgtVarRes,
+  #                                       hovedkat = as.numeric(input$hovedInngrepRes),
+  #                                       aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
+  #                                       hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
+  #
+  #   output$lastNed_dataTilResPort <- downloadHandler(
+  #     filename = function(){'dataTilResPort.csv'},
+  #     content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, fileEncoding = 'latin1', na = '')})
+  #
+  #
+  # })
+  }
+
+#Datakvalitet (dobbeltregistreringer)
   observe({
-    tabdataTilResPort <- dataTilOffVisning(RegData=RegData, valgtVar = input$valgtVarRes,
-                                        hovedkat = as.numeric(input$hovedInngrepRes),
-                                        aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
-                                        hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
+    tabDblReg <- tabPasMdblReg(RegData=RegData, tidsavvik=input$valgtTidsavvik)
+    output$tabDblReg <- renderTable(tabDblReg, digits=0)
 
-    output$lastNed_dataTilResPort <- downloadHandler(
-      filename = function(){'dataTilResPort.csv'},
-      content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, fileEncoding = 'latin1', na = '')})
-
-
+    output$lastNed_tabDblReg <- downloadHandler(
+      filename = function(){paste0('MuligeDobbeltReg.csv')},
+      content = function(file, filename){write.csv2(tabDblReg, file, row.names = F, fileEncoding = 'latin1', na = '')})
   })
-}
+
+  #----------- Eksport ----------------
+  registryName <- "rygg"
+  ## brukerkontroller
+  rapbase::exportUCServer("ryggExport", registryName)
+  ## veileding
+  rapbase::exportGuideServer("ryggExportGuide", registryName)
+
+
+
+
+
 #------------Fordelinger---------------------
 
   observeEvent(input$reset, {
@@ -844,11 +870,11 @@ server <- function(input, output,session) {
                         , full_width=F
                         , digits = c(0,0,1,0,0,1)[1:antKol]
       ) %>%
-        add_header_above(kolGruppering[1:(2+UtDataFord$medSml)]) %>%
-        #add_header_above(c(" "=1, tittelKolGr[1] = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
-        column_spec(column = 1, width='5em') %>% #width_min = '3em', width_max = '10em') %>%
-        column_spec(column = 2:(ncol(tabFord)+1), width = '7em') %>%
-        row_spec(0, bold = T)
+        kableExtra::add_header_above(kolGruppering[1:(2+UtDataFord$medSml)]) %>%
+        #kableExtra::add_header_above(c(" "=1, tittelKolGr[1] = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
+        kableExtra::column_spec(column = 1, width='5em') %>% #width_min = '3em', width_max = '10em') %>%
+        kableExtra::column_spec(column = 2:(ncol(tabFord)+1), width = '7em') %>%
+        kableExtra::row_spec(0, bold = T)
     }
 
     output$lastNed_tabFord <- downloadHandler(
@@ -940,10 +966,10 @@ server <- function(input, output,session) {
                         , full_width=F
                         , digits = c(0,0,1,0,0,1)[1:antKol]
       ) %>%
-        add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
-        column_spec(column = 1, width_min = '7em') %>%
-        column_spec(column = 2:(antKol+1), width = '7em') %>%
-        row_spec(0, bold = T)
+        kableExtra::add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
+        kableExtra::column_spec(column = 1, width_min = '7em') %>%
+        kableExtra::column_spec(column = 2:(antKol+1), width = '7em') %>%
+        kableExtra::row_spec(0, bold = T)
     }
     output$lastNed_tabAndelTid <- downloadHandler(
       filename = function(){
@@ -995,9 +1021,9 @@ server <- function(input, output,session) {
                         #, full_width=T
                         , digits = c(0,0,1) #,0,1)[1:antKol]
       ) %>%
-        #column_spec(column = 1, width_min = '5em') %>%
-        column_spec(column = 1:(antKol+1), width = '5em') %>%
-        row_spec(0, bold = T)
+        #kableExtra::column_spec(column = 1, width_min = '5em') %>%
+        kableExtra::column_spec(column = 1:(antKol+1), width = '5em') %>%
+        kableExtra::row_spec(0, bold = T)
     }
     output$lastNed_tabAndelGrVar <- downloadHandler(
       filename = function(){
@@ -1016,290 +1042,279 @@ server <- function(input, output,session) {
 
 
     #------------------ Abonnement ----------------------------------------------
-  ## reaktive verdier for å holde rede på endringer som skjer mens
-  ## applikasjonen kjører
-  # rv <- reactiveValues(
-  #   subscriptionTab = rapbase::makeUserSubscriptionTab(session))
-  #
-  #
+  # ## reaktive verdier for å holde rede på endringer som skjer mens
+  # ## applikasjonen kjører
+  # subscription <- reactiveValues(
+  #   tab = rapbase::makeAutoReportTab(session, type = "subscription"))
   # ## lag tabell over gjeldende status for abonnement
   # output$activeSubscriptions <- DT::renderDataTable(
-  #   rv$subscriptionTab, server = FALSE, escape = FALSE, selection = 'none',
-  #   rownames = FALSE, options = list(dom = 't')
+  #   subscription$tab, server = FALSE, escape = FALSE, selection = 'none',
+  #   options = list(dom = 'tp', ordning = FALSE,
+  #                  columnDefs = list(list(visible = FALSE, targets = 6))), #Fjerner kolonne
+  #   rownames = FALSE
   # )
-
-  ## reaktive verdier for å holde rede på endringer som skjer mens
-  ## applikasjonen kjører
-  subscription <- reactiveValues(
-    tab = rapbase::makeAutoReportTab(session, type = "subscription"))
-  ## lag tabell over gjeldende status for abonnement
-  output$activeSubscriptions <- DT::renderDataTable(
-    subscription$tab, server = FALSE, escape = FALSE, selection = 'none',
-    options = list(dom = 'tp', ordning = FALSE,
-                   columnDefs = list(list(visible = FALSE, targets = 6))), #Fjerner kolonne
-    rownames = FALSE
-  )
-
-
-  ## lag side som viser status for abonnement, også når det ikke finnes noen
+  #
+  #
+  # ## lag side som viser status for abonnement, også når det ikke finnes noen
   # output$subscriptionContent <- renderUI({
-  #   fullName <- rapbase::getUserFullName(session)
-  #   if (length(rv$subscriptionTab) == 0) {
-  #     p(paste("Ingen aktive abonnement for", fullName))
+  #   userFullName <- rapbase::getUserFullName(session)
+  #   userEmail <- rapbase::getUserEmail(session)
+  #   if (length(subscription$tab) == 0) {
+  #     p(paste("Ingen aktive abonnement for", userFullName))
   #   } else {
   #     tagList(
-  #       p(paste("Aktive abonnement for", fullName, "som sendes per epost til ",
-  #               rapbase::getUserEmail(session), ":")),
+  #       p(paste0("Aktive abonnement som sendes per epost til ", userFullName,
+  #                ":")),
   #       DT::dataTableOutput("activeSubscriptions")
   #     )
   #   }
   # })
-  ## lag side som viser status for abonnement, også når det ikke finnes noen
-  output$subscriptionContent <- renderUI({
-    userFullName <- rapbase::getUserFullName(session)
-    userEmail <- rapbase::getUserEmail(session)
-    if (length(subscription$tab) == 0) {
-      p(paste("Ingen aktive abonnement for", userFullName))
-    } else {
-      tagList(
-        p(paste0("Aktive abonnement som sendes per epost til ", userFullName,
-                 ":")),
-        DT::dataTableOutput("activeSubscriptions")
-      )
-    }
-  })
-
-  ## nye abonnement
-  observeEvent (input$subscribe, { #MÅ HA
-    owner <- rapbase::getUserName(session)
-    interval <- strsplit(input$subscriptionFreq, "-")[[1]][2]
-    intervalName <- strsplit(input$subscriptionFreq, "-")[[1]][1]
-    organization <- rapbase::getUserReshId(session)
-    runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
-    email <- rapbase::getUserEmail(session)
-    if (input$subscriptionRep == "Kvartalsrapport") {
-      synopsis <- "rygg/Rapporteket: kvartalsrapport"
-      rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
-      #print(rnwFil)
-    }
-
-    fun <- "abonnementRygg"  #"henteSamlerapporter"
-    paramNames <- c('rnwFil', 'brukernavn', "reshID")
-    paramValues <- c(rnwFil, brukernavn, reshID) #input$subscriptionFileFormat)
-
-    #abonnementRygg(rnwFil = 'RyggMndRapp.Rnw', brukernavn='hei', reshID=601161, datoTil=Sys.Date())
-
-    rapbase::createAutoReport(synopsis = synopsis, package = 'rygg',
-                              fun = fun, paramNames = paramNames,
-                              paramValues = paramValues, owner = owner,
-                              email = email, organization = organization,
-                              runDayOfYear = runDayOfYear, interval = interval,
-                              intervalName = intervalName)
-    #rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
-    subscription$tab <-
-      rapbase::makeAutoReportTab(session, type = "subscription")
-  })
-
-  # ## slett eksisterende abonnement
-  # observeEvent(input$del_button, {
-  #   selectedRepId <- strsplit(input$del_button, "_")[[1]][2]
-  #   rapbase::deleteAutoReport(selectedRepId)
-  #   rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  #
+  # ## nye abonnement
+  # observeEvent (input$subscribe, { #MÅ HA
+  #   owner <- rapbase::getUserName(session)
+  #   interval <- strsplit(input$subscriptionFreq, "-")[[1]][2]
+  #   intervalName <- strsplit(input$subscriptionFreq, "-")[[1]][1]
+  #   organization <- rapbase::getUserReshId(session)
+  #   runDayOfYear <- rapbase::makeRunDayOfYearSequence(interval = interval)
+  #   email <- rapbase::getUserEmail(session)
+  #   if (input$subscriptionRep == "Kvartalsrapport") {
+  #     synopsis <- "rygg/Rapporteket: kvartalsrapport"
+  #     rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
+  #     #print(rnwFil)
+  #   }
+  #
+  #   fun <- "abonnementRygg"  #"henteSamlerapporter"
+  #   paramNames <- c('rnwFil', 'brukernavn', "reshID")
+  #   paramValues <- c(rnwFil, brukernavn, reshID) #input$subscriptionFileFormat)
+  #
+  #   #abonnementRygg(rnwFil = 'RyggMndRapp.Rnw', brukernavn='hei', reshID=601161, datoTil=Sys.Date())
+  #
+  #   rapbase::createAutoReport(synopsis = synopsis, package = 'rygg',
+  #                             fun = fun, paramNames = paramNames,
+  #                             paramValues = paramValues, owner = owner,
+  #                             email = email, organization = organization,
+  #                             runDayOfYear = runDayOfYear, interval = interval,
+  #                             intervalName = intervalName)
+  #   #rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)
+  #   subscription$tab <-
+  #     rapbase::makeAutoReportTab(session, type = "subscription")
   # })
 
+  #------------------ Abonnement ----------------------------------------------
+
+  #--------Start modul, abonnement
+  orgs <- as.list(sykehusValg[-1])
+
+  ## make a list for report metadata
+  reports <- list(
+    Kvartalsrapp = list(
+      synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
+      fun = "abonnementRygg", #Lag egen funksjon for utsending
+      paramNames = c('rnwFil', 'reshID', 'brukernavn'),
+      paramValues = c('RyggMndRapp.Rnw', reshID, brukernavn) #'Alle')
+    )
+  )
+  #test <- rygg::abonnementRygg(rnwFil="RyggMndRapp.Rnw", reshID=105460)
+  rapbase::autoReportServer(
+    id = "RyggAbb", registryName = "rygg", type = "subscription",
+    paramNames = paramNames, paramValues = paramValues, #org = orgAbb$value,
+    reports = reports, orgs = orgs, eligible = TRUE
+  )
+
+
+  #-----Utsendinger (kok fra NGER)
+
+  if (rolle=='SC') {
+
+    ## liste med metadata for rapport
+    reports <- list(
+      KvartalsRapp = list(
+        synopsis = "Rapporteket-Degenerativ Rygg: Kvartalsrapport",
+        fun = "abonnementRygg",
+        paramNames = c('rnwFil', "reshID"),
+        paramValues = c('RyggMndRapp.Rnw', 0)
+      )
+    )
+
+    org <- rapbase::autoReportOrgServer("RyggUtsending", orgs)
+
+    # oppdatere reaktive parametre, for å få inn valgte verdier (overskrive de i report-lista)
+    paramNames <- shiny::reactive("reshID")
+    paramValues <- shiny::reactive(org$value())
+
+    rapbase::autoReportServer(
+      id = "RyggUtsending", registryName = "rygg", type = "dispatchment",
+      org = org$value, paramNames = paramNames, paramValues = paramValues,
+      reports = reports, orgs = orgs, eligible = TRUE
+    )
+
+}
 
   #----- Utsending -----------------
   ## reaktive verdier for å holde rede på endringer som skjer mens
   ## applikasjonen kjører
-  dispatchment <- reactiveValues(
-    tab = rapbase::makeAutoReportTab(session = session, type = "dispatchment"),
-    report = "RyggMndRapp",
-    freq = "Månedlig-month",
-    email = vector()
-  )
-  ## observér og foreta endringer mens applikasjonen kjører
-  observeEvent(input$addEmail, {
-    dispatchment$email <- c(dispatchment$email, input$email)
-  })
-  observeEvent(input$delEmail, {
-    dispatchment$email <-
-      dispatchment$email[!dispatchment$email == input$email]
-  })
-  observeEvent (input$dispatch, {
-    package <- "rygg"
-    type <- "dispatchment"
-    owner <- rapbase::getUserName(session)
-    ownerName <- rapbase::getUserFullName(session)
-    interval <- strsplit(input$dispatchmentFreq, "-")[[1]][2]
-    intervalName <- strsplit(input$dispatchmentFreq, "-")[[1]][1]
-    runDayOfYear <- rapbase::makeRunDayOfYearSequence(
-      interval = interval)
-
-    email <- dispatchment$email
-
-    # fun <- "abonnementRygg"  #"henteSamlerapporter"
-
-    if (input$dispatchmentRep == "Kvartalsrapport") {
-      synopsis <- "Kvartalsrapport, Rygg"
-      fun <- "abonnementRygg"
-      rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
-      reshIDuts <- input$dispatchmentResh
-      organization <- reshIDuts #rapbase::getUserReshId(session)
-      #print(reshIDuts)
-      indReshUts <- match(reshIDuts, RegData$ReshId) #Velger sykehusresh
-      paramNames <- c('rnwFil', 'brukernavn', "reshID")
-      paramValues <- c(rnwFil, brukernavn, reshIDuts)
-    }
-
-    rapbase::createAutoReport(synopsis = synopsis, package = package,
-                              type = type, fun = fun, paramNames = paramNames,
-                              paramValues = paramValues, owner = owner,
-                              ownerName = ownerName,
-                              email = email, organization = organization,
-                              runDayOfYear = runDayOfYear,
-                              interval = interval, intervalName = intervalName)
-    dispatchment$tab <- rapbase::makeAutoReportTab(session, type = "dispatchment")
-    test <- dimnames(dispatchment$tab)
-    # print(test[[]])
-    # print(attributes(dispatchment$tab))
-    #Author DataFlair
-
-    alleAutorapporter <- rapbase::readAutoReportData()
-    egneUts <-  rapbase::filterAutoRep(
-      rapbase::filterAutoRep(alleAutorapporter, by = 'package', pass = 'rygg'),
-      by = 'type', pass = 'dispatchment')
-
-    # ider <- names(egneUts)
-    # roller <- egneUts[[1]][['params']][[6]]$rolle
-    # for (k in 2:length(ider)) {
-    #   roller <- c(roller, egneUts[[k]][['params']][[6]]$rolle)
-    # }
-    # koblRoller <- cbind(ID = ider,
-    #                     roller = roller)
-
-    dispatchment$email <- vector()
-  })
-
-
-  ## ui: velg rapport
-  output$reportUts <- renderUI({
-    selectInput("dispatchmentRep", "Rapport:",
-                c("Kvartalsrapport"),
-                selected = dispatchment$report)
-  })
-  ## ui: velg rolle
-  # output$rolleUts <- renderUI({
-  #   selectInput("dispatchmentRole", "Rolle/nivå:",
-  #               c("LU", "LC", "SC"),
-  #               selected = dispatchment$rolle)
+  # dispatchment <- reactiveValues(
+  #   tab = rapbase::makeAutoReportTab(session = session, type = "dispatchment"),
+  #   report = "RyggMndRapp",
+  #   freq = "Månedlig-month",
+  #   email = vector()
+  # )
+  # ## observér og foreta endringer mens applikasjonen kjører
+  # observeEvent(input$addEmail, {
+  #   dispatchment$email <- c(dispatchment$email, input$email)
   # })
-  ## ui: velg enhet
-  output$ReshUts <- renderUI({
-    selectInput("dispatchmentResh", "Avdelingstilhørighet:",
-                sykehusValg[-1],
-                selected = dispatchment$Resh)
-  })
-
-  ## ui: velg frekvens
-  output$freqUts <- renderUI({
-    selectInput("dispatchmentFreq", "Frekvens:",
-                list(Årlig = "Årlig-year",
-                      Kvartalsvis = "Kvartalsvis-quarter",
-                      Månedlig = "Månedlig-month",
-                      Ukentlig = "Ukentlig-week",
-                      Daglig = "Daglig-DSTday"),
-                selected = dispatchment$freq)
-  })
-
-  ## ui: legg til gyldig- og slett epost
-  output$editEmail <- renderUI({
-    if (!grepl("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
-               input$email)) {
-      tags$p("Angi mottaker over")
-    } else {
-      if (input$email %in% dispatchment$email) {
-        actionButton("delEmail", "Slett epostmottaker",
-                     icon = shiny::icon("trash"))
-      } else {
-        actionButton("addEmail", "Legg til epostmottaker",
-                     icon = shiny::icon("pencil"))
-      }
-    }
-  })
-
-  ## ui: vis valgte mottakere
-  output$recipients <- renderText(paste(dispatchment$email, sep = "<br>"))
+  # observeEvent(input$delEmail, {
+  #   dispatchment$email <-
+  #     dispatchment$email[!dispatchment$email == input$email]
+  # })
+  # observeEvent (input$dispatch, {
+  #   package <- "rygg"
+  #   type <- "dispatchment"
+  #   owner <- rapbase::getUserName(session)
+  #   ownerName <- rapbase::getUserFullName(session)
+  #   interval <- strsplit(input$dispatchmentFreq, "-")[[1]][2]
+  #   intervalName <- strsplit(input$dispatchmentFreq, "-")[[1]][1]
+  #   runDayOfYear <- rapbase::makeRunDayOfYearSequence(
+  #     interval = interval)
+  #
+  #   email <- dispatchment$email
+  #
+  #   # fun <- "abonnementRygg"  #"henteSamlerapporter"
+  #
+  #   if (input$dispatchmentRep == "Kvartalsrapport") {
+  #     synopsis <- "Kvartalsrapport, Rygg"
+  #     fun <- "abonnementRygg"
+  #     rnwFil <- "RyggMndRapp.Rnw" #Navn på fila
+  #     reshIDuts <- input$dispatchmentResh
+  #     organization <- reshIDuts #rapbase::getUserReshId(session)
+  #     #print(reshIDuts)
+  #     indReshUts <- match(reshIDuts, RegData$ReshId) #Velger sykehusresh
+  #     paramNames <- c('rnwFil', 'brukernavn', "reshID")
+  #     paramValues <- c(rnwFil, brukernavn, reshIDuts)
+  #   }
+  #
+  #   rapbase::createAutoReport(synopsis = synopsis, package = package,
+  #                             type = type, fun = fun, paramNames = paramNames,
+  #                             paramValues = paramValues, owner = owner,
+  #                             ownerName = ownerName,
+  #                             email = email, organization = organization,
+  #                             runDayOfYear = runDayOfYear,
+  #                             interval = interval, intervalName = intervalName)
+  #   dispatchment$tab <- rapbase::makeAutoReportTab(session, type = "dispatchment")
+  #   test <- dimnames(dispatchment$tab)
+  #   # print(test[[]])
+  #   # print(attributes(dispatchment$tab))
+  #   #Author DataFlair
+  #
+  #   alleAutorapporter <- rapbase::readAutoReportData()
+  #   egneUts <-  rapbase::filterAutoRep(
+  #     rapbase::filterAutoRep(alleAutorapporter, by = 'package', pass = 'rygg'),
+  #     by = 'type', pass = 'dispatchment')
+  #
+  #   dispatchment$email <- vector()
+  # })
+  #
+  #
+  # ## ui: velg rapport
+  # output$reportUts <- renderUI({
+  #   selectInput("dispatchmentRep", "Rapport:",
+  #               c("Kvartalsrapport"),
+  #               selected = dispatchment$report)
+  # })
+  # ## ui: velg enhet
+  # output$ReshUts <- renderUI({
+  #   selectInput("dispatchmentResh", "Avdelingstilhørighet:",
+  #               sykehusValg[-1],
+  #               selected = dispatchment$Resh)
+  # })
+  #
+  # ## ui: velg frekvens
+  # output$freqUts <- renderUI({
+  #   selectInput("dispatchmentFreq", "Frekvens:",
+  #               list(Årlig = "Årlig-year",
+  #                     Kvartalsvis = "Kvartalsvis-quarter",
+  #                     Månedlig = "Månedlig-month",
+  #                     Ukentlig = "Ukentlig-week",
+  #                     Daglig = "Daglig-DSTday"),
+  #               selected = dispatchment$freq)
+  # })
+  #
+  # ## ui: legg til gyldig- og slett epost
+  # output$editEmail <- renderUI({
+  #   if (!grepl("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+  #              input$email)) {
+  #     tags$p("Angi mottaker over")
+  #   } else {
+  #     if (input$email %in% dispatchment$email) {
+  #       actionButton("delEmail", "Slett epostmottaker",
+  #                    icon = shiny::icon("trash"))
+  #     } else {
+  #       actionButton("addEmail", "Legg til epostmottaker",
+  #                    icon = shiny::icon("pencil"))
+  #     }
+  #   }
+  # })
+  #
+  # ## ui: vis valgte mottakere
+  # output$recipients <- renderText(paste(dispatchment$email, sep = "<br>"))
 
   ## ui: lag ny utsending
-  output$makeDispatchment <- renderUI({
-    if (length(dispatchment$email) == 0) {
-      NULL
-    } else {
-      actionButton("dispatch", "Lag utsending",
-                   icon = shiny::icon("save"))
-    }
-  })
+  # output$makeDispatchment <- renderUI({
+  #   if (length(dispatchment$email) == 0) {
+  #     NULL
+  #   } else {
+  #     actionButton("dispatch", "Lag utsending",
+  #                  icon = shiny::icon("save"))
+  #   }
+  # })
 
   ## lag tabell over gjeldende status for utsending
-  output$activeDispatchments <- DT::renderDataTable(
-    dispatchment$tab, server = FALSE, escape = FALSE, selection = 'none',
-    options = list(dom = 'tp', ordning = FALSE, columnDefs = list(list(visible = FALSE, targets = 9))),
-    rownames = FALSE
-  )
+  # output$activeDispatchments <- DT::renderDataTable(
+  #   dispatchment$tab, server = FALSE, escape = FALSE, selection = 'none',
+  #   options = list(dom = 'tp', ordning = FALSE, columnDefs = list(list(visible = FALSE, targets = 9))),
+  #   rownames = FALSE
+  # )
 
   ## ui: lag side som viser status for utsending, også når det ikke finnes noen
-  output$dispatchmentContent <- renderUI({
-    if (length(dispatchment$tab) == 0) {
-      p("Det finnes ingen utsendinger")
-    } else {
-      tagList(
-        h4("Aktive utsendinger:"),
-        h5("Når du trykker på knappen for å gjøre endringer i ei utsending,
-           slettes utsendinga fra lista og alle valg UNNTATT sykehustilhørighet/resh legger seg inn i skjemaet til venstre
-           slik at du f.eks. kan legge til/slette e-postmottagere og endre frekvens."),
-        DT::dataTableOutput("activeDispatchments")
-      )
-    }
-  })
+  # output$dispatchmentContent <- renderUI({
+  #   if (length(dispatchment$tab) == 0) {
+  #     p("Det finnes ingen utsendinger")
+  #   } else {
+  #     tagList(
+  #       h4("Aktive utsendinger:"),
+  #       h5("Når du trykker på knappen for å gjøre endringer i ei utsending,
+  #          slettes utsendinga fra lista og alle valg UNNTATT sykehustilhørighet/resh legger seg inn i skjemaet til venstre
+  #          slik at du f.eks. kan legge til/slette e-postmottagere og endre frekvens."),
+  #       DT::dataTableOutput("activeDispatchments")
+  #     )
+  #   }
+  # })
 
   # Rediger eksisterende auto rapport (alle typer)
-  observeEvent(input$edit_button, {
-    repId <- strsplit(input$edit_button, "_")[[1]][2]
-    rep <- rapbase::readAutoReportData()[[repId]]
-    if (rep$type == "subscription") {#abonnement
+  # observeEvent(input$edit_button, {
+  #   repId <- strsplit(input$edit_button, "__")[[1]][2]
+  #   rep <- rapbase::readAutoReportData()[[repId]]
+  #   if (rep$type == "dispatchment") { #utsending
+  #     dispatchment$freq <- paste0(rep$intervalName, "-", rep$interval)
+  #     dispatchment$email <- rep$email
+  #     rapbase::deleteAutoReport(repId)
+  #     dispatchment$tab <-
+  #       rapbase::makeAutoReportTab(session, type = "dispatchment")
+  #     dispatchment$report <- rep$synopsis
+  #   }
+  #  })
 
-    }
-    if (rep$type == "dispatchment") { #utsending
-      dispatchment$freq <- paste0(rep$intervalName, "-", rep$interval)
-      dispatchment$email <- rep$email
-      rapbase::deleteAutoReport(repId)
-      dispatchment$tab <-
-        rapbase::makeAutoReportTab(session, type = "dispatchment")
-      dispatchment$report <- rep$synopsis
-    }
-    if (rep$type == "bulletin") {
-
-    }
-  })
-
-
-  ## slett eksisterende abonnement
-  # observeEvent(input$del_button, {
-  #   selectedRepId <- strsplit(input$del_button, "_")[[1]][2]
-  #   rapbase::deleteAutoReport(selectedRepId)
-  #   rv$subscriptionTab <- rapbase::makeUserSubscriptionTab(session)})
 
   # Slett eksisterende auto rapport (alle typer)
-  observeEvent(input$del_button, {
-    repId <- strsplit(input$del_button, "_")[[1]][2]
-    rapbase::deleteAutoReport(repId)
-    subscription$tab <-
-      rapbase::makeAutoReportTab(session, type = "subscription")
-    dispatchment$tab <-
-      rapbase::makeAutoReportTab(session, type = "dispatchment")
-  })
-
-
+  # observeEvent(input$del_button, {
+  #   repId <- strsplit(input$del_button, "__")[[1]][2]
+  #   rapbase::deleteAutoReport(repId)
+  #   subscription$tab <-
+  #     rapbase::makeAutoReportTab(session, type = "subscription")
+  #   dispatchment$tab <-
+  #     rapbase::makeAutoReportTab(session, type = "dispatchment")
+  # })
 
 
 

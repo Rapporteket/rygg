@@ -21,25 +21,25 @@
 RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys.Date(), aar=0,
                             tidsenhet='Aar', hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1,
                         minald=0, maxald=130, erMann=99, reshID=0, outfile='', hastegrad=99,
-                        enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, offData=0,... ) {
+                        enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, ... ) { #offData=0,
 
    if ("session" %in% names(list(...))) {
-      raplog::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
+      rapbase::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
    }
 
       if (hentData == 1) {
             RegData <- RyggRegDataSQL()
       }
-      if (offData == 1) {
-            utvalgsInfo <- RegData$utvalgsInfo
-            KImaal <- RegData$KImaalGrenser
-            sortAvtagende <- RegData$sortAvtagende
-            tittel <- RegData$tittel
-            RegData <- RegData$RyggRegData01Off
-      }
+      # if (offData == 1) { #Usikker på hva offData er for noe og om det fortsatt er i bruk...
+      #       utvalgsInfo <- RegData$utvalgsInfo
+      #       KImaal <- RegData$KImaalGrenser
+      #       sortAvtagende <- RegData$sortAvtagende
+      #       tittel <- RegData$tittel
+      #       RegData <- RegData$RyggRegData01Off
+      # }
 
       # Preprosessering av data. I samledokument gjøre dette i samledokumentet. Off01-data er preprosessert.
-      if (offData==1) {preprosess <- 0}
+      #if (offData==1) {preprosess <- 0}
       if (preprosess==1){
             RegData <- RyggPreprosess(RegData=RegData)	#, reshID=reshID)
       }
@@ -47,7 +47,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
 
       #------- Tilrettelegge variable
       varTxt <- ''
-      if (offData == 0) {
+      #if (offData == 0) {
             RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar,
                                                datoTil=datoTil, ktr=ktr, figurtype = 'andelTid')
             RegData <- RyggVarSpes$RegData
@@ -55,7 +55,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
             varTxt <- RyggVarSpes$varTxt
             KImaal <- RyggVarSpes$KImaalGrenser
             tittel <- RyggVarSpes$tittel
-      }
+      #}
 
 
       #------- Gjøre utvalg
@@ -65,8 +65,12 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
       #
          if(ktr==2) {datoFra <- as.Date(min(as.Date(datoTil)-500, as.Date(datoFra)))}
 
-      if (offData == 0) {
+      #if (offData == 0) {
             if (reshID==0) {enhetsUtvalg <- 0}
+        if (valgtVar == 'trombProfylLettKI') {
+          erMann=1
+          hovedkat <- 1:2
+        }
             RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                                       minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                                       hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
@@ -75,13 +79,13 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
             medSml <- RyggUtvalg$medSml
             utvalgTxt <- RyggUtvalg$utvalgTxt
             ind <- RyggUtvalg$ind
-      }
-      if (offData == 1) {RyggUtvalg <- RyggUtvalgOff(RegData=RegData, aldGr=aldGr, aar=aar, erMann=erMann,
-                                                   grType=grType)
-
-            utvalgTxt <- c(RyggUtvalg$utvalgsTxt, utvalgsInfo)
-            ind <- list(Hoved = 1:dim(RegData)[1], Rest = NULL)
-      }
+      #}
+      # if (offData == 1) {RyggUtvalg <- RyggUtvalgOff(RegData=RegData, aldGr=aldGr, aar=aar, erMann=erMann,
+      #                                              grType=grType)
+      #
+      #       utvalgTxt <- c(RyggUtvalg$utvalgsTxt, utvalgsInfo)
+      #       ind <- list(Hoved = 1:dim(RegData)[1], Rest = NULL)
+      # }
       RegData <- RyggUtvalg$RegData
 
       #------------------------Klargjøre tidsenhet--------------
@@ -137,12 +141,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
 
 
       if (lagFig == 1) {
-#            RyggFigTidAndel(RegData, AggVerdier, Ngr, tittel=tittel, hovedgrTxt=RyggUtvalg$hovedgrTxt,
-#                           smltxt=RyggUtvalg$smltxt, Ngr = Ngr, KImaal = KImaal, N=N, retn='V',
-#                           utvalgTxt=utvalgTxt, tidtxt=tidtxt, varTxt=varTxt, grtxt2=grtxt2, medSml=medSml,
-#                           xAkseTxt=xAkseTxt, yAkseTxt=yAkseTxt,
-#                           outfile=outfile)
-
 
                   #-----------Figur---------------------------------------
                   #Hvis for f? observasjoner..
@@ -196,6 +194,10 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
                         if (valgtVar=='SympVarighUtstr') {
                         lines(xskala, rep(KImaal[2],length(xskala)), col= '#FF7260', lwd=3)
                         text(max(xskala), KImaal[2], pos=4, 'Mål', cex=0.9, col='#FF7260')
+                        }
+                        if (valgtVar=='trombProfylLettKI') {
+                          lines(xskala, rep(KImaal[2],length(xskala)), col= '#FF7260', lwd=3)
+                          text(max(xskala), KImaal[2], pos=4, 'Mål', cex=0.9, col='#FF7260')
                         }
 
                         Ttxt <- paste0('(Tall ved punktene angir antall ', varTxt, ')')

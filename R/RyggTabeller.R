@@ -22,8 +22,6 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       colnames(tabAvdMnd1) <- format(lubridate::ymd(colnames(tabAvdMnd1)), '%b %y') #month(ymd(colnames(tabAvdMnd1)), label = T)
       if (reshID==0){
         tabAvdMnd1 <- addmargins((tabAvdMnd1))}
-      #tabAvdMnd1 <- RegDataDum %>% group_by(Maaned=floor_date(InnDato, "month"), ShNavn) %>%
-      #      summarize(Antall=length(ShNavn))
       tabAvdMnd1 <- xtable::xtable(tabAvdMnd1, digits=0)
 	return(tabAvdMnd1)
 }
@@ -35,6 +33,7 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
 #' @return Antall opphold per sykehus og år, siste 5 år
 #' @export
 tabAntOpphSh5Aar <- function(RegData, datoTil=Sys.Date()){
+  RegData <- RegData[which(as.Date(RegData$InnDato) <= as.Date(datoTil, tz='UTC')), ]
       AarNaa <- as.numeric(format.Date(datoTil, "%Y"))
       tabAvdAarN <- addmargins(table(RegData[which(RegData$Aar %in% (AarNaa-4):AarNaa), c('ShNavn','Aar')]))
       rownames(tabAvdAarN)[dim(tabAvdAarN)[1] ]<- 'TOTALT, alle enheter:'
@@ -48,27 +47,39 @@ tabAntOpphSh5Aar <- function(RegData, datoTil=Sys.Date()){
 #'
 #' Tabell som viser oversikt over antall skjema av hver type. Kan velge kladd/ferdigstilt
 #'
-#' @param SkjemaOversikt Tabellen skjemaoversikt
+#' @param RegData Tabellen skjemaoversikt
 #' @param datoFra angi start for tidsperioden
 #' @param datoTil angi slutt for tidsperioden
-#' @param skjemastatus 0: Kladd, 1:ferdigstilt
+
 #' @export
-tabAntSkjema <- function(SkjemaOversikt, datoFra = '2019-01-01', datoTil=Sys.Date(), skjemastatus=1){
-  #tabAntSkjema(SkjemaOversikt, datoFra = '2019-01-01', datoTil=Sys.Date(), skjemastatus=1)
+tabAntSkjema <- function(RegData, datoFra = '2019-01-01', datoTil=Sys.Date()){ #, skjemastatus=1
+  #skjemastatus 0: Kladd, 1:ferdigstilt
+  #tabAntSkjema(RegData, datoFra = '2019-01-01', datoTil=Sys.Date(), skjemastatus=1)
+  #Denne ble utviklet for tabellenSkjemaOversikt. Endrer til å benytte AlleVarNum
   #NB: Denne skal også kunne vise skjema i kladd!
   #Skjemastatus kan være -1, 0 og 1
-  SkjemaOversikt$SkjemaRekkeflg <- factor(SkjemaOversikt$SkjemaRekkeflg, levels = c(5,10,15,20))
-  skjemanavn <- c('Pasient preop.','Lege preop.','Oppfølging, 3mnd', 'Oppfølging, 12mnd')
+  #Skjemastatus sier ikke noe om et skjema er utfylt eller ikke og kan ikke brukes for oppfølging.
 
-  indDato <- which(as.Date(SkjemaOversikt$InnDato) >= datoFra & as.Date(SkjemaOversikt$InnDato) <= datoTil)
-  indSkjemastatus <- which(SkjemaOversikt$SkjemaStatus==skjemastatus)
-  SkjemaOversikt <- SkjemaOversikt[intersect(indDato, indSkjemastatus),]
+  skjemanavn <- c()
 
-  tab <-table(SkjemaOversikt[,c('ShNavn', 'SkjemaRekkeflg')])
-  tab <- rbind(tab,
-               'TOTALT, alle enheter:'=colSums(tab))
-  colnames(tab) <- skjemanavn
-  tab <- xtable::xtable(tab)
+  indDato <- which(as.Date(RegData$InnDato) >= datoFra & as.Date(RegData$InnDato) <= datoTil)
+  RegData <- RegData[indDato, ]
+  table(RegData$BasisRegStatus)
+  RegData$ShNavn <- as.factor(RegData$ShNavn)
+  Registreringer <- table(RegData$ShNavn)
+  TreMnd <- table(RegData$ShNavn[RegData$Ferdigstilt1b3mnd==1])
+  TolvMnd <- table(RegData$ShNavn[RegData$Ferdigstilt1b12mnd==1])
+
+
+  tab <- cbind('Basisskjema' = Registreringer,
+               'Oppfølging, 3mnd' = TreMnd,
+               'Oppfølging, 12mnd' = TolvMnd)
+
+
+  #colnames(tab) <- skjemanavn
+  tab <- xtable::xtable(rbind(tab,
+                              'TOTALT, alle enheter:'= colSums(tab)),
+                        digits=0)
 
 return(tab)
 }
@@ -169,4 +180,38 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
 
   return(tabNokkeltall)
 }
+
+#' Finner pasienter med potensielt dobbeltregistrerte skjema
+#'
+#' @param RegData dataramme fra nakkeregisteret, tidligst fra 01-01-2019
+#' @param tidssavik - maks tidsavvik (dager) mellom to påfølgende registreringer som sjekkes
+#'
+#' @return mulig dobbeltregistrerte skjema
+#' @export
+tabPasMdblReg <- function(RegData, datoFra = '2019-03-01', tidsavvik=30){
+
+  RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra)$RegData
+
+  FlereReg <- RegData %>% dplyr::group_by(PasientID) %>%
+    dplyr::summarise(N = length(PasientID), #n(),
+                     KortTid = ifelse(N>1,
+                                      ifelse(difftime(InnDato[order(InnDato)][2:N], InnDato[order(InnDato)][1:(N-1)], units = 'days') <= tidsavvik,
+                                             1, 0), 0),
+                     PasientID = PasientID[1]
+    )
+
+  PasMdbl <- FlereReg$PasientID[which(FlereReg$KortTid == 1)]
+  TabDbl <- RegData[which(RegData$PasientID %in% PasMdbl),
+                    c("PasientID", "InnDato", "ShNavn", "ReshId", "ForlopsID")] #, 'SkjemaGUID'
+  TabDbl <- TabDbl[order(TabDbl$InnDato), ]
+  N <- dim(TabDbl)[1]
+
+  if (N>0) {
+    indSmTid <- which(difftime(TabDbl$InnDato[2:N], TabDbl$InnDato[1:(N-1)], units = 'days') <= tidsavvik)
+    TabDbl <- TabDbl[unique(sort(c(indSmTid, (indSmTid+1)))), ]
+    TabDbl$InnDato <- format(TabDbl$InnDato, '%Y-%m-%d') #'%d.%m.%Y')
+    tabUt <- TabDbl[order(TabDbl$PasientID, TabDbl$InnDato), ]
+  } else {tabUt <- paste0('Ingen registreringer med mindre enn ', tidsavvik, 'minutter mellom registreringene for samme pasient.')}
+}
+
 
