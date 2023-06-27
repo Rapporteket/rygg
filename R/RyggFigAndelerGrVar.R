@@ -159,6 +159,9 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
 
     if (valgtVar == 'OswEndr20' & hovedkat[1] == 1 & length(hovedkat)==1) {KImaalGrenser <- c(0, AndelHele, 100)}
     if (valgtVar == 'OswEndr30pst' & hovedkat[1] == 9 & length(hovedkat)==1) {KImaalGrenser <- c(0, AndelHele, 100)}
+    if (!is.na(KImaalGrenser[1]) & KImaalGrenser[1] == 'landsgj'){
+      landsgj <- round(100*prop.table(table(RegData$Variabel))[2], 1)
+      KImaalGrenser <- c(0,landsgj,100)}
     fargepalett <- RyggUtvalg$fargepalett
   }
   sortInd <- order(as.numeric(AndelerGr), decreasing=sortAvtagende, na.last = FALSE)
@@ -220,6 +223,9 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     pos <- rev(barplot(rev(as.numeric(AndelerGrSort)), horiz=T, border=NA, col=farger[4], #main=Tittel,
                        xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
                        las=1, cex.names=cexShNavn*0.9))
+    ybunn <- 0.1
+    ytopp <- max(pos)+0.4 #rev(pos)[AntGr]+1
+
     #Legge på målnivå
     if (!is.na(KImaalGrenser[1])) {
       antMaalNivaa <- length(KImaalGrenser)-1
@@ -231,7 +237,8 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
       rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
            ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
       legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
-      legend(x=0, y=legPos, pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
+      legend(x=xmax, y=ytopp, xjust=1, yjust=0, #+(pos[1]-pos[2])
+             pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
              ncol=antMaalNivaa+1,
              xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
              legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
@@ -240,8 +247,6 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
                        xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
                        las=1, cex.names=cexShNavn*0.9, add=T))
     mtext('Andel (%)', side=1, line=2)
-    ybunn <- 0.1
-    ytopp <- rev(pos)[AntGr]+1
     #Linje for hele landet/utvalget:
     lines(x=rep(AndelHele, 2), y=c(ybunn, ytopp), col=farger[2], lwd=2)
     legend('topright', xjust=1, cex=1, lwd=2, col=farger[2],

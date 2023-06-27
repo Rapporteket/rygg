@@ -228,6 +228,7 @@ valgtVarTest <- valgtVar
         tittel <- 'Degen. spondylolistese, fusjonskirurgi ved første operasjon'
         sortAvtagende <- F
         xAkseTxt <- 'Andel med fusjonskirurgi i første operasjon (%)'
+        KImaalGrenser <- 'landsgj' #c(0,landsgj,100)
       }
       if (valgtVar == 'degSponSSSten') { #AndelGrVar
             #(Først og fremst fusjonskirurgi)
@@ -913,8 +914,7 @@ valgtVarTest <- valgtVar
         RegData$Variabel <- RegData$PostopTrombProfyl
         varTxt <- 'fått tromboseprofylakse'
         sortAvtagende <- F
-        landsgj <- round(100*prop.table(table(RegData$Variabel))[2], 1)
-        KImaalGrenser <- c(0,landsgj,100)
+        KImaalGrenser <- 'landsgj'
       }
 
 
