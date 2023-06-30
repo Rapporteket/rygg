@@ -10,6 +10,17 @@ RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
 forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
              tilDato=Sys.Date()-100, forsinkelse=100, reshID=601161)
 
+#----Sjekk av Ferdig1b3mnd----
+
+16811
+17244
+17947
+18187
+22301
+16622
+
+
+
 #----Sjekk av utfyltdato----
 setwd('/home/rstudio/speil/aarsrapp/Rygg')
 RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2010-01-01'))
@@ -36,6 +47,8 @@ PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM kobling
 
 length(intersect(unique(sort(PIDtab$SSN)),unique(sort(RegDataV2$Personnummer))))
 head(RegDataV2$Personnummer)
+
+5266/6321
 #-------------- Laste fil og evt. lagre -------------
 rm(list=ls())
 setwd('C:/ResultattjenesteGIT/nkr')
