@@ -27,7 +27,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
                                        query='SELECT * FROM ForlopsOversikt')
   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
-                "Avdod", "AvdodDato", "BasisRegStatus")
+                "Avdod", "AvdodDato", "BasisRegStatus", "KryptertFnr")
    #varBegge <- intersect(sort(names(RegDataV3AV)), sort(names(RegDataV3For)))
   RegDataV3 <- merge(RegDataV3AVN, RegDataV3Forl[varForl], by='ForlopsID', all.x = TRUE, all.y = FALSE)
 

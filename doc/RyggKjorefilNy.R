@@ -24,6 +24,18 @@ ind12 <- which(RegData$Diff12 < 300)
 feil12 <- RegData[ind12, c("ForlopsID", "ShNavn", 'InnDato',  "Utfdato12mnd", "Diff12")]
 write.table(feil12, file="Feil12mnd.csv", sep=';')
 
+#V2 og V3
+
+RegDataV2 <- rapbase::loadRegData(registryName="rygg",
+                                  query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+#Legg til ledende 0 i V2
+indUten0 <- which(nchar(RegDataV2$Personnummer)==10)
+RegDataV2$Personnummer[indUten0] <- paste0(0,RegDataV2$Personnummer[indUten0])
+
+PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+
+length(intersect(unique(sort(PIDtab$SSN)),unique(sort(RegDataV2$Personnummer))))
+head(RegDataV2$Personnummer)
 #-------------- Laste fil og evt. lagre -------------
 rm(list=ls())
 setwd('C:/ResultattjenesteGIT/nkr')
