@@ -285,12 +285,12 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
     RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
                          RegDataV3[ ,VarV3])
   } else {
-    RegDataV3$AvdodDato <- as.Date(RegDataV3$AvdodDato)
+    #RegDataV3$AvdodDato <- as.Date(RegDataV3$AvdodDato)
     RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
     RegDataV3[, V2ikkeV3] <- NA
     RegDataV2V3 <- rbind(RegDataV2,
                          RegDataV3)
-    RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
+    #RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
 }
   #Avvik? PeropKompAnnet
   #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3
