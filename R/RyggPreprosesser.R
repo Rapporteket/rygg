@@ -16,7 +16,7 @@ RyggPreprosess <- function(RegData=RegData)
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
-	RegData$AvdodDato <- as.Date(RegData$AvdodDato, format="%Y-%m-%d")
+	#RegData$AvdodDato <- as.Date(RegData$AvdodDato, format="%Y-%m-%d")
 
 	#Endre variabelnavn:
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
