@@ -290,7 +290,6 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
     RegDataV3[, V2ikkeV3] <- NA
     RegDataV2V3 <- rbind(RegDataV2,
                          RegDataV3)
-    #RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
 }
   #Avvik? PeropKompAnnet
   #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3
@@ -304,6 +303,7 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
   EndreNavnInd <- grep('3Mnd', names(RegDataV2V3)) #names(RyggData)[grep('3Mnd', names(RyggData))]
   names(RegDataV2V3)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2V3)[EndreNavnInd])
 
+  RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
   #En desimal
   RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)
   RegDataV2V3$OswTotPre <- round(RegDataV2V3$OswTotPre,1)
