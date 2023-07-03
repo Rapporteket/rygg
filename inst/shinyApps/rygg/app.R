@@ -379,16 +379,16 @@ tabPanel(p('Fordelinger',
                     selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
                     ),
+                    selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
+                                #selected = reshID,
+                                choices = sykehusValg),
                     selectInput(inputId = "bildeformatFord",
                                 label = "Velg format for nedlasting av figur",
                                 choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
                     br(),
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
-                    actionButton("reset_fordValg", label="Tilbakestill valg"),
-                    selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
-                                #selected = reshID,
-                                choices = sykehusValg)
+                    actionButton("reset_fordValg", label="Tilbakestill valg")
                   ),
                   mainPanel(
                     tabsetPanel(
