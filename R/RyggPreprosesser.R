@@ -16,6 +16,7 @@ RyggPreprosess <- function(RegData=RegData)
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
+	RegData$AvdodDato <- as.Date(RegData$AvdodDato, format="%Y-%m-%d")
 
 	#Endre variabelnavn:
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
@@ -33,7 +34,14 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtskrivelseDato), units = 'days'))
-	#RegData$Dod100 <- as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)
+	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDato), as.Date(RegData$OpDato), units = 'days'))
+	#RegData$DiffUtfLukket <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtfyltDato), units = 'days'))
+	#RegData$DiffLukketOp <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$OpDato), units = 'days'))
+	RegData$Overlevelse <- as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato))
+	RegData$Dod30 <- 0
+	RegData$Dod30[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 30)] <- 1
+	RegData$Dod365 <- 0
+	RegData$Dod365[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 365)] <- 1
 
 	  return(invisible(RegData))
 }

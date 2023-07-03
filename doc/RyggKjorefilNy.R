@@ -12,14 +12,12 @@ forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
 
 #----Sjekk av Ferdig1b3mnd----
 
-16811
-17244
-17947
-18187
-22301
-16622
+forl3mndIkkeFunnet <- c(16811, 17244, 17947, 18187, 22301, 16622)
 
-
+tab <- ePROMadmTab[which(ePROMadmTab$MCEID %in% forl3mndIkkeFunnet),
+            c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
+              'REGISTRATION_TYPE', 'STATUS')]
+tab[tab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'), ]
 
 #----Sjekk av utfyltdato----
 setwd('/home/rstudio/speil/aarsrapp/Rygg')

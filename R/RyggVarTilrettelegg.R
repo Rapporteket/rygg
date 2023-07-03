@@ -237,6 +237,7 @@ valgtVarTest <- valgtVar
             varTxt <- 'som har dette'
             sortAvtagende <- FALSE
       }
+
       if (valgtVar == 'EQ5DPre') {#ford gjsnPre (gjsnBox)
             RegData <- RegData[which(RegData$EQ5DV3Pre > -0.6),]
             gr <- c(-0.6, seq(-0.2, 0.9, 0.1), 1)
@@ -694,16 +695,25 @@ valgtVarTest <- valgtVar
             #variable <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
             #grtxt <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diag.blokade', 'Rtg.LS-columna', 'Fleks./Ekst.')
       }
+
+      if (valgtVar == 'regDiffOp') {  #Andeler
+      #Verdier: 0-3402
+      tittel <- 'Tid fra utfylling av pasientskjema(?) til operasjon'
+      #if (figurtype == 'andeler') {	#Fordelingsfigur
+        gr <- c(-1000, seq(-60,90,30), 2000)
+        RegData$VariabelGr <- cut(RegData$DiffUtfOp, breaks=gr, include.lowest=TRUE, right=FALSE)
+        grtxt <- c('<-60d', levels(RegData$VariabelGr)[2:(length(gr)-2)], '>3mnd')
+        subtxt <- 'dager fra operasjon til utfylling' #}
+      }
+
+
        if (valgtVar == 'regForsinkelse') {  #Andeler, GjsnGrVar
-         #Verdier: 0-3402
+         #Verdier: -2205 - 969
          RegData <- RegData[which(RegData$DiffUtFerdig > -1), ]
          tittel <- switch(figurtype,
                           andeler='Tid fra utskriving til ferdigstilt registrering',
                           andelGrVar = 'Mer enn 30 dager fra utskriving til ferdig registrering') #
          subtxt <- 'døgn'
-         # gr <- c(0,1,7,14,30,90,365,5000) #gr <- c(seq(0, 90, 10), 1000)
-         # RegData$VariabelGr <- cut(RegData$DiffUtFerdig, breaks = gr, include.lowest = TRUE, right = TRUE)
-         # grtxt <- c('1', '(1-7]', '(7-14]', '(14-30]', '(30-90]', '(90-365]', '>365')
          cexgr <- 0.9
          xAkseTxt <- 'dager'
          sortAvtagende <- FALSE

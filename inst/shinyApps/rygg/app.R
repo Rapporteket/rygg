@@ -338,6 +338,7 @@ tabPanel(p('Fordelinger',
                                   #'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
                                   'Operasjonskategori' = 'opKat',
                                   'Radiologisk undersøkelse' = 'radUnders',
+                                  'Registreringsavvik, utf. pas.skjema - operasjon' ='regDiffOp',
                                   'Registreringsforsinkelse' = 'regForsinkelse',
                                   'Røyker du?' = 'roker',
                                   'Sårdren' = 'saardren',
@@ -753,7 +754,7 @@ server <- function(input, output,session) {
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
   dataDumpV2 <- rapbase::loadRegData(registryName="rygg",
-                                     query='select * FROM Uttrekk_Rapport_Krypt', dbType="mysql")
+                                     query='select * FROM Uttrekk_Rapport_From_Tore', dbType="mysql")
   output$lastNed_dataV2 <- downloadHandler(
     filename = function(){'dataDumpV2.csv'},
     content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
