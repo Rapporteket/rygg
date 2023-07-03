@@ -37,11 +37,13 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDato), as.Date(RegData$OpDato), units = 'days'))
 	#RegData$DiffUtfLukket <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtfyltDato), units = 'days'))
 	#RegData$DiffLukketOp <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$OpDato), units = 'days'))
-	RegData$Overlevelse <- as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato))
+	RegData$Overlevelse <- as.numeric(RegData$AvdodDato - as.Date(RegData$InnDato))
 	RegData$Dod30 <- 0
-	RegData$Dod30[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 30)] <- 1
+	RegData$Dod30[which(as.numeric(RegData$AvdodDato - as.Date(RegData$InnDato)) < 30)] <- 1
+	#RegData$Dod30[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 30)] <- 1
 	RegData$Dod365 <- 0
-	RegData$Dod365[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 365)] <- 1
+	RegData$Dod365[which(as.numeric(RegData$AvdodDato - as.Date(RegData$InnDato)) < 365)] <- 1
+	#RegData$Dod365[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 365)] <- 1
 
 	  return(invisible(RegData))
 }
