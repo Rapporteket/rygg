@@ -1,19 +1,7 @@
-#library(magrittr)
-#library(dplyr)
-#library(kableExtra)
-#library(knitr)
-#library(lubridate)
-#library(rapbase)
 library(rygg)
-#library(rapFigurer)
-#library(shiny)
-#library(shinyjs)
-#library(zoo)
 
 idag <- Sys.Date()
 startDato <- paste0(as.numeric(format(idag-120, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
-#sluttDato <- idag
-#datoTil <- as.POSIXlt(idag)
 datofra12 <- lubridate::floor_date(as.Date(idag)- months(12, abbreviate = T), unit='month')
 
 # gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
@@ -82,12 +70,10 @@ hovedkatValg <- c('Alle'=99, 'Andre inngrep'=0, 'Prolapskirurgi'=1, 'Midtlinjebe
 # Define UI for application
 ui <- navbarPage(id = "tab1nivaa",
 
-  #title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
   title = div(a(includeHTML(system.file('www/logo.svg', package='rapbase'))),
               regTitle),# sett inn tittel også i browser-vindu
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
-
 
 
   #------------ Startside -----------------
@@ -96,8 +82,6 @@ ui <- navbarPage(id = "tab1nivaa",
            tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color#fluidRow(
            #column(width=5,
            h2('Velkommen til Rapporteket for NKR, Rygg!', align='center'),
-
-
 
 
            sidebarPanel(
@@ -186,11 +170,7 @@ ui <- navbarPage(id = "tab1nivaa",
                           condition = "input.ark == 'Antall skjema'",
                           dateRangeInput(inputId = 'datovalgReg', start = startDato, end = Sys.Date(),
                                          label = "Tidsperiode", separator="t.o.m.", language="nb")
-                          # ,selectInput(inputId = 'skjemastatus', label='Velg skjemastatus'
-                          #             choices = c("Ferdigstilt"=1,
-                          #                         "Kladd"=0,
-                          #                         "Åpen"=-1)
-                        ),
+                       ),
 
                         br(),
                         br(),
@@ -603,7 +583,7 @@ server <- function(input, output,session) {
 
   # output$... <- renderTable()
   vec <- factor(SkjemaOversikt$SkjemaRekkeflg, levels= c(5,10))
-  iKladd <- table(vec[Reduce(intersect, list(#which(as.Date(SkjemaOversikt$InnDato) >= datofra12),
+  iKladd <- table(vec[Reduce(intersect, list( #which(as.Date(SkjemaOversikt$InnDato) >= datofra12),
                                                which(SkjemaOversikt$SkjemaStatus==0)
                                              ,which(SkjemaOversikt$AvdRESH == reshID)
                                              ))]) #, indSkjema
