@@ -700,9 +700,10 @@ valgtVarTest <- valgtVar
       #Verdier: 0-3402
       tittel <- 'Tid fra utfylling av pasientskjema(?) til operasjon'
       #if (figurtype == 'andeler') {	#Fordelingsfigur
-        gr <- c(-1000, seq(-60,90,30), 2000)
+      #14 dager, mellom 15 dager og 3 mnd, mer enn 3 mnd
+        gr <- c(-1000,-30, -14, 0, 15, 91, 2000)
         RegData$VariabelGr <- cut(RegData$DiffUtfOp, breaks=gr, include.lowest=TRUE, right=FALSE)
-        grtxt <- c('<-60d', levels(RegData$VariabelGr)[2:(length(gr)-2)], '>3mnd')
+        grtxt <- c('<-30d', levels(RegData$VariabelGr)[2:(length(gr)-2)], '>3mnd')
         subtxt <- 'dager fra operasjon til utfylling' #}
       }
 

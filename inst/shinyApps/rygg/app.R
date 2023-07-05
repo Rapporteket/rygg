@@ -673,12 +673,13 @@ server <- function(input, output,session) {
 # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
   tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
     #Koble på KryptertFnr fra ForlopsOversikt via ForlopsID
+    PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+    data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
+
     data <- dplyr::filter(data,
                           as.Date(InnDato) >= datovalg[1],
                           as.Date(InnDato) <= datovalg[2])
     if (rolle == 'SC') {
-      #PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
-      #data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
       valgtResh <- as.numeric(reshID)
       ind <- if (valgtResh == 0) {1:dim(data)[1]
       } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
@@ -689,12 +690,12 @@ server <- function(input, output,session) {
       data <- data[which(data$ReshId == reshID), ]}
 
     #Legg til ledende 0 i V2 - ikke for krypterte personnummer
-    # indUten0 <- which(nchar(data$Personnummer)==10)
-    # data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])
+     indUten0 <- which(nchar(data$Personnummer)==10)
+     data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])
 
     #Entydig PID
-    tidlPersNr <- intersect(sort(unique(data$KryptertFnr)), sort(unique(data$Personnummer))) #intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
-    tidlPas <- match(data$KryptertFnr, data$Personnummer, nomatch = 0, incomparables = NA)
+    #tidlPersNr <- intersect(sort(unique(data$KryptertFnr)), sort(unique(data$Personnummer))) #intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
+    tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA) #match(data$KryptertFnr, data$Personnummer, nomatch = 0, incomparables = NA)
         # Men får vi her med alle eller bare første treff...? Like greit å evt. bare tildele ny, gjennomgående PID?
     hvilkePas <- which(tidlPas>0)
     data$PID[hvilkePas] <- data$PID[tidlPas[hvilkePas]]
