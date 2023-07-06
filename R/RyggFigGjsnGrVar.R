@@ -43,7 +43,7 @@ if (hentData == 1) {
 
 # Hvis RegData ikke har blitt preprosessert. (I samledokument gjøres dette i samledokumentet)
 if (preprosess == 1){
-       RegData <- RyggPreprosess(RegData=RegData) #, reshID=reshID)
+       RegData <- RyggPreprosess(RegData=RegData)
      }
 
 #------- Tilrettelegge variable
@@ -129,7 +129,7 @@ if (valgtMaal=='Med') {
       MedianUt <- median(RegData$Variabel[indUt])
       KIUt <- sort(RegData$Variabel[indUt])[ceiling(Nut/2 +c(-1,1)*1.96*sqrt(Nut/4))]
 
-      sortInd <- order(c(Median, MedianUt), decreasing=RyggVarSpes$sortAvtagende, na.last = FALSE)
+      sortInd <- order(c(Median, MedianUt), decreasing=sortAvtagende, na.last = FALSE)
 
       MidtHele <- median(RegData$Variabel)
       KIHele <- sort(RegData$Variabel)[ceiling(N/2 +c(-1,1)*1.96*sqrt(N/4))]
@@ -156,7 +156,7 @@ if (valgtMaal=='Gjsn') {	#Gjennomsnitt er standard, men må velges.
 	MidtUt <- ifelse(length(indUt>0), mean(RegData$Variabel[indUt]), NA)
 	KIUt <- if (length(indUt)>0) {MidtUt + sd(RegData$Variabel[indUt])/sqrt(Nut)*c(-2,2)} else {0}
 
-	sortInd <- order(c(Gjsn, MidtUt), decreasing=RyggVarSpes$sortAvtagende, na.last = FALSE)
+	sortInd <- order(c(Gjsn, MidtUt), decreasing=sortAvtagende, na.last = FALSE)
 
 	MidtHele <- mean(RegData$Variabel)	#mean(RegData$Variabel)
 	KIHele <- MidtHele + sd(RegData$Variabel)/sqrt(N)*c(-2,2)

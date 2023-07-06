@@ -228,6 +228,7 @@ valgtVarTest <- valgtVar
         tittel <- 'Degen. spondylolistese, fusjonskirurgi ved første operasjon'
         sortAvtagende <- F
         xAkseTxt <- 'Andel med fusjonskirurgi i første operasjon (%)'
+        KImaalGrenser <- 'landsgj' #c(0,landsgj,100)
       }
       if (valgtVar == 'degSponSSSten') { #AndelGrVar
             #(Først og fremst fusjonskirurgi)
@@ -236,6 +237,7 @@ valgtVarTest <- valgtVar
             varTxt <- 'som har dette'
             sortAvtagende <- FALSE
       }
+
       if (valgtVar == 'EQ5DPre') {#ford gjsnPre (gjsnBox)
             RegData <- RegData[which(RegData$EQ5DV3Pre > -0.6),]
             gr <- c(-0.6, seq(-0.2, 0.9, 0.1), 1)
@@ -475,7 +477,7 @@ valgtVarTest <- valgtVar
          grtxt <- c(0:6, '7+')
          xAkseTxt <- 'Antall liggedøgn' #(subtxt
          subtxt <- 'døgn'
-         if (figurtype=='gjsnGrVar') {tittel <- 'liggetid'}
+         if (figurtype=='gjsnGrVar') {tittel <- 'liggetid etter operasjon'}
          sortAvtagende <- 'F'
          TittelVar <- 'Liggetid etter operasjon'
          ytxt1 <- 'liggetid'
@@ -693,16 +695,26 @@ valgtVarTest <- valgtVar
             #variable <- c('RvCt', 'RvMr', 'RvRadigr', 'RvDiscogr', 'RvDpregblok', 'RvRtgLscol', 'RvFunksjo')
             #grtxt <- c('CT', 'MR', 'Radikulografi', 'Diskografi', 'Diag.blokade', 'Rtg.LS-columna', 'Fleks./Ekst.')
       }
+
+      if (valgtVar == 'regDiffOp') {  #Andeler
+      #Verdier: 0-3402
+      tittel <- 'Tid fra utfylling av pasientskjema(?) til operasjon'
+      #if (figurtype == 'andeler') {	#Fordelingsfigur
+      #14 dager, mellom 15 dager og 3 mnd, mer enn 3 mnd
+        gr <- c(-1000,-30, -14, 0, 15, 91, 2000)
+        RegData$VariabelGr <- cut(RegData$DiffUtfOp, breaks=gr, include.lowest=TRUE, right=FALSE)
+        grtxt <- c('<-30d', levels(RegData$VariabelGr)[2:(length(gr)-2)], '>3mnd')
+        subtxt <- 'dager fra operasjon til utfylling' #}
+      }
+
+
        if (valgtVar == 'regForsinkelse') {  #Andeler, GjsnGrVar
-         #Verdier: 0-3402
+         #Verdier: -2205 - 969
          RegData <- RegData[which(RegData$DiffUtFerdig > -1), ]
          tittel <- switch(figurtype,
                           andeler='Tid fra utskriving til ferdigstilt registrering',
                           andelGrVar = 'Mer enn 30 dager fra utskriving til ferdig registrering') #
          subtxt <- 'døgn'
-         # gr <- c(0,1,7,14,30,90,365,5000) #gr <- c(seq(0, 90, 10), 1000)
-         # RegData$VariabelGr <- cut(RegData$DiffUtFerdig, breaks = gr, include.lowest = TRUE, right = TRUE)
-         # grtxt <- c('1', '(1-7]', '(7-14]', '(14-30]', '(30-90]', '(90-365]', '>365')
          cexgr <- 0.9
          xAkseTxt <- 'dager'
          sortAvtagende <- FALSE
@@ -913,8 +925,7 @@ valgtVarTest <- valgtVar
         RegData$Variabel <- RegData$PostopTrombProfyl
         varTxt <- 'fått tromboseprofylakse'
         sortAvtagende <- F
-        landsgj <- round(100*prop.table(table(RegData$Variabel))[2], 1)
-        KImaalGrenser <- c(0,landsgj,100)
+        KImaalGrenser <- 'landsgj'
       }
 
 

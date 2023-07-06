@@ -52,31 +52,19 @@ tabAntOpphSh5Aar <- function(RegData, datoTil=Sys.Date()){
 #' @param datoTil angi slutt for tidsperioden
 
 #' @export
-tabAntSkjema <- function(RegData, datoFra = '2019-01-01', datoTil=Sys.Date()){ #, skjemastatus=1
-  #skjemastatus 0: Kladd, 1:ferdigstilt
-  #tabAntSkjema(RegData, datoFra = '2019-01-01', datoTil=Sys.Date(), skjemastatus=1)
-  #Denne ble utviklet for tabellenSkjemaOversikt. Endrer til å benytte AlleVarNum
-  #NB: Denne skal også kunne vise skjema i kladd!
-  #Skjemastatus kan være -1, 0 og 1
-  #Skjemastatus sier ikke noe om et skjema er utfylt eller ikke og kan ikke brukes for oppfølging.
-
-  skjemanavn <- c()
+tabAntSkjema <- function(RegData, datoFra = '2019-01-01', datoTil=Sys.Date()){
 
   indDato <- which(as.Date(RegData$InnDato) >= datoFra & as.Date(RegData$InnDato) <= datoTil)
   RegData <- RegData[indDato, ]
-  table(RegData$BasisRegStatus)
   RegData$ShNavn <- as.factor(RegData$ShNavn)
   Registreringer <- table(RegData$ShNavn)
   TreMnd <- table(RegData$ShNavn[RegData$Ferdigstilt1b3mnd==1])
   TolvMnd <- table(RegData$ShNavn[RegData$Ferdigstilt1b12mnd==1])
 
-
   tab <- cbind('Basisskjema' = Registreringer,
                'Oppfølging, 3mnd' = TreMnd,
                'Oppfølging, 12mnd' = TolvMnd)
 
-
-  #colnames(tab) <- skjemanavn
   tab <- xtable::xtable(rbind(tab,
                               'TOTALT, alle enheter:'= colSums(tab)),
                         digits=0)
@@ -163,7 +151,7 @@ tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUt
   RegData <- SorterOgNavngiTidsEnhet(RegData, tidsenhet=tidsenhet, tab=1)$RegData
   # indLigget <- which(RegData$liggetid>0)
 
-prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
+  prosent <- function(x){sum(x, na.rm=T)/(length(x)-sum(is.na(x)))*100}
 
   tabNokkeltall <- rbind(
     'Antall operasjoner' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=length),
@@ -172,6 +160,8 @@ prosent <- function(x){sum(x, na.rm=T)/length(x)*100}
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
     'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum, na.rm=T),
     'Liggetid, postop., (gj.sn.)' = tapply(RegData$LiggetidPostOp, RegData$TidsEnhet, FUN=mean, na.rm=T),
+    'Fornøyde 3 mnd. etter operasjon (%)' = tapply(RegData$Fornoyd3mnd, RegData$TidsEnhet,
+                                               FUN=function(x){100*sum(x %in% 1:2)/sum(!is.na(x))}),
     'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean, na.rm=T)
     )
 

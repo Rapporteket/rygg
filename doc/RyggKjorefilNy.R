@@ -1,13 +1,4 @@
 
-#Trenger pakkene:
-library(grid)
-library(gridExtra)
-library(rJava)
-library(xtable)
-library(tools)
-library(knitr)
-library(nkr)
-
 devtools::install_github("Thinkr-open/golem", ref='master')
 devtools::install_github("Rapporteket/rapbase", ref='rel')
 
@@ -18,6 +9,15 @@ library(magrittr)
 RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
 forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
              tilDato=Sys.Date()-100, forsinkelse=100, reshID=601161)
+
+#----Sjekk av Ferdig1b3mnd----
+
+forl3mndIkkeFunnet <- c(16811, 17244, 17947, 18187, 22301, 16622)
+
+tab <- ePROMadmTab[which(ePROMadmTab$MCEID %in% forl3mndIkkeFunnet),
+            c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
+              'REGISTRATION_TYPE', 'STATUS')]
+tab[tab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'), ]
 
 #----Sjekk av utfyltdato----
 setwd('/home/rstudio/speil/aarsrapp/Rygg')
@@ -33,6 +33,20 @@ ind12 <- which(RegData$Diff12 < 300)
 feil12 <- RegData[ind12, c("ForlopsID", "ShNavn", 'InnDato',  "Utfdato12mnd", "Diff12")]
 write.table(feil12, file="Feil12mnd.csv", sep=';')
 
+#V2 og V3
+
+RegDataV2 <- rapbase::loadRegData(registryName="rygg",
+                                  query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+#Legg til ledende 0 i V2
+indUten0 <- which(nchar(RegDataV2$Personnummer)==10)
+RegDataV2$Personnummer[indUten0] <- paste0(0,RegDataV2$Personnummer[indUten0])
+
+PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+
+length(intersect(unique(sort(PIDtab$SSN)),unique(sort(RegDataV2$Personnummer))))
+head(RegDataV2$Personnummer)
+
+5266/6321
 #-------------- Laste fil og evt. lagre -------------
 rm(list=ls())
 setwd('C:/ResultattjenesteGIT/nkr')

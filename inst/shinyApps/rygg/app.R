@@ -1,19 +1,7 @@
-#library(magrittr)
-#library(dplyr)
-#library(kableExtra)
-#library(knitr)
-#library(lubridate)
-#library(rapbase)
 library(rygg)
-#library(rapFigurer)
-#library(shiny)
-#library(shinyjs)
-#library(zoo)
 
 idag <- Sys.Date()
 startDato <- paste0(as.numeric(format(idag-120, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
-#sluttDato <- idag
-#datoTil <- as.POSIXlt(idag)
 datofra12 <- lubridate::floor_date(as.Date(idag)- months(12, abbreviate = T), unit='month')
 
 # gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
@@ -38,6 +26,7 @@ if (paaServer) {
   SkjemaOversikt <- merge(SkjemaOversikt_orig, ePROMadmTab,
                           by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
   qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
+
   RegOversikt <- rapbase::loadRegData(registryName="rygg", query=qForlop, dbType="mysql")
   RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
 } else {
@@ -81,12 +70,10 @@ hovedkatValg <- c('Alle'=99, 'Andre inngrep'=0, 'Prolapskirurgi'=1, 'Midtlinjebe
 # Define UI for application
 ui <- navbarPage(id = "tab1nivaa",
 
-  #title = div(img(src="rap/logo.svg", alt="Rapporteket", height="26px"), regTitle), # lag logo og tittel som en del av navbar. - Funker det med fluidPage?
   title = div(a(includeHTML(system.file('www/logo.svg', package='rapbase'))),
               regTitle),# sett inn tittel også i browser-vindu
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
-
 
 
   #------------ Startside -----------------
@@ -95,8 +82,6 @@ ui <- navbarPage(id = "tab1nivaa",
            tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color#fluidRow(
            #column(width=5,
            h2('Velkommen til Rapporteket for NKR, Rygg!', align='center'),
-
-
 
 
            sidebarPanel(
@@ -185,11 +170,7 @@ ui <- navbarPage(id = "tab1nivaa",
                           condition = "input.ark == 'Antall skjema'",
                           dateRangeInput(inputId = 'datovalgReg', start = startDato, end = Sys.Date(),
                                          label = "Tidsperiode", separator="t.o.m.", language="nb")
-                          # ,selectInput(inputId = 'skjemastatus', label='Velg skjemastatus'
-                          #             choices = c("Ferdigstilt"=1,
-                          #                         "Kladd"=0,
-                          #                         "Åpen"=-1)
-                        ),
+                       ),
 
                         br(),
                         br(),
@@ -337,6 +318,7 @@ tabPanel(p('Fordelinger',
                                   #'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
                                   'Operasjonskategori' = 'opKat',
                                   'Radiologisk undersøkelse' = 'radUnders',
+                                  'Registreringsavvik, utf. pas.skjema - operasjon' ='regDiffOp',
                                   'Registreringsforsinkelse' = 'regForsinkelse',
                                   'Røyker du?' = 'roker',
                                   'Sårdren' = 'saardren',
@@ -377,16 +359,16 @@ tabPanel(p('Fordelinger',
                     selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                                 choices = enhetsUtvalg,
                     ),
+                    selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
+                                #selected = reshID,
+                                choices = sykehusValg),
                     selectInput(inputId = "bildeformatFord",
                                 label = "Velg format for nedlasting av figur",
                                 choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
                     br(),
                     #sliderInput(inputId="aar", label = "Årstall", min = 2012,  #min(RegData$Aar),
                     #           max = as.numeric(format(Sys.Date(), '%Y')), value = )
-                    actionButton("reset_fordValg", label="Tilbakestill valg"),
-                    selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
-                                #selected = reshID,
-                                choices = sykehusValg)
+                    actionButton("reset_fordValg", label="Tilbakestill valg")
                   ),
                   mainPanel(
                     tabsetPanel(
@@ -601,7 +583,7 @@ server <- function(input, output,session) {
 
   # output$... <- renderTable()
   vec <- factor(SkjemaOversikt$SkjemaRekkeflg, levels= c(5,10))
-  iKladd <- table(vec[Reduce(intersect, list(#which(as.Date(SkjemaOversikt$InnDato) >= datofra12),
+  iKladd <- table(vec[Reduce(intersect, list( #which(as.Date(SkjemaOversikt$InnDato) >= datofra12),
                                                which(SkjemaOversikt$SkjemaStatus==0)
                                              ,which(SkjemaOversikt$AvdRESH == reshID)
                                              ))]) #, indSkjema
@@ -649,7 +631,6 @@ server <- function(input, output,session) {
 
 
 #------Registreringsoversikter---------------------
-  observe({
     output$OppsumAntReg <- renderUI({
       Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PID']
       antallReg <- length(Registreringer)
@@ -659,7 +640,8 @@ server <- function(input, output,session) {
              antallPers, ' personer.', '</b>' ))})
 
 
-    tabAntOpphSh <- switch(input$tidsenhetReg,
+    observe({
+      tabAntOpphSh <- switch(input$tidsenhetReg,
            Mnd=tabAntOpphShMnd(RegData=RegData, datoTil=input$sluttDatoReg, antMnd=12), #input$datovalgTab[2])
            Aar=tabAntOpphSh5Aar(RegData=RegData, datoTil=input$sluttDatoReg))
 
@@ -690,12 +672,14 @@ server <- function(input, output,session) {
 
 # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
   tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
+    #Koble på KryptertFnr fra ForlopsOversikt via ForlopsID
+    PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+    data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
+
     data <- dplyr::filter(data,
                           as.Date(InnDato) >= datovalg[1],
                           as.Date(InnDato) <= datovalg[2])
     if (rolle == 'SC') {
-      PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
-      data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
       valgtResh <- as.numeric(reshID)
       ind <- if (valgtResh == 0) {1:dim(data)[1]
       } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
@@ -705,19 +689,20 @@ server <- function(input, output,session) {
       #Foreløpig ikke def siden oppf.skjema ikke med i dump. Dump bare for SC.
       data <- data[which(data$ReshId == reshID), ]}
 
-    #Legg til ledende 0 i V2
-    indUten0 <- which(nchar(data$Personnummer)==10)
-    data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])
+    #Legg til ledende 0 i V2 - ikke for krypterte personnummer
+     indUten0 <- which(nchar(data$Personnummer)==10)
+     data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])
 
     #Entydig PID
-    tidlPersNr <- intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
-    tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA)
+    #tidlPersNr <- intersect(sort(unique(data$KryptertFnr)), sort(unique(data$Personnummer))) #intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
+    tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA) #match(data$KryptertFnr, data$Personnummer, nomatch = 0, incomparables = NA)
+        # Men får vi her med alle eller bare første treff...? Like greit å evt. bare tildele ny, gjennomgående PID?
     hvilkePas <- which(tidlPas>0)
     data$PID[hvilkePas] <- data$PID[tidlPas[hvilkePas]]
 
     #SSN i en variabel
     fraV3 <- which(is.na(data$Personnummer))
-    data$Personnummer[fraV3] <- data$SSN[fraV3]
+    data$Personnummer[fraV3] <- data$KryptertFnr[fraV3]
 
     return(data)
   }
@@ -725,9 +710,6 @@ server <- function(input, output,session) {
   observe({
     reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
-    # uiOutput({
-    #
-    # })
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
                                 as.Date(InnDato) >= input$datovalgRegKtr[1],
                                 as.Date(InnDato) <= input$datovalgRegKtr[2])

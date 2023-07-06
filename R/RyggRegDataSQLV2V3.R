@@ -27,9 +27,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
                                        query='SELECT * FROM ForlopsOversikt')
   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
-                "Avdod", "AvdodDato", "BasisRegStatus")
+                "Avdod", "AvdodDato", "BasisRegStatus", "KryptertFnr")
    #varBegge <- intersect(sort(names(RegDataV3AV)), sort(names(RegDataV3For)))
-  RegDataV3 <- merge(RegDataV3AVN, RegDataV3Forl[varForl], by='ForlopsID', all.x = TRUE, all.y = FALSE)
+  RegDataV3 <- merge(RegDataV3AVN, RegDataV3Forl[ ,varForl], by='ForlopsID', all.x = TRUE, all.y = FALSE)
 
   ePROMadmTab <- rapbase::loadRegData(registryName="rygg",
                                    query='SELECT * FROM proms')
@@ -43,7 +43,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   ind12mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
                       c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
 
-  ePROM3mnd <- ePROMadmTab[intersect(ind3mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
+  ePROM3mnd <- ePROMadmTab[intersect(ind3mnd, which(ePROMadmTab$STATUS==3)), ePROMvar] #STATUS==3 completed
   names(ePROM3mnd) <- paste0(ePROMvar, '3mnd')
   ePROM12mnd <- ePROMadmTab[intersect(ind12mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
   names(ePROM12mnd) <- paste0(ePROMvar, '12mnd')
@@ -72,7 +72,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
    # test$forsinkelse3mnd <- as.Date(test$Utfdato3mnd) - as.Date(test$OpDato)
    # mean(test$forsinkelse3mnd)
 
-    #I 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
+    #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
     indIkkeSaarInf <- which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31')
     RegDataV3$KpInfOverfla3Mnd[indIkkeSaarInf] <- NA
     RegDataV3$KpInfOverfla12mnd[indIkkeSaarInf] <- NA
@@ -285,12 +285,11 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
     RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
                          RegDataV3[ ,VarV3])
   } else {
-    RegDataV3$AvdodDato <- as.Date(RegDataV3$AvdodDato)
+    #RegDataV3$AvdodDato <- as.Date(RegDataV3$AvdodDato)
     RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
     RegDataV3[, V2ikkeV3] <- NA
     RegDataV2V3 <- rbind(RegDataV2,
                          RegDataV3)
-    RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
 }
   #Avvik? PeropKompAnnet
   #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3
@@ -304,6 +303,7 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
   EndreNavnInd <- grep('3Mnd', names(RegDataV2V3)) #names(RyggData)[grep('3Mnd', names(RyggData))]
   names(RegDataV2V3)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2V3)[EndreNavnInd])
 
+  RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
   #En desimal
   RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)
   RegDataV2V3$OswTotPre <- round(RegDataV2V3$OswTotPre,1)
