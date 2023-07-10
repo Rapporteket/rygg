@@ -21,7 +21,7 @@
 RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys.Date(), aar=0,
                             tidsenhet='Aar', hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1,
                         minald=0, maxald=130, erMann=99, reshID=0, outfile='', hastegrad=99,
-                        enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, ... ) { #offData=0,
+                        enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, ... ) {
 
    if ("session" %in% names(list(...))) {
       rapbase::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
@@ -30,16 +30,8 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
       if (hentData == 1) {
             RegData <- RyggRegDataSQL()
       }
-      # if (offData == 1) { #Usikker på hva offData er for noe og om det fortsatt er i bruk...
-      #       utvalgsInfo <- RegData$utvalgsInfo
-      #       KImaal <- RegData$KImaalGrenser
-      #       sortAvtagende <- RegData$sortAvtagende
-      #       tittel <- RegData$tittel
-      #       RegData <- RegData$RyggRegData01Off
-      # }
 
-      # Preprosessering av data. I samledokument gjøre dette i samledokumentet. Off01-data er preprosessert.
-      #if (offData==1) {preprosess <- 0}
+      # Preprosessering av data. I samledokument gjøre dette i samledokumentet.
       if (preprosess==1){
             RegData <- RyggPreprosess(RegData=RegData)	#, reshID=reshID)
       }
@@ -47,7 +39,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
 
       #------- Tilrettelegge variable
       varTxt <- ''
-      #if (offData == 0) {
             RyggVarSpes <- RyggVarTilrettelegg(RegData=RegData, valgtVar=valgtVar,
                                                datoTil=datoTil, ktr=ktr, figurtype = 'andelTid')
             RegData <- RyggVarSpes$RegData
@@ -55,7 +46,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
             varTxt <- RyggVarSpes$varTxt
             KImaal <- RyggVarSpes$KImaalGrenser
             tittel <- RyggVarSpes$tittel
-      #}
 
 
       #------- Gjøre utvalg
@@ -65,7 +55,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
       #
          if(ktr==2) {datoFra <- as.Date(min(as.Date(datoTil)-500, as.Date(datoFra)))}
 
-      #if (offData == 0) {
             if (reshID==0) {enhetsUtvalg <- 0}
         if (valgtVar == 'trombProfylLettKI') {
           erMann=1
@@ -75,18 +64,39 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
                                       minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                                       hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
                                       enhetsUtvalg=enhetsUtvalg) #, grType=grType
+            hovedgrTxt <- RyggUtvalg$hovedgrTxt
             smltxt <- RyggUtvalg$smltxt
             medSml <- RyggUtvalg$medSml
             utvalgTxt <- RyggUtvalg$utvalgTxt
             ind <- RyggUtvalg$ind
-      #}
-      # if (offData == 1) {RyggUtvalg <- RyggUtvalgOff(RegData=RegData, aldGr=aldGr, aar=aar, erMann=erMann,
-      #                                              grType=grType)
-      #
-      #       utvalgTxt <- c(RyggUtvalg$utvalgsTxt, utvalgsInfo)
-      #       ind <- list(Hoved = 1:dim(RegData)[1], Rest = NULL)
-      # }
-      RegData <- RyggUtvalg$RegData
+            RegData <- RyggUtvalg$RegData
+            N <- list(Hoved = length(ind$Hoved), Rest =length(ind$Rest))
+
+
+            #Hvis for få observasjoner..
+            if (N$Hoved < 10 | (medSml ==1 & N$Rest<10)) {
+              FigTypUt <- figtype(outfile)
+              farger <- FigTypUt$farger
+              plot.new()
+              title(main=paste0('variabel: ', valgtVar))	#, line=-6)
+              legend('topleft',utvalgTxt, bty='n', cex=0.9, text.col=farger[1])
+              text(0.5, 0.65, 'Færre enn 10 registreringer i hoved-', cex=1.2)
+              text(0.55, 0.6, 'eller sammenlikningsgruppe', cex=1.2)
+              if ( outfile != '') {dev.off()}
+
+
+              FigDataParam <- list(KImaal = KImaal,
+                                   grtxt2=grtxt2,
+                                   varTxt=varTxt,
+                                   tittel=tittel,
+                                   retn='V',
+                                   yAkseTxt=yAkseTxt,
+                                   utvalgTxt=RyggUtvalg$utvalgTxt,
+                                   fargepalett=RyggUtvalg$fargepalett,
+                                   medSml=medSml,
+                                   hovedgrTxt=hovedgrTxt,
+                                   smltxt=RyggUtvalg$smltxt)
+            } else {
 
       #------------------------Klargjøre tidsenhet--------------
       RegDataMTidsenh <- SorterOgNavngiTidsEnhet(RegData=RegData, tidsenhet = tidsenhet)
@@ -101,8 +111,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
       #--------------- Gjøre beregninger ------------------------------
 
       AggVerdier <- list(Hoved = 0, Rest =0)
-      N <- list(Hoved = length(ind$Hoved), Rest =length(ind$Rest))
-
 
       NAarHoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'], length) #Tot. ant. per år
       NAarHendHoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'],sum, na.rm=T) #Ant. hendelser per år
@@ -112,14 +120,12 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
       AggVerdier$Rest <- NAarHendRest/NAarRest*100
       Ngr <- list(Hoved = NAarHendHoved, Rest = NAarHendRest)
 
-      #grtxt <- paste0(rev(RyggVarSpes$grtxt), ' (', rev(sprintf('%.1f',AggVerdier$Hoved)), '%)')
       grtxt2 <- paste0('(', sprintf('%.1f',AggVerdier$Hoved), '%)')
       yAkseTxt <- 'Andel (%)'
       vektor <- c('Aar','Halvaar','Kvartal','Mnd')
       xAkseTxt <- paste0(c('Innleggelsesår', 'Innleggelsesår', 'Innleggelseskvartal', 'Innleggelsesmåned')
                          [which(tidsenhet==vektor)])
 
-      hovedgrTxt <- RyggUtvalg$hovedgrTxt
 
       FigDataParam <- list(AggVerdier=AggVerdier, N=N,
                            Ngr=list('Hoved' = NAarHoved, 'Rest'= NAarHendRest),
@@ -140,21 +146,8 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
                            smltxt=RyggUtvalg$smltxt)
 
 
+        #-----------Figur---------------------------------------
       if (lagFig == 1) {
-
-                  #-----------Figur---------------------------------------
-                  #Hvis for f? observasjoner..
-                  if (N$Hoved < 10 | (medSml ==1 & N$Rest<10)) {
-                        FigTypUt <- figtype(outfile)
-                        farger <- FigTypUt$farger
-                        plot.new()
-                        title(main=paste0('variabel: ', valgtVar))	#, line=-6)
-                        legend('topleft',utvalgTxt, bty='n', cex=0.9, text.col=farger[1])
-                        text(0.5, 0.65, 'Færre enn 10 registreringer i hoved-', cex=1.2)
-                        text(0.55, 0.6, 'eller sammenlikningsgruppe', cex=1.2)
-                        if ( outfile != '') {dev.off()}
-
-                  } else {
 
                         #Plottspesifikke parametre:
                         FigTypUt <- figtype(outfile, fargepalett=RyggUtvalg$fargepalett)

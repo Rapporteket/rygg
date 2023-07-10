@@ -34,7 +34,6 @@ datoFra1Aar <- as.Date(paste0(1900+dato$year-1,'-', ifelse(dato$mon==11, 1, dato
 #Siste 6 måneder:
 datoFra6mnd <- paste0(substr(as.character(dato %m-% months(6, abbreviate=FALSE)),1, 8),'01')  #benytter lubridate
 
-#datoFra <- datoFra6mnd
 #Ønsker eget datasett for forrige måned
 datoFraMnd <- format(datoTil, "%Y-%m-01")
 
@@ -62,7 +61,6 @@ N <- dim(RegData6mnd)[1]
 RegDataEget6mnd <- RegData6mnd[ind$Hoved, ]
 RegDataEgetMnd <- RegDataEget6mnd[which(as.Date(RegDataEget6mnd$InnDato, tz='UTC') >= datoFraMnd), ]
 RegDataResten6mnd <- RegData6mnd[setdiff(1:N,ind$Hoved), ]
-#RegDataMnd <- RegData6mnd[which(as.Date(RegData$InnDato, tz='UTC') >= datoFraMnd), ]
 
 maxDatoEget <- format.Date(max(RegDataEget6mnd$InnDato), format='%d.%m.%Y', tz='UTC')
 Neget <- dim(RegDataEget6mnd)[1]
@@ -111,6 +109,8 @@ Rapporten viser følgende:
 \begin{itemize}
 \item Registreringsoversikt og nøkkeltall
 \item Registreingsforsinkelse
+\item Degenerativ spondylolistese operert med fusjonskirurgi ved første operasjon
+\item Tromboseprofylakse i forbindelse med lett ryggkirurgi
 \item Ventetid fra henvisning til time på poliklinikk
 \item Ventetid fra operasjon ble bestemt til utført
 \item Andel Ø-hjelp
@@ -159,6 +159,13 @@ dum <- RyggFigAndeler(RegData=RegData1aar, preprosess=0, valgtVar='regForsinkels
 dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
                       reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
 
+dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='degSponFusj1op',
+                enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+                outfile='degSponFusj1opKITid.pdf')
+
+dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
+                enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+                outfile='trombProfylLettKITid.pdf')
 @
 
 \begin{frame}[fragile] {Registreringsforsinkelse}
@@ -171,6 +178,26 @@ dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr',
 
 \end{frame}
 
+
+\begin{frame}[fragile] {Degenerativ spondylolistese, fusjonskirurgi ved første operasjon}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{degSponFusj1opKITid.pdf}
+\caption{Degenerativ spondylolistese operert med fusjonskirurgi ved første operasjon.}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}[fragile] {Tromboseprofylakse i forbindelse med lett ryggkirurgi}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{trombProfylLettKITid.pdf}
+\caption{Menn som får tromboseprofylakse i forbindelse med lett ryggkirurgi.}
+\end{figure}
+
+\end{frame}
 
 <<'LageFigurer2', include=FALSE>>=
 dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidHenvTimePol',
@@ -242,37 +269,6 @@ dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDur
 
 @
 
-% \begin{frame}[fragile] {Liggetid på avdelinga}
-%
-% Liggetida er tida fra pasienten legges inn på avdelinga til pasienten skrives ut.
-% Liggetida inkluderer derfor både preoperativ og postoperativ liggetid).
-%
-% <<'TabLiggetid', results='asis', echo=FALSE>>=
-% finnGjsnMedKj <- function(RegData){
-%       Gjsn <- sprintf("%.1f", mean(RegData$Liggedogn, na.rm=T))
-%       Med <- sprintf("%.1f", median(RegData$Liggedogn, na.rm=T))
-%       Sum <- sprintf("%.0f", sum(RegData$Liggedogn, na.rm=T))
-%       #Kvinner <- sprintf("%.0f", 100*prop.table(table(RegData$ErMann))[1])
-%       #Ut <- paste0(c(Gjsn, Med, Kvinner), c('', '', '%'))
-%       Ut <- paste0(c(Gjsn, Med, Sum)) #, c('', '', '%'))
-%       #paste0(sprintf("%.1f %.1f %+.f", Gjsn, Med, Kvinner), '%')
-%       }
-%
-% liggetidKj <- rbind(
-%       'Egen, siste måned' = finnGjsnMedKj(RegDataEgetMnd),
-%       'Egen'= finnGjsnMedKj(RegDataEget6mnd),
-% 	'Resten av landet'= finnGjsnMedKj(RegDataResten6mnd)) #,
-% #	'Eigen sjukehustype' = finnGjsnMedKj(RegDataShType))
-%
-% colnames(liggetidKj) <- c('Gj.snitt', 'Median', 'Totalsum')
-%
-% xtable(liggetidKj, digits=1, align=c('l', rep('r', ncol(liggetidKj))),
-% 		caption='Liggedøgn, siste 6 måneder.', # og andel kvinner
-% 		label='tab:liggetidKj')
-%
-% @
-%
-% \end{frame}
 
 \begin{frame}[fragile] {Postoperativ liggetid, prolaps}
 \begin{figure}[ht]
@@ -360,7 +356,6 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='nytte', ktr = 1,
 \end{figure}
 \end{frame}
 
-
 \begin{frame}[fragile] {Tilfredshet hos pasientene}
 \begin{figure}[ht]
 \centering
@@ -379,53 +374,5 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='nytte', ktr = 1,
 \end{frame}
 
 
-
-
-
-
 \end{tiny}
 \end{document}
-
-% \begin{frame}[fragile] {Alder}
-%
-% <<'Alder', results='asis' >>=
-% #, echo=FALSE
-% Under65aar <- function(RegData){
-%       Ant <- sum(RegData$Alder<65, na.rm = T)
-%       Andel <- Ant/dim(RegData)[1]*100
-%       paste0(Ant, ' (',sprintf('%.1f',Andel),'%)')
-%       }
-%
-% Over80aar <- function(RegData){
-%       Ant <- sum(RegData$Alder >= 80, na.rm = T)
-%       Andel <- Ant/dim(RegData)[1]*100
-%       paste0(Ant, ' (',sprintf('%.1f',Andel),'%)')
-%       }
-%
-% alderTabInnhold <- function(RegData){
-%            c(sprintf('%.1f', summary(RegData$Alder)[1:6]),
-%              Under65aar(RegData),
-%              Over80aar(RegData))
-%       }
-%
-% alderDIV <- cbind(
-%       'Egen, sist mnd.' = alderTabInnhold(RegDataEgetMnd),
-%       'Egen'= alderTabInnhold(RegDataEget),
-% 	'Resten av landet'= alderTabInnhold(RegDataResten))
-% 	#,'Egen sykehustype' = alderTabInnhold(RegDataShType))
-% rownames(alderDIV) <- c('Minimum:',
-%                         '25 \\% pasienter under:',
-%                         'Median:','Gjennomsnitt:',
-%                         '25 \\% pasienter over:',
-%                         'Maksimum:',
-%                         'Pasienter \\textless 65 år',
-%                         'Pasientar $\\geq $ 80 år')
-%
-%
-% print(xtable(alderDIV, digits=1, align=c('l', rep('r', ncol(alderDIV))),
-% 		caption='Alderskarakteristikker (alder i år), siste seks måneder.',
-% 		label='tab:Alderseigenskapar'), sanitize.rownames.function = identity)
-%
-% @
-%
-% \end{frame}

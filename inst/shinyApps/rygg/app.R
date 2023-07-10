@@ -185,8 +185,9 @@ ui <- navbarPage(id = "tab1nivaa",
                         downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
                         br(),
                         br(),
-                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump, V2 og V3'),
-                        h5('Datadumpen inneholder alle variabler fra alle elektroniske versjoner av registeret (V.1-3)')
+                        downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
+                        h5('Datadumpen inneholder alle variabler fra registeret.
+                           Velger man en dato etter 1.januar 2020, er det kun registreringer for versjon 3')
 
            ),
 
@@ -691,7 +692,8 @@ server <- function(input, output,session) {
 
     #Legg til ledende 0 i V2 - ikke for krypterte personnummer
      indUten0 <- which(nchar(data$Personnummer)==10)
-     data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])
+     if (length(indUten0)>0) {
+       data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])}
 
     #Entydig PID
     #tidlPersNr <- intersect(sort(unique(data$KryptertFnr)), sort(unique(data$Personnummer))) #intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
@@ -718,8 +720,7 @@ server <- function(input, output,session) {
     filename = function(){'dataTilKtr.csv'},
     content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
-
-  RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1)
+    RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1, datoFra = input$datovalgRegKtr[1])
   RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
   fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
                  "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
@@ -739,7 +740,8 @@ server <- function(input, output,session) {
   output$lastNed_dataV2 <- downloadHandler(
     filename = function(){'dataDumpV2.csv'},
     content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
-  })
+})
+
 #-----------Registeradministrasjon-----------
 
   if (rolle=='SC') {

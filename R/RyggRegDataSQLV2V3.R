@@ -17,10 +17,13 @@
 RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
                                alleVarV3=1, alleVarV2=0){
 #NB: datovalg har ingen effekt foreløpig!! - bør hente alle for å få f.eks. operasjonsnummer riktig...
-#Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
+#?Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
-  RegDataV2 <- rapbase::loadRegData(registryName="rygg",
-                                    query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+  kunV3 <- ifelse(datoFra >= '2020-01-01' & !is.na(datoFra), 1, 0)
+
+  if (kunV3 == 0) {
+    RegDataV2 <- rapbase::loadRegData(registryName="rygg",
+                                    query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')}
   RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
                                      query='SELECT * FROM AlleVarNum')
   #test <- RegDataV3[ ,c("DodsDato", 'AvdodDato', 'Avdod')]
@@ -119,7 +122,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
 
   #-----Tilrettelegging av V2-data-------------------------
     #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..
-
+if (kunV3 == 0) {
    RegDataV2$PID <- paste0(RegDataV2$PID, 'V2')
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
@@ -142,6 +145,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
   RegDataV2$Utd[is.na(RegDataV2$Utd)] <- 9
   RegDataV2$KpInf3Mnd[RegDataV2$KpInf3Mnd==0] <- NA #Tilpasning til V3
+  RegDataV2$Versjon <- 'V2'
 
 
   RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
@@ -184,19 +188,20 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   )
 
 
+  #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
+  RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
-
+}
   #-----Tilrettelegging av V3-data-------------------------
 #Fjerner ikke-ferdigstilte pasientskjema
   RegDataV3 <- RegDataV3[RegDataV3$Ferdig1a==1 & RegDataV3$Ferdig2a==1, ]
+  RegDataV3$Versjon <- 'V3'
 
   RegDataV3$PID <- RegDataV3$PasientID #PID vil kobles med variabel PID fra V2 og tilpasses, ønsker å beholde PasientID fra V3
   #Navneendring av V3:
   RegDataV3 <- dplyr::rename(RegDataV3,
                              OpProlap = OprProlap #Siden Alle andre heter Op..
                              ) #PIDV3 = PasientID)
-  #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
-  RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
   #Legge til underkategori for hovedkategori.
   ny <- rygg::kategoriserInngrep(RegData=RegDataV3)
@@ -263,16 +268,16 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,0,0,1,0))
 
   RegDataV3$MedForstLukket <- as.character(as.Date(RegDataV3$MedForstLukket)) #Kobling med NA fungerer ikke for datotid-var
-RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
 
   #NB:----------Sjekk ut at alle variabler har samme format - VENTER TIL ENDELIG V2-FIL PÅ RAPPORTEKET.
   #f.eks.
   #head(RegDataV2[, V2ogV3])
   #head(RegDataV3[, V2ogV3])
 
-
+if (kunV3 == 0){
   #Variabler i V2 som ikke er i V3. Noen er bevisst fjernet fra V3, se vektor fjernesV3
   #setdiff(VarV2, VarV3) #Sjekk på nytt når gått gjennom.
+  RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
   VarV2 <- names(RegDataV2) #sort
   VarV3 <- names(RegDataV3) #sort
 
@@ -290,7 +295,9 @@ RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
     RegDataV3[, V2ikkeV3] <- NA
     RegDataV2V3 <- rbind(RegDataV2,
                          RegDataV3)
+  }
 }
+  if (kunV3 == 1) {RegDataV2V3 <- RegDataV3}
   #Avvik? PeropKompAnnet
   #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3
 
