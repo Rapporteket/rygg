@@ -511,8 +511,6 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
 
 ), #tab
 
-#------------------Abonnement-------------------------
-
 #----------Abonnement-----------------
 
 tabPanel(p("Abonnement",
