@@ -48,3 +48,26 @@ dataDump <- tilretteleggDataDumper(data=AlleData, datoFra = min(koblingsPID$Dato
 
 #DataUt <-
 
+
+
+
+#--------------------Til Eirik Mikkelsen, dødsdato------------------------
+
+PIDdato <- read.csv2(file = 'C:/Registerdata/rygg/Populasjon2_PID_OprDato.csv',
+                      header = TRUE, dec = '.')
+PIDdato$Operasjonsdato <- format(as.Date(PIDdato$Operasjonsdato, "%m/%d/%Y",  "%B %d %Y"))
+
+
+dataDumpV2 <- PIDdato <- read.csv2(file = 'C:/Registerdata/rygg/dataDumpV2.csv',
+                                   header = TRUE, dec = '.')
+
+
+#Vi har dødsdato kun for V3. Dette er kun V1/V2-data.
+
+
+
+
+
+
+
+
