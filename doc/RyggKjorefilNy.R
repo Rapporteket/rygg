@@ -110,6 +110,7 @@ RegData <- RyggRegDataSQLV2V3()
 RyggDataRaa <- read.table('C:/Registerdata/Rygg/RyggdataDump2022-12-09fra2018.csv',
                       sep=';', header=T, encoding = 'latin1', dec = ',')
 #RyggDataRaa <- RyggDataRaa[-which(RyggDataRaa$ForlopsID == 8274),]
+RyggDataRaa <- RyggRegDataSQLV2V3(datoFra = '2021-01-01', datoTil = '2021-12-31')
 RyggData <- RyggPreprosess(RyggDataRaa)
 
 Variabler <- c('AntibiotikaV3',	'ASA',	'TidlOpr',	'OpKat',	'BMI',	'SympVarighUtstr',
@@ -150,7 +151,7 @@ ArbstatusPreV3 <- 1-tab[1:4,'99']
 Kompletthet <- cbind(AntibiotikaV3,	ASA,	TidlOpr,	OpKat,	BMI,	SympVarighUtstr,
   SmRyPre,	SmBePre,	SmStiPre,	ArbstatusPreV3)
 
-write.csv2(Kompletthet, file = 'c:/Registerdata/rygg/RyggKompl.csv', fileEncoding = 'UTF-8')
+write.csv2(Kompletthet, file = '../mydata/RyggKompl21.csv', fileEncoding = 'UTF-8')
 
 #_________________________________________________________________________________________
 #Registreringsoversikter for 2019-data

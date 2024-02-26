@@ -669,44 +669,7 @@ server <- function(input, output,session) {
     })
 
 
-# Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato)
-  tilretteleggDataDumper <- function(data, datovalg, reshID, rolle){
-    #Koble på KryptertFnr fra ForlopsOversikt via ForlopsID
-    PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
-    data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
-
-    data <- dplyr::filter(data,
-                          as.Date(InnDato) >= datovalg[1],
-                          as.Date(InnDato) <= datovalg[2])
-    if (rolle == 'SC') {
-      valgtResh <- as.numeric(reshID)
-      ind <- if (valgtResh == 0) {1:dim(data)[1]
-      } else {which(as.numeric(data$ReshId) %in% as.numeric(valgtResh))}
-      data <- data[ind,]
-    } else {
-      #variablePRM <- 'variable som skal fjernes hvis lastes ned av avdeling'
-      #Foreløpig ikke def siden oppf.skjema ikke med i dump. Dump bare for SC.
-      data <- data[which(data$ReshId == reshID), ]}
-
-    #Legg til ledende 0 i V2 - ikke for krypterte personnummer
-     indUten0 <- which(nchar(data$Personnummer)==10)
-     if (length(indUten0)>0) {
-       data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])}
-
-    #Entydig PID
-    #tidlPersNr <- intersect(sort(unique(data$KryptertFnr)), sort(unique(data$Personnummer))) #intersect(sort(unique(data$SSN)), sort(unique(data$Personnummer)))
-    tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA) #match(data$KryptertFnr, data$Personnummer, nomatch = 0, incomparables = NA)
-        # Men får vi her med alle eller bare første treff...? Like greit å evt. bare tildele ny, gjennomgående PID?
-    hvilkePas <- which(tidlPas>0)
-    data$PID[hvilkePas] <- data$PID[tidlPas[hvilkePas]]
-
-    #SSN i en variabel
-    fraV3 <- which(is.na(data$Personnummer))
-    data$Personnummer[fraV3] <- data$KryptertFnr[fraV3]
-
-    return(data)
-  }
-
+# Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato), samt datadump
   observe({
     reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
@@ -718,14 +681,16 @@ server <- function(input, output,session) {
     filename = function(){'dataTilKtr.csv'},
     content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
-    RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1, datoFra = input$datovalgRegKtr[1])
+ RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1, datoFra = input$datovalgRegKtr[1])
   RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
   fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
                  "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
                  "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
   RegDataV2V3 <- RegDataV2V3[ ,-which(names(RegDataV2V3) %in% fritxtVar)]
-  dataDump <- tilretteleggDataDumper(data=RegDataV2V3, datovalg = input$datovalgRegKtr,
-                                     reshID=input$velgReshReg, rolle = rolle)
+  dataDump <- tilretteleggDataDumper(data=RegDataV2V3,
+                                     datoFra = input$datovalgRegKtr[1],
+                                     datoTil = input$datovalgRegKtr[2],
+                                     reshID=input$velgReshReg) #rolle = rolle Bare SC får hente disse dataene
   dataDump <- finnReoperasjoner(RegData = dataDump)
 
 
@@ -741,21 +706,6 @@ server <- function(input, output,session) {
 })
 
 #-----------Registeradministrasjon-----------
-
-  if (rolle=='SC') {
-  # observe({
-  #   tabdataTilResPort <- dataTilOffVisning(RegData=RegData, valgtVar = input$valgtVarRes,
-  #                                       hovedkat = as.numeric(input$hovedInngrepRes),
-  #                                       aar=as.numeric(input$aarRes[1]):as.numeric(input$aarRes[2]),
-  #                                       hastegrad = input$hastegradRes, tidlOp = input$tidlOpRes)
-  #
-  #   output$lastNed_dataTilResPort <- downloadHandler(
-  #     filename = function(){'dataTilResPort.csv'},
-  #     content = function(file, filename){write.csv2(tabdataTilResPort, file, row.names = T, fileEncoding = 'latin1', na = '')})
-  #
-  #
-  # })
-  }
 
 #Datakvalitet (dobbeltregistreringer)
   observe({

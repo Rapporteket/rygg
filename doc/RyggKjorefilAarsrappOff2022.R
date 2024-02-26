@@ -187,7 +187,7 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 
 #------------------------------------------------------------------------------------
 #-----------Filer til Interaktive nettsider -----------------------
-# Endring i kvalitetsindikatorer. MÅ OPPDATERES!!
+# Endring i kvalitetsindikatorer.
 #------------------------------------------------------------------------------------
 
 library(rygg)
@@ -200,7 +200,7 @@ valgteAar <- 2011:rappAar
 RyggData <- RyggUtvalgEnh(RegData=RyggData, aar=valgteAar)$RegData
 
 #Sjekk om nye resh:
-#setdiff(sort(unique(RyggData$ReshId)), sort(names(nyID)))
+setdiff(sort(unique(RyggData$ReshId)), sort(names(nyID)))
 
 #Ventetid, operasjon bestemt til utført
 # Ventetid på kirurgi
@@ -257,24 +257,24 @@ ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
 
 # Kl 5. Andel pasienter med degenerativ spondylolistese som blir operert med
 # fusjonskirurgi ved første operasjon
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='degSponFusj1op', preprosess = 0,
-                    Ngrense=20, aar=(rappAar-1):rappAar, outfile='degSponFusj1opKISh.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='degSponFusj1op', preprosess = 0,
+#                     Ngrense=20, aar=(rappAar-1):rappAar, outfile='degSponFusj1opKISh.pdf')
 
 ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
                           aar = valgteAar,
                           slaaSmToAar=1,
                           indID = 'nkr_rygg_degSponFusj1op', filUt = 'ind4_degSponFusj1op')
 
-Andel pasienter med degenerativ spondylolistese som blir operert med
-fusjonskirurgi ved første operasjon
-Mål: 		≤ landsgjennomsnittet høy måloppnåelse (grønt), > landsgjennomsnittet moderat/lav (gult): 2023: 9%
-Hensikt: 	Redusere andel pasienter med degenerativ spondylolistese som blir operert med fusjonskirurgi ved første operasjon
+# Andel pasienter med degenerativ spondylolistese som blir operert med
+# fusjonskirurgi ved første operasjon
+# Mål: 		≤ landsgjennomsnittet høy måloppnåelse (grønt), > landsgjennomsnittet moderat/lav (gult): 2023: 9%
+# Hensikt: 	Redusere andel pasienter med degenerativ spondylolistese som blir operert med fusjonskirurgi ved første operasjon
 
 
 # K6 Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi.
 # Spesifisering: (BlodfortynnendeFast = 0 &  ASA grad< 3 & Kjønn = 1 (mann)) & (HovedInngrepV2V3=1 eller HovedInngrepV2V3=2)
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', preprosess = 0,
-                    Ngrense=20, aar=rappAar, outfile='trombProfylLettKISh.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', preprosess = 0,
+#                     Ngrense=20, aar=rappAar, outfile='trombProfylLettKISh.pdf')
 
 ind6 <- dataTilOffVisning(RegData = RyggData, valgtVar='trombProfylLettKI',
                           aar = valgteAar,
@@ -282,9 +282,9 @@ ind6 <- dataTilOffVisning(RegData = RyggData, valgtVar='trombProfylLettKI',
                           indID = 'nkr_rygg_trombProfylLettKI', filUt = 'ind6_trombProfylLettKI')
 
 #Kl 6. 		Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi
-Mål: 	< landsgjennomsnittet høy måloppnåelse (grønt), ≥ landsgjennomsnittet moderat/lav (gult). 2023: 10%
-Hensikt: 	Økt etterlevelse av nasjonale retningslinjer for bruk av tromboseprofylakse ved å redusere andelen som får slik profylakse i forbindelse med lett ryggkirurgi, der det ikke er anbefalt
-Datakilde: 	NKR, legeskjema perioperativt
+# Mål: 	< landsgjennomsnittet høy måloppnåelse (grønt), ≥ landsgjennomsnittet moderat/lav (gult). 2023: 10%
+# Hensikt: 	Økt etterlevelse av nasjonale retningslinjer for bruk av tromboseprofylakse ved å redusere andelen som får slik profylakse i forbindelse med lett ryggkirurgi, der det ikke er anbefalt
+# Datakilde: 	NKR, legeskjema perioperativt
 
 # #--Sårinfeksjon, dyp og overfladisk
 # # Sårinfeksjon, pasientrapportert
