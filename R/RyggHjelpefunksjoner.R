@@ -326,33 +326,41 @@ if (ktr==2) {
 #' @return Datafil med entydige PID
 #' @export
 #'
-tilretteleggDataDumper <- function(data, datoFra, datoTil=Sys.Date(), reshID=0){
+tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0){
   #Koble på KryptertFnr fra ForlopsOversikt via ForlopsID
   PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
-  data <- merge(data, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
+  RegData <- merge(RegData, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
 
-  #Legg til ledende 0 i V2 - ikke for krypterte personnummer
-  indUten0 <- which(nchar(data$Personnummer)==10)
+  #Legg til ledende 0 i V2
+  indUten0 <- which(nchar(RegData$Personnummer)==10)
   if (length(indUten0)>0) {
-    data$Personnummer[indUten0] <- paste0(0,data$Personnummer[indUten0])}
+    RegData$Personnummer[indUten0] <- paste0(0,RegData$Personnummer[indUten0])}
 
   #Entydig PID SSN-var fra V3/koblingstab, Personnummer-var fra V
-  tidlPas <- match(data$SSN, data$Personnummer, nomatch = 0, incomparables = NA) #match(data$KryptertFnr, data$Personnummer, nomatch = 0, incomparables = NA)
-  # Men får vi her med alle eller bare første treff...? Like greit å evt. bare tildele ny, gjennomgående PID?
+  tidlPas <- match(RegData$SSN, RegData$Personnummer, nomatch = 0, incomparables = NA) #match(RegData$KryptertFnr, RegData$Personnummer, nomatch = 0, incomparables = NA)
   hvilkePas <- which(tidlPas>0)
-  data$PID[hvilkePas] <- data$PID[tidlPas[hvilkePas]]
+  RegData$PID[hvilkePas] <- RegData$PID[tidlPas[hvilkePas]]
+
+  #Pas med flere op i V2:
+  # table(RegData$SSN[hvilkePas])[table(RegData$SSN[hvilkePas])>2]
+  #   names(table(RegData$SSN)[table(RegData$SSN) == 5])
+  # RegData$SSN ==
+  # pas4 <- names(table(tidlPas)[table(tidlPas)==4])
+  # which(tidlPas == pas4)
+  # RegData[which(tidlPas == pas4), c('OpDato','SSN')]
+  # RegData[pas4, c('OpDato', 'Personnummer')]
 
   #SSN i en variabel
-  fraV3 <- which(is.na(data$Personnummer))
-  data$Personnummer[fraV3] <- data$KryptertFnr[fraV3]
+  fraV3 <- which(is.na(RegData$Personnummer))
+  RegData$Personnummer[fraV3] <- RegData$KryptertFnr[fraV3]
 
-  data <- dplyr::filter(data,
+  RegData <- dplyr::filter(RegData,
                         as.Date(InnDato) >= datoFra, # datovalg[1],
                         as.Date(InnDato) <= datoTil) #datovalg[2])
   if (reshID != 0) {
-    data <- data[which(as.numeric(data$ReshId) %in% as.numeric(reshID)), ]}
+    RegData <- RegData[which(as.numeric(RegData$ReshId) %in% as.numeric(reshID)), ]}
 
 
-  return(data)
+  return(RegData)
 }
 

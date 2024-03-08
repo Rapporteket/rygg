@@ -23,7 +23,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
 
   if (kunV3 == 0) {
     RegDataV2 <- rapbase::loadRegData(registryName="rygg",
-                                    query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')}
+                                    query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+    }
   RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
                                      query='SELECT * FROM AlleVarNum')
   #test <- RegDataV3[ ,c("DodsDato", 'AvdodDato', 'Avdod')]
@@ -121,9 +122,25 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   }
 
   #-----Tilrettelegging av V2-data-------------------------
-    #"Arbstatus12mnd", "Arbstatus3mnd", "ArbstatusPre" - vanskelig å tilpasse til ny versjon..
 if (kunV3 == 0) {
    RegDataV2$PID <- paste0(RegDataV2$PID, 'V2')
+
+   # Arbstatus3mnd OG Arbstatus12mnd V2:
+   # De som har verdi 11 og  FriskmeldtDato3mnd før Utfdato3mnd får samme Arb.status som ArbstatusPre
+   # which(RegDataV2$Arbstatus3mnd == 11 & (RegDataV2$dato > RegDataV2$FriskemeldtDato3mnd))
+   # De andre med 11 settes som manglende. FINNER IKKE DATO FOR UTFYLLING. SETTER FORELØPIG ALLE TIL MANGLENDE
+
+   # 7:Delvis sykemeldt - V2: 7+8,
+   # 8: Arbeidsavklaring - V2:9
+   # 9: Ufør - V2: 10,
+
+   RegDataV2$ArbstatusPreV2V3 <- as.numeric(RegDataV2$ArbstatusPre)
+   RegDataV2$Arbstatus3mndV2V3 <- as.numeric(RegDataV2$Arbstatus3mnd)
+   RegDataV2$Arbstatus12mndV2V3 <- as.numeric(RegDataV2$Arbstatus12mnd)
+   RegDataV2$ArbstatuspreV2V3 <- plyr::mapvalues(RegDataV2$ArbstatusPreV2V3, from = c(8,9,10), to = c(7,8,9))
+   RegDataV2$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus3mndV2V3, from = c(8,9,10,11), to = c(7,8,9,NA))
+   RegDataV2$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus12mndV2V3, from = c(8,9,10,11), to = c(7,8,9,NA))
+
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
   RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
@@ -131,12 +148,12 @@ if (kunV3 == 0) {
                                                   right = FALSE, labels=c(1:4)))
   RegDataV2$SykemeldVarighPreV3[is.na(RegDataV2$SykemeldVarighPreV3)] <- 9
 
-  RegDataV2$AntibiotikaV3 <-  plyr::mapvalues(RegDataV2$Antibiotika, from = c(0, 1, NA), to = c(0,1,9))
+  RegDataV2$AntibiotikaV3 <-  plyr::mapvalues(as.numeric(RegDataV2$Antibiotika), from = c(0, 1, NA), to = c(0,1,9))
 
   #V2: Kode 1:4,NA: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
   #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger","Innvilget","Ikke utfylt"]
-  RegDataV2$ErstatningPre <- plyr::mapvalues(RegDataV2$ErstatningPre, from = c(2,3,4,NA), to = c(0,2,3,9))
-  RegDataV2$UforetrygdPre <- plyr::mapvalues(RegDataV2$UforetrygdPre, from = c(2,3,4,NA), to = c(0,2,3,9))
+  RegDataV2$ErstatningPre <- plyr::mapvalues(as.numeric(RegDataV2$ErstatningPre), from = c(2,3,4,NA), to = c(0,2,3,9))
+  RegDataV2$UforetrygdPre <- plyr::mapvalues(as.numeric(RegDataV2$UforetrygdPre), from = c(2,3,4,NA), to = c(0,2,3,9))
 
   RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
   RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
@@ -189,7 +206,7 @@ if (kunV3 == 0) {
 
 
   #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
-  RegDataV2$SivilStatusV3 <- plyr::mapvalues(RegDataV2$SivilStatus, from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
+  RegDataV2$SivilStatusV3 <- plyr::mapvalues(as.numeric(RegDataV2$SivilStatus), from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 
 }
   #-----Tilrettelegging av V3-data-------------------------
@@ -202,6 +219,25 @@ if (kunV3 == 0) {
   RegDataV3 <- dplyr::rename(RegDataV3,
                              OpProlap = OprProlap #Siden Alle andre heter Op..
                              ) #PIDV3 = PasientID)
+
+  #Ny arbedisstatus-variabel, basert på V2 og V3:
+  #Arbstatus3mndV3 - de med verdi 11 eller 99 eller tom som har oppgitt sykemeldingsgrad., Skal ha verdien 7.
+  RegDataV3$Arbstatus3mndV3[which(RegDataV3$Arbstatus3mndV3 %in% c(11,99))] <- NA
+  ind7_3mnd <- which(is.na(RegDataV3$Arbstatus3mndV3) & RegDataV3$SykemeldPros3mnd>0) #17 per 1.mars 2024
+  RegDataV3$Arbstatus3mndV3[ind7_3mnd] <- 7
+
+  RegDataV3$Arbstatus12mndV3[which(RegDataV3$Arbstatus12mndV3 %in% c(10,99))] <- NA
+  ind7_12mnd <- which( is.na(RegDataV3$Arbstatus12mndV3) & RegDataV3$SykemeldPros12mnd>0) #6 per 1.mars 2024
+  RegDataV3$Arbstatus12mndV3[ind7_12mnd] <- 7
+
+  # 1: I arbeid - V3- 1+2
+  RegDataV3$ArbstatusPreV2V3 <- RegDataV3$ArbstatusPreV3
+  RegDataV3$Arbstatus3mndV2V3 <- RegDataV3$Arbstatus3mndV3
+  RegDataV3$Arbstatus12mndV2V3 <- RegDataV3$Arbstatus12mndV3
+  RegDataV3$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV3$ArbstatusPreV2V3, from = 2, to = 1)
+  RegDataV3$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus3mndV2V3, from = 2, to = 1)
+  RegDataV3$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus12mndV2V3, from = 2, to = 1)
+
 
   #Legge til underkategori for hovedkategori.
   ny <- rygg::kategoriserInngrep(RegData=RegDataV3)
@@ -269,7 +305,7 @@ if (kunV3 == 0) {
 
   RegDataV3$MedForstLukket <- as.character(as.Date(RegDataV3$MedForstLukket)) #Kobling med NA fungerer ikke for datotid-var
 
-  #NB:----------Sjekk ut at alle variabler har samme format - VENTER TIL ENDELIG V2-FIL PÅ RAPPORTEKET.
+  #NB:----------Sjekk ut at alle variabler har samme format
   #f.eks.
   #head(RegDataV2[, V2ogV3])
   #head(RegDataV3[, V2ogV3])

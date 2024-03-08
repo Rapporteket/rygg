@@ -7,19 +7,20 @@ Lager entydig PID basert på personnummer. Alle PID i V2 har ending suffiks V2. 
 deres finnes i begge versjoner. NB: For at dette skal bli riktig er vi avhengig av kilde med oppdatert koblingsfil (PID-personnummer)}
 \usage{
 tilretteleggDataDumper(
-  data,
-  datoFra,
+  RegData,
+  datoFra = "2000-01-01",
   datoTil = Sys.Date(),
-  reshID = 0,
-  rolle = "SC"
+  reshID = 0
 )
 }
 \arguments{
-\item{data}{tilnavn for utdatatabell. Hvis ikke angitt, lastes ikke fil ned}
+\item{datoFra}{startdato for filtrering}
+
+\item{datoTil}{sluttdato for filtrering}
 
 \item{reshID}{hvilken resh det evt. skal filtreres på}
 
-\item{rolle}{hvilken rolle som henter data}
+\item{data}{tilnavn for utdatatabell. Hvis ikke angitt, lastes ikke fil ned}
 }
 \value{
 Datafil med entydige PID
