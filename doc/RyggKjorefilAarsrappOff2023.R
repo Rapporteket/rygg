@@ -27,8 +27,6 @@ Ntot07 <- dim(RegData)[1]
 
 # RegDataV3 <- RegData[RegData$Aar >2018, ]
 table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
-# test <- RegData[ ,c('Aar', "Ferdigstilt1b3mnd", 'Utfdato3mnd', "Nytte3mnd")]
-table(RegData$Aar, !is.na(RegData$OswTot12mnd), useNA = 'a')
 
 #Gjør utvalg/tilrettelegge årsfiler
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData #RegData[which(RegData$InnDato>= as.Date(datoFra) & RegData$InnDato <= as.Date(datoTil)), ] #
@@ -41,69 +39,69 @@ AntAvd <- length(unique(RegData$ShNavn))
 
 #---------FIGURER, årsrapport --------------
 2024:
-RYGG
-OK VentetidSpesOpTid
-OK VentetidBestOp_Sh
-OK BeinsmLavPreProTid
-OK BeinsmLavPrePro
-OK OswEndr20ProTid
-OK OswEndr20Pro
-OK OswEndr30pstSSTid
-OK OswEndr30pstSS
-OK degSponFusj1opKITid
-OK degSponFusj1opKISh
-OK TrombosepforLettKITid heter trombProfylLettKITid
-OK TrombosepforLettKISh heter trombProfylLettKISh
-OK SympVarighUtstrTidPro
-OK SympVarighUtstrAarPro
-OK KpInf3mndProAar
-OK KpInf3mndSSAar
-OK PeropKompDuraProTid
-OK PeropKompDuraAarPro
-OK PeropKompDuraAarSS
-OK PeropKompDuraSSTid
-OK PeropKompDuraFusjTid
-OK Alder70
-OK Morsmal
-OK HoyUtdAvd
-OK UforAvd
-OK LiggetidAvdPro
-OK LiggetidAvdSS
-
-Hjemmelagede figurer vi selv har tatt ut av Rapporteket, som vi fortsatt vil bruke:
-  OK RegForsinkelseFord: Registreringsforsinkelse for hele landet, fordelt på andel per uker (Fordelingsfigur)
-OK RegForsinkelseTid: Registrert for sent for 3 mnd. oppfølging, tidstrend
-OK RegForsinkelseSh: Registrert for sent for 3 mnd. oppfølging per sykehus
-
-
-NAKKE
-NakkeNDIendr12mnd35pstTid
-NakkeNDIendr12mnd35pstSh
-NakkeKomplStemme3mndTid
-NakkeKomplStemme3mndSh
-NakkeKomplSvelging3mndTid
-NakkeKomplSvelging3mndSh
-NakkeKomplinfekSh
-NakkeAlder70Tid
-NakkeOprIndikMyelopatiSh
-NakkeSaardrenUmFTid
-Nye figurer 2024:
-  Responsrate på ePROM
-
-
-Hjemmelagede figurer vi selv har tatt ut av Rapporteket, som vi fortsatt vil bruke:
-RegForsinkelseFord: Registreringsforsinkelse for hele landet, fordelt på andel per uker (Fordelingsfigur)
-RegForsinkelseTid: Registrert for sent for 3 mnd. oppfølging, tidstrend
-RegForsinkelseSh: Registrert for sent for 3 mnd. oppfølging per sykehus
-
-Nye figurer 2024:
-Responsrate på ePROM - andel som har svart på 3mnd-oppfølging?
-  Oppf3mndSh
-  Oppf3mndTid
-Praksisendring og utfall (fusjon vs. Dekompresjon) - se e-post fra Tore
-
-Dekningsgrad offentlig, både rygg og nakke
-Dekningsgrad privat, både rygg og nakke
+# RYGG
+# OK VentetidSpesOpTid
+# OK VentetidBestOp_Sh
+# OK BeinsmLavPreProTid
+# OK BeinsmLavPrePro
+# OK OswEndr20ProTid
+# OK OswEndr20Pro
+# OK OswEndr30pstSSTid
+# OK OswEndr30pstSS
+# OK degSponFusj1opKITid
+# OK degSponFusj1opKISh
+# OK TrombosepforLettKITid heter trombProfylLettKITid
+# OK TrombosepforLettKISh heter trombProfylLettKISh
+# OK SympVarighUtstrTidPro
+# OK SympVarighUtstrAarPro
+# OK KpInf3mndProAar
+# OK KpInf3mndSSAar
+# OK PeropKompDuraProTid
+# OK PeropKompDuraAarPro
+# OK PeropKompDuraAarSS
+# OK PeropKompDuraSSTid
+# OK PeropKompDuraFusjTid
+# OK Alder70
+# OK Morsmal
+# OK HoyUtdAvd
+# OK UforAvd
+# OK LiggetidAvdPro
+# OK LiggetidAvdSS
+#
+# Hjemmelagede figurer vi selv har tatt ut av Rapporteket, som vi fortsatt vil bruke:
+#   OK RegForsinkelseFord: Registreringsforsinkelse for hele landet, fordelt på andel per uker (Fordelingsfigur)
+# OK RegForsinkelseTid: Registrert for sent for 3 mnd. oppfølging, tidstrend
+# OK RegForsinkelseSh: Registrert for sent for 3 mnd. oppfølging per sykehus
+#
+#
+# NAKKE
+# NakkeNDIendr12mnd35pstTid
+# NakkeNDIendr12mnd35pstSh
+# NakkeKomplStemme3mndTid
+# NakkeKomplStemme3mndSh
+# NakkeKomplSvelging3mndTid
+# NakkeKomplSvelging3mndSh
+# NakkeKomplinfekSh
+# NakkeAlder70Tid
+# NakkeOprIndikMyelopatiSh
+# NakkeSaardrenUmFTid
+# Nye figurer 2024:
+#   Responsrate på ePROM
+#
+#
+# Hjemmelagede figurer vi selv har tatt ut av Rapporteket, som vi fortsatt vil bruke:
+# RegForsinkelseFord: Registreringsforsinkelse for hele landet, fordelt på andel per uker (Fordelingsfigur)
+# RegForsinkelseTid: Registrert for sent for 3 mnd. oppfølging, tidstrend
+# RegForsinkelseSh: Registrert for sent for 3 mnd. oppfølging per sykehus
+#
+# Nye figurer 2024:
+# Responsrate på ePROM - andel som har svart på 3mnd-oppfølging?
+#   Oppf3mndSh
+#   Oppf3mndTid
+# Praksisendring og utfall (fusjon vs. Dekompresjon) - se e-post fra Tore
+#
+# Dekningsgrad offentlig, både rygg og nakke
+# Dekningsgrad privat, både rygg og nakke
 
 #Ut fra dette fjernes følgende figurer:
 DegSponFusj
