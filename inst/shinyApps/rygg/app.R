@@ -249,6 +249,8 @@ ui <- navbarPage(id = "tab1nivaa",
                    br(),
                    br(),
                    h3('Last ned data fra versjon 2.0:'),
+                   h4('NB: Dette er kun rådata, dvs. tabellen Uttrekk_Rapport_FROM_TORE'),
+                   h4('uten noe prosessering av data'),
                    downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
                    br(),
 
@@ -687,7 +689,7 @@ server <- function(input, output,session) {
                  "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
                  "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
   RegDataV2V3 <- RegDataV2V3[ ,-which(names(RegDataV2V3) %in% fritxtVar)]
-  dataDump <- tilretteleggDataDumper(data=RegDataV2V3,
+  dataDump <- tilretteleggDataDumper(RegData=RegDataV2V3,
                                      datoFra = input$datovalgRegKtr[1],
                                      datoTil = input$datovalgRegKtr[2],
                                      reshID=input$velgReshReg) #rolle = rolle Bare SC får hente disse dataene

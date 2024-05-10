@@ -33,7 +33,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
                 "Avdod", "AvdodDato", "BasisRegStatus", "KryptertFnr")
    #varBegge <- intersect(sort(names(RegDataV3AV)), sort(names(RegDataV3For)))
-  RegDataV3 <- merge(RegDataV3AVN, RegDataV3Forl[ ,varForl], by='ForlopsID', all.x = TRUE, all.y = FALSE)
+  RegDataV3 <- merge(RegDataV3AVN[ ,-which(names(RegDataV3AVN)=='DodsDato')],
+                     RegDataV3Forl[ ,varForl], by='ForlopsID',
+                     all.x = TRUE, all.y = FALSE)
 
   ePROMadmTab <- rapbase::loadRegData(registryName="rygg",
                                    query='SELECT * FROM proms')
@@ -126,10 +128,8 @@ if (kunV3 == 0) {
    RegDataV2$PID <- paste0(RegDataV2$PID, 'V2')
 
    # Arbstatus3mnd OG Arbstatus12mnd V2:
-   # De som har verdi 11 og  FriskmeldtDato3mnd før Utfdato3mnd får samme Arb.status som ArbstatusPre
-   # which(RegDataV2$Arbstatus3mnd == 11 & (RegDataV2$dato > RegDataV2$FriskemeldtDato3mnd))
-   # De andre med 11 settes som manglende. FINNER IKKE DATO FOR UTFYLLING. SETTER FORELØPIG ALLE TIL MANGLENDE
-
+   # De som har verdi 11 settes TIL MANGLENDE
+  # 2: Hjemmeværende - bare i V2 - settes tom
    # 7:Delvis sykemeldt - V2: 7+8,
    # 8: Arbeidsavklaring - V2:9
    # 9: Ufør - V2: 10,
@@ -137,9 +137,9 @@ if (kunV3 == 0) {
    RegDataV2$ArbstatusPreV2V3 <- as.numeric(RegDataV2$ArbstatusPre)
    RegDataV2$Arbstatus3mndV2V3 <- as.numeric(RegDataV2$Arbstatus3mnd)
    RegDataV2$Arbstatus12mndV2V3 <- as.numeric(RegDataV2$Arbstatus12mnd)
-   RegDataV2$ArbstatuspreV2V3 <- plyr::mapvalues(RegDataV2$ArbstatusPreV2V3, from = c(8,9,10), to = c(7,8,9))
-   RegDataV2$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus3mndV2V3, from = c(8,9,10,11), to = c(7,8,9,NA))
-   RegDataV2$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus12mndV2V3, from = c(8,9,10,11), to = c(7,8,9,NA))
+   RegDataV2$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV2$ArbstatusPreV2V3, from = c(2,8,9,10), to = c(NA,7,8,9))
+   RegDataV2$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus3mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
+   RegDataV2$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus12mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
 
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
@@ -155,8 +155,8 @@ if (kunV3 == 0) {
   RegDataV2$ErstatningPre <- plyr::mapvalues(as.numeric(RegDataV2$ErstatningPre), from = c(2,3,4,NA), to = c(0,2,3,9))
   RegDataV2$UforetrygdPre <- plyr::mapvalues(as.numeric(RegDataV2$UforetrygdPre), from = c(2,3,4,NA), to = c(0,2,3,9))
 
-  RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
-  RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
+  #Ønsker tom for manglende RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
+  #Ønsker tom for manglende RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
   RegDataV2$OpIndPareseGrad[is.na(RegDataV2$OpIndPareseGrad)] <- 9
   RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
   RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
@@ -219,6 +219,11 @@ if (kunV3 == 0) {
   RegDataV3 <- dplyr::rename(RegDataV3,
                              OpProlap = OprProlap #Siden Alle andre heter Op..
                              ) #PIDV3 = PasientID)
+  #Ønsker tom for manglende
+  RegDataV3$SmBePre[RegDataV3$SmBePre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
+  RegDataV3$SmRyPre[RegDataV3$SmRyPre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
+
+
 
   #Ny arbedisstatus-variabel, basert på V2 og V3:
   #Arbstatus3mndV3 - de med verdi 11 eller 99 eller tom som har oppgitt sykemeldingsgrad., Skal ha verdien 7.
@@ -234,7 +239,7 @@ if (kunV3 == 0) {
   RegDataV3$ArbstatusPreV2V3 <- RegDataV3$ArbstatusPreV3
   RegDataV3$Arbstatus3mndV2V3 <- RegDataV3$Arbstatus3mndV3
   RegDataV3$Arbstatus12mndV2V3 <- RegDataV3$Arbstatus12mndV3
-  RegDataV3$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV3$ArbstatusPreV2V3, from = 2, to = 1)
+  RegDataV3$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV3$ArbstatusPreV2V3, from = c(2, 99), to = c(1, NA))
   RegDataV3$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus3mndV2V3, from = 2, to = 1)
   RegDataV3$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus12mndV2V3, from = 2, to = 1)
 

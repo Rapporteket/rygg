@@ -150,21 +150,33 @@ valgtVarTest <- valgtVar
             # Andel i kategori 6 tom 9, mottar sykepenger Av 1-9, (ikke bare de som sykemeldt fra før)
             #  Gml: grtxt <- c('I arbeid','Hjemmeværende', 'Studie/skole', 'Pensjonist', 'Arbeidsledig', 'Sykemeldt',
             #		'Aktiv sykemeldt', 'Delvis sykemeldt', 'Attføring/rehab.', 'Uføretrygdet', 'Ukjent')
+        # grtxt <- c("Fulltidsjobb","Deltidsjobb","Student/skoleelev",
+        #            "Alderspensjonist", "Arbeidsledig","Sykemeldt","Delvis sykemeldt",
+        #            "Arbeidsavklaringspenger", "Uførepensjonert","Ikke utfylt")
+        #ArbstatusV2V3:
+        #1: I arbeid - V2 1, V3- 1+2
+        # 2: Hjemmeværende - bare i V2 - settes tom
+        # 3: Student/elev, 4: Pensjonist, 5: Arb.ledig, 6: Sykemeldt
+        # 7:Delvis sykemeldt - V2: 7+8, V3: 7
+        # 8: Arbeidsavklaring - V2: 9, V3:8
+        # 9: Ufør - V2: 10, V3: 9
+
             datoTil <- min(datoTil, Sys.Date()-trekkfraDager)
             RegData$Arbstatus <- switch(as.character(ktr),
-                                        '0' = RegData$ArbstatusPreV3,
-                                        '1'= RegData$Arbstatus3mndV3,
-                                        '2'= RegData$Arbstatus12mndV3)
+                                        '0' = RegData$ArbstatusPreV2V3, #ArbstatusPreV3
+                                        '1'= RegData$Arbstatus3mndV2V3, #Arbstatus3mndV3
+                                        '2'= RegData$Arbstatus12mndV2V3) #Arbstatus12mndV3
             ind <- switch(as.character(ktr),
                           '0' = 1:dim(RegData)[1],
                           '1' = which(RegData$Ferdigstilt1b3mnd==1),
                           '2' = which(RegData$Ferdigstilt1b12mnd == 1))
             RegData <- RegData[ind, ]
             retn <- 'H'
-            grtxt <- c("Fulltidsjobb","Deltidsjobb","Student/skoleelev",
+            grtxt <- c("I arbeid", "Student/skoleelev",
                        "Alderspensjonist", "Arbeidsledig","Sykemeldt","Delvis sykemeldt",
-                       "Arbeidsavklaringspenger", "Uførepensjonert","Ikke utfylt")
-            RegData$VariabelGr <- factor(RegData$Arbstatus, levels = c(1:9,99))
+                       "Arbeidsavklaring", "Uførepensjonert","Ikke utfylt")
+            RegData$Arbstatus[is.na(RegData$Arbstatus)] <- 99
+            RegData$VariabelGr <- factor(RegData$Arbstatus, levels = c(1,3:9,99))
             tittel <- paste0('Arbeidsstatus, ', ktrtxt)
             if (figurtype %in% c('andelTid', 'andelGrVar')) {
                   RegData <- RegData[which(RegData$Arbstatus %in% 1:9), ]

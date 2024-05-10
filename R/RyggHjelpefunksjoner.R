@@ -189,6 +189,11 @@ RegDataSort$DagerNesteOp[indPasFlereOp-1] <-
 RegDataSort$Reop90dEtterOp <- 0
 indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d==1)
 RegDataSort$Reop90dEtterOp[indReop] <- 1
+
+#Tar bort den gamle Reop90d-variabelen for å unngå misforståelse
+#RegDataSort <- RegDataSort[ ,-which(names(RegDataSort) == 'Reop90d')]
+#Ikke med lenger når henter data.
+
 # RegDataSort <-
 #   RegDataSort %>%
 #   dplyr::mutate(Reop2 =
@@ -253,6 +258,7 @@ if (ktr==2) {
             '4211883' = '943545634', #Aleris Bodø
             '107508' = '943545634',	#Aleris Bergen	Aleris Bergen
             '107240' = '943545634',	#Aleris Drammen	Aleris Drammen
+            '4211880' = '943545634', #Aleris Helse AS / Aleris Nesttun (ny 2023)
             '107511' = '943545634',  #Aleris Oslo
             '999975' = '943545634',	#Aleris Oslo	Aleris Colosseum Nobel
             '999994' = '943545634',	#Aleris Stavanger	Aleris Colosseum Stavanger
