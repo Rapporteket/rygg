@@ -932,7 +932,7 @@ valgtVarTest <- valgtVar
         indUtv <- which((RegData$ASA<3) & (RegData$ErMann==1) & (RegData$HovedInngrepV2V3 %in% 1:2) & (RegData$BlodfortynnendeFast==0))
         #(RegData$ErMann==1) & (RegData$HovedInngrepV2V3 %in% 1:2) er også hardkodet utvalg i andelsfigurene.
         RegData <- RegData[indUtv,]
-        tittel <- 'Tromboseprofylakse gitt, ASA<3'
+        tittel <- 'Tromboseprofylakse gitt, mann, ASA<3'
         RegData <- RegData[which(RegData$PostopTrombProfyl %in% 0:1), ]
         RegData$Variabel <- RegData$PostopTrombProfyl
         varTxt <- 'fått tromboseprofylakse'

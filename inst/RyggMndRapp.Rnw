@@ -114,12 +114,11 @@ Rapporten viser følgende:
 \item Gjennomsnittlig forbedring av ODI prolaps
 \item Gjennomsnittlig forbedring av ODI spinal stenose
 \item Degenerativ spondylolistese operert med fusjonskirurgi ved første operasjon
-\item Tromboseprofylakse gitt, ASA<3
 \item Tromboseprofylakse i forbindelse med lett ryggkirurgi
 \item Ventetid fra henvisning til time på poliklinikk
-\item Symptomvarighet
 \item Andel Ø-hjelp
 \item Inngrepstype
+\item Symptomvarighet
 \item Postoperativ liggetid prolaps
 \item Postoperativ liggetid spinal stenose
 \item Durarift prolaps
@@ -127,6 +126,7 @@ Rapporten viser følgende:
 \item Pasientrapportert sårinfeksjon, dyp og overflatisk
 \item Tilfredshet hos pasienten
 \item Nytte av operasjon
+
 \end{itemize}
 
 Dette er bare et lite utvalg resultater. På Rapporteket kan du finne mer spesifikke resultater for disse og mange andre variable.
@@ -172,6 +172,13 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='smBePreLav',
                 enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                 outfile='smBePreLavKITid.pdf')
 
+dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+               hovedkat = 1, outfile='OswEndr_pro.pdf')
+dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+               hovedkat = 9, outfile='OswEndr_SS.pdf')
+
 dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='degSponFusj1op',
                 enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                 outfile='degSponFusj1opKITid.pdf')
@@ -180,16 +187,6 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLet
                 enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                 outfile='trombProfylLettKITid.pdf')
 
-dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
-                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
-               hovedkat = 1, outfile='OswEndr_pro.pdf')
-dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
-                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
-               hovedkat = 9, outfile='OswEndr_SS.pdf')
-#----------
-
-dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
-                      reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
 
 
 @
@@ -205,6 +202,14 @@ dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr',
 \end{frame}
 
 %Kvalitetsindikatorer:
+
+\begin{frame}[fragile] {Ventetid fra operasjon ble bestemt til utført}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{VentetidSpesOp.pdf}
+\caption{Ventetid fra operasjon ble bestemt til utført, elektive pasienter, egen avd. og resten av landet.}
+\end{figure}
+\end{frame}
 
 \begin{frame}[fragile] {Lite beinsmerter og ingen parese}
 \begin{figure}[ht]
@@ -270,14 +275,6 @@ dum <- RyggFigAndeler(RegData=RegData1aar, preprosess=0, valgtVar='inngrep', enh
 \end{figure}
 \end{frame}
 
-\begin{frame}[fragile] {Ventetid fra operasjon ble bestemt til utført}
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.35]{VentetidSpesOp.pdf}
-\caption{Ventetid fra operasjon ble bestemt til utført, elektive pasienter, egen avd. og resten av landet.}
-\end{figure}
-\end{frame}
-
 \begin{frame}[fragile] {Andel ø-hjelp}
 \begin{figure}[ht]
 \centering
@@ -296,9 +293,13 @@ dum <- RyggFigAndeler(RegData=RegData1aar, preprosess=0, valgtVar='inngrep', enh
 
 <<'LageFigurer3', include=FALSE>>=
 
-RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='liggetidPostOp',
+dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
+                      reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
+
+dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='liggetidPostOp',
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                hovedkat = 1, outfile='LiggetidPostOp_pro.pdf')
+
 RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='liggetidPostOp',
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                hovedkat = 9, outfile='LiggetidPostOp_SS.pdf')
@@ -310,8 +311,15 @@ dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDur
                       datoFra = datoFra1Aar, reshID = reshID, hovedkat = 9,
                       outfile='PeropKompDura_SS.pdf')
 
-
 @
+
+\begin{frame}[fragile] {Symptomvarighet}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{SymptVarighUtstrTilBen.pdf}
+\caption{Varighet av utstrålende smerter til ben, egen avdeling og resten av landet.}
+\end{figure}
+\end{frame}
 
 
 \begin{frame}[fragile] {Postoperativ liggetid, prolaps}
@@ -330,14 +338,6 @@ dum <- RyggFigAndelerGrVar(RegData=RegData, preprosess=0, valgtVar='peropKompDur
 \end{figure}
 \end{frame}
 
-
-\begin{frame}[fragile] {Symptomvarighet}
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.35]{SymptVarighUtstrTilBen.pdf}
-\caption{Varighet av utstrålende smerter til ben, egen avdeling og resten av landet.}
-\end{figure}
-\end{frame}
 
 \begin{frame}[fragile] {Durarift prolaps}
 \begin{figure}[ht]
@@ -386,7 +386,6 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='nytte', ktr = 1,
 \caption{Pasientenes tilfredshet, egen avd og resten av landet.}
 \end{figure}
 \end{frame}
-
 
 \begin{frame}[fragile] {Nytte av operasjonen}
 \begin{figure}[ht]
