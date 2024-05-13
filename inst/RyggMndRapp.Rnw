@@ -88,7 +88,7 @@ Den inneholder en sammenstilling av resultater  fra Norsk Kvalitetsregister for 
 Alle resultater er baserte på data fra registeret og er gyldige per rapportdato for
 opphold som er ferdigstilte t.o.m. dagen før rapportdato i QReg.
 
-Fagrådet for NKR er ansvarlig for alle vurderinger og tolkninger av data, og også feil i resultat som skyldes feil i datagrunnlaget. Den viktigste feilkilden i rapporten vil trolig være ufullstendige datasett for mange av de registrerende enheter – det vil si at ikke alle data er ferdigstilte for aktuell månad. Dette etterslepet vil variere markert både i tid og volum, og gjør at data blir mer eller mindre representative for de ulike enhetene.
+Fagrådet for NKR er ansvarlig for alle vurderinger og tolkninger av data, og også feil i resultat som skyldes feil i datagrunnlaget. Den viktigste feilkilden i rapporten vil trolig være ufullstendige datasett for mange av de registrerende enheter – det vil si at ikke alle data er ferdigstilte for aktuell måned. Dette etterslepet vil variere markert både i tid og volum, og gjør at data blir mer eller mindre representative for de ulike enhetene.
 Rapporten har følgelig usikkert datagrunnlag og er ment til internt bruk i enhetene.
 Rapporten inneholder anonymiserte samledata. I tilfeller der utvalget inneholder få
 registreringer kombinert med eksempelvis demografiske data, kan det ikke utelukkes at rapporterte data kan tilbakeidentifiseres til enkeltpersoner.
@@ -108,21 +108,23 @@ Datoer/årstall er basert på operasjonsdato. Tidsutvalg for rapportene er spesi
 Rapporten viser følgende:
 \begin{itemize}
 \item Registreringsoversikt og nøkkeltall
-\item Registreingsforsinkelse
+\item Registreringsforsinkelse
+\item Ventetid fra operasjon ble bestemt til utført
+\item Lite beinsmerter og ingen parese
+\item Gjennomsnittlig forbedring av ODI prolaps
+\item Gjennomsnittlig forbedring av ODI spinal stenose
 \item Degenerativ spondylolistese operert med fusjonskirurgi ved første operasjon
+\item Tromboseprofylakse gitt, ASA<3
 \item Tromboseprofylakse i forbindelse med lett ryggkirurgi
 \item Ventetid fra henvisning til time på poliklinikk
-\item Ventetid fra operasjon ble bestemt til utført
+\item Symptomvarighet
 \item Andel Ø-hjelp
 \item Inngrepstype
 \item Postoperativ liggetid prolaps
 \item Postoperativ liggetid spinal stenose
-\item Symptomvarighet
 \item Durarift prolaps
 \item Durarift spinal stenose
 \item Pasientrapportert sårinfeksjon, dyp og overflatisk
-\item Gjennomsnittlig forbedring av ODI prolaps
-\item Gjennomsnittlig forbedring av ODI spinal stenose
 \item Tilfredshet hos pasienten
 \item Nytte av operasjon
 \end{itemize}
@@ -156,8 +158,19 @@ xtable(tabNokkeltall, digits=0, align=c('l', rep('r', ncol(tabNokkeltall))),
 dum <- RyggFigAndeler(RegData=RegData1aar, preprosess=0, valgtVar='regForsinkelse', enhetsUtvalg = 1,
                       reshID = reshID, outfile='RegForsinkelse.pdf')
 
-dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
-                      reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
+#Kvalitetsindikatorer:
+ 1. Ventetid op-utført, 3/4 Gj.sn forb ODI prolaps/SS
+- KI 2 Lite beinsmerter og ingen parese
+- KI 5 Fusjonskirurgi ved første operasjon
+- KI 6 Tromboseprofylakse gitt, ASA<3
+
+dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidSpesOp',
+                       hastegrad = 1,
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+                       outfile='VentetidSpesOp.pdf')
+dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='smBePreLav',
+                enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+                outfile='smBePreLavKITid.pdf')
 
 dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='degSponFusj1op',
                 enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
@@ -166,6 +179,19 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='degSponFusj1op
 dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
                 enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                 outfile='trombProfylLettKITid.pdf')
+
+dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+               hovedkat = 1, outfile='OswEndr_pro.pdf')
+dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
+                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+               hovedkat = 9, outfile='OswEndr_SS.pdf')
+#----------
+
+dum <- RyggFigAndeler(RegData=RegData, preprosess=0, valgtVar='sympVarighUtstr', enhetsUtvalg = 1,
+                      reshID = reshID, outfile='SymptVarighUtstrTilBen.pdf')
+
+
 @
 
 \begin{frame}[fragile] {Registreringsforsinkelse}
@@ -178,25 +204,47 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLet
 
 \end{frame}
 
+%Kvalitetsindikatorer:
+
+\begin{frame}[fragile] {Lite beinsmerter og ingen parese}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{smBePreLavKITid.pdf}
+\caption{Lite beinsmerter og ingen parese }
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Gjennomsnittlig forbedring av ODI prolaps}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{OswEndr_pro.pdf}
+\caption{Gjennomsnittlig forbedring av ODI prolaps, egen avd og resten av landet.}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile] {Gjennomsnittlig forbedring av ODI spinal stenose}
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.35]{OswEndr_SS.pdf}
+\caption{Gjennomsnittlig forbedring av ODI spinal stenose, egen avd og resten av landet.}
+\end{figure}
+\end{frame}
+
 
 \begin{frame}[fragile] {Degenerativ spondylolistese, fusjonskirurgi ved første operasjon}
-
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.35]{degSponFusj1opKITid.pdf}
-\caption{Degenerativ spondylolistese operert med fusjonskirurgi ved første operasjon.}
+\caption{Fusjonskirurgi ved første operasjon.}
 \end{figure}
-
 \end{frame}
 
 \begin{frame}[fragile] {Tromboseprofylakse i forbindelse med lett ryggkirurgi}
-
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.35]{trombProfylLettKITid.pdf}
 \caption{Menn som får tromboseprofylakse i forbindelse med lett ryggkirurgi.}
 \end{figure}
-
 \end{frame}
 
 <<'LageFigurer2', include=FALSE>>=
@@ -204,10 +252,6 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidHenvTime
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                        outfile='VentetidHenvTimePol.pdf')
 
-dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidSpesOp',
-                       hastegrad = 1,
-                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
-                       outfile='VentetidSpesOp.pdf')
 
 dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='opKat',
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
@@ -317,12 +361,6 @@ datoFraInf <- max(datoFra, '2020-01-01')
 dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='kpInf3mnd', datoFra = datoFraInf,
                         enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                         outfile='KpInf.pdf')
-RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
-                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
-               hovedkat = 1, outfile='OswEndr_pro.pdf')
-RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
-                       enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
-               hovedkat = 9, outfile='OswEndr_SS.pdf')
 
 dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='fornoydhet', ktr = 1,
                         enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
@@ -340,21 +378,6 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='nytte', ktr = 1,
 \end{figure}
 \end{frame}
 
-\begin{frame}[fragile] {Gjennomsnittlig forbedring av ODI prolaps}
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.35]{OswEndr_pro.pdf}
-\caption{Gjennomsnittlig forbedring av ODI prolaps, egen avd og resten av landet.}
-\end{figure}
-\end{frame}
-
-\begin{frame}[fragile] {Gjennomsnittlig forbedring av ODI spinal stenose}
-\begin{figure}[ht]
-\centering
-\includegraphics[scale=0.35]{OswEndr_SS.pdf}
-\caption{Gjennomsnittlig forbedring av ODI spinal stenose, egen avd og resten av landet.}
-\end{figure}
-\end{frame}
 
 \begin{frame}[fragile] {Tilfredshet hos pasientene}
 \begin{figure}[ht]
