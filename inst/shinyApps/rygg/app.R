@@ -91,8 +91,8 @@ ui <- navbarPage(id = "tab1nivaa",
              h4(tags$b('Registreringsoversikter '), 'viser aktivitet i registeret.'),
              #h4(tags$b('Kvalitetsindikatorer '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
              h4(tags$b('Fordelinger '), 'viser fordelinger (figur/tabell) av ulike variabler.'),
-             # h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) per sykehus og utvikling over tid.
-             #                Man kan velge hvilken tidsskala man vi se på.'),
+              h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) per sykehus og utvikling over tid.
+                             Man kan velge hvilken tidsskala man vi se på.'),
              # h4(tags$b('Gjennomsnitt: per sykehus og over tid'), ' viser gjennomsnittsverdier per sykehus og utvikling over tid.
              #                Man kan velge om man vil se gjennomsnitt eller median.'),
              br(),

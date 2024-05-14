@@ -159,10 +159,6 @@ dum <- RyggFigAndeler(RegData=RegData1aar, preprosess=0, valgtVar='regForsinkels
                       reshID = reshID, outfile='RegForsinkelse.pdf')
 
 #Kvalitetsindikatorer:
- 1. Ventetid op-utført, 3/4 Gj.sn forb ODI prolaps/SS
-- KI 2 Lite beinsmerter og ingen parese
-- KI 5 Fusjonskirurgi ved første operasjon
-- KI 6 Tromboseprofylakse gitt, ASA<3
 
 dum <- RyggFigAndelTid(RegData=RegData, preprosess=0, valgtVar='ventetidSpesOp',
                        hastegrad = 1,
