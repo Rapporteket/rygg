@@ -20,7 +20,7 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       RegDataDum$Maaned1 <- lubridate::floor_date(RegDataDum$InnDato, 'month')
       tabAvdMnd1 <- table(RegDataDum[ , c('ShNavn', 'Maaned1')])
       colnames(tabAvdMnd1) <- format(lubridate::ymd(colnames(tabAvdMnd1)), '%b %y') #month(ymd(colnames(tabAvdMnd1)), label = T)
-      if (reshID==0){
+      if (reshID==0 & !is.na(datoTil)) {
         tabAvdMnd1 <- addmargins((tabAvdMnd1))}
       tabAvdMnd1 <- xtable::xtable(tabAvdMnd1, digits=0)
 	return(tabAvdMnd1)
@@ -140,12 +140,13 @@ lagTabavFigGjsnGrVar <- function(UtDataFraFig){
 #' @inheritParams RyggUtvalgEnh
 #'
 #' @export
-tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=2, reshID=0) {
+tabNokkeltall <- function(RegData, utvid=0, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=2, reshID=0) {
   datoFra <- switch(tidsenhet,
                     Mnd = lubridate::floor_date(as.Date(datoTil)%m-% months(12, abbreviate = T), 'month'), #as.Date(paste0(as.numeric(substr(datoTil,1,4))-1, substr(datoTil,5,8), '01'), tz='UTC')
                     Kvartal = paste0(year(as.Date(datoTil))-4, '-01-01'),
                     Aar = paste0(year(as.Date(datoTil))-4, '-01-01')
   )
+
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil = datoTil,
                           enhetsUtvalg = enhetsUtvalg, reshID = reshID)$RegData
   RegData <- SorterOgNavngiTidsEnhet(RegData, tidsenhet=tidsenhet, tab=1)$RegData
@@ -165,8 +166,15 @@ tabNokkeltall <- function(RegData, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUt
     'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean, na.rm=T)
     )
 
-    # 'Liggetid (gj.sn)' = tapply(RegData$liggetid[indLigget], RegData$TidsEnhet[indLigget], FUN=median, na.rm=T),
+  if (utvid == 1) {
+    tabUtvid <- rbind(
+    'Antall avdelinger' = tapply(RegData$ShNavn, RegData$TidsEnhet, FUN=length), #length(unique((RyggData1aar$ShNavn))),
+    tabNokkeltall,
+    'Svart på oppfølging, 3 mnd.' = tapply(RyggData1aar$Ferdigstilt1b3mnd==1, RegData$TidsEnhet, FUN=prosent) #mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T),
+    )
 
+     tabNokkeltall <- tabUtvid
+  }
 
   return(tabNokkeltall)
 }

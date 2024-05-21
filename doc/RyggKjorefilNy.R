@@ -3,6 +3,27 @@ devtools::install_github("Thinkr-open/golem", ref='master')
 devtools::install_github("Rapporteket/rapbase", ref='rel')
 
 #------------------------------------
+RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
+                                     query='SELECT * FROM AlleVarNum')
+RegDataV3AVN$PostopTrombProfyl
+
+#Fritekstfeltet i  spørsmålet ovenfor (Hvis ja, hviket?) «SpesTrombProfyl» (navn i repporteket) er en variabel som ikke kommer med i uttrekket fra rapporteket.
+#Vi har fått forespørsel fra Ålesund ( ReshId: 102483) om å se på innholdet i denne variabelen (Ålesund sykehus for 2022).
+#Vi vil da trenge en fil som inneholder PID + opr.dato + SpesTrombProfy + ReshId.
+ind <- which(lubridate::year(RegDataV3AVN$OpDato)==2022 & RegDataV3AVN$AvdRESH==102483 & RegDataV3AVN$PostopTrombProfyl==1)
+Aalesund <- RegDataV3AVN[ind,
+                         c('PasientID', 'OpDato', 'AvdRESH','PostopTrombProfyl', 'SpesTrombProfyl')]
+write.csv2(Aalesund, file = 'Aalesund.csv', row.names = F)
+
+#Kunne jeg også få en frekvenstabell på alle sykehus på hva som er registrert SpesTrombProfyl.
+InnholdSpesTrombProfyl <- table(RegDataV3AVN$SpesTrombProfyl[RegDataV3AVN$PostopTrombProfyl==1])
+table(RegDataV3AVN$PostopTrombProfyl)
+write.csv2(InnholdSpesTrombProfyl, file = 'Frekv_SpesTrombProfyl.csv', row.names = F)
+
+
+
+
+
 #Sjekk
 library(rygg)
 library(magrittr)
@@ -10,6 +31,11 @@ RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
 forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
              tilDato=Sys.Date()-100, forsinkelse=100, reshID=601161)
 
+
+Rygg22 <- RyggRegDataSQLgml(datoFra = '2022-01-01', datoTil = '2022-12-31')
+RyggV3 <- RyggRegDataSQLgml(datoFra = '2023-01-01')
+tab <- table(RyggV3[ ,c('SykehusNavn', "HelseRegion")])
+write.csv2(tab, file = 'ShNavnRHF.csv', enc)
 #----Sjekk av Ferdig1b3mnd----
 
 forl3mndIkkeFunnet <- c(16811, 17244, 17947, 18187, 22301, 16622)
@@ -84,6 +110,7 @@ RegData <- RyggRegDataSQLV2V3()
 RyggDataRaa <- read.table('C:/Registerdata/Rygg/RyggdataDump2022-12-09fra2018.csv',
                       sep=';', header=T, encoding = 'latin1', dec = ',')
 #RyggDataRaa <- RyggDataRaa[-which(RyggDataRaa$ForlopsID == 8274),]
+RyggDataRaa <- RyggRegDataSQLV2V3(datoFra = '2021-01-01', datoTil = '2021-12-31')
 RyggData <- RyggPreprosess(RyggDataRaa)
 
 Variabler <- c('AntibiotikaV3',	'ASA',	'TidlOpr',	'OpKat',	'BMI',	'SympVarighUtstr',
@@ -124,7 +151,7 @@ ArbstatusPreV3 <- 1-tab[1:4,'99']
 Kompletthet <- cbind(AntibiotikaV3,	ASA,	TidlOpr,	OpKat,	BMI,	SympVarighUtstr,
   SmRyPre,	SmBePre,	SmStiPre,	ArbstatusPreV3)
 
-write.csv2(Kompletthet, file = 'c:/Registerdata/rygg/RyggKompl.csv', fileEncoding = 'UTF-8')
+write.csv2(Kompletthet, file = '../mydata/RyggKompl21.csv', fileEncoding = 'UTF-8')
 
 #_________________________________________________________________________________________
 #Registreringsoversikter for 2019-data

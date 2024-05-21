@@ -1,11 +1,11 @@
-#Generere filer og tall til årsrapport for 2022.
+#Generere filer og tall til årsrapport for 2023.
 library(rygg)
 library(xtable)
-setwd('~/Aarsrappresultater/NKR/')
+setwd('~/Aarsrappresultater/NKR/Rygg23')
 
 #Felles parametre:
 startAar <- 2011
-rappAar <- 2022
+rappAar <- 2023
 datoFra1aar <- paste0(rappAar,'-01-01')
 datoFra2aar <- paste0(rappAar-1,'-01-01')
 datoFra3aar <- paste0(rappAar-2,'-01-01')
@@ -17,44 +17,68 @@ aar2 <- (rappAar-1):rappAar
 aar2_12mnd <- aar2-1
 tidlAar <- rappAar-1
 tidlAar2 <- (rappAar-3):(rappAar-2)
-Ngrense <- 20
-AKjust <- 0
-ktr <- 2
 
 RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 Ntot07 <- dim(RegData)[1]
 
-# RegDataV3 <- RegData[RegData$Aar >2018, ]
-table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
-# test <- RegData[ ,c('Aar', "Ferdigstilt1b3mnd", 'Utfdato3mnd', "Nytte3mnd")]
-table(RegData$Aar, !is.na(RegData$OswTot12mnd), useNA = 'a')
+# table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
+# table(RegData[,c('Aar', "Ferdigstilt1b3mnd")])
+
 
 #Gjør utvalg/tilrettelegge årsfiler
-RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData #RegData[which(RegData$InnDato>= as.Date(datoFra) & RegData$InnDato <= as.Date(datoTil)), ] #
+RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData
 RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoTil)$RegData
-write.table(RegData, file = 'RyggAarsrapp2022.csv', sep = ';', row.names = F, fileEncoding = 'latin1', na = '')
+#write.table(RegData, file = 'RyggAarsrapp2023.csv', sep = ';', row.names = F, fileEncoding = 'latin1', na = '')
 
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
 AntAvd <- length(unique(RegData$ShNavn))
 
 #---------FIGURER, årsrapport --------------
+#Følgende figurer fjernes for årsrapp 2023:
+DegSponFusj
+DegSponFusjSStid
+FornoydAvdPro
+FornoydAvdSS
+KpInf3mndFusjTid
+KpInf3mndProTid
+KpInf3mndSSTid
+OswEndrTidDS
+PeropKompDuraSS
+SympVarighUtstrTidFusj
+SympVarighUtstrTidSS
+VentetidHenvTimePol_Sh
+
+
 
 # Dekningsgrad for hvert sykehus, Se tidligere figurer.
 #RyggFigAndelerGrVar(RegData=0, valgtVar='dekn21Rygg', outfile='DGrygg.pdf')
 
+# RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidHenvTimePol', Ngrense = 20,
+#                     hastegrad=1, outfile='VentetidHenvTimePol_Sh.pdf') #Fjernes for 2023
 
-RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidHenvTimePol', Ngrense = 20,
-                    hastegrad=1, outfile='VentetidHenvTimePol_Sh.pdf')
 
+# RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar='fornoydhet', ktr=ktr,
+#                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20
+#                     , hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='FornoydAvdPro.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar='fornoydhet', ktr=ktr,
+#                     aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
+#                     hovedkat=9,  hastegrad=1, tidlOp=4,  outfile='FornoydAvdSS.pdf')
 
-RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar='fornoydhet', ktr=ktr,
-                    aar=c((rappAar-2):(rappAar-1)), Ngrense = 20
-                    , hovedkat=1,  hastegrad=1, tidlOp=4,  outfile='FornoydAvdPro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar='fornoydhet', ktr=ktr,
-                    aar=c((rappAar-2):(rappAar-1)), Ngrense = 20,
-                    hovedkat=9,  hastegrad=1, tidlOp=4,  outfile='FornoydAvdSS.pdf')
+#Registreringsforsinkelse
+
+dum <- RyggFigAndeler(RegData=RegData1aar, valgtVar='regForsinkelse', datoFra=datoFra1aar,
+                            outfile='RegForsinkelseFord.pdf')
+dum <-  RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', Ngrense = 10,
+                               outfile='RegForsinkelseSh.pdf')
+dum <- RyggFigAndelTid(RegData=RegData, valgtVar='regForsinkelse',  outfile='RegForsinkelseTid.pdf')
+
+#Responsrate
+dum <-  RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='oppf3mnd', Ngrense = 10,
+                            outfile='Oppf3mndSh.pdf')
+dum <- RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd',  outfile='Oppf3mndTid.pdf')
+
 
 RyggFigAndelerGrVar(RegData = RegData1aar, preprosess = 0, valgtVar='morsmal',
                     outfile = 'Morsmal.pdf')
@@ -65,16 +89,16 @@ HoyUtdAvd <- RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='utd', Ngrense = 
 UforetrygdPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='uforetrygdPre', datoFra=datoFra1aar,
                                      outfile='UforAvd.pdf')
 
-RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj', aar = (rappAar-4):rappAar,
-                    outfile = 'DegSponFusj.pdf')
-DegSponFusjSStid <- RyggFigAndelTid(RegData=RegData, valgtVar = 'degSponFusj', hovedkat=9,
-                                    outfile = 'DegSponFusjSStid.pdf')
+# RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'degSponFusj', aar = (rappAar-4):rappAar,
+#                     outfile = 'DegSponFusj.pdf')
+# DegSponFusjSStid <- RyggFigAndelTid(RegData=RegData, valgtVar = 'degSponFusj', hovedkat=9,
+#                                     outfile = 'DegSponFusjSStid.pdf')
 
 
-RyggFigGjsnBox(RegData=RegData, aar=startAar:(rappAar-1) ,tidsenhet = 'Aar', outfile='OswEndrTidDS.pdf',
-               valgtVar='OswEndr', hovedkat=10, ktr=ktr)
+# RyggFigGjsnBox(RegData=RegData, aar=startAar:(rappAar-1) ,tidsenhet = 'Aar', outfile='OswEndrTidDS.pdf',
+#                valgtVar='OswEndr', hovedkat=10, ktr=ktr)
 
-Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', preprosess = 0,
+RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', preprosess = 0,
                               outfile='Alder70.pdf')
 
 RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdPro.pdf',
@@ -86,11 +110,11 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
 #RyggFigGjsnGrVar(RegData=RegData1aar, valgtVar='liggetidPostOp', outfile='LiggetidPostOpGjsn.pdf')
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
                        Ngrense=20, aar=rappAar, tidlAar=tidlAar, hastegrad=1, outfile='SympVarighUtstrAarPro.pdf')
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, preprosess = 0,
-                    Ngrense=20, aar=aar2, outfile='SympVarighUtstrShFusj.pdf')
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, preprosess = 0,
+#                     Ngrense=20, aar=aar2, outfile='SympVarighUtstrShFusj.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, hastegrad=1, outfile='SympVarighUtstrTidPro.pdf')
-RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, outfile='SympVarighUtstrTidFusj.pdf')
-RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, outfile='SympVarighUtstrTidSS.pdf')
+#RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=5, outfile='SympVarighUtstrTidFusj.pdf')
+# RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=9, outfile='SympVarighUtstrTidSS.pdf')
 
 
 
@@ -100,14 +124,13 @@ dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar
 dum <- RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='kpInf3mnd', aar=rappAar, tidlAar=tidlAar,
                     Ngrense = 30, hovedkat=9, outfile='KpInf3mndSSAar.pdf')
 
-RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=1, outfile='KpInf3mndProTid.pdf')
-RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=5, outfile='KpInf3mndFusjTid.pdf')
-RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=9, outfile='KpInf3mndSSTid.pdf')
+# RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=1, outfile='KpInf3mndProTid.pdf')
+# RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=5, outfile='KpInf3mndFusjTid.pdf')
+# RyggFigAndelTid(RegData=RegData, valgtVar='kpInf3mnd', hovedkat=9, outfile='KpInf3mndSSTid.pdf')
 
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar, tidlOp=4,
+#                     Ngrense = 30, hovedkat=9, outfile='PeropKompDuraSS.pdf')
 
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura', aar=rappAar, tidlOp=4,
-                    Ngrense = 30, hovedkat=9, outfile='PeropKompDuraSS.pdf')
-#Lena
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=1, tidlOp=4, #hastegrad=1, fjernet fra -21
                        Ngrense = 30, aar=aar2, tidlAar=tidlAar2, outfile='PeropKompDuraAarPro.pdf')
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, #hastegrad=1, #fjernet fra -21
@@ -128,6 +151,7 @@ RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
 #------ KVALITETSINDIKATORER------------
 #K1 Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
 RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', outfile='VentetidSpesOpTid.pdf')
+
 #NY2021: Ventetid fra operasjon bestemt til opr.tidpk
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20,
                     hastegrad=1, outfile='VentetidBestOp_Sh.pdf')
@@ -166,8 +190,8 @@ RyggFigAndelerGrVar(RegData=RegData, valgtVar='degSponFusj1op', preprosess = 0,
 RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='degSponFusj1op',
                 datoFra = '01-01-2019', outfile='degSponFusj1opKITid.pdf')
 
-PROMadm <- rapbase::loadRegData(registryName="rygg",
-                     query='SELECT * FROM proms')
+# PROMadm <- rapbase::loadRegData(registryName="rygg",
+#                      query='SELECT * FROM proms')
 
 #Ny, mars 2023
 # K6 Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi.
@@ -184,7 +208,6 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 
 
 
-
 #------------------------------------------------------------------------------------
 #-----------Filer til Interaktive nettsider -----------------------
 # Endring i kvalitetsindikatorer.
@@ -194,13 +217,14 @@ library(rygg)
 library(magrittr)
 setwd('/home/rstudio/Aarsrappresultater/NETTsider/')
 RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
-rappAar <- 2023
-valgteAar <- 2011:rappAar
-#Viktig å angi valgte år siden vi
-RyggData <- RyggUtvalgEnh(RegData=RyggData, aar=valgteAar)$RegData
+valgteAar <- 2011:2024
+#Ønsker å vise alle data
+RyggData <- RyggUtvalgEnh(RegData=RyggData, datoFra = '2011-01-01')$RegData
 
 #Sjekk om nye resh:
-setdiff(sort(unique(RyggData$ReshId)), sort(names(nyID)))
+nyresh <- setdiff(sort(unique(RyggData$ReshId)), sort(names(nyID)))
+RyggData$ShNavn[match(nyresh, RyggData$ReshId)]
+table(RyggData$Aar[RyggData$ReshId == nyresh])
 
 #Ventetid, operasjon bestemt til utført
 # Ventetid på kirurgi
@@ -211,18 +235,6 @@ ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp',
                           slaaSmToAar=0,
                           hastegrad=1,
                           indID = 'nkr_rygg_ventetid_kirurgi', filUt = 'ind1_VentetidOperasjon')
-
-
-# #Varighet av utstrålende smerter minst ett år
-# # Andel pasienter operert for lumbalt prolaps som har hatt utstrålende smerter i mer enn ett år før operasjonen.
-# # ØNSKET MÅLNIVÅ: ≤ 20 %
-# ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='sympVarighUtstr',
-#                           aar = valgteAar,
-#                           slaaSmToAar=0,
-#                           hovedkat=1,
-#                           hastegrad = 1,
-#                           indID = 'nkr_rygg_varighet_bensmerter',
-#                           filUt = 'ind1_Varighet_bensmerter')
 
 #--Bensmerter mindre eller lik 3 på numerisk smerteskala. SLÅ SAMMEN 2 ÅR
 # Lite beinsmerter og ingen parese - SJEKK PARESE!
@@ -239,7 +251,7 @@ ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
 # Forbedring av fysisk funksjon i dagliglivet, prolapskirurgi
 # Andel som oppnår 20 prosentpoeng forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter prolapskirurgi
 # ØNSKET MÅLNIVÅ: ≥ 69 %
-#! SPM - for 2021, skal vi vise de som svarte i rapporteringsåret
+#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
                           hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
                           aar = valgteAar,
@@ -248,7 +260,7 @@ ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
 # Forbedring av fysisk funksjon i dagliglivet, spinal stenose kirurgi
 # Andel som oppnår 30 % forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter kirurgi for spinal stenose
 # ØNSKET MÅLNIVÅ: ≥ 67 %
-#! Skal vise de som svarte i rapporteringsåret
+#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
                           hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
                           aar = valgteAar,
@@ -263,7 +275,7 @@ ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
 ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
                           aar = valgteAar,
                           slaaSmToAar=1,
-                          indID = 'nkr_rygg_degSponFusj1op', filUt = 'ind4_degSponFusj1op')
+                          indID = 'nkr_rygg_degSponFusj1op', filUt = 'ind5_degSponFusj1op')
 
 # Andel pasienter med degenerativ spondylolistese som blir operert med
 # fusjonskirurgi ved første operasjon
@@ -350,8 +362,7 @@ write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
 
 RyggData <- RyggPreprosess(
   RegData=RyggRegDataSQLV2V3())
-RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, datoFra = datoFra1aar, datoTil = datoTil)$RegData
-Dum <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
+RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
 
 FornoydData <- RyggVarTilrettelegg(RegData = RyggData1aar,
                                    valgtVar = 'fornoydhet', ktr = 1, figurtype = 'andelGrVar')$RegData
@@ -362,18 +373,27 @@ VerreData <- RyggVarTilrettelegg(RegData = RyggData1aar,
 VentetidKirData <- RyggVarTilrettelegg(RegData = RyggData1aar,
                                  valgtVar = 'ventetidSpesOp', ktr = 1, figurtype = 'andelGrVar')$RegData
 
+tall <- 100*mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T)
+paste(sprintf('%.1f', tall), '%')
+
 NokkeltallRygg <- rbind(
   'Antall avdelinger' = length(unique((RyggData1aar$ShNavn))),
   'Antall operasjoner' = dim(RyggData1aar)[1],
-  'Svart på oppfølging, 3 mnd.' = mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T),
-  'Andel over 70 år'	= mean(RyggData1aar$Alder>=70, na.rm=T),
-  'Gjennomsnittsalder' = mean(RyggData1aar$Alder, na.rm=T),
-  'Andel kvinner' = 1-mean(RyggData1aar$ErMann, na.rm=T),
-  'Fornøyd med behandlingen, 3 mnd. etter' = mean(FornoydData$Variabel),
-  'Helt restituert/mye bedre, 3 mnd. etter' = mean(BedreData$Variabel),
-  'Verre 3 mnd. etter' = mean(VerreData$Variabel),
-  'Ventet <3 mnd fra operasjon bestemt til kirurgi utført' = mean(VentetidKirData$Variabel)
+  'Svart på oppfølging, 3 mnd.' = paste(sprintf('%.1f', 100*mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T)), '%'),
+  'Andel over 70 år'	= paste(sprintf('%.1f', 100*mean(RyggData1aar$Alder>=70, na.rm=T)), '%'),
+  'Gjennomsnittsalder' = sprintf('%.1f',mean(RyggData1aar$Alder, na.rm=T)),
+  'Andel kvinner' = paste(sprintf('%.1f', 100*(1-mean(RyggData1aar$ErMann, na.rm=T))), '%'),
+  'Fornøyd med behandlingen, 3 mnd. etter' = paste(sprintf('%.1f', 100*mean(FornoydData$Variabel)), '%'),
+  'Helt restituert/mye bedre, 3 mnd. etter' = paste(sprintf('%.1f', 100*mean(BedreData$Variabel)), '%'),
+  'Verre 3 mnd. etter' = paste(sprintf('%.1f', 00*mean(VerreData$Variabel)), '%'),
+  'Ventet <3 mnd fra operasjon bestemt til kirurgi utført' = paste(sprintf('%.1f', 100*mean(VentetidKirData$Variabel)), '%')
 )
+
+xtable::xtable(NokkeltallRygg,
+               align = c('l','r'),
+               caption = paste('Nøkkeltall,', rappAar)
+               )
+
 
 tabNokkeltallRygg <- cbind(row.names(NokkeltallRygg),NokkeltallRygg)
 write.table(tabNokkeltallRygg, file = 'NokkeltallRygg.csv', row.names=F, sep=';', fileEncoding = 'UTF-8' )
@@ -383,9 +403,8 @@ write.table(tabNokkeltallRygg, file = 'NokkeltallRygg.csv', row.names=F, sep=';'
 
 #---------Figurer, utdata til videre beregninger----
 
-RyggFigAndelTid(RegData=RegData, hovedkat = 1, valgtVar = 'tidlOp3', outfile = 'TidlOpAnt3Tid.pdf') #TidlOp3 <-
-RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='tidlOp3', aar=rappAar, outfile='TidlOpAnt3Sh.pdf')
-
+#RyggFigAndelTid(RegData=RegData, hovedkat = 1, valgtVar = 'tidlOp3', outfile = 'TidlOpAnt3Tid.pdf') #TidlOp3 <-
+#RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='tidlOp3', aar=rappAar, outfile='TidlOpAnt3Sh.pdf')
 
 UtdanningTid <- RyggFigAndelTid(RegData=RegData, valgtVar='utd', aar = startAar:rappAar, preprosess = 0,
                                 outfile='')
@@ -399,17 +418,12 @@ Utdanning <- RyggFigAndeler(RegData=RegData1aar, valgtVar='utd', datoFra=datoFra
 HovedInngrep <- RyggFigAndeler(RegData=RegData1aar, valgtVar='hovedInngrep', datoFra=datoFra1aar,
                                datoTil=datoTil, outfile='')
 
-KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='kpInf3mnd',
-                                   hovedkat = 1, outfile='')
-KpInf3mndTidPro <- RyggFigAndelTid(RegData=RegData,  valgtVar='kpInf3mnd',
-                                   hovedkat=9, outfile='')
-
-DuraPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
-                               aar=(rappAar-1):rappAar, Ngrense = 20,
-                               hastegrad = 1, tidlOp = 4, hovedkat = 1, outfile='')
-DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
-                              aar=(rappAar-1):rappAar, Ngrense = 20,
-                              hastegrad = 1, tidlOp = 4, hovedkat=9, outfile='')
+# DuraPro <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
+#                                aar=(rappAar-1):rappAar, Ngrense = 20,
+#                                hastegrad = 1, tidlOp = 4, hovedkat = 1, outfile='')
+# DuraSS <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='peropKompDura',
+#                               aar=(rappAar-1):rappAar, Ngrense = 20,
+#                               hastegrad = 1, tidlOp = 4, hovedkat=9, outfile='')
 # sjekket
 FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = startAar:rappAar,
                                      outfile='', preprosess = 0)
@@ -434,12 +448,15 @@ xtable(tabAvdN5, digits=0, align=c('l', rep('r', 6)),
        caption=paste0('Antall registreringer ved hver avdeling siste 5 år, samt totalt siden ', min(RegData$Aar, na.rm=T),'.'),
        label = 'tab:AntReg')
 
-#Gjennomsnittsalderen per år:
+#Gjennomsnittsalder per år:
 AlderAar <- tapply(RegData$Alder, RegData$Aar, 'mean', na.rm=T)
 (startAar:rappAar)
 (AlderAar <- sprintf('%.1f', AlderAar))
 #Andel over 70 år:
-(Andel70 <- sprintf('%.1f', Alder70Aar$AggVerdier$Hoved))
+Alder70Aar <- RyggFigAndelTid(RegData=RegData, datoFra = datoFra, valgtVar='alder70', preprosess = 0, lagFig = 0)
+Andel70 <- as.numeric(sprintf('%.1f', Alder70Aar$AggVerdier$Hoved))
+names(Andel70) <- as.character(startAar:rappAar)
+Andel70
 
 #Andelen pasienter med fedme:
   FedmeAar <- table(RegData$BMI>30, RegData$Aar)
@@ -458,11 +475,11 @@ AlderAar <- tapply(RegData$Alder, RegData$Aar, 'mean', na.rm=T)
 
 
 #Andel i fullt arbeid når de blir ryggoperert:
-ArbNum <- round(table(RegData1aar$ArbstatusPre)*100/sum(table(RegData1aar$ArbstatusPre)), 1)
+ArbNum <- round(table(RegData1aar$ArbstatusPreV3)*100/sum(table(RegData1aar$ArbstatusPreV3)), 1)
 ArbNum[1]
 
 #Andel pasienter svart på spørsmål om arbeidsstatus, årsrapportåret: \% 22: 94,1
-  NsvarArb <- sum(RegData1aar$ArbstatusPre %in% 1:9)
+  NsvarArb <- sum(RegData1aar$ArbstatusPreV3 %in% 1:9)
   round(NsvarArb/Ntot1aar*100, 1)
 
 Arb <- paste0(ArbNum, '%')
@@ -538,25 +555,4 @@ AntDegenSpondSS <-  dim(RyggUtvalgEnh(RegDataSS, hovedkat = 10, aar = rappAar)$R
 round(AntDegenSpondSS/sum(RegDataSS$Aar==rappAar)*100,1)
 
 
-
-
-#MANGLER:
-#gjennomsnittlig ODI score, lumbalt prolaps, rappAar, FØR operasjon:
-indProPP <-  with(RegDataPro, which((Aar == (rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
-sprintf('%.1f', mean(RegDataPro$OswTotPre[indProPP]))
-#gjennomsnittlig ODI score, lumbalt prolaps, rappAar, ETTER operasjon:
-sprintf('%.1f', mean(RegDataPro$OswTot12mnd[indProPP]))
-
-#ODI-pre, lumbal spinal stenose:
-indSSPP <-  with(RegDataSS, which((Aar == (rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
-sprintf('%.1f', mean(RegDataSS$OswTotPre[indSSPP]))
-#ODI-post, lumbal spinal stenose:
-sprintf('%.1f', mean(RegDataSS$OswTot12mnd[indSSPP]))
-
-#ODI-pre, fusjonkirurgi:
-indFusjPP <-  with(RegData,
-                   which(HovedInngrepV2V3==5 & (Aar==(rappAar-1)) & !is.na(OswTotPre) & !is.na(OswTot12mnd)))
-sprintf('%.1f', mean(RegData$OswTotPre[indFusjPP]))
-#ODI-pre, fusjonkirurgi:
-sprintf('%.1f', mean(RegData$OswTot12mnd[indFusjPP]))
 

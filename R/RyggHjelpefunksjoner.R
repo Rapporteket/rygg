@@ -189,6 +189,11 @@ RegDataSort$DagerNesteOp[indPasFlereOp-1] <-
 RegDataSort$Reop90dEtterOp <- 0
 indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d==1)
 RegDataSort$Reop90dEtterOp[indReop] <- 1
+
+#Tar bort den gamle Reop90d-variabelen for å unngå misforståelse
+#RegDataSort <- RegDataSort[ ,-which(names(RegDataSort) == 'Reop90d')]
+#Ikke med lenger når henter data.
+
 # RegDataSort <-
 #   RegDataSort %>%
 #   dplyr::mutate(Reop2 =
@@ -253,6 +258,7 @@ if (ktr==2) {
             '4211883' = '943545634', #Aleris Bodø
             '107508' = '943545634',	#Aleris Bergen	Aleris Bergen
             '107240' = '943545634',	#Aleris Drammen	Aleris Drammen
+            '4211880' = '943545634', #Aleris Helse AS / Aleris Nesttun (ny 2023)
             '107511' = '943545634',  #Aleris Oslo
             '999975' = '943545634',	#Aleris Oslo	Aleris Colosseum Nobel
             '999994' = '943545634',	#Aleris Stavanger	Aleris Colosseum Stavanger
@@ -315,4 +321,52 @@ if (ktr==2) {
   return(invisible(RegDataUt))
 }
 
+
+#' Lage entydig PID
+#' Lager entydig PID basert på personnummer. Alle PID i V2 har ending suffiks V2. Pasienter i V3 får PID fra V2 hvis personnummeret
+#' deres finnes i begge versjoner. NB: For at dette skal bli riktig er vi avhengig av kilde med oppdatert koblingsfil (PID-personnummer)
+#' @param data tilnavn for utdatatabell. Hvis ikke angitt, lastes ikke fil ned
+#' @param datoFra startdato for filtrering
+#' @param datoTil sluttdato for filtrering
+#' @param reshID hvilken resh det evt. skal filtreres på
+#' @return Datafil med entydige PID
+#' @export
+#'
+tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0){
+  #Koble på KryptertFnr fra ForlopsOversikt via ForlopsID
+  PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+  RegData <- merge(RegData, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
+
+  #Legg til ledende 0 i V2
+  indUten0 <- which(nchar(RegData$Personnummer)==10)
+  if (length(indUten0)>0) {
+    RegData$Personnummer[indUten0] <- paste0(0,RegData$Personnummer[indUten0])}
+
+  #Entydig PID SSN-var fra V3/koblingstab, Personnummer-var fra V
+  tidlPas <- match(RegData$SSN, RegData$Personnummer, nomatch = 0, incomparables = NA) #match(RegData$KryptertFnr, RegData$Personnummer, nomatch = 0, incomparables = NA)
+  hvilkePas <- which(tidlPas>0)
+  RegData$PID[hvilkePas] <- RegData$PID[tidlPas[hvilkePas]]
+
+  #Pas med flere op i V2:
+  # table(RegData$SSN[hvilkePas])[table(RegData$SSN[hvilkePas])>2]
+  #   names(table(RegData$SSN)[table(RegData$SSN) == 5])
+  # RegData$SSN ==
+  # pas4 <- names(table(tidlPas)[table(tidlPas)==4])
+  # which(tidlPas == pas4)
+  # RegData[which(tidlPas == pas4), c('OpDato','SSN')]
+  # RegData[pas4, c('OpDato', 'Personnummer')]
+
+  #SSN i en variabel
+  fraV3 <- which(is.na(RegData$Personnummer))
+  RegData$Personnummer[fraV3] <- RegData$KryptertFnr[fraV3]
+
+  RegData <- dplyr::filter(RegData,
+                        as.Date(InnDato) >= datoFra, # datovalg[1],
+                        as.Date(InnDato) <= datoTil) #datovalg[2])
+  if (reshID != 0) {
+    RegData <- RegData[which(as.numeric(RegData$ReshId) %in% as.numeric(reshID)), ]}
+
+
+  return(RegData)
+}
 
