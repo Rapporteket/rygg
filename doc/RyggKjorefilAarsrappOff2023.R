@@ -1,7 +1,7 @@
 #Generere filer og tall til årsrapport for 2023.
 library(rygg)
 library(xtable)
-setwd('~/Aarsrappresultater/NKR/Rygg23')
+setwd('~/Aarsrappresultater/NKR/')
 
 #Felles parametre:
 startAar <- 2011
@@ -37,18 +37,18 @@ AntAvd <- length(unique(RegData$ShNavn))
 
 #---------FIGURER, årsrapport --------------
 #Følgende figurer fjernes for årsrapp 2023:
-DegSponFusj
-DegSponFusjSStid
-FornoydAvdPro
-FornoydAvdSS
-KpInf3mndFusjTid
-KpInf3mndProTid
-KpInf3mndSSTid
-OswEndrTidDS
-PeropKompDuraSS
-SympVarighUtstrTidFusj
-SympVarighUtstrTidSS
-VentetidHenvTimePol_Sh
+# DegSponFusj
+# DegSponFusjSStid
+# FornoydAvdPro
+# FornoydAvdSS
+# KpInf3mndFusjTid
+# KpInf3mndProTid
+# KpInf3mndSSTid
+# OswEndrTidDS
+# PeropKompDuraSS
+# SympVarighUtstrTidFusj
+# SympVarighUtstrTidSS
+# VentetidHenvTimePol_Sh
 
 
 
@@ -149,13 +149,21 @@ RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
 
 
 #------ KVALITETSINDIKATORER------------
-#K1 Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
-RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', outfile='VentetidSpesOpTid.pdf')
+# Sett 70 % på KI 3 og 4 (ODI) og la det ligge fast.
+# KI 5, fusjonskirurgi: fast på 10 %
+# KI 6, tromboseprofylakse: fast på 10 %
+# 'ventetidSpesOp'  - vises bare i andelgrvar
+# 'smBePreLav',  - vises bare i andelgrvar
+# 'OswEndr20', 'OswEndr30pst', - må defineres som kvalitetsindikatorer
+# 'degSponFusj1op' - vises bare i andelgrvar
+# 'trombProfylLettKI' - vises bare i andelgrvar
 
-#NY2021: Ventetid fra operasjon bestemt til opr.tidpk
+#K1 NY2021: Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
+RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', hastegrad=1,
+                outfile='VentetidSpesOpTid.pdf')
+
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20,
                     hastegrad=1, outfile='VentetidBestOp_Sh.pdf')
-
 
 #K2 Lite beinsmerter/utstrålende smerter før prolapskirurgi
 BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='smBePreLav', aar=aar2,
@@ -171,6 +179,8 @@ RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr20', outfile='OswEndr20ProTid.
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf',
                     aar=aar2_12mnd, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSSTid.pdf',
+                hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2)
+RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr30pstSSKI', outfile='OswEndr30pstSSTid.pdf',
                 hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2)
 
 
@@ -203,8 +213,6 @@ RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', preprosess = 
 
 RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
                 datoFra = '01-01-2019', outfile='trombProfylLettKITid.pdf')
-
-
 
 
 
@@ -250,7 +258,7 @@ ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
 #-----Oswestry---
 # Forbedring av fysisk funksjon i dagliglivet, prolapskirurgi
 # Andel som oppnår 20 prosentpoeng forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter prolapskirurgi
-# ØNSKET MÅLNIVÅ: ≥ 69 %
+# ØNSKET MÅLNIVÅ: ≥ 70 %
 #! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
                           hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
@@ -259,7 +267,7 @@ ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
                           indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind3_OswEndr20poengPro')
 # Forbedring av fysisk funksjon i dagliglivet, spinal stenose kirurgi
 # Andel som oppnår 30 % forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter kirurgi for spinal stenose
-# ØNSKET MÅLNIVÅ: ≥ 67 %
+# ØNSKET MÅLNIVÅ: ≥ 70 %
 #! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
                           hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
@@ -279,7 +287,7 @@ ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
 
 # Andel pasienter med degenerativ spondylolistese som blir operert med
 # fusjonskirurgi ved første operasjon
-# Mål: 		≤ landsgjennomsnittet høy måloppnåelse (grønt), > landsgjennomsnittet moderat/lav (gult): 2023: 9%
+# Mål: 	høy	≤ 10%
 # Hensikt: 	Redusere andel pasienter med degenerativ spondylolistese som blir operert med fusjonskirurgi ved første operasjon
 
 

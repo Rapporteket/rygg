@@ -44,7 +44,7 @@ RyggFigGjsnBox <- function(RegData, outfile, valgtVar, tidlOp='', erMann='', hov
                            valgtMaal='Gjsn',enhetsUtvalg=0, hentData=0, preprosess=1, reshID=0){
 
       if (hentData == 1) {
-            RegData <- RyggRegDataSQL()   #(datoFra, datoTil)
+            RegData <- RyggRegDataSQLV2V3()   #(datoFra, datoTil)
       }
 
       # Hvis RegData ikke har blitt preprosessert. (I samledokument gjøre dette i samledokumentet)

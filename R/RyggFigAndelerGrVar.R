@@ -115,11 +115,22 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     RegData[ ,grVar] <- factor(RegData[ ,grVar])
 
     #------- Gjøre utvalg
-
     if (reshID==0) {enhetsUtvalg <- 0}
+
+    #Vise riktig utvalg for kvalitetsindikatorer
+    if (RyggVarSpes$hovedkat[1] != 99) {
+      hovedkat <- RyggVarSpes$hovedkat
+    }
+    #print(RyggVarSpes$hovedkat)
+
     if (valgtVar == 'trombProfylLettKI') {
       erMann=1
-      hovedkat <- 1:2}
+      # hovedkat <- 1:2
+      }
+    if (valgtVar %in% c('OswEndr20ProKI', 'OswEndr30pstSSKI')) {
+      hastegrad = 1
+      tidlOp = 4}
+
     RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                                 minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                                 hovedkat=hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg)
@@ -157,8 +168,10 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     }
     if (tittel==0) {Tittel<-''} else {Tittel <- RyggVarSpes$tittel}
 
-    if (valgtVar == 'OswEndr20' & hovedkat[1] == 1 & length(hovedkat)==1) {KImaalGrenser <- c(0, AndelHele, 100)}
-    if (valgtVar == 'OswEndr30pst' & hovedkat[1] == 9 & length(hovedkat)==1) {KImaalGrenser <- c(0, AndelHele, 100)}
+    # if (valgtVar == ('OswEndr20' | 'OswEndr20ProKI')  & hovedkat[1] == 1 & length(hovedkat)==1) {
+    #   KImaalGrenser <- KImaalGrenser}
+    # if (valgtVar == ('OswEndr30pst' | 'OswEndr30pstSSKI') & hovedkat[1] == 9 & length(hovedkat)==1) {
+    #   KImaalGrenser <- KImaalGrenser}
     if (!is.na(KImaalGrenser[1]) & KImaalGrenser[1] == 'landsgj'){
       landsgj <- round(100*prop.table(table(RegData$Variabel))[2], 1)
       KImaalGrenser <- c(0,landsgj,100)}
@@ -180,10 +193,6 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
                        soyletxt=andeltxt,
                        grtxt=GrNavnSort,
                        Tittel=Tittel,
-                       #                          xAkseTxt=xAkseTxt, #NIRVarSpes$xAkseTxt,
-                       #                          KImaal = KImaal,
-                       #                          KImaaltxt = KImaaltxt,
-                       #                          grTypeTxt=RyggUtvalg$grTypeTxt,
                        utvalgTxt=utvalgTxt,
                        fargepalett =fargepalett
 
