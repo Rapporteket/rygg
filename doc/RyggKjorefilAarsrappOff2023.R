@@ -20,6 +20,7 @@ tidlAar2 <- (rappAar-3):(rappAar-2)
 
 RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
+RegData <- RyggUtvalgEnh(RegData=RegData, datoTil=datoTil)$RegData
 Ntot07 <- dim(RegData)[1]
 
 # table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
@@ -163,7 +164,7 @@ RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', hastegrad=1,
                 outfile='VentetidSpesOpTid.pdf')
 
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20,
-                    hastegrad=1, outfile='VentetidBestOp_Sh.pdf')
+                    hastegrad=1, outfile='VentetidSpesOp_Sh.pdf')
 
 #K2 Lite beinsmerter/utstrålende smerter før prolapskirurgi
 BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='smBePreLav', aar=aar2,

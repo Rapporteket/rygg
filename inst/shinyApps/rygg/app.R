@@ -14,7 +14,7 @@ regTitle = ifelse(paaServer, 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi',
 
 
 if (paaServer) {
-  RegData <- RyggRegDataSQLV2V3()  #RyggRegDataSQL(alle = 1)
+  RegData <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
   qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
                     DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
   ePROMadmTab <- rapbase::loadRegData(registryName="rygg", query=qEprom)
