@@ -2,22 +2,12 @@
 #'
 #' Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3.
 #' Registeret ønsker også en versjon hvor variabler som bare er i versjon 2 er med i det
-#' felles uttrekket. (?Lager en egen versjon for dette.)
-#'
-#' @param alleVarV3 0: IKKE I BRUK fjerner variabler som ikke er i bruk på Rapporteket ,
-#'                  1: har med alle variabler fra V3 (foreløpig er dette standard)
-#' @param alleVarV2 0: Bare variabler som også finnes i V3 med (standard),
-#'                  1: har med alle variabler fra V2
-#' @param datoFra P.t ikke i bruk
-#' @param datoTil P.t ikke i bruk
+#' felles uttrekket.
 #'
 #' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
 
-RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
-                               alleVarV3=1, alleVarV2=0){
-#NB: datovalg har ingen effekt foreløpig!! - bør hente alle for å få f.eks. operasjonsnummer riktig...
-#?Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
+RyggRegDataSQLV2V3 <- function(){
 
     RegDataV2 <- rapbase::loadRegData(registryName="rygg",
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
@@ -191,7 +181,7 @@ if (kunV3 == 0) {
   ny <- rygg::kategoriserInngrep(RegData=RegDataV3)
   RegDataV3 <- ny$RegData
 
-  #Dette kan kanskje fjeres fra din jobb...:
+  #------------------Følgende kan kanskje fjeres fra din jobb...:
 
   #--------Definasjon av diagnosegrupper prolaps og spinal stenose V3
   # COMPUTE filter_$=(HovedInngrepV2V3 = 4 or (RfSentr = 1 or RfLateral = 1 or RfForaminalSS = 1)
@@ -253,9 +243,6 @@ if (kunV3 == 0) {
   RegDataV3$OpMikro <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,1,1,1,0))
   RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,0,0,1,0))
 
-  RegDataV3$MedForstLukket <- as.character(as.Date(RegDataV3$MedForstLukket)) #Kobling med NA fungerer ikke for datotid-var
-
-
 if (kunV3 == 0){
   #Variabler i V2 som ikke er i V3.
   RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
@@ -275,10 +262,9 @@ if (kunV3 == 0){
 }
 
   #Mars 2021: KpInf-variabler, 3mnd er navngitt ..3Mnd i begge versjoner. Endrer navngiving
-  EndreNavnInd <- grep('3Mnd', names(RegDataV2V3)) #names(RyggData)[grep('3Mnd', names(RyggData))]
+  EndreNavnInd <- grep('3Mnd', names(RegDataV2V3))
   names(RegDataV2V3)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2V3)[EndreNavnInd])
 
-  RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
   #En desimal
   RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)
   RegDataV2V3$OswTotPre <- round(RegDataV2V3$OswTotPre,1)
