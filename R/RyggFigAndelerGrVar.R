@@ -168,10 +168,6 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     }
     if (tittel==0) {Tittel<-''} else {Tittel <- RyggVarSpes$tittel}
 
-    # if (valgtVar == ('OswEndr20' | 'OswEndr20ProKI')  & hovedkat[1] == 1 & length(hovedkat)==1) {
-    #   KImaalGrenser <- KImaalGrenser}
-    # if (valgtVar == ('OswEndr30pst' | 'OswEndr30pstSSKI') & hovedkat[1] == 9 & length(hovedkat)==1) {
-    #   KImaalGrenser <- KImaalGrenser}
     if (!is.na(KImaalGrenser[1]) & KImaalGrenser[1] == 'landsgj'){
       landsgj <- round(100*prop.table(table(RegData$Variabel))[2], 1)
       KImaalGrenser <- c(0,landsgj,100)}
@@ -240,11 +236,16 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
       antMaalNivaa <- length(KImaalGrenser)-1
       rekkef <- 1:antMaalNivaa
       if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
-      fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
+      fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef]
       maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
       if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
       rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
            ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
+
+      polygon(c(KImaalGrenser[1:antMaalNivaa], 0, KImaalGrenser[2:(antMaalNivaa+1)], max(pos)+0.4),
+              col = fargerMaalNiva[1:antMaalNivaa], density = 10, angle = 45,
+              border = NA)
+
       legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
       legend(x=xmax, y=ytopp, xjust=1, yjust=0, #+(pos[1]-pos[2])
              pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
@@ -252,7 +253,7 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
              xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
              legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
     }
-    pos <- rev(barplot(rev(as.numeric(AndelerGrSort)), horiz=T, border=NA, col=farger[4], #main=Tittel,
+    pos <- rev(barplot(rev(as.numeric(AndelerGrSort)), horiz=T, border=NA, col=farger[4],
                        xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
                        las=1, cex.names=cexShNavn*0.9, add=T))
     mtext('Andel (%)', side=1, line=2)

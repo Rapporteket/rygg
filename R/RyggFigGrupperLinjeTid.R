@@ -56,7 +56,7 @@ RyggFigGrupperLinjelTid <- function(RegData, valgtVar = 'gruppeAndel' , gr1='', 
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                                hastegrad=hastegrad, tidlOp=tidlOp, hovedkat = hovedkat,
                               enhetsUtvalg=enhetsUtvalg) #, grType=grType
-  RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, datoFra = '2010-01-01', datoTil='2022-12-31', hovedkat = 10)
+  RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, datoFra = '2010-01-01', datoTil='2023-12-31', hovedkat = 10)
   utvalgTxt <- RyggUtvalg$utvalgTxt
   RegData <- RyggUtvalg$RegData
 
