@@ -70,7 +70,8 @@ if (kunV3 == 0) {
    # 7:Delvis sykemeldt - V2: 7+8,
    # 8: Arbeidsavklaring - V2:9
    # 9: Ufør - V2: 10,
-
+# Torkil, vi justerer Abeidsstatus-variabelen både i V2 og V3 for å få en gjennomgående variabel.
+   # Arbeidsstatus i V2 har avvikende kategorisering ift tilsvarende variabel i V3 slik at den ikke kan migreres inn i ArbeidsstatusV3.
    RegDataV2$ArbstatusPreV2V3 <- as.numeric(RegDataV2$ArbstatusPre)
    RegDataV2$Arbstatus3mndV2V3 <- as.numeric(RegDataV2$Arbstatus3mnd)
    RegDataV2$Arbstatus12mndV2V3 <- as.numeric(RegDataV2$Arbstatus12mnd)
