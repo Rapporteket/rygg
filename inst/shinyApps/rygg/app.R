@@ -1,7 +1,7 @@
 library(rygg)
 
 idag <- Sys.Date()
-startDato <- paste0(as.numeric(format(idag-120, "%Y")), '-01-01') #'2019-01-01' #Sys.Date()-364
+startDato <- paste0(as.numeric(format(idag-180, "%Y")), '-01-01')
 datofra12 <- lubridate::floor_date(as.Date(idag)- months(12, abbreviate = T), unit='month')
 
 # gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
@@ -419,6 +419,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Degen. spondy. 1. op. m/fusjon' = 'degSponFusj1op',
                          'Fedme (BMI>30)' = 'BMI',
                          'Flere enn to tidligere operasjoner' = 'tidlOp3',
+                         'Fusjon, ryggsmerter uten utstråling, ingen dekompresjon' = 'opFusjonUtenDekompr',
                          'For sen registrering' = 'regForsinkelse',
                          'Forbedring av Oswestry-skår >= 20p' = 'OswEndr20',
                          'Fornøyde pasienter' = 'fornoydhet',
@@ -439,6 +440,7 @@ tabPanel(p("Andeler: per sykehus og tid", title='Alder, antibiotika, ASA, fedme,
                          'Oswestry-skår < 23 poeng' = 'Osw22',
                          'Oswestry-skår > 48 poeng' = 'Osw48',
                          'Røykere' = 'roker',
+                         'Skivedegenerasjon/spondylose uten nerveaffeksjon' = 'rfKunDegenerasjon',
                          'Smertestillende før operasjon' = 'smStiPre',
                          'Søkt erstatning før operasjon' = 'erstatningPre',
                         'Søkt uføretrygd før operasjon' = 'uforetrygdPre',

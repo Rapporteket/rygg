@@ -7,7 +7,7 @@
 #' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
 
-RyggRegDataSQLV2V3 <- function(){
+RyggDataV2V3 <- function(){
 
     RegDataV2 <- rapbase::loadRegData(registryName="rygg",
                                     query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')

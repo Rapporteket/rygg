@@ -224,12 +224,11 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     par('fig'=c(vmarg, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
 
     xmax <- min(max(AndelerGrSort, na.rm=T),100)*1.15
-    #paste0(GrNavnSort,' (',Ngrtxt , ')')
     pos <- rev(barplot(rev(as.numeric(AndelerGrSort)), horiz=T, border=NA, col=farger[4], #main=Tittel,
                        xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
                        las=1, cex.names=cexShNavn*0.9))
     ybunn <- 0.1
-    ytopp <- max(pos)+0.4 #rev(pos)[AntGr]+1
+    ytopp <- max(pos)+0.4
 
     #Legge på målnivå
     if (!is.na(KImaalGrenser[1])) {
@@ -237,21 +236,31 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
       rekkef <- 1:antMaalNivaa
       if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
       fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef]
+      tetth <- c(100, 70,15)[rekkef]
       maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
       if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
       rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
-           ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
-
-      polygon(c(KImaalGrenser[1:antMaalNivaa], 0, KImaalGrenser[2:(antMaalNivaa+1)], max(pos)+0.4),
-              col = fargerMaalNiva[1:antMaalNivaa], density = 10, angle = 45,
-              border = NA)
+           ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa],
+           density = tetth, angle = 60, border = NA) #add = TRUE, #pos[AntGrNgr+1],
+      # rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
+      #      ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
+      # polygon(c(KImaalGrenser[1:antMaalNivaa], 0, KImaalGrenser[2:(antMaalNivaa+1)], max(pos)+0.4),
+      #         col = fargerMaalNiva[1:antMaalNivaa], density = 10, angle = 45,
+      #         border = NA)
 
       legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
-      legend(x=xmax, y=ytopp, xjust=1, yjust=0, #+(pos[1]-pos[2])
-             pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
-             ncol=antMaalNivaa+1,
+      legend(x=xmax, y=ytopp, xjust=1, yjust=0, ncol=antMaalNivaa+1,
+             density = c(NA, tetth),
+             angle = c(NA,rep(60, antMaalNivaa)),
+             fill=c('white', fargerMaalNiva[1:antMaalNivaa]),
              xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
              legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
+
+      # legend(x=xmax, y=ytopp, xjust=1, yjust=0, #+(pos[1]-pos[2])
+      #        pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
+      #        ncol=antMaalNivaa+1,
+      #        xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
+      #        legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
     }
     pos <- rev(barplot(rev(as.numeric(AndelerGrSort)), horiz=T, border=NA, col=farger[4],
                        xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
@@ -274,10 +283,6 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
 
     #Tekst som angir hvilket utvalg som er gjort
     mtext(utvalgTxt, side=3, las=1, cex=1, adj=0, col=farger[1], line=c(3+0.8*((NutvTxt-1):0)))
-
-    # if (indGrUt[1]>0){
-    # mtext(paste0('* ',length(indGrUt),  ' avdelinger har mindre enn ', Ngrense,' registreringer og er fjernet fra figuren'),
-    #              side=1, at=-0.2*xmax, las=1, cex=0.8, adj=0, col=farger[1], line=3)}
 
     par('fig'=c(0, 1, 0, 1))
     if ( outfile != '') {dev.off()}

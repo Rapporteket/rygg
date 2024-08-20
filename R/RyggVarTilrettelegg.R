@@ -35,7 +35,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
       flerevar <- 0
       grtxt <- ''		#Spesifiseres for hver enkelt variabel
       grtxt2 <- ''	#Spesifiseres evt. for hver enkelt variabel
-      varTxt <- ''
+      varTxt <- 'tilfeller'
       xAkseTxt <- ''	#Benevning
       subtxt <- ''
       antDes <- 1
@@ -653,7 +653,7 @@ valgtVarTest <- valgtVar
           hovedkat <- 9
           ktr <- 2
           ktrtxt <- ' (12 mnd. etter)'
-          RegData <- RyggUtvalgEnh(RegData = RegData, hovedkat = 9)$RegData
+          RegData <- RyggUtvalgEnh(RegData = RegData, hastegrad = 1, tidlOp = 4, hovedkat = 9)$RegData
         }
             RegData$OswPst <- switch(as.character(ktr),
                                      '1' = (RegData$OswTotPre - RegData$OswTot3mnd)/RegData$OswTotPre*100,
@@ -812,6 +812,26 @@ valgtVarTest <- valgtVar
          RegData$VariabelGr <- factor(RegData$SmHyppPre, levels = c(1:5,9))
          retn <- 'H'
       }
+
+
+      if (valgtVar == 'rfKunDegenerasjon') { #andelGrVar/Tid
+        #LegeSkjema. Andel med RFKunDegenerasjon=1
+        #Kode 0,1,tom: Nei, Ja Ukjent
+        tittel <- 'Skivedegenerasjon/spondylose uten nerveaffeksjon'
+        sortAvtagende <- F
+          RegData <- RegData[which(RegData$RFKunDegenerasjon %in% 0:1), ]
+          RegData$Variabel <- RegData$RFKunDegenerasjon
+      }
+      if (valgtVar == 'opFusjonUtenDekompr') { #andelGrVar/Tid
+        #LegeSkjema. Andel med OpFusjonUtenDekompr=1
+        #Kode 0,1,tom: Nei, Ja Ukjent
+        tittel <- 'Fusjon, ryggsmerter uten utstråling, ingen dekompresjon'
+        sortAvtagende <- F
+        RegData <- RegData[which(RegData$OpFusjonUtenDekompr %in% 0:1), ]
+        RegData$Variabel <- RegData$OpFusjonUtenDekompr
+      }
+
+
 
       if (valgtVar %in% c('smBeinEndr', 'smBeinEndr3mnd', 'smBeinEndr12mnd')) {
          tittel <- paste0('bedring av beinsmerter ',ktrtxt)

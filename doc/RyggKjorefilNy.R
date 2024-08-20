@@ -2,6 +2,119 @@
 devtools::install_github("Thinkr-open/golem", ref='master')
 devtools::install_github("Rapporteket/rapbase", ref='rel')
 
+#Universell utforming - dvs. endre hvordan "trafikklys" legges bak søylene til kvalitetsindikatorene
+library(rygg)
+
+valgtVar <- 'ventetidSpesOp'
+KImaalGrenser <- c(0,50,80,100)
+
+valgtVar <- 'smBePreLav'
+KImaalGrenser <- c(0,3,100)
+RyggData <- RyggPreprosess(RyggRegDataSQLV2V3())
+RyggVarSpes <- RyggVarTilrettelegg(RegData=RyggData, valgtVar=valgtVar,
+                                   figurtype = 'andelGrVar')
+grVar <- 'ShNavn'
+RegData <- RyggVarSpes$RegData
+sortAvtagende <- RyggVarSpes$sortAvtagende
+Tittel <- RyggVarSpes$tittel
+RegData <- RegData[which(RegData[ ,grVar] != ''),] #Tar ut registreringer uten grupperingsnavn
+RegData[ ,grVar] <- as.factor(RegData[ ,grVar])
+Ngr <- table(RegData[ ,grVar])
+Ngrtxt <- as.character(Ngr)
+N <- dim(RegData)[1]
+AntGr <- length(which(Ngr >= 5))	#Alle som har gyldig resultat
+AndelHele <- round(100*sum(RegData$Variabel)/N, 2)
+AndelerGr <- round(100*tapply(RegData$Variabel, RegData[ ,grVar], sum, na.rm=T)/Ngr,2)
+GrNavn <- names(Ngr)
+xAkseTxt <- "Andel opphold (%)"
+
+indGrUt <- which(Ngr < 5)
+# if (sum(indGrUt)>0) {
+#   AndelGrUt <- sum(AndelerGr[indGrUt]*Ngr[indGrUt], na.rm = T)/sum(Ngr[indGrUt])
+#   AndelerGr <- c(AndelerGr[-indGrUt],AndelGrUt) #AndelerGr[indGrUt] <- NA
+#   GrUtNavn <- paste0(length(indGrUt), ' avd. med N<',5)
+#   Ngrtxt <- c(Ngr[-indGrUt],sum(Ngr[indGrUt]))  #Ngrtxt[indGrUt] <- paste0('<', Ngrense)
+#   GrNavn <- c(GrNavn[-indGrUt], GrUtNavn) #paste0(c(GrNavn[-indGrUt], GrUtNavn),' (',Ngrtxt , ')')
+# }
+
+fargepalett <- 'BlaaOff'
+sortInd <- order(as.numeric(AndelerGr), decreasing=sortAvtagende, na.last = FALSE)
+AndelerGrSort <- AndelerGr[sortInd]
+GrNavnSort <- GrNavn[sortInd]
+Ngrtxt <- Ngrtxt[sortInd]
+andeltxtUsort <- paste0(sprintf('%.1f',AndelerGr), ' %')
+andeltxt <- andeltxtUsort[sortInd]
+
+outfile <- ''
+utvalgTxt <- 'hei hei'
+
+#Figur
+cexShNavn <- 0.9 #0.85
+
+FigTypUt <- rapFigurer::figtype(outfile, height=3*800, fargepalett=fargepalett)
+farger <- FigTypUt$farger
+#Tilpasse marger for å kunne skrive utvalgsteksten
+NutvTxt <- length(utvalgTxt)
+vmarg <- max(0, strwidth(GrNavnSort, units='figure', cex=cexShNavn)*0.8)
+#NB: strwidth oppfører seg ulikt avh. av device...
+par('fig'=c(vmarg, 1, 0, 1-0.02*(NutvTxt-1)))	#Har alltid datoutvalg med
+
+xmax <- min(max(AndelerGrSort, na.rm=T),100)*1.15
+pos <- rev(barplot(rev(as.numeric(AndelerGrSort)), horiz=T, border=NA, col=farger[4], #main=Tittel,
+                   xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
+                   las=1, cex.names=cexShNavn*0.9))
+ybunn <- 0.1
+ytopp <- max(pos)+0.4 #rev(pos)[AntGr]+1
+
+#Legge på målnivå
+  antMaalNivaa <- length(KImaalGrenser)-1
+  rekkef <- 1:antMaalNivaa
+  if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
+  fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef]
+  tetth <- c(100, 70,15)[rekkef]
+  maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
+  if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
+  rect(xleft=KImaalGrenser[1:antMaalNivaa], ybottom=0, xright=KImaalGrenser[2:(antMaalNivaa+1)],
+       ytop=max(pos)+0.4, col = fargerMaalNiva[1:antMaalNivaa],
+       density = tetth, angle = 60, border = NA) #add = TRUE, #pos[AntGrNgr+1],
+
+  legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
+  legend(x=xmax, y=ytopp, xjust=1, yjust=0, ncol=antMaalNivaa+1,
+         density = c(NA, tetth),
+         angle = c(NA,rep(60, antMaalNivaa)),
+         fill=c('white', fargerMaalNiva[1:antMaalNivaa]),
+         xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
+         legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
+
+
+pos <- rev(barplot(rev(as.numeric(AndelerGrSort)), horiz=T, border=NA, col=farger[4],
+                   xlim=c(0,xmax), ylim=c(0.05, 1.25)*length(GrNavnSort), font.main=1, #xlab='Andel (%)',
+                   las=1, cex.names=cexShNavn*0.9, add=T))
+mtext('Andel (%)', side=1, line=2)
+#Linje for hele landet/utvalget:
+lines(x=rep(AndelHele, 2), y=c(ybunn, ytopp), col=farger[2], lwd=2)
+legend('topright', xjust=1, cex=1, lwd=2, col=farger[2],
+       legend=paste0('hovedgrTxt', ' (', sprintf('%.1f',AndelHele), '%), ', 'N=', N),
+       bty='o', bg='white', box.col='white')
+mtext(at=pos+max(pos)*0.0045, paste0(GrNavnSort,' (',Ngrtxt , ')'), side=2, las=1, cex=cexShNavn, adj=1, line=0.25)	#Legge på navn som eget steg
+
+
+title(Tittel, line=1, font.main=1, cex.main=1.3)
+
+text(x=AndelerGrSort+xmax*0.01, y=pos+0.1, andeltxt,
+     las=1, cex=0.9, adj=0, col=farger[1])	#Andeler, hvert sykehus
+
+par('fig'=c(0, 1, 0, 1))
+
+
+
+
+
+
+
+
+
+
 #------------------------------------
 RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
                                      query='SELECT * FROM AlleVarNum')
@@ -19,10 +132,6 @@ write.csv2(Aalesund, file = 'Aalesund.csv', row.names = F)
 InnholdSpesTrombProfyl <- table(RegDataV3AVN$SpesTrombProfyl[RegDataV3AVN$PostopTrombProfyl==1])
 table(RegDataV3AVN$PostopTrombProfyl)
 write.csv2(InnholdSpesTrombProfyl, file = 'Frekv_SpesTrombProfyl.csv', row.names = F)
-
-
-
-
 
 #Sjekk
 library(rygg)

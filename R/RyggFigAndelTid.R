@@ -170,25 +170,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
            xlim= c(0.9,xmax+0.1), xaxt='n', frame.plot = FALSE,  #xaxp=c(min(tidtxt), max(tidtxt),length(tidtxt)-1)
            cex=2, xlab='Operasjonsår', ylab="Andel (%)", ylim=c(0,ymax), yaxs = 'i')
 
-      #Legge på målnivå - ikke helt klar
-      # if (!is.na(KImaalGrenser[1])) {
-      #   antMaalNivaa <- length(KImaalGrenser)-1
-      #   rekkef <- 1:antMaalNivaa
-      #   if (sortAvtagende == TRUE) {rekkef <- rev(rekkef)}
-      #   fargerMaalNiva <-  c('#4fc63f', '#fbf850', '#c6312a')[rekkef] #c('green','yellow')# #c('#ddffcc', '#ffffcc') #, '#fff0e6') #Grønn, gul, rød
-      #   maalOppTxt <- c('Høy', 'Moderat til lav', 'Lav')[rekkef]
-      #   if (antMaalNivaa==3) {maalOppTxt[2] <- 'Moderat' }
-      #
-      #   rect(xleft=xskala[1], xright=xmax,
-      #        ybottom= KImaalGrenser[1:antMaalNivaa], ytop=KImaalGrenser[2:(antMaalNivaa+1)],
-      #        col = fargerMaalNiva[1:antMaalNivaa], border = NA) #add = TRUE, #pos[AntGrNgr+1],
-      #   #legPos <- ifelse(AntGr < 31, ifelse(AntGr < 15, -1, -2.5), -3.5)
-      #   legend(x=xmax, y=ymax, xjust=1, yjust=0, #+(pos[1]-pos[2])
-      #          pch=c(NA,rep(15, antMaalNivaa)), col=c(NA, fargerMaalNiva[1:antMaalNivaa]),
-      #          ncol=antMaalNivaa+1,
-      #          xpd=TRUE, border=NA, box.col='white',cex=0.8, pt.cex=1.5,
-      #          legend=c('Måloppnåelse:', maalOppTxt[1:antMaalNivaa])) #,
-      # }
 
       #Legge på linjer i plottet.
       grid(nx = NA, ny = NULL, col = farger[4], lty = "solid")

@@ -1,10 +1,29 @@
 #Her tenker jeg å samle kode til ulike datautleveringer fra Rygg
 
+#----------------Dekningsgradsanalyse for 2023-----------------
+#samt utlevering til Arendal (egne data)
+#Skal bare begrense koblingnøkkelen til de aktuelle data
+RyggKobl <- read.csv2(file = 'd:RYGG_koblingstabell.csv')
+NakkeKobl <- read.csv2(file = 'd:NAKKE_koblingstabell.csv')
+
+Rygg23 <- read.csv2(file = 'd:Rygg_dataDump_23.csv')
+RyggKobl23 <- RyggKobl[which(RyggKobl$PID %in% Rygg23$PID), ]
+write.csv2(RyggKobl23, file =  'd:RyggKobl23.csv', row.names = FALSE)
+
+Nakke23 <- read.csv2(file = 'd:Nakke_dataDump_23.csv')
+NakkeKobl23 <- NakkeKobl[which(NakkeKobl$PID %in% Nakke23$PasientID), ]
+write.csv2(NakkeKobl23, file =  'd:NakkeKobl23.csv', row.names = FALSE)
+
+Arendal <- read.csv2(file = 'd:Arendal_dataDump_fom2020.csv')
+ArendalKobl <- RyggKobl[which(RyggKobl$PID %in% Arendal$PID), ]
+write.csv2(ArendalKobl, file =  'd:ArendalKobl.csv', row.names = FALSE)
+
+
 #------------Omstrukturer til bredt format--------------
 #Ønsker omstrukturering til ei rad per person hvor variabler tilhørende påfølgende operasjoner kommer på ei linje.
 #Lag først datasett hvor operasjonene er nummerert. Operasjonsnummer kan da legges til variabelnavnet når vi gjør om til bredt format.
 
-#-------- Til Ole Kristian---------------------------
+#-------- Til Ole Kristian 2023/4?---------------------------
 #Hva heter prosjektet?
 #Ønsker data for noen utvalgte PID.
 #Har fått PID (felles for V2 og V2) og innleggelsesdato. Vi har ikke innleggelsesdato, men benytter operasjonsdato.
@@ -69,7 +88,7 @@ write.table(DataRed, file = '../Aarsrappresultater/NKR/RyggTilleggsvar.csv', row
 
 
 
-#--------------------Til Eirik Mikkelsen, dødsdato------------------------
+#--------------------Til Eirik Mikkelsen, dødsdato 2023?------------------------
 
 PIDdato <- read.csv2(file = 'C:/Registerdata/rygg/Populasjon2_PID_OprDato.csv',
                       header = TRUE, dec = '.')

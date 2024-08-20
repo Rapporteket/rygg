@@ -22,10 +22,8 @@ RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 RegData <- RyggUtvalgEnh(RegData=RegData, datoTil=datoTil)$RegData
 Ntot07 <- dim(RegData)[1]
-
 # table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
 # table(RegData[,c('Aar', "Ferdigstilt1b3mnd")])
-
 
 #Gjør utvalg/tilrettelegge årsfiler
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData
