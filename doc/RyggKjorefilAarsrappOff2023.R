@@ -51,9 +51,6 @@ AntAvd <- length(unique(RegData$ShNavn))
 
 
 
-# Dekningsgrad for hvert sykehus, Se tidligere figurer.
-#RyggFigAndelerGrVar(RegData=0, valgtVar='dekn21Rygg', outfile='DGrygg.pdf')
-
 # RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidHenvTimePol', Ngrense = 20,
 #                     hastegrad=1, outfile='VentetidHenvTimePol_Sh.pdf') #Fjernes for 2023
 
@@ -149,13 +146,12 @@ RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
 
 #------ KVALITETSINDIKATORER------------
 # Sett 70 % på KI 3 og 4 (ODI) og la det ligge fast.
-# KI 5, fusjonskirurgi: fast på 10 %
-# KI 6, tromboseprofylakse: fast på 10 %
+# KI 5, fusjonskirurgi: fast på 10 % 'degSponFusj1op' - vises bare i andelgrvar
+# KI 6, tromboseprofylakse: fast på 10 % 'trombProfylLettKI' - vises bare i andelgrvar
 # 'ventetidSpesOp'  - vises bare i andelgrvar
 # 'smBePreLav',  - vises bare i andelgrvar
 # 'OswEndr20', 'OswEndr30pst', - må defineres som kvalitetsindikatorer
-# 'degSponFusj1op' - vises bare i andelgrvar
-# 'trombProfylLettKI' - vises bare i andelgrvar
+
 
 #K1 NY2021: Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
 RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', hastegrad=1,
@@ -217,7 +213,6 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 
 #------------------------------------------------------------------------------------
 #-----------Filer til Interaktive nettsider -----------------------
-# Endring i kvalitetsindikatorer.
 #------------------------------------------------------------------------------------
 
 library(rygg)
@@ -362,6 +357,42 @@ table(Pro$Aar)
 #Alle sykehus og resh:
 ShResh <- unique(RyggData[c('ReshId', 'ShNavn')])
 write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
+
+#-------Dekningsgrad-------------------
+ReshShNavn <- unique(RegData[ , c("ReshId", "ShNavn")])
+write.csv2(ReshShNavn, file = 'data-raw/RyggReshSh.csv', row.names = F)
+
+#NakkeData <- nakke::NakkePreprosess(RegData = nakke::NakkeRegDataSQL())
+#ReshShNavnNakke <- unique(NakkeData[ , c("ReshId", "ShNavn")])
+#write.csv2(ReshShNavnNakke, file = '~/nakke/data-raw/NakkeReshSh.csv', row.names = F)
+
+#Rygg:
+ReshSh <- read.csv2('data-raw/RyggReshSh.csv', encoding = 'UTF-8')
+RyggDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderRygg2023.xlsx', sheet = 'RyggFig')
+RyggDgSh <- aggregate(RyggDg[ ,c("RegRygg", 'Total')], by = list(RyggDg$ReshId), FUN = 'sum')
+RyggDgSh$ShNavn <- ReshSh$ShNavn[match(RyggDgSh$Group.1, ReshSh$ReshId)]
+#RyggDgSh$DG_nkr <- 100*RyggDgSh$RegRygg/RyggDgSh$Total
+
+RyggFigAndelerGrVar(RegData=RyggDgSh, valgtVar='dekn23Rygg', outfile='DGrygg.pdf')
+
+#Nakke:
+ReshSh <- read.csv2('../nakke/data-raw/NakkeReshSh.csv', encoding = 'UTF-8')
+NakkeDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderNakke2023.xlsx', sheet = 'NakkeFig')
+NakkeDg$ShNavn <- ReshSh$ShNavn[match(NakkeDg$ReshId, ReshSh$ReshId)]
+#table(NakkeDg$ShNavn)
+rygg::RyggFigAndelerGrVar(RegData=NakkeDg, valgtVar='dekn23Nakke', outfile='DGnakke.pdf') #
+
+#Data til nettsider (legge på orgnr: nyID)
+DataDgOrg <- RyggDg
+DataDgOrg$orgnr <- as.character(nyID[as.character(DataDgOrg$ReshId)])
+DataDgOrg$ind_id <- 'nkr_rygg_dg' #'nakke_dg'
+#Variabler: year, orgnr, var, denominator, ind_id
+DataDgOrg <- dplyr::rename(DataDgOrg, var=RegNKR, denominator=Total, )
+DataDgOrg$context <- 'caregiver'
+DataDgOrg$year <- 2023
+DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus"))]
+write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
+
 
 
 #---Nøkkelinformasjon, ------
