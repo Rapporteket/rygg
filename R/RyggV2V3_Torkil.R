@@ -22,36 +22,6 @@ RyggDataV2V3 <- function(){
                      RegDataV3Forl[ ,varForl], by='ForlopsID',
                      all.x = TRUE, all.y = FALSE)
 
-  ePROMadmTab <- rapbase::loadRegData(registryName="rygg",
-                                   query='SELECT * FROM proms')
-  ePROMvar <- c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
-                'REGISTRATION_TYPE')
-  # «EpromStatus» er definert av oss, og den som er viktigst med tanke på svarprosent. Det er altså verdi 3 her som betyr at pasienten har besvart.
-  # OBS at den skiller seg litt fra tilsvarende variabel i Hemit-definisjonen. Denne er for deg og oss definert slik:
-  # 0 = Created, 1 = Ordered, 2 = Expired, 3 = Completed, 4 = Failed
-  ind3mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
-                         c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
-
-  ind12mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
-                      c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
-
-  ePROM3mnd <- ePROMadmTab[intersect(ind3mnd, which(ePROMadmTab$STATUS==3)), ePROMvar] #STATUS==3 completed
-  names(ePROM3mnd) <- paste0(ePROMvar, '3mnd')
-  ePROM12mnd <- ePROMadmTab[intersect(ind12mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
-  names(ePROM12mnd) <- paste0(ePROMvar, '12mnd')
-
-    indIkkeEprom3mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
-    indIkkeEprom12mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind12mnd]))
-    RegDataV3$Ferdig1b3mndGML <- RegDataV3$Ferdigstilt1b3mnd
-    RegDataV3$Ferdigstilt1b3mnd <- 0
-    RegDataV3$Ferdigstilt1b3mnd[RegDataV3$ForlopsID %in% ePROM3mnd$MCEID] <- 1
-    RegDataV3$Ferdigstilt1b3mnd[intersect(which(RegDataV3$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
-
-    RegDataV3$Ferdig1b12mndGML <- RegDataV3$Ferdigstilt1b12mnd
-    RegDataV3$Ferdigstilt1b12mnd <- 0
-    RegDataV3$Ferdigstilt1b12mnd[RegDataV3$ForlopsID %in% ePROM12mnd$MCEID] <- 1
-    RegDataV3$Ferdigstilt1b12mnd[intersect(which(RegDataV3$Ferdig1b12mndGML ==1), indIkkeEprom12mnd)] <- 1
-
     #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
     indIkkeSaarInf <- which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31')
     RegDataV3$KpInfOverfla3Mnd[indIkkeSaarInf] <- NA
@@ -94,7 +64,6 @@ if (kunV3 == 0) {
   RegDataV2$UforetrygdPre <- plyr::mapvalues(as.numeric(RegDataV2$UforetrygdPre), from = c(2,3,4,NA), to = c(0,2,3,9))
 
   #Ønsker tom for manglende RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
-  #Ønsker tom for manglende RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
   RegDataV2$OpIndPareseGrad[is.na(RegDataV2$OpIndPareseGrad)] <- 9
   RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
   RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
@@ -102,21 +71,7 @@ if (kunV3 == 0) {
   RegDataV2$KpInf3Mnd[RegDataV2$KpInf3Mnd==0] <- NA #Tilpasning til V3
   RegDataV2$Versjon <- 'V2'
 
-#Denne blir vel overflødig...? Antar navn legges på ut fra resh
-  # RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
-  #   'Aleris, Bergen' = 'Aleris Bergen',
-  #   'Aleris, Oslo' = 'Aleris Oslo',
-  #   'Larvik' = 'Tønsberg',
-  #   'Oslofjordklinikken Øst' = 'Oslofjordklinikken',
-  #   'Teres Colloseum, Oslo' = 'Aleris Oslo',
-  #   'Teres Colloseum, Stavanger'  = 'Aleris Stavanger',
-  #   'Teres, Bergen' = 'Aleris Bergen',
-  #   'Teres, Drammen' =  'Aleris Drammen'  ,
-  #   'Ulriksdal' = 'Volvat',
-  #   'UNN, nevrokir' = 'Tromsø')
-  # )
-
-  RegDataV2$AvdReshID <- plyr::revalue(RegDataV2$AvdReshID,  #Gammel resh V2 - ny resh (V3)
+RegDataV2$AvdReshID <- plyr::revalue(RegDataV2$AvdReshID,  #Gammel resh V2 - ny resh (V3)
                                      c('107137' =	'107508', #Aleris Bergen
                                        '107511' =	'999975', #Aleris Oslo
                                        '999999' =	'110771') #Volvat
