@@ -1,0 +1,98 @@
+#Alle data
+#AlleData <-    read.table(file = 'C:/Registerdata/rygg/RyggV2V3_2023_01_03.csv', sep=';', header=T) #'UTF-8', stringsAsFactors = FALSE, na.strings = "NULL",
+library(rygg)
+RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1)
+RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
+fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
+               "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
+               "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
+RegData <- RegDataV2V3[ ,-which(names(RegDataV2V3) %in% fritxtVar)]
+#PID er ikke personentydig. V2-PID har endinga ..V2
+V3Kobl <- read.csv2(file = '~/mydata/Degenerativ_rygg_koblingstabell_datadump_22.10.2024.csv')
+
+#Antall PID fra V3 som mangler i koblingsfila: 59 Tilsvarer 66 opphold (Data fra 21./22.okt)
+length(setdiff(RegData$PID[RegData$Versjon=='V3'], V3Kobl$PID))
+
+#Koble på SSN via PasientID
+  #PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+  RegData <- merge(RegData, V3Kobl, by.x = 'PasientID', by.y = 'PID', all.x = T)
+
+  #Legg til ledende 0 i V2
+  indUten0 <- which(nchar(RegData$Personnummer)==10)
+  if (length(indUten0)>0) {
+    RegData$Personnummer[indUten0] <- paste0(0,RegData$Personnummer[indUten0])}
+
+#Entydig PID SSN-var fra V3/koblingstab, Personnummer-var fra V
+  tidlPas <- match(RegData$SSN, RegData$Personnummer, nomatch = 0, incomparables = NA) #match(RegData$KryptertFnr, RegData$Personnummer, nomatch = 0, incomparables = NA)
+  hvilkePas <- which(tidlPas>0)
+  RegData$PID[hvilkePas] <- RegData$PID[tidlPas[hvilkePas]]
+
+#SSN i en variabel
+  RegData$Personnummer[which(RegData$Versjon == 'V3')] <- RegData$SSN[which(RegData$Versjon == 'V3')]
+  #Følgende PID mangler fødselsnummer i koblingsfila:
+   # tab <- RegData[which(is.na(RegData$Personnummer)), c('PID', "OpDato")] #, "Morsmal", "KryptertFnr")]
+#print(tab, row.names = FALSE)
+
+
+  # Idetifisere alle med >1 operasjon OG de med NyRyggOpr3mnd=1 (V3). Se også på Reop90 for V2
+# Reoperasjon innen 90d regnes som en komplikasjon til første inngrep.
+# Vi skal derfor markere at første operasjon har en reoperasjon. Den markeres altså ikke på reoperasjonen, men på den foregående.
+# Variabler: ErReop, BlittReop eller noe sånt.
+
+
+RegData <- rygg::finnReoperasjoner(RegData)
+# test <- FusjFlereOp[ ,c('OpDato', 'PID', 'OpNr', "DagerNesteOp",
+#                          "NyRyggOpr3mnd", "Reop90d", "Reop90dEtterOp")]
+library(magrittr)
+library(tidyverse)
+
+#Se nærmere på fusjonskirurgi. Hvilke typer operasjon ETTER fusjon.
+PIDflereop <- unique(RegData$PID[RegData$OpNr>1])
+PIDfusj <- unique(RegData$PID[RegData$HovedInngrepV2V3==5])
+PIDfusjFlereOp <- intersect(PIDflereop, PIDfusj)
+
+#Alle som har mer enn en operasjon hvorav minst en er fusjon
+FusjFlereOp <- RegData[RegData$PID %in% PIDfusjFlereOp, ]
+write.csv2(FusjFlereOp, file = 'FusjFlereOp.csv')
+
+#Finne de som har fusjon før annen operasjon
+#Etterpå legge på øvre og nedre nivå i V2. Kode om i V3 slik at likt med variablene fra V2
+
+#Fjerner de som har flere operasjoner på samme dag: 6 PID -> 17 operasjoner
+PIDsmdag <- FusjFlereOp %>%
+  group_by(PID) %>%
+  dplyr::summarise(
+    SmOpDato = ifelse(max(table(OpDato)) > 1, 1, 0),
+  )
+#length(PIDsmdag$PID[PIDsmdag$SmOpDato==1])
+#length(which(FusjFlereOp$PID %in% sort(PIDsmdag$PID[PIDsmdag$SmOpDato==1])))
+FusjFlereOp <- FusjFlereOp[-which(FusjFlereOp$PID %in% sort(PIDsmdag$PID[PIDsmdag$SmOpDato==1])), ]
+
+
+PIDsjekk <- FusjFlereOp %>%
+  group_by(PID) %>%
+  dplyr::summarise(
+    AntOp = n(),
+    AntFusj = sum(HovedInngrepV2V3==5),
+    ForsteInngr = HovedInngrepV2V3[OpDato==min(OpDato)],
+    OpNrForsteFusj = min(OpNr[HovedInngrepV2V3==5]),
+    SisteInngr = HovedInngrepV2V3[OpDato==max(OpDato)],
+    BareSiste = ifelse(SisteInngr == 5 & AntFusj ==1, 1, 0)
+)
+
+#Fjerner de med Fusjon bare i siste operasjon
+PIDmFusjBareSist <- PIDsjekk$PID[which(PIDsjekk$BareSiste == 1)] #1295 pasienter
+FusjFlereOp <- FusjFlereOp[-which(FusjFlereOp$PID %in% sort(PIDmFusjBareSist)), ]
+
+#Fjerne operasjoner før første avstivning
+FusjOgEtterfolgendeOp <- merge(FusjFlereOp, PIDsjekk, by = 'PID')
+indAnnenOpForFusj <- which(FusjOgEtterfolgendeOp$OpNrForsteFusj > FusjOgEtterfolgendeOp$OpNr)
+FusjOgEtterfolgendeOp <- FusjOgEtterfolgendeOp[-indAnnenOpForFusj, ]
+
+#Sluttfil: FusjOgEtterfolgendeOp.csv
+#Har fjernet PID som har flere operasjoner på samme dag: 6 PID -> 17 operasjoner
+#Fjernet PID med Fusjon bare i siste operasjon, altså ingen andre operasjoner etter den ene fusjonen: 1295 pasienter
+#Fjernet operasjoner før første avstivingsoperasjon: 231 operasjoner
+
+write.csv2(FusjOgEtterfolgendeOp, file = 'FusjOgEtterfolgendeOp.csv')
+view(FusjOgEtterfolgendeOp[,c("HovedInngrepV2V3", "OpNr", "OpDato", "PID", "AntFusj")])

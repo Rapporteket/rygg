@@ -248,7 +248,7 @@ if (kunV3 == 0) {
   ny <- rygg::kategoriserInngrep(RegData=RegDataV3)
   RegDataV3 <- ny$RegData
 
-  #--------Definasjon av diagnosegrupper prolaps og spinal stenose V3
+  #--------Definasjon av diagnosegrupper prolaps og spinal stenose V3----
   # COMPUTE filter_$=(HovedInngrepV2V3 = 4 or (RfSentr = 1 or RfLateral = 1 or RfForaminalSS = 1)
   #                   & (OpDeUlamin = 1 or OpDeUlaminTilgang > 0 or OpLaminektomi  = 1)
   #                   & (HovedInngrepV2V3 = 2 or HovedInngrepV2V3 = 3

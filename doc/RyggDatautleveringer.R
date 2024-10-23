@@ -61,8 +61,11 @@ write.csv2(RyggAkt, file = 'C:/Registerdata/rygg/TilCharlson/RyggOpDato.csv', ro
 
 
 #------------Omstrukturer til bredt format--------------
-#Ønsker omstrukturering til ei rad per person hvor variabler tilhørende påfølgende operasjoner kommer på ei linje.
-#Lag først datasett hvor operasjonene er nummerert. Operasjonsnummer kan da legges til variabelnavnet når vi gjør om til bredt format.
+#Ønsker omstrukturering til ei rad per person hvor variabler tilhørende påfølgende
+#operasjoner kommer på ei linje.
+#Lag først datasett hvor operasjonene er nummerert.
+#Operasjonsnummer kan da legges til variabelnavnet når vi gjør om til bredt format.
+
 
 #-------- Til Ole Kristian 2023/4?---------------------------
 #Hva heter prosjektet?
