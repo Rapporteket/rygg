@@ -14,7 +14,7 @@ regTitle = ifelse(paaServer, 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi',
 
 
 if (paaServer) {
-  RegData <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
+  RegData <- RyggRegDataSQLV2V3()
   qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
                     DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
   ePROMadmTab <- rapbase::loadRegData(registryName="rygg", query=qEprom)
@@ -57,6 +57,7 @@ tidlOprValg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet 
 hastegradValg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 
+# Tidy versjon, feiler på server
 # sykehusValg_df <-
 #   data.frame(resh = unique(RegData$ReshId),
 #              shus = RegData$ShNavn[match(unique(RegData$ReshId),
@@ -71,6 +72,13 @@ ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 # sykehusValg <- sykehusValg_df$resh
 # names(sykehusValg) <- sykehusValg_df$shus
 # sykehusValg <- c("Alle" = 0, sykehusValg)
+
+# Gammel Lena-kode
+# sykehusNavn <- sort(unique(RegData$ShNavn), index.return=T)
+# sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
+# sykehusValg <- c(0,sykehusValg)
+# names(sykehusValg) <- c('Alle',sykehusNavn$x)
+# sykehusValg <- sykehusValg
 
 sykehusValg_df <-
   data.frame(
