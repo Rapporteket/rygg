@@ -86,13 +86,14 @@ sykehusValg_df <-
     shus = as.character(RegData$ShNavn[match(unique(RegData$ReshId),
                                              RegData$ReshId)]))
 sykehusValg_df <- sykehusValg_df[order(sykehusValg_df$shus), ]
-print(as.character(names(table(sykehusValg_df$shus))[
-  table(sykehusValg_df$shus)>1]))
-duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
-  table(sykehusValg_df$shus)>1])
-sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus] <-
-  paste0(sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus], " (",
-         sykehusValg_df$resh[sykehusValg_df$shus %in% duplikatshus], ")")
+print(sykehusValg_df)
+# print(as.character(names(table(sykehusValg_df$shus))[
+#   table(sykehusValg_df$shus)>1]))
+# duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
+#   table(sykehusValg_df$shus)>1])
+# sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus] <-
+#   paste0(sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus], " (",
+#          sykehusValg_df$resh[sykehusValg_df$shus %in% duplikatshus], ")")
 sykehusValg <- sykehusValg_df$resh
 names(sykehusValg) <- sykehusValg_df$shus
 sykehusValg <- c("Alle" = 0, sykehusValg)
