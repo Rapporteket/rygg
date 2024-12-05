@@ -83,9 +83,11 @@ ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 sykehusValg_df <-
   data.frame(
     resh = unique(RegData$ReshId),
-    shus = RegData$ShNavn[match(unique(RegData$ReshId), RegData$ReshId)])
+    shus = as.character(RegData$ShNavn[match(unique(RegData$ReshId),
+                                             RegData$ReshId)]))
 sykehusValg_df <- sykehusValg_df[order(sykehusValg_df$shus), ]
-duplikatshus <- names(table(sykehusValg_df$shus))[table(sykehusValg_df$shus)>1]
+duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
+  table(sykehusValg_df$shus)>1])
 sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus] <-
   paste0(sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus], " (",
          sykehusValg_df$resh[sykehusValg_df$shus %in% duplikatshus], ")")
