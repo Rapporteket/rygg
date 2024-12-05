@@ -87,10 +87,10 @@ sykehusValg_df <-
                                              RegData$ReshId)]))
 sykehusValg_df <- sykehusValg_df[order(sykehusValg_df$shus), ]
 print(sykehusValg_df)
-# print(as.character(names(table(sykehusValg_df$shus))[
-#   table(sykehusValg_df$shus)>1]))
-# duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
-#   table(sykehusValg_df$shus)>1])
+print(as.character(names(table(sykehusValg_df$shus))[
+  which(table(sykehusValg_df$shus)>1)]))
+duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
+  which(table(sykehusValg_df$shus)>1)])
 # sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus] <-
 #   paste0(sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus], " (",
 #          sykehusValg_df$resh[sykehusValg_df$shus %in% duplikatshus], ")")
