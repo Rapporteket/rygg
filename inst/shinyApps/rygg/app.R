@@ -59,7 +59,7 @@ ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 
 sykehusValg_df <-
   data.frame(resh = unique(RegData$ReshId),
-             shus =RegData$ShNavn[match(unique(RegData$ReshId),
+             shus = RegData$ShNavn[match(unique(RegData$ReshId),
                                         RegData$ReshId)]) %>%
   dplyr::arrange(shus) %>%
   dplyr::mutate(
@@ -68,8 +68,6 @@ sykehusValg_df <-
         (dplyr::summarise(., N=dplyr::n(), .by = shus) %>%
         dplyr::filter(N>1) %>% dplyr::select(shus) %>% as.vector()),
       paste0(shus, " (", resh, ")"), shus))
-sykehusValg <- unique(RegData$ReshId)
-names(sykehusValg) <- RegData$ShNavn[match(sykehusValg, RegData$ReshId)]
 sykehusValg <- sykehusValg_df$resh
 names(sykehusValg) <- sykehusValg_df$shus
 sykehusValg <- c("Alle" = 0, sykehusValg)
