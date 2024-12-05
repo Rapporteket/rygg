@@ -88,6 +88,7 @@ sykehusValg_df <-
 sykehusValg_df <- sykehusValg_df[order(sykehusValg_df$shus), ]
 duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
   which(table(sykehusValg_df$shus)>1)])
+sykehusValg_df$shus <- as.character(sykehusValg_df$shus)
 sykehusValg_df$shus[which(sykehusValg_df$shus %in% duplikatshus)] <- "test"
   # paste0(sykehusValg_df$shus[which(sykehusValg_df$shus %in% duplikatshus)], " (",
   #        sykehusValg_df$resh[which(sykehusValg_df$shus %in% duplikatshus)], ")")
