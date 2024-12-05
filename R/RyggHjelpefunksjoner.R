@@ -333,7 +333,7 @@ if (ktr==2) {
 #' @export
 #'
 tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0){
-  #Koble på KryptertFnr fra ForlopsOversikt via ForlopsID
+  #Koble på KryptertFnr fra forlopsoversikt via ForlopsID
   PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
   RegData <- merge(RegData, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
 

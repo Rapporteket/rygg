@@ -25,13 +25,13 @@ Imports:
     magrittr,
     rapbase,
     rapFigurer,
-    raplog,
     rapsodi,
     shiny,
     shinyalert,
     shinyjs,
     testthat,
     xtable,
-    zoo
+    zoo,
+    plyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

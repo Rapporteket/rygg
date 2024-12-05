@@ -21,11 +21,11 @@ if (paaServer) {
   ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
   ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
 #test <- ePROMadmTab$MCEID[intersect(ind3mndeprom, which(ePROMadmTab$STATUS==3))]
-  qSkjemaOversikt <- 'SELECT * from SkjemaOversikt'
-  SkjemaOversikt_orig <- rapbase::loadRegData(registryName="rygg", query=qSkjemaOversikt, dbType="mysql")
-  SkjemaOversikt <- merge(SkjemaOversikt_orig, ePROMadmTab,
+  qskjemaoversikt <- 'SELECT * from skjemaoversikt'
+  skjemaoversikt_orig <- rapbase::loadRegData(registryName="rygg", query=qskjemaoversikt, dbType="mysql")
+  skjemaoversikt <- merge(skjemaoversikt_orig, ePROMadmTab,
                           by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
-  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from ForlopsOversikt'
+  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from forlopsoversikt'
 
   RegOversikt <- rapbase::loadRegData(registryName="rygg", query=qForlop, dbType="mysql")
   RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
@@ -34,7 +34,7 @@ if (paaServer) {
 }
 
 RegData <- RyggPreprosess(RegData = RegData)
-SkjemaOversikt <- dplyr::rename(.data=SkjemaOversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
+skjemaoversikt <- dplyr::rename(.data=skjemaoversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
 
 #Definere innhold i felles rullegardinmenyer:
 kjonn <- c("Begge"=2, "Menn"=1, "Kvinner"=0)
@@ -57,10 +57,10 @@ tidlOprValg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet 
 hastegradValg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 
-sykehusNavn <- sort(unique(RegData$ShNavn), index.return=T)
-sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
-sykehusValg <- c(0,sykehusValg)
-names(sykehusValg) <- c('Alle',sykehusNavn$x)
+sykehusValg <- unique(RegData$ReshId)
+names(sykehusValg) <- RegData$ShNavn[match(sykehusValg, RegData$ReshId)]
+sykehusValg <- sykehusValg[order(names(sykehusValg))]
+sykehusValg <- c("Alle" = 0, sykehusValg)
 
 hovedkatValg <- c('Alle'=99, 'Andre inngrep'=0, 'Prolapskirurgi'=1, 'Midtlinjebevarende dekompr.'=2,
   'Laminektomi'=3, 'Eksp. intersp implantat'=4, 'Fusjonskirurgi'=5, 'Osteotomi, deformitet'=6,
@@ -249,7 +249,7 @@ ui <- navbarPage(id = "tab1nivaa",
                    br(),
                    br(),
                    h3('Last ned data fra versjon 2.0:'),
-                   h4('NB: Dette er kun rådata, dvs. tabellen Uttrekk_Rapport_FROM_TORE'),
+                   h4('NB: Dette er kun rådata, dvs. tabellen uttrekk_rapport_from_tore'),
                    h4('uten noe prosessering av data'),
                    downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
                    br(),
@@ -587,10 +587,10 @@ server <- function(input, output,session) {
   #------ Dæsjbord ---------------------
 
   # output$... <- renderTable()
-  vec <- factor(SkjemaOversikt$SkjemaRekkeflg, levels= c(5,10))
-  iKladd <- table(vec[Reduce(intersect, list( #which(as.Date(SkjemaOversikt$InnDato) >= datofra12),
-                                               which(SkjemaOversikt$SkjemaStatus==0)
-                                             ,which(SkjemaOversikt$AvdRESH == reshID)
+  vec <- factor(skjemaoversikt$SkjemaRekkeflg, levels= c(5,10))
+  iKladd <- table(vec[Reduce(intersect, list( #which(as.Date(skjemaoversikt$InnDato) >= datofra12),
+                                               which(skjemaoversikt$SkjemaStatus==0)
+                                             ,which(skjemaoversikt$AvdRESH == reshID)
                                              ))]) #, indSkjema
   names(iKladd) <- c('Pasientskjema','Legeskjema')
   output$iKladdPas <- renderText(paste('Pasientskjema: ', iKladd[1]))
@@ -705,7 +705,7 @@ server <- function(input, output,session) {
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
   dataDumpV2 <- rapbase::loadRegData(registryName="rygg",
-                                     query='select * FROM Uttrekk_Rapport_FROM_TORE', dbType="mysql")
+                                     query='select * FROM uttrekk_rapport_from_tore', dbType="mysql")
   output$lastNed_dataV2 <- downloadHandler(
     filename = function(){'dataDumpV2.csv'},
     content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
