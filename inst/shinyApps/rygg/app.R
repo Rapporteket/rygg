@@ -86,6 +86,8 @@ sykehusValg_df <-
     shus = as.character(RegData$ShNavn[match(unique(RegData$ReshId),
                                              RegData$ReshId)]))
 sykehusValg_df <- sykehusValg_df[order(sykehusValg_df$shus), ]
+print(as.character(names(table(sykehusValg_df$shus))[
+  table(sykehusValg_df$shus)>1]))
 duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
   table(sykehusValg_df$shus)>1])
 sykehusValg_df$shus[sykehusValg_df$shus %in% duplikatshus] <-
