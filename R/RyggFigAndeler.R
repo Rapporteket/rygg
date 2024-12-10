@@ -96,7 +96,7 @@ RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', d
   #if (reshID==0){stopifnot(enhetsUtvalg ==0 )}
 
   if (hentData == 1) {
-    RegData <- RyggRegDataSQL()       #(datoFra, datoTil)
+    RegData <- RyggRegDataSQLV2V3()       #(datoFra, datoTil)
   }
 
   # Hvis RegData ikke har blitt preprosessert. (I samledokument gjøre dette i samledokumentet)

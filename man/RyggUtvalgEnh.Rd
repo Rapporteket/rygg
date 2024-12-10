@@ -6,7 +6,7 @@
 \usage{
 RyggUtvalgEnh(
   RegData,
-  datoFra = "2009-01-01",
+  datoFra = "2007-01-01",
   datoTil = Sys.Date(),
   minald = 0,
   maxald = 110,

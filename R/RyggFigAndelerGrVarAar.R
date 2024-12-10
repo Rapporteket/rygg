@@ -62,7 +62,7 @@ RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', dato
                                    ktr=0, reshID=0, aar=0,tidlAar=0,  Ngrense=10, AKjust=0, outfile='') {
 
       if (hentData == 1) {
-            RegData <- RyggRegDataSQL()
+            RegData <- RyggRegDataSQLV2V3()
       }
 
       # Preprosessere data

@@ -1,7 +1,7 @@
 #Generere filer og tall til årsrapport for 2023.
 library(rygg)
 library(xtable)
-setwd('~/Aarsrappresultater/NKR/Rygg23')
+setwd('~/Aarsrappresultater/NKR/')
 
 #Felles parametre:
 startAar <- 2011
@@ -20,11 +20,10 @@ tidlAar2 <- (rappAar-3):(rappAar-2)
 
 RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
+RegData <- RyggUtvalgEnh(RegData=RegData, datoTil=datoTil)$RegData
 Ntot07 <- dim(RegData)[1]
-
 # table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
 # table(RegData[,c('Aar', "Ferdigstilt1b3mnd")])
-
 
 #Gjør utvalg/tilrettelegge årsfiler
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData
@@ -37,23 +36,20 @@ AntAvd <- length(unique(RegData$ShNavn))
 
 #---------FIGURER, årsrapport --------------
 #Følgende figurer fjernes for årsrapp 2023:
-DegSponFusj
-DegSponFusjSStid
-FornoydAvdPro
-FornoydAvdSS
-KpInf3mndFusjTid
-KpInf3mndProTid
-KpInf3mndSSTid
-OswEndrTidDS
-PeropKompDuraSS
-SympVarighUtstrTidFusj
-SympVarighUtstrTidSS
-VentetidHenvTimePol_Sh
+# DegSponFusj
+# DegSponFusjSStid
+# FornoydAvdPro
+# FornoydAvdSS
+# KpInf3mndFusjTid
+# KpInf3mndProTid
+# KpInf3mndSSTid
+# OswEndrTidDS
+# PeropKompDuraSS
+# SympVarighUtstrTidFusj
+# SympVarighUtstrTidSS
+# VentetidHenvTimePol_Sh
 
 
-
-# Dekningsgrad for hvert sykehus, Se tidligere figurer.
-#RyggFigAndelerGrVar(RegData=0, valgtVar='dekn21Rygg', outfile='DGrygg.pdf')
 
 # RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidHenvTimePol', Ngrense = 20,
 #                     hastegrad=1, outfile='VentetidHenvTimePol_Sh.pdf') #Fjernes for 2023
@@ -149,13 +145,20 @@ RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
 
 
 #------ KVALITETSINDIKATORER------------
-#K1 Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
-RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', outfile='VentetidSpesOpTid.pdf')
+# Sett 70 % på KI 3 og 4 (ODI) og la det ligge fast.
+# KI 5, fusjonskirurgi: fast på 10 % 'degSponFusj1op' - vises bare i andelgrvar
+# KI 6, tromboseprofylakse: fast på 10 % 'trombProfylLettKI' - vises bare i andelgrvar
+# 'ventetidSpesOp'  - vises bare i andelgrvar
+# 'smBePreLav',  - vises bare i andelgrvar
+# 'OswEndr20', 'OswEndr30pst', - må defineres som kvalitetsindikatorer
 
-#NY2021: Ventetid fra operasjon bestemt til opr.tidpk
+
+#K1 NY2021: Ventetid fra kirurgi er besl. til utført under 3 mnd., tidstrend
+RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', hastegrad=1,
+                outfile='VentetidSpesOpTid.pdf')
+
 RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20,
-                    hastegrad=1, outfile='VentetidBestOp_Sh.pdf')
-
+                    hastegrad=1, outfile='VentetidSpesOp_Sh.pdf')
 
 #K2 Lite beinsmerter/utstrålende smerter før prolapskirurgi
 BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='smBePreLav', aar=aar2,
@@ -171,6 +174,8 @@ RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr20', outfile='OswEndr20ProTid.
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSS.pdf',
                     aar=aar2_12mnd, hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, Ngrense = 30)
 RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr30pst', outfile='OswEndr30pstSSTid.pdf',
+                hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2)
+RyggFigAndelTid(RegData=RegData, valgtVar='OswEndr30pstSSKI', outfile='OswEndr30pstSSTid.pdf',
                 hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2)
 
 
@@ -206,11 +211,8 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 
 
 
-
-
 #------------------------------------------------------------------------------------
 #-----------Filer til Interaktive nettsider -----------------------
-# Endring i kvalitetsindikatorer.
 #------------------------------------------------------------------------------------
 
 library(rygg)
@@ -250,7 +252,7 @@ ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
 #-----Oswestry---
 # Forbedring av fysisk funksjon i dagliglivet, prolapskirurgi
 # Andel som oppnår 20 prosentpoeng forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter prolapskirurgi
-# ØNSKET MÅLNIVÅ: ≥ 69 %
+# ØNSKET MÅLNIVÅ: ≥ 70 %
 #! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
                           hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
@@ -259,7 +261,7 @@ ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
                           indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind3_OswEndr20poengPro')
 # Forbedring av fysisk funksjon i dagliglivet, spinal stenose kirurgi
 # Andel som oppnår 30 % forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter kirurgi for spinal stenose
-# ØNSKET MÅLNIVÅ: ≥ 67 %
+# ØNSKET MÅLNIVÅ: ≥ 70 %
 #! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
                           hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
@@ -279,7 +281,7 @@ ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
 
 # Andel pasienter med degenerativ spondylolistese som blir operert med
 # fusjonskirurgi ved første operasjon
-# Mål: 		≤ landsgjennomsnittet høy måloppnåelse (grønt), > landsgjennomsnittet moderat/lav (gult): 2023: 9%
+# Mål: 	høy	≤ 10%
 # Hensikt: 	Redusere andel pasienter med degenerativ spondylolistese som blir operert med fusjonskirurgi ved første operasjon
 
 
@@ -355,6 +357,42 @@ table(Pro$Aar)
 #Alle sykehus og resh:
 ShResh <- unique(RyggData[c('ReshId', 'ShNavn')])
 write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
+
+#-------Dekningsgrad-------------------
+ReshShNavn <- unique(RegData[ , c("ReshId", "ShNavn")])
+write.csv2(ReshShNavn, file = 'data-raw/RyggReshSh.csv', row.names = F)
+
+#NakkeData <- nakke::NakkePreprosess(RegData = nakke::NakkeRegDataSQL())
+#ReshShNavnNakke <- unique(NakkeData[ , c("ReshId", "ShNavn")])
+#write.csv2(ReshShNavnNakke, file = '~/nakke/data-raw/NakkeReshSh.csv', row.names = F)
+
+#Rygg:
+ReshSh <- read.csv2('data-raw/RyggReshSh.csv', encoding = 'UTF-8')
+RyggDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderRygg2023.xlsx', sheet = 'RyggFig')
+RyggDgSh <- aggregate(RyggDg[ ,c("RegRygg", 'Total')], by = list(RyggDg$ReshId), FUN = 'sum')
+RyggDgSh$ShNavn <- ReshSh$ShNavn[match(RyggDgSh$Group.1, ReshSh$ReshId)]
+#RyggDgSh$DG_nkr <- 100*RyggDgSh$RegRygg/RyggDgSh$Total
+
+RyggFigAndelerGrVar(RegData=RyggDgSh, valgtVar='dekn23Rygg', outfile='DGrygg.pdf')
+
+#Nakke:
+ReshSh <- read.csv2('../nakke/data-raw/NakkeReshSh.csv', encoding = 'UTF-8')
+NakkeDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderNakke2023.xlsx', sheet = 'NakkeFig')
+NakkeDg$ShNavn <- ReshSh$ShNavn[match(NakkeDg$ReshId, ReshSh$ReshId)]
+#table(NakkeDg$ShNavn)
+rygg::RyggFigAndelerGrVar(RegData=NakkeDg, valgtVar='dekn23Nakke', outfile='DGnakke.pdf') #
+
+#Data til nettsider (legge på orgnr: nyID)
+DataDgOrg <- RyggDg
+DataDgOrg$orgnr <- as.character(nyID[as.character(DataDgOrg$ReshId)])
+DataDgOrg$ind_id <- 'nkr_rygg_dg' #'nakke_dg'
+#Variabler: year, orgnr, var, denominator, ind_id
+DataDgOrg <- dplyr::rename(DataDgOrg, var=RegNKR, denominator=Total, )
+DataDgOrg$context <- 'caregiver'
+DataDgOrg$year <- 2023
+DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus"))]
+write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
+
 
 
 #---Nøkkelinformasjon, ------

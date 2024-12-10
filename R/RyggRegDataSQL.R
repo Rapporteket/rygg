@@ -11,7 +11,7 @@ RyggRegDataSQLgml <- function(datoFra = '2007-01-01', datoTil = '2099-01-01', al
 if (alle == 1) {
   RegData <- rapbase::loadRegData(
     registryName="rygg",
-    query=paste0('SELECT * FROM AlleVarNum WHERE OpDato >= \'', datoFra, '\' AND OpDato <= \'', datoTil, '\''),
+    query=paste0('SELECT * FROM allevarnum WHERE OpDato >= \'', datoFra, '\' AND OpDato <= \'', datoTil, '\''),
     dbType="mysql")
   # RegDataV2 <- rapbase::loadRegData(registryName="rygg",
   #                                              query='SELECT * FROM Uttrekk_Rapport', dbType="mysql")
@@ -165,7 +165,7 @@ Morsmal,
 	-- Utfylt3Mnd,
 	UtskrivelseDato,
 	Vekt
-FROM AlleVarNum
+FROM allevarnum
   WHERE OpDato >= \'', datoFra, '\' AND OpDato <= \'', datoTil, '\'')
 
 

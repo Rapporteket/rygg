@@ -6,6 +6,7 @@
 \usage{
 tabNokkeltall(
   RegData,
+  utvid = 0,
   tidsenhet = "Mnd",
   datoTil = Sys.Date(),
   enhetsUtvalg = 2,

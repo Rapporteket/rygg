@@ -46,7 +46,7 @@ RyggFigAndelStabelTid <- function(RegData, outfile, valgtVar, hovedkat=99, prepr
                                erMann=99, ktr=1, tidlOp=0, aar=0, enhetsUtvalg=0, tittel=1, reshID=0) {
 
 if (hentData == 1) {
-  RegData <- RyggRegDataSQL()       #(datoFra, datoTil)
+  RegData <- RyggRegDataSQLV2V3()       #(datoFra, datoTil)
 }
 
 # Hvis RegData ikke har blitt preprosessert. (I samledokument gjøre dette i samledokumentet)

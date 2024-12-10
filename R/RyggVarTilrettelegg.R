@@ -35,7 +35,7 @@ RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01
       flerevar <- 0
       grtxt <- ''		#Spesifiseres for hver enkelt variabel
       grtxt2 <- ''	#Spesifiseres evt. for hver enkelt variabel
-      varTxt <- ''
+      varTxt <- 'tilfeller'
       xAkseTxt <- ''	#Benevning
       subtxt <- ''
       antDes <- 1
@@ -217,7 +217,7 @@ valgtVarTest <- valgtVar
             }}
 
       if (valgtVar == 'degSponFusj') { #AndelGrVar, AndelTid
-        #hovedkat=10 #Degen. spondylolistese
+        hovedkat=10 #Degen. spondylolistese
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
         RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
         varTxt <- 'tilfeller'
@@ -233,6 +233,7 @@ valgtVarTest <- valgtVar
         # med fusjonskirurgi ved første operasjon
         #hovedkat=10 #Degen. spondylolistese
         #RegData <- finnReoperasjoner(RegData = RegData)
+        hovedkat=10 #Degen. spondylolistese
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
         RegData <- RegData[which(RegData$TidlOpr == 4), ]
         RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1 # & RegData$TidlOpr == 4
@@ -240,7 +241,7 @@ valgtVarTest <- valgtVar
         tittel <- 'Degen. spondylolistese, fusjonskirurgi ved første operasjon'
         sortAvtagende <- F
         xAkseTxt <- 'Andel med fusjonskirurgi i første operasjon (%)'
-        KImaalGrenser <- 'landsgj' #c(0,landsgj,100)
+        KImaalGrenser <- c(0,10,100)
       }
       if (valgtVar == 'degSponSSSten') { #AndelGrVar
             #(Først og fremst fusjonskirurgi)
@@ -451,9 +452,9 @@ valgtVarTest <- valgtVar
         sortAvtagende <- FALSE
         xAkseTxt <- 'Andel sårinfeksjoner (%)'
         #KImaalRetn <- 'lav'
-        if (hovedkat == 1) {KImaalGrenser <- c(0,2,100)}
-        if (hovedkat == 5) {KImaalGrenser <- c(0,3,100)}
-        if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
+        # if (hovedkat == 1) {KImaalGrenser <- c(0,2,100)}
+        # if (hovedkat == 5) {KImaalGrenser <- c(0,3,100)}
+        # if (hovedkat == 9) {KImaalGrenser <- c(0,3,100)}
       }
 
       if (valgtVar=='liggedogn') {#fordeling, gjsnGrVar, andeler, gjsnTid
@@ -625,21 +626,35 @@ valgtVarTest <- valgtVar
             tittel <- paste0('Forbedring av Oswestry-skår < 13 poeng', ktrtxt)
             sortAvtagende <- F
       }
-      if (valgtVar %in% c('OswEndr20', 'OswEndr203mnd', 'OswEndr2012mnd')) { #AndelGrVar, andelTid
-            #Mislykkede operasjoner
-            RegData$OswEndr <- switch(as.character(ktr),
-                                      '1'= (RegData$OswTotPre - RegData$OswTot3mnd),
-                                      '2'= (RegData$OswTotPre - RegData$OswTot12mnd))
-            RegData <- RegData[which(RegData$OswEndr >= -100), ]
-            RegData$Variabel[which(RegData$OswEndr >=20)] <- 1
-            varTxt <- 'med >20 poeng forbedring'
-            tittel <- paste0('Forbedring av Oswestry-skår >= 20 poeng', ktrtxt)
+      if (valgtVar %in% c('OswEndr20', 'OswEndr203mnd', 'OswEndr2012mnd', 'OswEndr20ProKI')) { #AndelGrVar, andelTid
+        #Mislykkede operasjoner
+        if (valgtVar == 'OswEndr20ProKI') {
+          hovedkat <- 1
+          ktr <- 2
+          ktrtxt <- ' (12 mnd. etter)'
+          RegData <- RyggUtvalgEnh(RegData = RegData, hovedkat = 1)$RegData
+          }
 
+        RegData$OswEndr <- switch(as.character(ktr),
+                                  '1'= (RegData$OswTotPre - RegData$OswTot3mnd),
+                                  '2'= (RegData$OswTotPre - RegData$OswTot12mnd))
+        RegData <- RegData[which(RegData$OswEndr >= -100), ]
+        RegData$Variabel[which(RegData$OswEndr >=20)] <- 1
+        varTxt <- 'med >20 poeng forbedring'
+        tittel <- paste0('Forbedring av Oswestry-skår >= 20 poeng', ktrtxt)
+        if (hovedkat == 1){
+          KImaalGrenser <- c(0,70,100)}
       }
 
-      if (valgtVar %in% c('OswEndr30pst', 'OswEndr30pst3mnd', 'OswEndr30pst12mnd')) { #AndelGrVar, andelTid
+      if (valgtVar %in% c('OswEndr30pst', 'OswEndr30pst3mnd', 'OswEndr30pst12mnd', 'OswEndr30pstSSKI')) { #AndelGrVar, andelTid
             #Andel med klinisk signifikant forbedring i Oswestry-skår.
             #Forbedring = nedgang
+        if (valgtVar == 'OswEndr30pstSSKI') {
+          hovedkat <- 9
+          ktr <- 2
+          ktrtxt <- ' (12 mnd. etter)'
+          RegData <- RyggUtvalgEnh(RegData = RegData, hastegrad = 1, tidlOp = 4, hovedkat = 9)$RegData
+        }
             RegData$OswPst <- switch(as.character(ktr),
                                      '1' = (RegData$OswTotPre - RegData$OswTot3mnd)/RegData$OswTotPre*100,
                                      '2' = (RegData$OswTotPre - RegData$OswTot12mnd)/RegData$OswTotPre*100)
@@ -647,6 +662,8 @@ valgtVarTest <- valgtVar
             RegData$Variabel[which(RegData$OswPst >=30)] <- 1
             varTxt <- 'med \u2265 30 % forbedring'
             tittel <- paste0('Minst 30% forbedring av Oswestry-skår', ktrtxt)
+            if (hovedkat == 9){
+            KImaalGrenser <- c(0,70,100)}
       }
       if (valgtVar %in% c('Osw22', 'Osw223mnd', 'Osw2212mnd')) { #AndelGrVar
             #Andel med Oswestry-skår under 23 etter op.
@@ -796,6 +813,26 @@ valgtVarTest <- valgtVar
          retn <- 'H'
       }
 
+
+      if (valgtVar == 'rfKunDegenerasjon') { #andelGrVar/Tid
+        #LegeSkjema. Andel med RFKunDegenerasjon=1
+        #Kode 0,1,tom: Nei, Ja Ukjent
+        tittel <- 'Skivedegenerasjon/spondylose uten nerveaffeksjon'
+        sortAvtagende <- F
+          RegData <- RegData[which(RegData$RFKunDegenerasjon %in% 0:1), ]
+          RegData$Variabel <- RegData$RFKunDegenerasjon
+      }
+      if (valgtVar == 'opFusjonUtenDekompr') { #andelGrVar/Tid
+        #LegeSkjema. Andel med OpFusjonUtenDekompr=1
+        #Kode 0,1,tom: Nei, Ja Ukjent
+        tittel <- 'Fusjon, ryggsmerter uten utstråling, ingen dekompresjon'
+        sortAvtagende <- F
+        RegData <- RegData[which(RegData$OpFusjonUtenDekompr %in% 0:1), ]
+        RegData$Variabel <- RegData$OpFusjonUtenDekompr
+      }
+
+
+
       if (valgtVar %in% c('smBeinEndr', 'smBeinEndr3mnd', 'smBeinEndr12mnd')) {
          tittel <- paste0('bedring av beinsmerter ',ktrtxt)
          RegData <- RegData[which((RegData$SmBePre %in% 0:10) &
@@ -828,9 +865,8 @@ valgtVarTest <- valgtVar
          RegData$Variabel[which((RegData$OpIndParese==0) & (RegData$SmBePre < 3.5))] <- 1
          sortAvtagende <- F
          tittel <- "Lite beinsmerter og ingen parese" #expression("Lite beinsmerter og ingen parese") #paste0('Beinsmerte ', expression(""<="3"), ' og ingen parese')
-         #intToUtf8(2264)
-         #KImaalRetn <- 'lav'
-         KImaalGrenser <- c(0,3,100)
+         if (hovedkat==1) {
+           KImaalGrenser <- c(0,3,100)}
          varTxt <- 'med manglende indikasjon'
       }
 
@@ -928,16 +964,16 @@ valgtVarTest <- valgtVar
         #Legeskjema
         #Spesifisering: (BlodfortynnendeFast = 0 &  ASA grad< 3 & Kjønn = 1 (mann)) & (HovedInngrepV2V3=1 eller HovedInngrepV2V3=2)
         #Mål: < landsgjennomsnittet høy måloppnåelse (grønt), ≥ landsgjennomsnittet moderat/lav (gult)
-
+        hovedkat <- 1:2
         indUtv <- which((RegData$ASA<3) & (RegData$ErMann==1) & (RegData$HovedInngrepV2V3 %in% 1:2) & (RegData$BlodfortynnendeFast==0))
         #(RegData$ErMann==1) & (RegData$HovedInngrepV2V3 %in% 1:2) er også hardkodet utvalg i andelsfigurene.
         RegData <- RegData[indUtv,]
-        tittel <- 'Tromboseprofylakse gitt, mann, ASA<3'
+        tittel <- c('Tromboseprofylakse gitt ved ASA<3')
         RegData <- RegData[which(RegData$PostopTrombProfyl %in% 0:1), ]
         RegData$Variabel <- RegData$PostopTrombProfyl
         varTxt <- 'fått tromboseprofylakse'
         sortAvtagende <- F
-        KImaalGrenser <- 'landsgj'
+        KImaalGrenser <- c(0,10,100)
       }
 
 
@@ -951,7 +987,7 @@ valgtVarTest <- valgtVar
             RegData <- RegData[which(RegData$SafeSurgery %in% 0:3), ]
             RegData$Variabel[which(RegData$SafeSurgery %in% c(1:3))] <- 1
             varTxt <- 'trygg kirurgi'
-            KImaalGrenser <- c(0,95,100)
+            # KImaalGrenser <- c(0,95,100)
             sortAvtagende <- T}
       }
 
@@ -1035,7 +1071,8 @@ valgtVarTest <- valgtVar
       UtData <- list(RegData=RegData, grtxt=grtxt, cexgr=cexgr, varTxt=varTxt, xAkseTxt=xAkseTxt,
                      KImaalGrenser=KImaalGrenser, KIekstrem=KIekstrem, #KImaal=KImaalRetn,
                      retn=retn, subtxt=subtxt, tittel=tittel, antDes=antDes,
-                     flerevar=flerevar, variable=variable, sortAvtagende=sortAvtagende)
+                     flerevar=flerevar, variable=variable, sortAvtagende=sortAvtagende,
+                     hovedkat=hovedkat)
       #RegData inneholder nå variablene 'Variabel' og 'VariabelGr'
       return(invisible(UtData))
 

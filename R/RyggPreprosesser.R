@@ -25,6 +25,7 @@ RyggPreprosess <- function(RegData=RegData)
 	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 	RegData$ShNavn <- as.character(RegData$ShNavn)
+	RegData$ShNavn <- trimws(RegData$ShNavn)
 
 	# Nye variable:
 	RegData$Aar <- lubridate::year(RegData$InnDato)
