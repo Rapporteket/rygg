@@ -80,6 +80,7 @@ ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 # names(sykehusValg) <- c('Alle',sykehusNavn$x)
 # sykehusValg <- sykehusValg
 
+RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 sykehusValg_df <-
   data.frame(
     resh = unique(RegData$ReshId),
