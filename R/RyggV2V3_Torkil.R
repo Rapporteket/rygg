@@ -10,12 +10,12 @@
 RyggDataV2V3 <- function(){
 
     RegDataV2 <- rapbase::loadRegData(registryName="rygg",
-                                    query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+                                    query='SELECT * FROM uttrekk_rapport_from_tore')
 
   RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
-                                     query='SELECT * FROM AlleVarNum')
+                                     query='SELECT * FROM allevarnum')
   RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
-                                       query='SELECT * FROM ForlopsOversikt')
+                                       query='SELECT * FROM forlopsoversikt')
   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
                 "Avdod", "AvdodDato", "BasisRegStatus", "KryptertFnr")
   RegDataV3 <- merge(RegDataV3AVN[ ,-which(names(RegDataV3AVN)=='DodsDato')],

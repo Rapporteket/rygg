@@ -23,13 +23,13 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
 
   if (kunV3 == 0) {
     RegDataV2 <- rapbase::loadRegData(registryName="rygg",
-                                    query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+                                    query='SELECT * FROM uttrekk_rapport_from_tore')
     }
   RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
-                                     query='SELECT * FROM AlleVarNum')
+                                     query='SELECT * FROM allevarnum')
   #test <- RegDataV3[ ,c("DodsDato", 'AvdodDato', 'Avdod')]
   RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
-                                       query='SELECT * FROM ForlopsOversikt')
+                                       query='SELECT * FROM forlopsoversikt')
   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
                 "Avdod", "AvdodDato", "BasisRegStatus", "KryptertFnr")
    #varBegge <- intersect(sort(names(RegDataV3AV)), sort(names(RegDataV3For)))

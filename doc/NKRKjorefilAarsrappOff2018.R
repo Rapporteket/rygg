@@ -11,11 +11,11 @@ save(RegData, file=paste0('A:/Rygg/Rygg2010-2018aarsrapp', '.Rdata'))
 #save(RegData, file='C:/Registre/nkr/data/NKR2010-2016aarsrapp.Rdata')
 
 #Nakke
-NakkeSkjemaDataRaa <- read.table(paste0('A:/Nakke/SkjemaOversiktAarsrappRaa.csv'), sep=';', header=T, fileEncoding = 'UTF-8') #, encoding = 'UTF-8')
+NakkeSkjemaDataRaa <- read.table(paste0('A:/Nakke/skjemaoversiktAarsrappRaa.csv'), sep=';', header=T, fileEncoding = 'UTF-8') #, encoding = 'UTF-8')
 NakkeSkjemaData <- SkjemaData[which(as.Date(SkjemaData$HovedDato) <= '2018-12-31'), ]
 write.table(NakkeSkjemaData, file = 'A:/Nakke/NakkeSkjemaDataAarsrapp2018.csv', sep = ';', row.names = F, fileEncoding = 'UTF-8')
 
-NakkeDataRaa <- read.table(paste0('A:/Nakke/AlleVarNumAarsrappRaa.csv'), sep=';', header=T, encoding = 'UTF-8')
+NakkeDataRaa <- read.table(paste0('A:/Nakke/allevarnumAarsrappRaa.csv'), sep=';', header=T, encoding = 'UTF-8')
 NakkeData <- NakkeDataRaa[which(as.Date(NakkeDataRaa$OprDato) <= '2018-12-31'), ]
 write.table(NakkeData, file = 'A:/Nakke/NakkeDataAarsrapp2018.csv', sep = ';', row.names = F, fileEncoding = 'UTF-8')
 
@@ -552,7 +552,7 @@ sum(testAar$x >1)
 # NAKKE
 library(Nakke)
 setwd('C:/ResultattjenesteGIT/nkr/inst/')
-NakkeData <- read.table('A:/Nakke/AlleVarNum2018-06-21.csv', sep=';', header=T, encoding = 'UTF-8', stringsAsFactors = FALSE)  # na.strings = "NULL", 
+NakkeData <- read.table('A:/Nakke/allevarnum2018-06-21.csv', sep=';', header=T, encoding = 'UTF-8', stringsAsFactors = FALSE)  # na.strings = "NULL", 
 
 
 load('A:/Nakke/NakkeAarsrapp2017.Rdata')
