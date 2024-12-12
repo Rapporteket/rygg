@@ -14,7 +14,7 @@ regTitle = ifelse(paaServer, 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi',
 
 
 if (paaServer) {
-  RegData <- RyggRegDataSQLV2V3()
+  RegData <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
   qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
                     DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
   ePROMadmTab <- rapbase::loadRegData(registryName="rygg", query=qEprom)
@@ -93,9 +93,8 @@ sykehusValg_df$shus <- as.character(sykehusValg_df$shus)
 sykehusValg_df$shus[which(sykehusValg_df$shus %in% duplikatshus)] <-
   paste0(sykehusValg_df$shus[which(sykehusValg_df$shus %in% duplikatshus)], " (",
          sykehusValg_df$resh[which(sykehusValg_df$shus %in% duplikatshus)], ")")
-sykehusValg <- sykehusValg_df$resh
-names(sykehusValg) <- sykehusValg_df$shus
-sykehusValg <- c("Alle" = 0, sykehusValg)
+sykehusValg <- c(0, as.numeric(as.character(sykehusValg_df$resh)))
+names(sykehusValg) <- c("Alle", sykehusValg_df$shus)
 
 hovedkatValg <- c('Alle'=99, 'Andre inngrep'=0, 'Prolapskirurgi'=1, 'Midtlinjebevarende dekompr.'=2,
                   'Laminektomi'=3, 'Eksp. intersp implantat'=4, 'Fusjonskirurgi'=5, 'Osteotomi, deformitet'=6,
