@@ -1,9 +1,17 @@
 
-devtools::install_github("Thinkr-open/golem", ref='master')
-devtools::install_github("Rapporteket/rapbase", ref='rel')
+
+library(rygg)
+RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+test <- unique(RyggData[,c("ReshId", "ShNavn")])
+table(test$ReshId)[table(test$ReshId)>1]
+table(test$ShNavn)[table(test$ShNavn)>1]
+test[order(test$ShNavn),]
+#110771 - 'Volvat ', 'Volvat'
+# 999975 - Aleris Oslo (ingen f.o.m. 2022)
+# 107511 - Aleris Oslo t.o.m. slutten av 2021
+table(RyggData$ReshId, RyggData$Aar)
 
 #Universell utforming - dvs. endre hvordan "trafikklys" legges bak søylene til kvalitetsindikatorene
-library(rygg)
 
 valgtVar <- 'ventetidSpesOp'
 KImaalGrenser <- c(0,50,80,100)
