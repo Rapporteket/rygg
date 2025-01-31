@@ -1,6 +1,6 @@
 Package: rygg
 Title: Degenerativ Rygg, figurer, tabeller, analyser
-Version: 2.4.0
+Version: 2.5.1
 Date: 2024-05-21
 Authors@R: 
     person(given = "Lena Ringstad",
@@ -25,13 +25,13 @@ Imports:
     magrittr,
     rapbase,
     rapFigurer,
-    raplog,
     rapsodi,
     shiny,
     shinyalert,
     shinyjs,
     testthat,
     xtable,
-    zoo
+    zoo,
+    plyr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

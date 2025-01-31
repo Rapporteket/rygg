@@ -19,14 +19,14 @@ ArendalKobl <- RyggKobl[which(RyggKobl$PID %in% Arendal$PID), ]
 write.csv2(ArendalKobl, file =  'd:ArendalKobl.csv', row.names = FALSE)
 
 #--------- Data til NPR for å få CCI Charlson-komorbiditets-index-------
-RyggV2 <- read.csv2(file = 'C:/Registerdata/rygg/TilCharlson/Uttrekk_Rapport_FROM_TORE.csv')
+RyggV2 <- read.csv2(file = 'C:/Registerdata/rygg/TilCharlson/uttrekk_rapport_from_tore.csv')
 RyggV2$PIDny <- paste0('V2PID', RyggV2$PID)
 RyggV2$SSN_v3 <- NA
 RyggV2$PasientID <- NA
 names(RyggV2)[which(names(RyggV2)=='Personnummer')] <- 'SSN'
 RyggV2$SSN_v2 <- RyggV2$SSN
 
-RyggV3 <- read.csv2(file = 'C:/Registerdata/rygg/TilCharlson/Rygg_ForlopsOversikt.csv')
+RyggV3 <- read.csv2(file = 'C:/Registerdata/rygg/TilCharlson/Rygg_forlopsoversikt.csv')
 V3Kobl <- read.csv2(file = 'C:/Registerdata/rygg/TilCharlson/Rygg_koblingstabell.csv')
 RyggV3 <- merge(RyggV3, V3Kobl, by.x = 'PasientID', by.y = 'PID', all.x = T)
 RyggV3$PIDny <- RyggV3$PasientID

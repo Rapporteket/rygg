@@ -125,7 +125,7 @@ par('fig'=c(0, 1, 0, 1))
 
 #------------------------------------
 RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
-                                     query='SELECT * FROM AlleVarNum')
+                                     query='SELECT * FROM allevarnum')
 RegDataV3AVN$PostopTrombProfyl
 
 #Fritekstfeltet i  spørsmålet ovenfor (Hvis ja, hviket?) «SpesTrombProfyl» (navn i repporteket) er en variabel som ikke kommer med i uttrekket fra rapporteket.
@@ -179,7 +179,7 @@ write.table(feil12, file="Feil12mnd.csv", sep=';')
 #V2 og V3
 
 RegDataV2 <- rapbase::loadRegData(registryName="rygg",
-                                  query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+                                  query='SELECT * FROM uttrekk_rapport_from_tore')
 #Legg til ledende 0 i V2
 indUten0 <- which(nchar(RegDataV2$Personnummer)==10)
 RegDataV2$Personnummer[indUten0] <- paste0(0,RegDataV2$Personnummer[indUten0])
@@ -198,14 +198,14 @@ reshID <- 601161 #Haukeland nevr.kir: 105588, NIMI:  104279, Unn: 601161, St Ola
 #fil <- 'A:/Rygg/NKR2010-2017aarsrapp'
 dato <- '2019-08-21'
 #RegData <- read.table(paste0(fil, '.csv'), sep=';', header=T, encoding = 'UTF-8') #, stringsAsFactors = FALSE, na.strings = "NULL",
-SkjemaOversikt <- read.table(paste0('A:/Rygg/SkjemaOversikt',dato,'.csv'),
+skjemaoversikt <- read.table(paste0('A:/Rygg/skjemaoversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
-#usethis::use_data(SkjemaOversikt, internal = TRUE, overwrite = TRUE)
-ForlopsOversikt <- read.table(paste0('A:/Rygg/ForlopsOversikt',dato,'.csv'),
+#usethis::use_data(skjemaoversikt, internal = TRUE, overwrite = TRUE)
+forlopsoversikt <- read.table(paste0('A:/Rygg/forlopsoversikt',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8')
-RegData <- read.table(paste0('A:/Rygg/AlleVarNum',dato,'.csv'),
+RegData <- read.table(paste0('A:/Rygg/allevarnum',dato,'.csv'),
                              sep=';', header=T, encoding = 'UTF-8')
-save(SkjemaOversikt, ForlopsOversikt, RegData, file = 'A:/Rygg/RyggData.RData')
+save(skjemaoversikt, forlopsoversikt, RegData, file = 'A:/Rygg/RyggData.RData')
 #RegData$Kjonn <- 0
 
 #save(RegData, file=paste0(fil, '.Rdata'))
@@ -274,18 +274,18 @@ write.csv2(Kompletthet, file = '../mydata/RyggKompl21.csv', fileEncoding = 'UTF-
 #Registreringsoversikter for 2019-data
 #_________________________________________________________________________________________
 
-SkjemaOversikt <- read.table('A:\Rygg\SkjemaOversikt2019-11-04.csv',
+skjemaoversikt <- read.table('A:\Rygg\skjemaoversikt2019-11-04.csv',
                              sep=';', header=T, encoding = 'UTF-8') #IKKE sensitive data. Kan legges i pakken.
-#SkjemaOversikt$Skjemanavn <- SkjemaOversikt$X.U.FEFF.Skjemanavn
-SkjemaOversikt$MndAar <- format(as.Date(SkjemaOversikt$HovedDato), '%y.%m')
-table(SkjemaOversikt$MndAar)
+#skjemaoversikt$Skjemanavn <- skjemaoversikt$X.U.FEFF.Skjemanavn
+skjemaoversikt$MndAar <- format(as.Date(skjemaoversikt$HovedDato), '%y.%m')
+table(skjemaoversikt$MndAar)
 
-indPasientskjema <- which((SkjemaOversikt$SkjemaRekkeflg==5) & SkjemaOversikt$SkjemaStatus %in% -1:1)
-table(SkjemaOversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")]) # ,
+indPasientskjema <- which((skjemaoversikt$SkjemaRekkeflg==5) & skjemaoversikt$SkjemaStatus %in% -1:1)
+table(skjemaoversikt[indPasientskjema, c('Sykehusnavn','MndAar', "SkjemaStatus")]) # ,
 
 
 #----------- Teste valgtVar for nye data -----------------------------
-#Benytter AlleVarNum som RegData
+#Benytter allevarnum som RegData
 #Tester Andeler, AndelTid, AndelGrVar, GjsnBox og GjsnGrVar
 #Oppfølgingsskjema har ikke fått selvvalgte navn. Variable fra oppfølgingsskjema sjekkes IKKE
 
@@ -299,7 +299,7 @@ outfile <- ''
 tidsenhet <- 'Mnd'
 valgtVar <- 'regForsinkelse'
 
-# RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
+# RegData <- read.table('A:/Rygg/allevarnum2019-08-12.csv',
 #                       sep=';', header=T, encoding = 'UTF-8')
 RegData <- RyggRegDataSQLV2V3()
 test <- RyggFigAndeler(RegData=RegData)  #, valgtVar=valgtVar, enhetsUtvalg = 1, reshID = reshID) #, outfile='test.pdf')
@@ -419,7 +419,7 @@ for (var in variable) {
 #-------- Andel per sykehus eller annen gr.variabel (AndelGrVar)-----------------------------------------
 #---------AndelTid
 #-------------------------------------------------------
-RegData <- RyggRegDataSQLV2V3() #read.table('A:/Rygg/AlleVarNum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
+RegData <- RyggRegDataSQLV2V3() #read.table('A:/Rygg/allevarnum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
 
 
 DataUt <- RyggFigAndelerGrVar(valgtVar='fornoydhet', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
@@ -448,7 +448,7 @@ for (var in variable) {
 #---------Traktplott------
 library(rapFigurer)
 library(qicharts2)
-RegData <- read.table('A:/Rygg/AlleVarNum2019-08-12.csv',
+RegData <- read.table('A:/Rygg/allevarnum2019-08-12.csv',
                       sep=';', header=T, encoding = 'UTF-8')
 AndelGrVarData <- RyggFigAndelerGrVar(valgtVar='uforetrygdPre', RegData=RegData, Ngrense = 20,
                                       datoFra='2019-01-01', outfile='')
@@ -637,9 +637,9 @@ sort(variable)[which(!(sort(variable) %in% sort(names(RegData))))]
 #------------Sjekk av gml. ny resh------------
 
 RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
-                                  query='SELECT * FROM Uttrekk_Rapport_FROM_TORE')
+                                  query='SELECT * FROM uttrekk_rapport_from_tore')
 RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
-                                  query='SELECT * FROM AlleVarNum')
+                                  query='SELECT * FROM allevarnum')
 RegData <- RyggRegDataSQLV2V3()
 #table(RegData[,c(ReshId)])
 tab <- unique(RegData[, c("ShNavn", "ReshId")])
