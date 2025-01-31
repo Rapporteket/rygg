@@ -26,6 +26,21 @@ RyggPreprosess <- function(RegData=RegData)
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 	RegData$ShNavn <- as.character(RegData$ShNavn)
 
+	#Tomme sykehusnavn får resh som navn:
+	indTom <- which(is.na(RegData$ShNavn) | RegData$ShNavn == '')
+	RegData$ShNavn[indTom] <- RegData$ReshId[indTom]
+
+	#Sjekker om alle resh har egne enhetsnavn
+	dta <- unique(RegData[ ,c('ReshId', 'ShNavn')])
+	duplResh <- names(table(dta$ReshId)[which(table(dta$ReshId)>1)])
+	duplSh <- names(table(dta$ShNavn)[which(table(dta$ShNavn)>1)])
+
+	if (length(c(duplSh, duplResh)) > 0) {
+	  ind <- union(which(RegData$ReshId %in% duplResh), which(RegData$ShNavn %in% duplSh))
+	  RegData$ShNavn[ind] <- paste0(RegData$ShNavn[ind],' (', RegData$ReshId[ind], ')')
+	}
+
+
 	# Nye variable:
 	RegData$Aar <- lubridate::year(RegData$InnDato)
 	RegData$MndNum <- as.numeric(format(RegData$InnDato, '%m'))
