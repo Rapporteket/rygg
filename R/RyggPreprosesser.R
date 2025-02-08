@@ -51,9 +51,6 @@ RyggPreprosess <- function(RegData=RegData)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtskrivelseDato), units = 'days'))
 	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDato), as.Date(RegData$OpDato), units = 'days'))
-	#RegData$DiffUtfLukket <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtfyltDato), units = 'days'))
-	#RegData$DiffLukketOp <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$OpDato), units = 'days'))
-	#RegData$Overlevelse <- as.numeric(RegData$AvdodDato - RegData$InnDato)
 	RegData$Dod30 <- 0
 	RegData$Dod30[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 30)] <- 1
 	RegData$Dod365 <- 0

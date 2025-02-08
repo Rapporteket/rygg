@@ -8,40 +8,42 @@
 #'                  1: har med alle variabler fra V3 (foreløpig er dette standard)
 #' @param alleVarV2 0: Bare variabler som også finnes i V3 med (standard),
 #'                  1: har med alle variabler fra V2
-#' @param datoFra P.t ikke i bruk
+#' @param datoFra Benyttes kun til å avgjøre om kobling til V2 skal utføres.
 #' @param datoTil P.t ikke i bruk
 #'
 #' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
 
-RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
+RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
                                alleVarV3=1, alleVarV2=0){
-#NB: datovalg har ingen effekt foreløpig!! - bør hente alle for å få f.eks. operasjonsnummer riktig...
+#NB: datovalg enyttes kun til å avgjøre om kobling til V2 skal utføres.
 #?Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
   kunV3 <- ifelse(datoFra >= '2020-01-01' & !is.na(datoFra), 1, 0)
 
+  registryName <- "data"   # "rygg"
+
   if (kunV3 == 0) {
-    RegDataV2 <- rapbase::loadRegData(registryName="rygg",
+    RegDataV2 <- rapbase::loadRegData(registryName=registryName,
                                     query='SELECT * FROM uttrekk_rapport_from_tore')
     }
-  RegDataV3AVN <- rapbase::loadRegData(registryName="rygg",
+  RegDataV3AVN <- rapbase::loadRegData(registryName=registryName,
                                      query='SELECT * FROM allevarnum')
-  #test <- RegDataV3[ ,c("DodsDato", 'AvdodDato', 'Avdod')]
-  RegDataV3Forl <- rapbase::loadRegData(registryName="rygg",
+  RegDataV3Forl <- rapbase::loadRegData(registryName=registryName,
                                        query='SELECT * FROM forlopsoversikt')
   varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
                 "Avdod", "AvdodDato", "BasisRegStatus", "KryptertFnr")
-   #varBegge <- intersect(sort(names(RegDataV3AV)), sort(names(RegDataV3For)))
   RegDataV3 <- merge(RegDataV3AVN[ ,-which(names(RegDataV3AVN)=='DodsDato')],
                      RegDataV3Forl[ ,varForl], by='ForlopsID',
                      all.x = TRUE, all.y = FALSE)
 
-  ePROMadmTab <- rapbase::loadRegData(registryName="rygg",
+  ePROMadmTab <- rapbase::loadRegData(registryName=registryName,
                                    query='SELECT * FROM proms')
   ePROMvar <- c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
                 'REGISTRATION_TYPE')
-  # «EpromStatus» er definert av oss, og den som er viktigst med tanke på svarprosent. Det er altså verdi 3 her som betyr at pasienten har besvart. OBS at den skiller seg litt fra tilsvarende variabel i Hemit-definisjonen. Denne er for deg og oss definert slik:
+  # «EpromStatus» er definert av HNIKT, og den som er viktigst med tanke på svarprosent.
+  # Verdien 3 betyr at pasienten har besvart.
+  # OBS at den skiller seg litt fra tilsvarende variabel i MRS som er definert slik:
   # 0 = Created, 1 = Ordered, 2 = Expired, 3 = Completed, 4 = Failed
   ind3mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
                          c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
@@ -66,17 +68,6 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', datoTil = '2099-01-01',
     RegDataV3$Ferdigstilt1b12mnd <- 0
     RegDataV3$Ferdigstilt1b12mnd[RegDataV3$ForlopsID %in% ePROM12mnd$MCEID] <- 1
     RegDataV3$Ferdigstilt1b12mnd[intersect(which(RegDataV3$Ferdig1b12mndGML ==1), indIkkeEprom12mnd)] <- 1
-
-    # table(RegDataV3$Ferdig1b3mndGML)
-    # table(RegDataV3$Ferdigstilt1b12mnd)
-    #
-    # table(RegDataV3[ ,c('Aar', 'Ferdigstilt1b12mnd')])
-    # table(RegDataV3$Aar, !is.na(RegDataV3$OswTot12mnd))
-
-   # RegDataV3$Aar <- lubridate::year(RegDataV3$OpDato)
-   # test <- RegDataV3[which(RegDataV3$Aar==2021 & RegDataV3$Ferdigstilt1b3mnd==1), c("OpDato", "Utfdato3mnd", "ForstLukket3mnd")]
-   # test$forsinkelse3mnd <- as.Date(test$Utfdato3mnd) - as.Date(test$OpDato)
-   # mean(test$forsinkelse3mnd)
 
     #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
     indIkkeSaarInf <- which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31')
@@ -310,10 +301,6 @@ if (kunV3 == 0) {
 
   RegDataV3$MedForstLukket <- as.character(as.Date(RegDataV3$MedForstLukket)) #Kobling med NA fungerer ikke for datotid-var
 
-  #NB:----------Sjekk ut at alle variabler har samme format
-  #f.eks.
-  #head(RegDataV2[, V2ogV3])
-  #head(RegDataV3[, V2ogV3])
 
 if (kunV3 == 0){
   #Variabler i V2 som ikke er i V3. Noen er bevisst fjernet fra V3, se vektor fjernesV3
@@ -338,6 +325,7 @@ if (kunV3 == 0){
                          RegDataV3)
   }
 }
+
   if (kunV3 == 1) {RegDataV2V3 <- RegDataV3}
   #Avvik? PeropKompAnnet
   #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3

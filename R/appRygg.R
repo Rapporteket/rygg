@@ -127,10 +127,9 @@ ui <- navbarPage(
            ),
            mainPanel(
              tags$head(tags$link(rel="shortcut icon", href="rap/favicon.ico")),
-             rapbase::appNavbarUserWidget(user = uiOutput("appUserName"),
-                                          organization = uiOutput("appOrgName")
-                                          , addUserInfo = TRUE
-             ),
+             if (context %in% c("DEV", "TEST", "QA", "PRODUCTION", "QAC", "PRODUCTIONC")) {
+               rapbase::navbarWidgetInput("navbar-widget", selectOrganization = TRUE)
+             },
              br(),
              h5('Her kan du se på figurer og tabeller som viser resultater fra registeret.
                             Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
@@ -162,10 +161,7 @@ ui <- navbarPage(
              fluidRow(
                column(10,
                       h4(strong("Nøkkeltall")),
-                      # selectInput(inputId = 'enhetsNivaaStart', label='Enhetsnivå',
-                      #             choices = c("Egen enhet"=2, "Hele landet"=0,
-                      # "Egen sykehustype"=4, "Egen region"=7)),
-                      tableOutput('tabNokkeltallStart')
+                     tableOutput('tabNokkeltallStart')
                ))
            )#main
   ), #tab
@@ -269,13 +265,13 @@ ui <- navbarPage(
                        step = 1
                        , width = '100px'
           ),
-          br(),
-          br(),
-          h3('Last ned data fra versjon 2.0:'),
-          h4('NB: Dette er kun rådata, dvs. tabellen uttrekk_rapport_from_tore'),
-          h4('uten noe prosessering av data'),
-          downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
-          br(),
+          # br(),
+          # br(),
+          # h3('Last ned data fra versjon 2.0:'),
+          # h4('NB: Dette er kun rådata, dvs. tabellen uttrekk_rapport_from_tore'),
+          # h4('uten noe prosessering av data'),
+          # downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
+          # br(),
 
         ),
         mainPanel(
@@ -386,7 +382,6 @@ ui <- navbarPage(
                          choices = enhetsUtvalg,
              ),
              selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
-                         #selected = reshID,
                          choices = sykehusValg),
              selectInput(inputId = "bildeformatFord",
                          label = "Velg format for nedlasting av figur",
@@ -563,37 +558,43 @@ ui <- navbarPage(
 server <- function(input, output,session) {
 
   rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
-  #reshID <- reactive({ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)),
-  #                           601161)})
-  reshID <- ifelse(paaServer, as.numeric(rapbase::getUserReshId(session)), 601161)
-  output$reshID <- renderText(reshID)
-  #rolle <- reactive({ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'SC')})
-  rolle <- ifelse(paaServer, rapbase::getUserRole(shinySession=session), 'LU')
-  rolle <- ifelse(rolle %in% c('LU', 'SC'), rolle, 'LU')
-  output$rolle <- renderText(rolle)
-  brukernavn <- ifelse(paaServer, rapbase::getUserName(session), 'inkognito')
-  output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(reshID, RegData$ReshId)]))
-  output$egetShTxt <- renderText(paste('Drift og resultater, ',
-                                       as.character(RegData$ShNavn[match(reshID, RegData$ReshId)])))
 
-  observe({if (rolle != 'SC') { #
-    shinyjs::hide(id = 'velgReshReg')
-    shinyjs::hide(id = 'velgReshFord')
-    shinyjs::hide(id = 'lastNed_dataDump')
-    shiny::hideTab(inputId = "tab1nivaa",
-                   target = 'Registeradministrasjon') #
-  }
+  user <- rapbase::navbarWidgetServer2(
+    id = "navbar-widget",
+    orgName = "rygg",
+    caller = "rygg"
+  )
+
+  #output$reshID <- renderText(user$org())
+  #output$rolle <- renderText(user$role())
+  #output$egetShnavn <- renderText(as.character(RegData$ShNavn[match(user$org(), RegData$ReshId)]))
+  output$egetShTxt <- renderText(paste('Drift og resultater, ',
+                                       as.character(RegData$ShNavn[match(user$org(), RegData$ReshId)])))
+
+
+  observeEvent(user$role(), {
+    if (user$role() == 'SC') {
+      showTab(inputId = "tab1nivaa", target = "Registeradministrasjon")
+      shinyjs::show(id = 'velgResh')
+      shinyjs::show(id = 'velgReshReg')
+      shinyjs::show(id = 'velgReshFord')
+      shinyjs::show(id = 'lastNed_dataDump')
+    } else {
+      hideTab(inputId = "tab1nivaa", target = "Registeradministrasjon")
+      shinyjs::hide(id = 'velgResh')
+      shinyjs::hide(id = 'velgReshReg')
+      shinyjs::hide(id = 'velgReshFord')
+      shinyjs::hide(id = 'lastNed_dataDump')
+    }
   })
 
-  observeEvent(input$reset_fordValg, shinyjs::reset("brukervalg_fordeling"))
 
-  #observeEvent(input$reset_andelValg, shinyjs::reset("brukervalg_andeler"))
-  #observeEvent(input$reset_gjsnValg, shinyjs::reset("brukervalg_gjsn"))
+  observeEvent(input$reset_fordValg, shinyjs::reset("brukervalg_fordeling"))
 
   # widget
   if (paaServer) {
     output$appUserName <- renderText(rapbase::getUserFullName(session))
-    output$appOrgName <- renderText(paste0('rolle: ', rolle, '<br> ReshID: ', reshID) )}
+    output$appOrgName <- renderText(paste0('rolle: ', user$role(), '<br> ReshID: ', user$org()) )}
 
   # User info in widget
   userInfo <- rapbase::howWeDealWithPersonalData(session)
@@ -610,7 +611,7 @@ server <- function(input, output,session) {
   vec <- factor(skjemaoversikt$SkjemaRekkeflg, levels= c(5,10))
   iKladd <- table(vec[Reduce(intersect, list( #which(as.Date(skjemaoversikt$InnDato) >= datofra12),
     which(skjemaoversikt$SkjemaStatus==0)
-    ,which(skjemaoversikt$AvdRESH == reshID)
+    ,which(skjemaoversikt$AvdRESH == user$org())
   ))]) #, indSkjema
   names(iKladd) <- c('Pasientskjema','Legeskjema')
   output$iKladdPas <- renderText(paste('Pasientskjema: ', iKladd[1]))
@@ -623,19 +624,19 @@ server <- function(input, output,session) {
                                fraDato=Sys.Date()-400,
                                tilDato=Sys.Date()-100,
                                forsinkelse=100,
-                               reshID=reshID),'</b>',
+                               reshID = user$org()),'</b>',
            ' skjema ferdigstilt for sent for 3 mnd.ktr i perioden ',
            format.Date(Sys.Date()-400, '%d.%b%Y'), '-', format.Date(Sys.Date()-100, '%d.%b%Y'))
   )
   output$forSen12mnd <- renderText(
     paste0('<b>', forsinketReg(RegData=RegData,
                                fraDato=max(as.Date('2019-01-01'),Sys.Date()-745),
-                               tilDato=Sys.Date()-380, forsinkelse=380, reshID=reshID), '</b>',
+                               tilDato=Sys.Date()-380, forsinkelse=380, reshID = user$org()), '</b>',
            ' skjema ferdigstilt for sent for 12 mnd.ktr i perioden ',
            format.Date(max(as.Date('2019-01-01'),Sys.Date()-745), '%d.%b%Y'), '-', format.Date(Sys.Date()-380, '%d.%b%Y')))
 
   output$tabNokkeltallStart <- function() {
-    tab <- t(tabNokkeltall(RegData=RegData, tidsenhet='Mnd', reshID=reshID))
+    tab <- t(tabNokkeltall(RegData=RegData, tidsenhet='Mnd', reshID = user$org()))
     kableExtra::kable(tab,
                       full_width=F,
                       digits = c(0,0,1,1,1,1,0)) %>%
@@ -646,7 +647,7 @@ server <- function(input, output,session) {
   }
 
   output$tabAntOpphEget <- renderTable(
-    tabAntOpphShMnd(RegData=RegData, datoTil=idag, reshID = reshID, antMnd=12)
+    tabAntOpphShMnd(RegData=RegData, datoTil=idag, reshID = user$org(), antMnd=12)
     ,rownames = T, digits=0, spacing="xs" )
 
   #-------Samlerapporter--------------------
@@ -655,18 +656,22 @@ server <- function(input, output,session) {
     filename = function(){ paste0('MndRapp', Sys.time(), '.pdf')},
     content = function(file){
       henteSamlerapporter(file, rnwFil="RyggMndRapp.Rnw",
-                          reshID = reshID, datoFra = startDato)
+                          reshID = user$org(), datoFra = startDato)
     }
   )
 
 
   #------Registreringsoversikter---------------------
   output$OppsumAntReg <- renderUI({
-    Registreringer <- RyggUtvalgEnh(RegData=RegData, datoFra = input$datovalgRegKtr[1], datoTil=input$datovalgRegKtr[2])$RegData[,'PID']
+    Registreringer <- RyggUtvalgEnh(RegData=RegData,
+                                    datoFra = input$datovalgRegKtr[1],
+                                    datoTil=input$datovalgRegKtr[2])$RegData[,'PID']
     antallReg <- length(Registreringer)
     antallPers <- length(unique(Registreringer))
-    HTML(paste0('<b> I perioden ',format.Date(input$datovalgRegKtr[1], '%d. %B %Y'), ' - ', format.Date(input$datovalgRegKtr[2], '%d. %B %Y'),
-                ' er det totalt registrert ', antallReg, ' operasjoner. Disse er utført på tilsammen ',
+    HTML(paste0('<b> I perioden ',format.Date(input$datovalgRegKtr[1], '%d. %B %Y'), ' - ',
+                format.Date(input$datovalgRegKtr[2], '%d. %B %Y'),
+                ' er det totalt registrert ', antallReg, ' operasjoner.
+                Disse er utført på tilsammen ',
                 antallPers, ' personer.', '</b>' ))})
 
 
@@ -702,7 +707,7 @@ server <- function(input, output,session) {
 
   # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato), samt datadump
   observe({
-    reshKtr <- ifelse(rolle=='SC', input$velgReshReg, reshID )
+    reshKtr <- ifelse(user$role()=='SC', input$velgReshReg, user$org() )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
                                 as.Date(InnDato) >= input$datovalgRegKtr[1],
@@ -721,7 +726,7 @@ server <- function(input, output,session) {
     dataDump <- tilretteleggDataDumper(RegData=RegDataV2V3,
                                        datoFra = input$datovalgRegKtr[1],
                                        datoTil = input$datovalgRegKtr[2],
-                                       reshID=input$velgReshReg) #rolle = rolle Bare SC får hente disse dataene
+                                       reshID=input$velgReshReg) #Bare SC får hente disse dataene
     dataDump <- finnReoperasjoner(RegData = dataDump)
 
 
@@ -729,11 +734,11 @@ server <- function(input, output,session) {
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
-    dataDumpV2 <- rapbase::loadRegData(registryName="rygg",
-                                       query='select * FROM uttrekk_rapport_from_tore', dbType="mysql")
-    output$lastNed_dataV2 <- downloadHandler(
-      filename = function(){'dataDumpV2.csv'},
-      content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
+    # dataDumpV2 <- rapbase::loadRegData(registryName = 'data',  # "rygg",
+    #                                    query='select * FROM uttrekk_rapport_from_tore', dbType="mysql")
+    # output$lastNed_dataV2 <- downloadHandler(
+    #   filename = function(){'dataDumpV2.csv'},
+    #   content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
   })
 
   #-----------Registeradministrasjon-----------
@@ -749,12 +754,10 @@ server <- function(input, output,session) {
   })
 
   #----------- Eksport ----------------
-  registryName <- "rygg"
   ## brukerkontroller
-  rapbase::exportUCServer("ryggExport", registryName)
+  rapbase::exportUCServer("ryggExport", registryName="rygg")
   ## veileding
-  rapbase::exportGuideServer("ryggExportGuide", registryName)
-
+  rapbase::exportGuideServer("ryggExportGuide", registryName="rygg")
 
 
   #------------Fordelinger---------------------
@@ -767,7 +770,7 @@ server <- function(input, output,session) {
     shinyjs::reset("alder")
   })
   output$fordelinger <- renderPlot({
-    reshIDford <- ifelse(rolle=='SC', input$velgReshFord, reshID)
+    reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
                    reshID=reshIDford,
@@ -783,9 +786,11 @@ server <- function(input, output,session) {
   )
 
   observe({
-    reshIDford <- ifelse(rolle=='SC', input$velgReshFord, reshID)
-    UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0, valgtVar=input$valgtVar,
-                                 reshID=reshIDford, enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+    reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
+    UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0,
+                                 valgtVar=input$valgtVar,
+                                 reshID=reshIDford,
+                                 enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                                  datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                                  minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
                                  erMann=as.numeric(input$erMann),
@@ -847,14 +852,6 @@ server <- function(input, output,session) {
 
 
   #--------------Andeler-----------------------------------
-  observe({
-    #   minDato <- ifelse(input$ktrAndel == '2', min(as.Date(startDato), Sys.Date()-365*2), startDato)
-    #   output$datovalgAndel <- renderUI({
-    #
-    #   #selectInput("User", "Date:", choices = as.character(dat5[dat5$email==input$Select,"date"]))
-    #   dateRangeInput(inputId = 'datovalgAndel', start = as.Date(minDato), end = idag,
-    #                  label = "Tidsperiode", separator="t.o.m.", language="nb")
-    # })
 
     output$andelerGrVar <- renderPlot({
       RyggFigAndelerGrVar(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
@@ -889,7 +886,7 @@ server <- function(input, output,session) {
     output$andelTid <- renderPlot({
 
       RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
-                      reshID= reshID,
+                      reshID = user$org(),
                       datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
                       minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
                       ktr = as.numeric(input$ktrAndel),
@@ -903,9 +900,10 @@ server <- function(input, output,session) {
     }, height = 300, width = 1000
     )
 
+    observe({
     #AndelTid
     AndelerTid <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
-                                  reshID= reshID,
+                                  reshID = user$org(),
                                   datoFra=as.Date(input$datovalgAndel[1]), datoTil=input$datovalgAndel[2],
                                   minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
                                   ktr = as.numeric(input$ktrAndel),
@@ -944,7 +942,7 @@ server <- function(input, output,session) {
       },
       content = function(file){
         RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
-                        reshID= reshID,
+                        reshID = user$org(),
                         datoFra=as.Date(input$datovalgAndel[1]), datoTil=input$datovalgAndel[2],
                         minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
                         ktr = as.numeric(input$ktrAndel),
@@ -992,62 +990,105 @@ server <- function(input, output,session) {
       content = function(file, filename){
         write.csv2(tabAndelerShus, file, row.names = T, fileEncoding = 'latin1', na = '')
       })
+  }) #observe
 
     output$tittelAndel <- renderUI({
       tagList(
         h3(AndelerShus$tittel),
         h5(HTML(paste0(AndelerShus$utvalgTxt, '<br />')))
       )}) #, align='center'
-  }) #observe
 
 
   #------------------ Abonnement ----------------------------------------------
 
-  orgs <- as.list(sykehusValg[-1])
-
-  ## make a list for report metadata
-  reports <- list(
-    Kvartalsrapp = list(
-      synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
-      fun = "abonnementRygg", #Lag egen funksjon for utsending
-      paramNames = c('rnwFil', 'reshID', 'brukernavn'),
-      paramValues = c('RyggMndRapp.Rnw', reshID, brukernavn) #'Alle')
-    )
-  )
-  #test <- rygg::abonnementRygg(rnwFil="RyggMndRapp.Rnw", reshID=105460)
-  rapbase::autoReportServer(
-    id = "RyggAbb", registryName = "rygg", type = "subscription",
-    paramNames = paramNames, paramValues = paramValues, #org = orgAbb$value,
-    reports = reports, orgs = orgs, eligible = TRUE
-  )
+    observe({
+      rapbase::autoReportServer2(
+        id = "RyggAbb",
+        registryName = "rygg",
+        type = "subscription",
+        reports = list(
+          Kvartalsrapp = list(
+            synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
+            fun = "abonnementRygg",
+            paramNames = c('rnwFil', 'reshID', 'brukernavn'),
+            paramValues = c('RyggMndRapp.Rnw', user$org(), user$name())
+          )
+        ),
+        orgs = as.list(sykehusValg[-1]),
+        eligible = TRUE,
+        user = user
+      )})
 
 
   #-----Utsendinger
 
-  if (rolle=='SC') {
+  if (user$role()=='SC') { #Fjerne?
 
     ## liste med metadata for rapport
-    reports <- list(
-      KvartalsRapp = list(
-        synopsis = "Rapporteket-Degenerativ Rygg: Kvartalsrapport",
-        fun = "abonnementRygg",
-        paramNames = c('rnwFil', "reshID"),
-        paramValues = c('RyggMndRapp.Rnw', 0)
-      )
-    )
-
-    org <- rapbase::autoReportOrgServer("RyggUtsending", orgs)
+     org <- rapbase::autoReportOrgServer("RyggUtsending", orgs)
 
     # oppdatere reaktive parametre, for å få inn valgte verdier (overskrive de i report-lista)
     paramNames <- shiny::reactive("reshID")
     paramValues <- shiny::reactive(org$value())
 
+    observe(
     rapbase::autoReportServer(
-      id = "RyggUtsending", registryName = "rygg", type = "dispatchment",
-      org = org$value, paramNames = paramNames, paramValues = paramValues,
-      reports = reports, orgs = orgs, eligible = TRUE
+      id = "RyggUtsending",
+      registryName = "rygg",
+      type = "dispatchment",
+      org = org$value,
+      paramNames = paramNames,
+      paramValues = paramValues,
+      reports = list(
+        KvartalsRapp = list(
+          synopsis = "Rapporteket-Degenerativ Rygg: Kvartalsrapport",
+          fun = "abonnementRygg",
+          paramNames = c('rnwFil', "reshID"),
+          paramValues = c('RyggMndRapp.Rnw', org$value())
+        )
+      ),
+      orgs = orgs,
+      eligible = (user$role() == "SC"),
+      user = user
+    )
     )
   }
+
+
+    ## Dispatchment
+    observe(
+      rapbase::autoReportServer2(
+        id = "norgastDispatch",
+        registryName = "norgast",
+        type = "dispatchment",
+        org = org$value,
+        paramNames = paramNames,
+        paramValues = paramValues,
+        reports = list(
+          Kvartalsrapport = list(
+            synopsis = "NORGAST: Kvartalsrapport",
+            fun = "abonnement_kvartal_norgast",
+            paramNames = c("baseName", "reshID"),
+            paramValues = c("NorgastKvartalsrapport_abonnement", user$org())
+          )
+        ),
+        orgs = orgs,
+        eligible = (user$role() == "SC"),
+        freq = "quarter",
+        user = user
+      )
+    )
+
+
+
+
+
+
+
+
+
+
+
 
 } #server
 # Run the application
