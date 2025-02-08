@@ -4,8 +4,21 @@
 #'
 #' Detaljer. kommer senereGroup of functions Details paragraph.
 #'
-#'
-#'
+
+
+#' Kjør Shiny Application
+#' @return Et objekt som representerer den Rygg-app'en
+#' @export
+
+kjorRyggApp <- function() {
+
+  app <- shiny::runApp('R/appRygg.R')
+  #app <- shiny::shinyApp(ui = rygg::ui_rygg, server = rygg::server_rygg)
+
+  return(app)
+}
+
+
 
 #' Tilrettelegge tidsenhetvariabel:
 #'
