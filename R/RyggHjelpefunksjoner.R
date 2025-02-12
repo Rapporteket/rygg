@@ -12,7 +12,7 @@
 
 kjorRyggApp <- function() {
 
-  app <- shiny::runApp('R/appRygg.R')
+  app <- shiny::runApp('appErHer/appRygg.R')
   #app <- shiny::shinyApp(ui = rygg::ui_rygg, server = rygg::server_rygg)
 
   return(app)
@@ -347,7 +347,7 @@ if (ktr==2) {
 #'
 tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0){
   #Koble på KryptertFnr fra forlopsoversikt via ForlopsID
-  PIDtab <- rapbase::loadRegData(registryName="rygg", query='SELECT * FROM koblingstabell')
+  PIDtab <- rapbase::loadRegData(registryName="data", query='SELECT * FROM koblingstabell')
   RegData <- merge(RegData, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
 
   #Legg til ledende 0 i V2

@@ -2,7 +2,7 @@
 Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":86,\"R\":\"SC\",\"U\":110734},{\"A\":86,\"R\":\"LU\",\"U\":110734},{\"A\":86,\"R\":\"LU\",\"U\":108172},{\"A\":86,\"R\":\"LU\",\"U\":103575}]")
 Sys.setenv(MYSQL_DB_LOG="db_log")
 Sys.setenv(MYSQL_DB_AUTOREPORT="db_autoreport")
-Sys.setenv(MYSQL_DB_DATA="ryggreportdatastaging")
+Sys.setenv(MYSQL_DB_DATA="NKRRapporteket")
 Sys.setenv(MYSQL_HOST="db")
 Sys.setenv(MYSQL_USER="root")
 Sys.setenv(MYSQL_PASSWORD="root")

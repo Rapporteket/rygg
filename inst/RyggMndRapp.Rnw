@@ -15,8 +15,8 @@
 knitr::opts_chunk$set(warnings=FALSE,echo=FALSE)
 knitr::opts_knit$set(root.dir = './')
 library(rygg)
-library(xtable)
-library(lubridate)
+#library(xtable)
+#library(lubridate)
 @
 
 <<'hentDataOgTilrettelegg', include=FALSE>>=
@@ -38,7 +38,7 @@ datoFra6mnd <- paste0(substr(as.character(dato %m-% months(6, abbreviate=FALSE))
 datoFraMnd <- format(datoTil, "%Y-%m-01")
 
 if (!exists('RegData')){
-      RegData <- RyggRegDataSQLV2V3(datoFra = datoFra, datoTil = datoTil)
+      RegData <- RyggRegDataSQLV2V3(datoFra = datoFra) #, datoTil = datoTil)
       RegData <- RyggPreprosess(RegData=RegData)
 }
 
@@ -134,8 +134,6 @@ Dette er bare et lite utvalg resultater. På Rapporteket kan du finne mer spesif
 \end{frame}
 
 
-%\section{Registreringsoversikter}
-
 \begin{frame}[fragile] {Registreringsoversikt og nøkkeltall}
 For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
 \Sexpr{maxDatoEget}.
@@ -143,12 +141,12 @@ For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
 <<'TabReg', results='asis', echo=FALSE, eval=T>>=
 tabAntOpph <- tabAntOpphShMnd(RegData=RegDataEget6mnd, datoTil=datoTil, reshID = reshID, antMnd=6)
 
-xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
+xtable::xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
 		caption=paste0('Antall registreringer, ', shtxt,'.'), label='tab:RegEget')
 
 RegDataNokkelt <- RyggUtvalgEnh(RegData = RegDataEget, datoFra = datoFraKvart)$RegData
 tabNokkeltall <- tabNokkeltall(RegData=RegDataNokkelt, tidsenhet='Kvartal', datoTil=datoTil, enhetsUtvalg=2, reshID=reshID)
-xtable(tabNokkeltall, digits=0, align=c('l', rep('r', ncol(tabNokkeltall))),
+xtable::xtable(tabNokkeltall, digits=0, align=c('l', rep('r', ncol(tabNokkeltall))),
 		caption=paste0('Kvartalsvise nøkkeltall, ', shtxt,'.'), label='tab:NokkeltallEget')
 @
 \end{frame}

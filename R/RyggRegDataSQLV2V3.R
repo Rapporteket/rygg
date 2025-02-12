@@ -29,12 +29,13 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     }
   RegDataV3AVN <- rapbase::loadRegData(registryName=registryName,
                                      query='SELECT * FROM allevarnum')
-  RegDataV3Forl <- rapbase::loadRegData(registryName=registryName,
-                                       query='SELECT * FROM forlopsoversikt')
-  varForl <- c("ForlopsID", "Kommune", "Kommunenr", "Fylkenr",     #Fylke er med i AVN
-                "Avdod", "AvdodDato", "BasisRegStatus", "KryptertFnr")
-  RegDataV3 <- merge(RegDataV3AVN[ ,-which(names(RegDataV3AVN)=='DodsDato')],
-                     RegDataV3Forl[ ,varForl], by='ForlopsID',
+  RegDataV3Forl <- rapbase::loadRegData(
+    registryName=registryName,
+    query='SELECT ForlopsID, Kommune, Kommunenr, Fylkenr,     #Fylke er med i AVN
+                 AvDodDato, BasisRegStatus, KryptertFnr FROM forlopsoversikt')
+
+  RegDataV3 <- merge(RegDataV3AVN,
+                     RegDataV3Forl, by='ForlopsID',
                      all.x = TRUE, all.y = FALSE)
 
   ePROMadmTab <- rapbase::loadRegData(registryName=registryName,
@@ -68,6 +69,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     RegDataV3$Ferdigstilt1b12mnd <- 0
     RegDataV3$Ferdigstilt1b12mnd[RegDataV3$ForlopsID %in% ePROM12mnd$MCEID] <- 1
     RegDataV3$Ferdigstilt1b12mnd[intersect(which(RegDataV3$Ferdig1b12mndGML ==1), indIkkeEprom12mnd)] <- 1
+
 
     #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
     indIkkeSaarInf <- which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31')
@@ -339,7 +341,7 @@ if (kunV3 == 0){
   EndreNavnInd <- grep('3Mnd', names(RegDataV2V3)) #names(RyggData)[grep('3Mnd', names(RyggData))]
   names(RegDataV2V3)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2V3)[EndreNavnInd])
 
-  RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato, origin='1970-01-01')
+  #RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato) #, origin='1970-01-01')
   #En desimal
   RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)
   RegDataV2V3$OswTotPre <- round(RegDataV2V3$OswTotPre,1)

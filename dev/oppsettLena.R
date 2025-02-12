@@ -1,20 +1,18 @@
 
-Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":86,\"R\":\"SC\",\"U\":110734},{\"A\":86,\"R\":\"LU\",\"U\":110734},{\"A\":86,\"R\":\"LU\",\"U\":108172},{\"A\":86,\"R\":\"LU\",\"U\":103575}]")
+Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":86,\"R\":\"SC\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":601161}]")
 Sys.setenv(R_RAP_INSTANCE="QAC")
-Sys.setenv(R_RAP_CONFIG_PATH="/home/rstudio/nger/data-raw/config")
+Sys.setenv(R_RAP_CONFIG_PATH="/home/rstudio/rygg/data-raw/config")
 # Sys.unsetenv("MYSQL_PORT_LOG")
-Sys.setenv(MYSQL_DB_DATA="ngerReportDataStaging")
+Sys.setenv(MYSQL_DB_DATA="NKRRapporteket")
 # Sys.setenv(MYSQL_USER="root")
 # Sys.setenv(MYSQL_PASSWORD="root")
 
 Sys.setlocale(locale = 'nb_NO.UTF-8')
 source("dev/sysSetenv.R")
 
-nger::kjor_NGERapp()
+rygg::kjorRyggApp()
 
-dum <- NGERRegDataSQL(datoFra = '2022-01-01')
-RegData <- NGERPreprosess(dum)
-rm('RegData')
+
 
 ##############################
 ## Kjøring på mobilt kontor ##

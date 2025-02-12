@@ -4,23 +4,18 @@
 \alias{RyggRegDataSQLV2V3}
 \title{Henter data registrert for Degenerativ Rygg}
 \usage{
-RyggRegDataSQLV2V3(
-  datoFra = "2007-01-01",
-  datoTil = "2099-01-01",
-  alleVarV3 = 1,
-  alleVarV2 = 0
-)
+RyggRegDataSQLV2V3(datoFra = "2007-01-01", alleVarV3 = 1, alleVarV2 = 0)
 }
 \arguments{
-\item{datoFra}{P.t ikke i bruk}
-
-\item{datoTil}{P.t ikke i bruk}
+\item{datoFra}{Benyttes kun til å avgjøre om kobling til V2 skal utføres.}
 
 \item{alleVarV3}{0: IKKE I BRUK fjerner variabler som ikke er i bruk på Rapporteket ,
 1: har med alle variabler fra V3 (foreløpig er dette standard)}
 
 \item{alleVarV2}{0: Bare variabler som også finnes i V3 med (standard),
 1: har med alle variabler fra V2}
+
+\item{datoTil}{P.t ikke i bruk}
 }
 \value{
 RegData, dataramme med data f.o.m. 2007.

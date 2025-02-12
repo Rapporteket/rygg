@@ -143,14 +143,13 @@ lagTabavFigGjsnGrVar <- function(UtDataFraFig){
 tabNokkeltall <- function(RegData, utvid=0, tidsenhet='Mnd', datoTil=Sys.Date(), enhetsUtvalg=2, reshID=0) {
   datoFra <- switch(tidsenhet,
                     Mnd = lubridate::floor_date(as.Date(datoTil)%m-% months(12, abbreviate = T), 'month'), #as.Date(paste0(as.numeric(substr(datoTil,1,4))-1, substr(datoTil,5,8), '01'), tz='UTC')
-                    Kvartal = paste0(year(as.Date(datoTil))-4, '-01-01'),
-                    Aar = paste0(year(as.Date(datoTil))-4, '-01-01')
+                    Kvartal = paste0(lubridate::year(as.Date(datoTil))-4, '-01-01'),
+                    Aar = paste0(lubridate::year(as.Date(datoTil))-4, '-01-01')
   )
 
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil = datoTil,
                           enhetsUtvalg = enhetsUtvalg, reshID = reshID)$RegData
   RegData <- SorterOgNavngiTidsEnhet(RegData, tidsenhet=tidsenhet, tab=1)$RegData
-  # indLigget <- which(RegData$liggetid>0)
 
   prosent <- function(x){sum(x, na.rm=T)/(length(x)-sum(is.na(x)))*100}
 

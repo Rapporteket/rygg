@@ -2,7 +2,7 @@
 % Please edit documentation in R/RyggHjelpefunksjoner.R
 \name{SorterOgNavngiTidsEnhet}
 \alias{SorterOgNavngiTidsEnhet}
-\title{Hjelpefunksjoner. Group of functions page title}
+\title{Tilrettelegge tidsenhetvariabel:}
 \usage{
 SorterOgNavngiTidsEnhet(RegData, tidsenhet = "Aar", tab = 0)
 }
@@ -14,10 +14,5 @@ SorterOgNavngiTidsEnhet(RegData, tidsenhet = "Aar", tab = 0)
 \item{tab}{? hmm...}
 }
 \description{
-Fil med div hjelpefunksjoner.Group of functions Description section
-}
-\details{
-Detaljer. kommer senereGroup of functions Details paragraph.
-
 Tilrettelegge tidsenhetvariabel:
 }
