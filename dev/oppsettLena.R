@@ -2,16 +2,13 @@
 Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":86,\"R\":\"SC\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":601161}]")
 Sys.setenv(R_RAP_INSTANCE="QAC")
 Sys.setenv(R_RAP_CONFIG_PATH="/home/rstudio/rygg/data-raw/config")
-# Sys.unsetenv("MYSQL_PORT_LOG")
-Sys.setenv(MYSQL_DB_DATA="NKRRapporteket")
-# Sys.setenv(MYSQL_USER="root")
-# Sys.setenv(MYSQL_PASSWORD="root")
-
+Sys.setenv(MYSQL_DB_DATA="NKRRapporteket") #"NKRRapporteket" db_data
 Sys.setlocale(locale = 'nb_NO.UTF-8')
+
+# eller
 source("dev/sysSetenv.R")
 
 rygg::kjorRyggApp()
-
 
 
 ##############################

@@ -1,6 +1,6 @@
 x-environment: &environment
   MYSQL_DB_LOG: db_log
-  NORDICSCIR_DB: db_data
+  # NORDICSCIR_DB: db_data
   MYSQL_DB_AUTOREPORT: db_autoreport
   MYSQL_DB_DATA: NKRRapporteket
   MYSQL_HOST: db
