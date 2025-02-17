@@ -10,8 +10,10 @@
 #' @return Et objekt som representerer den Rygg-app'en
 #' @export
 
-kjorRyggApp <- function() {
-
+kjorRyggApp <- function(browser = FALSE, logAsJson = FALSE) {
+  if (logAsJson) {
+    rapbase::loggerSetup()
+  }
   app <- shiny::runApp('appErHer/appRygg.R')
   #app <- shiny::shinyApp(ui = rygg::ui_rygg, server = rygg::server_rygg)
 
