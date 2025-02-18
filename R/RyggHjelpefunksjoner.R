@@ -14,8 +14,8 @@ kjorRyggApp <- function(browser = FALSE, logAsJson = FALSE) {
   if (logAsJson) {
     rapbase::loggerSetup()
   }
-  app <- shiny::runApp('appErHer/appRygg.R')
-  #app <- shiny::shinyApp(ui = rygg::ui_rygg, server = rygg::server_rygg)
+
+  app <- shiny::runApp(system.file('appErHer/appRygg.R', package = 'rygg'))
 
   return(app)
 }
