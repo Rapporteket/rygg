@@ -89,6 +89,7 @@ hovedkatValg <- c('Alle'=99,
 
 
 # Define UI for application
+pdf(file = NULL)
 ui <- navbarPage(
   id = "tab1nivaa",
 
