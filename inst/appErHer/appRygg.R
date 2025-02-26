@@ -562,10 +562,15 @@ ui <- navbarPage(
 server <- function(input, output,session) {
 
   # rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
+  map_avdeling <- data.frame(
+    UnitId = unique(RegData$ReshId),
+    orgname = RegData$ShNavn[match(unique(RegData$ReshId),
+                                   RegData$ReshId)])
 
   user <- rapbase::navbarWidgetServer2(
     id = "navbar-widget",
     orgName = "rygg",
+    map_orgname = shiny::req(map_avdeling),
     caller = "rygg"
   )
 
