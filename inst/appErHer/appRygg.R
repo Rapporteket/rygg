@@ -1005,95 +1005,58 @@ server <- function(input, output,session) {
 
   #------------------ Abonnement ----------------------------------------------
   orgs <- as.list(sykehusValg[-1])
-  observe({
-    rapbase::autoReportServer2(
-      id = "RyggAbb",
-      registryName = "rygg",
-      type = "subscription",
-      reports = list(
-        Kvartalsrapp = list(
-          synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
-          fun = "abonnementRygg",
-          paramNames = c('rnwFil', 'reshID', 'brukernavn'),
-          paramValues = c('RyggMndRapp.Rnw', user$org(), user$name())
-        )
-      ),
-      orgs = orgs,
-      eligible = TRUE,
-      user = user
-    )})
-
-
-  #-----Utsendinger
-#observe({ if (user$role()=='SC') { #Fjerne?
-
-    ## liste med metadata for rapport
-    org <- rapbase::autoReportOrgServer("RyggUtsending", orgs)
-
-    # oppdatere reaktive parametre, for å få inn valgte verdier (overskrive de i report-lista)
-    paramNames <- shiny::reactive("reshID")
-    paramValues <- shiny::reactive(org$value())
-
-    observe(
-      rapbase::autoReportServer2(
-        id = "RyggUtsending",
-        registryName = "rygg",
-        type = "dispatchment",
-        org = org$value,
-        paramNames = paramNames,
-        paramValues = paramValues,
-        reports = list(
-          KvartalsRapp = list(
-            synopsis = "Rapporteket-Degenerativ Rygg: Kvartalsrapport",
-            fun = "abonnementRygg",
-            paramNames = c('rnwFil', "reshID"),
-            paramValues = c('RyggMndRapp.Rnw', user$org())
-          )
-        ),
-        orgs = orgs,
-        eligible = (user$role() == "SC"),
-        user = user
+  paramNames <- shiny::reactive(c('reshID', 'brukernavn'))
+  paramValues <- shiny::reactive(c(user$org(), user$name()))
+  rapbase::autoReportServer(
+    id = "RyggAbb",
+    registryName = "rygg",
+    type = "subscription",
+    paramNames = paramNames,
+    paramValues = paramValues,
+    reports = list(
+      Kvartalsrapp = list(
+        synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
+        fun = "abonnementRygg",
+        paramNames = c('rnwFil', 'reshID', 'brukernavn'),
+        paramValues = c('RyggMndRapp.Rnw', "user$org()", "user$name()")
       )
-    )
- #} })
-
-
-  ## Dispatchment
-  observe(
-    rapbase::autoReportServer2(
-      id = "norgastDispatch",
-      registryName = "norgast",
-      type = "dispatchment",
-      org = org$value,
-      paramNames = paramNames,
-      paramValues = paramValues,
-      reports = list(
-        Kvartalsrapport = list(
-          synopsis = "NORGAST: Kvartalsrapport",
-          fun = "abonnement_kvartal_norgast",
-          paramNames = c("baseName", "reshID"),
-          paramValues = c("NorgastKvartalsrapport_abonnement", user$org())
-        )
-      ),
-      orgs = orgs,
-      eligible = (user$role() == "SC"),
-      freq = "quarter",
-      user = user
-    )
+    ),
+    orgs = orgs,
+    user = user
   )
 
+  #-----Utsendinger
 
-
-
-
-
-
-
-
-
-
-
+  ## liste med metadata for rapport
+  org <- rapbase::autoReportOrgServer("RyggUtsending", orgs)
+  # oppdatere reaktive parametre, for å få inn valgte verdier (overskrive de i report-lista)
+  paramNames <- shiny::reactive(c("reshID"))
+  paramValues <- shiny::reactive(c(org$value()))
+  vis_rapp <- shiny::reactiveVal(FALSE)
+  shiny::observeEvent(user$role(), {
+    vis_rapp(user$role() == "SC")
+  })
+  rapbase::autoReportServer(
+    id = "RyggUtsending",
+    registryName = "rygg",
+    type = "dispatchment",
+    org = org$value,
+    paramNames = paramNames,
+    paramValues = paramValues,
+    reports = list(
+      KvartalsRapp = list(
+        synopsis = "Rapporteket-Degenerativ Rygg: Kvartalsrapport",
+        fun = "abonnementRygg",
+        paramNames = c('rnwFil', "reshID"),
+        paramValues = c('RyggMndRapp.Rnw', "org$value()")
+      )
+    ),
+    orgs = orgs,
+    eligible = vis_rapp,
+    user = user
+  )
 } #server
+
 # Run the application
 shinyApp(ui = ui, server = server)
 

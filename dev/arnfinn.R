@@ -1,4 +1,5 @@
 devtools::install("../rapbase/.", upgrade = FALSE)
+devtools::install("../nakke/.", upgrade = FALSE)
 devtools::install(upgrade = FALSE)
 
 # dekoding av database-dump
@@ -8,6 +9,6 @@ Sys.setlocale(locale = 'nb_NO.UTF-8')
 source("dev/sysSetenv.R")
 
 Sys.setenv(MYSQL_HOST="localhost") # for mobilt kontor
-Sys.setenv(R_RAP_CONFIG_PATH="dev/config")
+Sys.setenv(R_RAP_CONFIG_PATH="c://Users/ast046/repo/rapporteket/rygg/dev/config")
 
 rygg::kjorRyggApp()
