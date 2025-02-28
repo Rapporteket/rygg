@@ -1000,8 +1000,8 @@ server <- function(input, output,session) {
 
   #------------------ Abonnement ----------------------------------------------
   orgs <- as.list(sykehusValg[-1])
-  paramNames <- shiny::reactive('reshID', 'brukernavn')
-  paramValues <- shiny::reactive(user$org(), user$name())
+  paramNames <- shiny::reactive(c('reshID', 'brukernavn'))
+  paramValues <- shiny::reactive(c(user$org(), user$name()))
   rapbase::autoReportServer(
     id = "RyggAbb",
     registryName = "rygg",
@@ -1017,7 +1017,6 @@ server <- function(input, output,session) {
       )
     ),
     orgs = orgs,
-    eligible = TRUE,
     user = user
   )
 
@@ -1026,8 +1025,8 @@ server <- function(input, output,session) {
   ## liste med metadata for rapport
   org <- rapbase::autoReportOrgServer("RyggUtsending", orgs)
   # oppdatere reaktive parametre, for å få inn valgte verdier (overskrive de i report-lista)
-  paramNames <- shiny::reactive("reshID")
-  paramValues <- shiny::reactive(org$value())
+  paramNames <- shiny::reactive(c("reshID"))
+  paramValues <- shiny::reactive(c(org$value()))
   vis_rapp <- shiny::reactiveVal(FALSE)
   shiny::observeEvent(user$role(), {
     vis_rapp(user$role() == "SC")
