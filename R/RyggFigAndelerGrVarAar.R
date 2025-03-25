@@ -58,7 +58,7 @@
 
 RyggFigAndelerGrVarAar <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil='3000-12-31',
                                    minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', hastegrad=99,
-                                   hentData=0, preprosess=1,enhetsUtvalg=0, grVar='ShNavn', tittel=1,
+                                   hentData=0, preprosess=1,enhetsUtvalg=0, grVar='SykehusNavn', tittel=1,
                                    ktr=0, reshID=0, aar=0,tidlAar=0,  Ngrense=10, AKjust=0, outfile='') {
 
       if (hentData == 1) {

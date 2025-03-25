@@ -57,7 +57,7 @@
 
 RyggFigAndelerGrVarAarVarKval <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil='3000-12-31',
                                           minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', hastegrad=99, hentData=0,
-                                          preprosess=1,grVar='ShNavn', tittel=1, ktr=0, outfile='',
+                                          preprosess=1,grVar='SykehusNavn', tittel=1, ktr=0, outfile='',
                                           AKjust=0) {
 
       if (hentData == 1) {

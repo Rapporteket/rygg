@@ -21,11 +21,12 @@ RyggPreprosess <- function(RegData=RegData)
 	#Endre variabelnavn:
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
 
-	#Variabel som identifiserer avdelingas resh
-	names(RegData)[which(names(RegData) == 'SykehusNavn')] <- 'ShNavn'
+	#Variabel som identifiserer avdelinga
+	RegData$SykehusNavn <- trimws(RegData$SykehusNavn)
+	RegData$SykehusNavn[which(RegData$AvdRESH %in% c(999975, 107511))] <- 'Aleris Oslo'
+	RegData$ShNavn <- RegData$SykehusNavn
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
-	RegData$ShNavn <- as.character(RegData$ShNavn)
-	RegData$ShNavn <- trimws(RegData$ShNavn)
+
 
 	#Tomme sykehusnavn får resh som navn:
 	indTom <- which(is.na(RegData$ShNavn) | RegData$ShNavn == '')
