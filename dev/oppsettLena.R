@@ -2,7 +2,7 @@
 Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":86,\"R\":\"SC\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":601161}]")
 Sys.setenv(R_RAP_INSTANCE="QAC")
 Sys.setenv(R_RAP_CONFIG_PATH="/home/rstudio/rygg/data-raw/config")
-Sys.setenv(MYSQL_DB_DATA="NKRRapporteket") #"NKRRapporteket" db_data
+Sys.setenv(MYSQL_DB_DATA="rygg") #"NKRRapporteket" db_data
 Sys.setlocale(locale = 'nb_NO.UTF-8')
 
 # eller

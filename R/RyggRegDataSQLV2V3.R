@@ -19,9 +19,13 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 #NB: datovalg enyttes kun til å avgjøre om kobling til V2 skal utføres.
 #?Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
-  kunV3 <- ifelse(datoFra >= '2020-01-01' & !is.na(datoFra), 1, 0)
-
   registryName <- "data"   # "rygg"
+
+  #Kan ikke hente data fra V2:
+  alleVarV2 <- 0
+  kunV3 <- 1 #ifelse(datoFra >= '2020-01-01' & !is.na(datoFra), 1, 0)
+  datoFra <- max(datoFra, '2020-01-01')
+
 
   if (kunV3 == 0) {
     RegDataV2 <- rapbase::loadRegData(registryName=registryName,
