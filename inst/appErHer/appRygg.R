@@ -1021,7 +1021,8 @@ server <- function(input, output,session) {
         paramValues = c('RyggMndRapp.Rnw', "user$org()", "user$name()")
       )
     ),
-    orgs = orgs
+    orgs = orgs,
+    user = user
   )
 
   #-----Utsendinger
@@ -1051,7 +1052,8 @@ server <- function(input, output,session) {
       )
     ),
     orgs = orgs,
-    eligible = vis_rapp
+    eligible = vis_rapp,
+    user = user
   )
 } #server
 
