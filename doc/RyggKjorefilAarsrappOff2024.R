@@ -1,7 +1,7 @@
 #Generere filer og tall til årsrapport for 2024.
 library(rygg)
 library(xtable)
-setwd('~/Aarsrapp/NKR/')
+setwd('../Aarsrapp/NKR/')
 
 #Felles parametre:
 startAar <- 2011
@@ -311,7 +311,8 @@ write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
 
 #---Nøkkelinformasjon, ------
 #---- R Y G G
-
+RyggData <- RegData
+RyggData1aar <- RegData1aar
 RyggData <- RyggPreprosess(
   RegData=RyggRegDataSQLV2V3())
 RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
