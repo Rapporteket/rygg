@@ -11,6 +11,8 @@ source("dev/sysSetenv.R")
 rygg::kjorRyggApp()
 
 
+
+
 ##############################
 ## Kjøring på mobilt kontor ##
 ##############################

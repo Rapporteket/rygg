@@ -52,13 +52,13 @@ hastegradValg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 
 # Gammel Lena-kode
+# Duplikat er nå tatt hånd om i preprosess-fila så gammel kode skal fungere. (Jan-25)
 # sykehusNavn <- sort(unique(RegData$ShNavn), index.return=T)
 # sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
 # sykehusValg <- c(0,sykehusValg)
 # names(sykehusValg) <- c('Alle',sykehusNavn$x)
 # sykehusValg <- sykehusValg
 
-#Duplikat er nå tatt hånd om i preprosess-fila så gammel kode skal fungere. (Jan-25)
 RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 sykehusValg_df <-
   data.frame(
