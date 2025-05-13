@@ -1,31 +1,20 @@
-
-Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":86,\"R\":\"SC\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":601161}]")
-Sys.setenv(R_RAP_INSTANCE="QAC")
-Sys.setenv(R_RAP_CONFIG_PATH="/home/rstudio/rygg/data-raw/config")
-Sys.setenv(MYSQL_DB_DATA="rygg") #"NKRRapporteket" db_data
-Sys.setlocale(locale = 'nb_NO.UTF-8')
-
-# eller
-source("dev/sysSetenv.R")
-
-rygg::kjorRyggApp()
-
-
-
-
 ##############################
 ## Kjøring på mobilt kontor ##
 ##############################
 
 devtools::install("../rapbase/.")
-devtools::install(upgrade = FALSE)
+# devtools::install(upgrade = FALSE)
 
-# dekoding av database-dump
-# sship::dec("c://Users/ast046/Downloads/nordicscir573c60536ce3.sql.gz__20241107_122831.tar.gz", keyfile = "p://.ssh/id_rsa")
 
 Sys.setlocale(locale = 'nb_NO.UTF-8')
 source("dev/sysSetenv.R")
 
-Sys.setenv(MYSQL_HOST="localhost") # for mobilt kontor
+rygg::kjorRyggApp()
 
-nordicscir::kjor_NSapper(register='nordicscir', browser = TRUE)
+test <- rygg::RyggRegDataSQLV2V3()
+
+# dekoding av database-dump
+# sship::dec("c://Users/ast046/Downloads/nordicscir573c60536ce3.sql.gz__20241107_122831.tar.gz", keyfile = "p://.ssh/id_rsa")
+
+remotes::install_github('Rapporteket/rapbase', ref = 'main')
+

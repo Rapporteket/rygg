@@ -2,6 +2,8 @@
 library(rygg)
 library(xtable)
 setwd('../Aarsrapp/NKR/')
+Sys.setlocale(locale = 'nb_NO.UTF-8')
+source("dev/sysSetenv.R")
 
 #Felles parametre:
 startAar <- 2011
@@ -18,7 +20,7 @@ aar2_12mnd <- aar2-1
 tidlAar <- rappAar-1
 tidlAar2 <- (rappAar-3):(rappAar-2)
 
-RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
+RyggData <- RyggRegDataSQLV2V3(datoFra = '2007-01-01', alleVarV3 = 0)
 #ReshSh <- unique(RyggData[,c('SykehusNavn', 'AvdRESH')])
 #ReshSh <- unique(ReshSh[order(ReshSh$SykehusNavn), ])
 #Lagt til i preprosseser:

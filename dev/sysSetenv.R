@@ -1,15 +1,14 @@
-
-Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":86,\"R\":\"SC\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":111068},{\"A\":86,\"R\":\"LU\",\"U\":601161}]")
+Sys.setenv(FALK_EXTENDED_USER_RIGHTS= "[{\"A\":96,\"R\":\"SC\",\"U\":111068},{\"A\":96,\"R\":\"LU\",\"U\":111068},{\"A\":96,\"R\":\"LU\",\"U\":601161}]")
 Sys.setenv(FALK_APP_ID="86")
 Sys.setenv(FALK_USER_EMAIL="jesus@sky.no")
 Sys.setenv(FALK_USER_FULLNAME="Arnie")
+Sys.setenv(FALK_USER_NAME="ttest")
+Sys.setenv(FALK_USER_SHORTNAME="kortnavn")
 Sys.setenv(MYSQL_DB_LOG="db_log")
 Sys.setenv(MYSQL_DB_AUTOREPORT="db_autoreport")
 # Sys.setenv(MYSQL_DB_DATA='rygg')
 Sys.setenv(MYSQL_DB_DATA="nkrrapporteket")
-# Sys.setenv(MYSQL_DB_DATA="DegenNakkeReportDataStaging")
-# Sys.setenv(MYSQL_DB_DATA="nakke")
-Sys.setenv(MYSQL_HOST="localhost") #"db") #
+Sys.setenv(MYSQL_HOST="localhost") #"db") # for mobilt kontor
 Sys.setenv(MYSQL_USER="root")
 Sys.setenv(MYSQL_PASSWORD="root")
 Sys.setenv(R_RAP_INSTANCE="QAC")
