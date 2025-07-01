@@ -172,144 +172,6 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 
 
 
-#------------------------------------------------------------------------------------
-#-----------Filer til Interaktive nettsider -----------------------
-#------------------------------------------------------------------------------------
-
-library(rygg)
-library(magrittr)
-setwd('/home/rstudio/Aarsrappresultater/NETTsider/')
-RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
-valgteAar <- 2011:2024
-#Ønsker å vise alle data
-RyggData <- RyggUtvalgEnh(RegData=RyggData, datoFra = '2011-01-01')$RegData
-
-#Sjekk om nye resh:
-nyresh <- setdiff(sort(unique(RyggData$ReshId)), sort(names(nyID)))
-RyggData$ShNavn[match(nyresh, RyggData$ReshId)]
-table(RyggData$Aar[RyggData$ReshId == nyresh])
-
-#Ventetid, operasjon bestemt til utført
-# Ventetid på kirurgi
-# Ventetid < 3 måneder fra ryggkirurgi ble bestemt (ved spesialist poliklinikk) til operasjonen ble utført.
-# ØNSKET MÅLNIVÅ: ≥ 80 %
-ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp',
-                          aar = valgteAar,
-                          slaaSmToAar=0,
-                          hastegrad=1,
-                          indID = 'nkr_rygg_ventetid_kirurgi', filUt = 'ind1_VentetidOperasjon')
-
-#--Bensmerter mindre eller lik 3 på numerisk smerteskala. SLÅ SAMMEN 2 ÅR
-# Lite beinsmerter og ingen parese - SJEKK PARESE!
-# Andel pasienter med lite beinsmerter (≤ 3) operert for lumbale prolaps siste to år
-# ØNSKET MÅLNIVÅ: ≤ 3,0 %
-ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
-                                 hovedkat=1,
-                          aar = valgteAar,
-                          slaaSmToAar=1,
-                                 indID = 'nkr_rygg_lav_bensmerte_prolaps',
-                                filUt = 'ind2_lav_bensmerte_prolaps')
-
-#-----Oswestry---
-# Forbedring av fysisk funksjon i dagliglivet, prolapskirurgi
-# Andel som oppnår 20 prosentpoeng forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter prolapskirurgi
-# ØNSKET MÅLNIVÅ: ≥ 70 %
-#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
-ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
-                          hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
-                          aar = valgteAar,
-                          slaaSmToAar=1,
-                          indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind3_OswEndr20poengPro')
-# Forbedring av fysisk funksjon i dagliglivet, spinal stenose kirurgi
-# Andel som oppnår 30 % forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter kirurgi for spinal stenose
-# ØNSKET MÅLNIVÅ: ≥ 70 %
-#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
-ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
-                          hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
-                          aar = valgteAar,
-                          slaaSmToAar=1,
-                          indID = 'nkr_rygg_odi30pst12mnd_stenose', filUt = 'ind4_OswEndr30pstSS')
-
-# Kl 5. Andel pasienter med degenerativ spondylolistese som blir operert med
-# fusjonskirurgi ved første operasjon
-# RyggFigAndelerGrVar(RegData=RegData, valgtVar='degSponFusj1op', preprosess = 0,
-#                     Ngrense=20, aar=(rappAar-1):rappAar, outfile='degSponFusj1opKISh.pdf')
-
-ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
-                          aar = valgteAar,
-                          slaaSmToAar=1,
-                          indID = 'nkr_rygg_degSponFusj1op', filUt = 'ind5_degSponFusj1op')
-
-# Andel pasienter med degenerativ spondylolistese som blir operert med
-# fusjonskirurgi ved første operasjon
-# Mål: 	høy	≤ 10%
-# Hensikt: 	Redusere andel pasienter med degenerativ spondylolistese som blir operert med fusjonskirurgi ved første operasjon
-
-
-# K6 Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi.
-# Spesifisering: (BlodfortynnendeFast = 0 &  ASA grad< 3 & Kjønn = 1 (mann)) & (HovedInngrepV2V3=1 eller HovedInngrepV2V3=2)
-# RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', preprosess = 0,
-#                     Ngrense=20, aar=rappAar, outfile='trombProfylLettKISh.pdf')
-
-ind6 <- dataTilOffVisning(RegData = RyggData, valgtVar='trombProfylLettKI',
-                          aar = valgteAar,
-                          slaaSmToAar=0,
-                          indID = 'nkr_rygg_trombProfylLettKI', filUt = 'ind6_trombProfylLettKI')
-
-#Kl 6. 		Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi
-# Mål: 	< landsgjennomsnittet høy måloppnåelse (grønt), ≥ landsgjennomsnittet moderat/lav (gult). 2023: 10%
-# Hensikt: 	Økt etterlevelse av nasjonale retningslinjer for bruk av tromboseprofylakse ved å redusere andelen som får slik profylakse i forbindelse med lett ryggkirurgi, der det ikke er anbefalt
-# Datakilde: 	NKR, legeskjema perioperativt
-
-FellesFil <- rbind(ind1, ind2, ind3, ind4, ind5, ind6) #ind7,
-write.table(FellesFil, file = 'NKRryggKvalInd.csv', sep = ';', row.names = F)
-table(FellesFil$ind_id, FellesFil$year)
-
-SS <- RyggUtvalgEnh(RegData = RyggData, hovedkat = 9)$RegData
-table(SS$Aar)
-Pro <- RyggUtvalgEnh(RegData = RyggData, hovedkat = 1)$RegData
-table(Pro$Aar)
-
-#Alle sykehus og resh:
-ShResh <- unique(RyggData[c('ReshId', 'ShNavn')])
-write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
-
-#-------Dekningsgrad-------------------
-ReshShNavn <- unique(RegData[ , c("ReshId", "ShNavn")])
-write.csv2(ReshShNavn, file = 'data-raw/RyggReshSh.csv', row.names = F)
-
-#NakkeData <- nakke::NakkePreprosess(RegData = nakke::NakkeRegDataSQL())
-#ReshShNavnNakke <- unique(NakkeData[ , c("ReshId", "ShNavn")])
-#write.csv2(ReshShNavnNakke, file = '~/nakke/data-raw/NakkeReshSh.csv', row.names = F)
-
-#Rygg:
-ReshSh <- read.csv2('data-raw/RyggReshSh.csv', encoding = 'UTF-8')
-RyggDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderRygg2023.xlsx', sheet = 'RyggFig')
-RyggDgSh <- aggregate(RyggDg[ ,c("RegRygg", 'Total')], by = list(RyggDg$ReshId), FUN = 'sum')
-RyggDgSh$ShNavn <- ReshSh$ShNavn[match(RyggDgSh$Group.1, ReshSh$ReshId)]
-#RyggDgSh$DG_nkr <- 100*RyggDgSh$RegRygg/RyggDgSh$Total
-
-RyggFigAndelerGrVar(RegData=RyggDgSh, valgtVar='dekn23Rygg', outfile='DGrygg.pdf')
-
-#Nakke:
-ReshSh <- read.csv2('../nakke/data-raw/NakkeReshSh.csv', encoding = 'UTF-8')
-NakkeDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderNakke2023.xlsx', sheet = 'NakkeFig')
-NakkeDg$ShNavn <- ReshSh$ShNavn[match(NakkeDg$ReshId, ReshSh$ReshId)]
-#table(NakkeDg$ShNavn)
-rygg::RyggFigAndelerGrVar(RegData=NakkeDg, valgtVar='dekn23Nakke', outfile='DGnakke.pdf') #
-
-#Data til nettsider (legge på orgnr: nyID)
-DataDgOrg <- RyggDg
-DataDgOrg$orgnr <- as.character(nyID[as.character(DataDgOrg$ReshId)])
-DataDgOrg$ind_id <- 'nkr_rygg_dg' #'nakke_dg'
-#Variabler: year, orgnr, var, denominator, ind_id
-DataDgOrg <- dplyr::rename(DataDgOrg, var=RegNKR, denominator=Total, )
-DataDgOrg$context <- 'caregiver'
-DataDgOrg$year <- 2023
-DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus"))]
-write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
-
-
 
 #---Nøkkelinformasjon, ------
 #---- R Y G G
@@ -502,6 +364,152 @@ round(prop.table(SSDagTid[1:2,],2)*100,1)
 #Andel operert for spinal stenose som også hadde Degenerativ spondylolistese,
 AntDegenSpondSS <-  dim(RyggUtvalgEnh(RegDataSS, hovedkat = 10, aar = rappAar)$RegData)[1]
 round(AntDegenSpondSS/sum(RegDataSS$Aar==rappAar)*100,1)
+
+
+#------------------------------------------------------------------------------------
+#-----------Filer til Interaktive nettsider -----------------------
+#------------------------------------------------------------------------------------
+# Følgende indikatorer (med markering for de som finnes i csv-fila) er gyldige for
+# Nasjonalt kvalitetsregister for ryggkirurgi – ryggkirurgi:
+#   nkr_rygg_degSponFusj1op, nkr_rygg_dg, nkr_rygg_durarift_prolaps,
+# nkr_rygg_durarift_stenose, nkr_rygg_lav_bensmerte_prolaps, nkr_rygg_odi20p12mnd_prolaps, nkr_rygg_odi30pst12mnd_stenose, nkr_rygg_saarinfeksjon_prolaps, nkr_rygg_saarinfeksjon_stenose, nkr_rygg_trombProfylLettKI, nkr_rygg_varighet_bensmerter, nkr_rygg_ventetid_kirurgi.
+library(rygg)
+library(magrittr)
+Sys.setlocale(locale = 'nb_NO.UTF-8')
+source("dev/sysSetenv.R")
+RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+valgteAar <- 2011:2025
+#Ønsker å vise alle data
+RyggData <- RyggUtvalgEnh(RegData=RyggData, datoFra = '2011-01-01')$RegData
+
+#Sjekk om nye resh:
+nyresh <- setdiff(sort(unique(RyggData$ReshId)), sort(names(nyID)))
+RyggData$ShNavn[match(nyresh, RyggData$ReshId)]
+table(RyggData$Aar[RyggData$ReshId == nyresh])
+
+setwd('../Aarsrapp/NKR/')
+#Ventetid, operasjon bestemt til utført
+# Ventetid på kirurgi
+# Ventetid < 3 måneder fra ryggkirurgi ble bestemt (ved spesialist poliklinikk) til operasjonen ble utført.
+# ØNSKET MÅLNIVÅ: ≥ 80 %
+ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp',
+                          aar = valgteAar,
+                          slaaSmToAar=0,
+                          hastegrad=1,
+                          indID = 'nkr_rygg_ventetid_kirurgi', filUt = 'ind1_VentetidOperasjon')
+
+#--Bensmerter mindre eller lik 3 på numerisk smerteskala. SLÅ SAMMEN 2 ÅR
+# Lite beinsmerter og ingen parese - SJEKK PARESE!
+# Andel pasienter med lite beinsmerter (≤ 3) operert for lumbale prolaps siste to år
+# ØNSKET MÅLNIVÅ: ≤ 3,0 %
+ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
+                          hovedkat=1,
+                          aar = valgteAar,
+                          slaaSmToAar=1,
+                          indID = 'nkr_rygg_lav_bensmerte_prolaps',
+                          filUt = 'ind2_lav_bensmerte_prolaps')
+
+#-----Oswestry---
+# Forbedring av fysisk funksjon i dagliglivet, prolapskirurgi
+# Andel som oppnår 20 prosentpoeng forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter prolapskirurgi
+# ØNSKET MÅLNIVÅ: ≥ 70 %
+#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
+ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
+                          hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
+                          aar = valgteAar,
+                          slaaSmToAar=1,
+                          indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind3_OswEndr20poengPro')
+# Forbedring av fysisk funksjon i dagliglivet, spinal stenose kirurgi
+# Andel som oppnår 30 % forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter kirurgi for spinal stenose
+# ØNSKET MÅLNIVÅ: ≥ 70 %
+#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
+ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
+                          hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
+                          aar = valgteAar,
+                          slaaSmToAar=1,
+                          indID = 'nkr_rygg_odi30pst12mnd_stenose', filUt = 'ind4_OswEndr30pstSS')
+
+# Kl 5. Andel pasienter med degenerativ spondylolistese som blir operert med
+# fusjonskirurgi ved første operasjon
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='degSponFusj1op', preprosess = 0,
+#                     Ngrense=20, aar=(rappAar-1):rappAar, outfile='degSponFusj1opKISh.pdf')
+
+ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
+                          aar = valgteAar,
+                          slaaSmToAar=1,
+                          indID = 'nkr_rygg_degSponFusj1op', filUt = 'ind5_degSponFusj1op')
+
+# Andel pasienter med degenerativ spondylolistese som blir operert med
+# fusjonskirurgi ved første operasjon
+# Mål: 	høy	≤ 10%
+# Hensikt: 	Redusere andel pasienter med degenerativ spondylolistese som blir operert med fusjonskirurgi ved første operasjon
+
+
+# K6 Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi.
+# Spesifisering: (BlodfortynnendeFast = 0 &  ASA grad< 3 & Kjønn = 1 (mann)) & (HovedInngrepV2V3=1 eller HovedInngrepV2V3=2)
+# RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', preprosess = 0,
+#                     Ngrense=20, aar=rappAar, outfile='trombProfylLettKISh.pdf')
+
+ind6 <- dataTilOffVisning(RegData = RyggData, valgtVar='trombProfylLettKI',
+                          aar = valgteAar,
+                          slaaSmToAar=0,
+                          indID = 'nkr_rygg_trombProfylLettKI', filUt = 'ind6_trombProfylLettKI')
+
+#Kl 6. 		Andel som får tromboseprofylakse i forbindelse med lett ryggkirurgi
+# Mål: 	< landsgjennomsnittet høy måloppnåelse (grønt), ≥ landsgjennomsnittet moderat/lav (gult). 2023: 10%
+# Hensikt: 	Økt etterlevelse av nasjonale retningslinjer for bruk av tromboseprofylakse ved å redusere andelen som får slik profylakse i forbindelse med lett ryggkirurgi, der det ikke er anbefalt
+# Datakilde: 	NKR, legeskjema perioperativt
+
+FellesFil <- rbind(ind1, ind2, ind3, ind4, ind5, ind6) #ind7,
+write.table(FellesFil, file = 'NKRryggKvalInd.csv', sep = ';', row.names = F)
+table(FellesFil$ind_id, FellesFil$year)
+
+
+
+
+SS <- RyggUtvalgEnh(RegData = RyggData, hovedkat = 9)$RegData
+table(SS$Aar)
+Pro <- RyggUtvalgEnh(RegData = RyggData, hovedkat = 1)$RegData
+table(Pro$Aar)
+
+#Alle sykehus og resh:
+ShResh <- unique(RyggData[c('ReshId', 'ShNavn')])
+write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
+
+#-------Dekningsgrad-------------------
+ReshShNavn <- unique(RegData[ , c("ReshId", "ShNavn")])
+write.csv2(ReshShNavn, file = 'data-raw/RyggReshSh.csv', row.names = F)
+
+#NakkeData <- nakke::NakkePreprosess(RegData = nakke::NakkeRegDataSQL())
+#ReshShNavnNakke <- unique(NakkeData[ , c("ReshId", "ShNavn")])
+#write.csv2(ReshShNavnNakke, file = '~/nakke/data-raw/NakkeReshSh.csv', row.names = F)
+
+#Rygg:
+ReshSh <- read.csv2('data-raw/RyggReshSh.csv', encoding = 'UTF-8')
+RyggDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderRygg2023.xlsx', sheet = 'RyggFig')
+RyggDgSh <- aggregate(RyggDg[ ,c("RegRygg", 'Total')], by = list(RyggDg$ReshId), FUN = 'sum')
+RyggDgSh$ShNavn <- ReshSh$ShNavn[match(RyggDgSh$Group.1, ReshSh$ReshId)]
+#RyggDgSh$DG_nkr <- 100*RyggDgSh$RegRygg/RyggDgSh$Total
+
+RyggFigAndelerGrVar(RegData=RyggDgSh, valgtVar='dekn23Rygg', outfile='DGrygg.pdf')
+
+#Nakke:
+ReshSh <- read.csv2('../nakke/data-raw/NakkeReshSh.csv', encoding = 'UTF-8')
+NakkeDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderNakke2023.xlsx', sheet = 'NakkeFig')
+NakkeDg$ShNavn <- ReshSh$ShNavn[match(NakkeDg$ReshId, ReshSh$ReshId)]
+#table(NakkeDg$ShNavn)
+rygg::RyggFigAndelerGrVar(RegData=NakkeDg, valgtVar='dekn23Nakke', outfile='DGnakke.pdf') #
+
+#Data til nettsider (legge på orgnr: nyID)
+DataDgOrg <- RyggDg
+DataDgOrg$orgnr <- as.character(nyID[as.character(DataDgOrg$ReshId)])
+DataDgOrg$ind_id <- 'nkr_rygg_dg' #'nakke_dg'
+#Variabler: year, orgnr, var, denominator, ind_id
+DataDgOrg <- dplyr::rename(DataDgOrg, var=RegNKR, denominator=Total, )
+DataDgOrg$context <- 'caregiver'
+DataDgOrg$year <- 2023
+DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus"))]
+write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
 
 
 

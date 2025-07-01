@@ -273,6 +273,7 @@ if (ktr==2) {
             '4211883' = '943545634', #Aleris Bodø
             '107508' = '943545634',	#Aleris Bergen	Aleris Bergen
             '107240' = '943545634',	#Aleris Drammen	Aleris Drammen
+            '4211881' = '943545634', #Aleris Drammen
             '4211880' = '943545634', #Aleris Helse AS / Aleris Nesttun (ny 2023)
             '107511' = '943545634',  #Aleris Oslo
             '999975' = '943545634',	#Aleris Oslo	Aleris Colosseum Nobel
