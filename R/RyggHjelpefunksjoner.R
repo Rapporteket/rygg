@@ -1,25 +1,25 @@
-#' Hjelpefunksjoner. Group of functions page title
-#'
-#' Fil med div hjelpefunksjoner.Group of functions Description section
-#'
-#' Detaljer. kommer senereGroup of functions Details paragraph.
-#'
-
+#Hjelpefunksjoner.
 
 #' Kjør Shiny Application
-#' @return Et objekt som representerer den Rygg-app'en
+#'
+#' @param browser App åpner i browser
+#' @param logAsJson Logg i json-format
+#'
+#' @return Et objekt som representerer Rygg-app'en
 #' @export
-
 kjorRyggApp <- function(browser = FALSE, logAsJson = FALSE) {
+
   if (logAsJson) {
     rapbase::loggerSetup()
   }
-
-  app <- shiny::runApp(system.file('appErHer/appRygg.R', package = 'rygg'))
+  app <- shiny::shinyApp(
+    ui = rygg::ui_rygg,
+    server = rygg::server_rygg,
+    options = list(launch.browser = browser)
+  )
 
   return(app)
 }
-
 
 
 #' Tilrettelegge tidsenhetvariabel:

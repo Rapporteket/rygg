@@ -1,3 +1,11 @@
+#Resultattjeneste for Degenerativ Rygg
+
+
+#' Brukergrensesnitt (ui) til rygg-appen
+#'
+#' @return Brukergrensesnittet (ui) til rygg-appen
+#' @export
+ui_rygg <- function() {
 
 library(rygg)
 idag <- Sys.Date()
@@ -7,37 +15,7 @@ datofra12 <- lubridate::floor_date(as.Date(idag)- months(12, abbreviate = T), un
 # gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
 shiny::addResourcePath('rap', system.file('www', package='rapbase'))
 
-context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
-paaServer <- (context %in% c("DEV", "TEST", "QA", "QAC", "PRODUCTIONC", "PRODUCTION")) #rapbase::isRapContext()
-regTitle = ifelse(paaServer, 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi',
-                  'Nasjonalt Kvalitetsregister for Ryggkirurgi, testversjon med FIKTIVE data')
-
-
-if (paaServer) {
-
-  dataRegistry <- 'data'
-  RegData <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
-
-  qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
-                    DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
-  ePROMadmTab <- rapbase::loadRegData(registryName=dataRegistry, query=qEprom)
-  ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
-  ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
-
-  qskjemaoversikt <- 'SELECT * from skjemaoversikt'
-  skjemaoversikt_orig <- rapbase::loadRegData(registryName=dataRegistry, query=qskjemaoversikt, dbType="mysql")
-  skjemaoversikt <- merge(skjemaoversikt_orig, ePROMadmTab,
-                          by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
-
-  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from forlopsoversikt'
-  RegOversikt <- rapbase::loadRegData(registryName=dataRegistry, query=qForlop, dbType="mysql")
-  RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
-} else {
-  print('Data ikke tilgjengelig')
-}
-
-RegData <- RyggPreprosess(RegData = RegData)
-skjemaoversikt <- dplyr::rename(.data=skjemaoversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
+regTitle = 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi'
 
 #Definere innhold i felles rullegardinmenyer:
 kjonn <- c("Begge"=2, "Menn"=1, "Kvinner"=0)
@@ -51,29 +29,6 @@ tidlOprValg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet 
 hastegradValg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
 
-# Gammel Lena-kode
-# Duplikat er nå tatt hånd om i preprosess-fila så gammel kode skal fungere. (Jan-25)
-# sykehusNavn <- sort(unique(RegData$ShNavn), index.return=T)
-# sykehusValg <- unique(RegData$ReshId)[sykehusNavn$ix]
-# sykehusValg <- c(0,sykehusValg)
-# names(sykehusValg) <- c('Alle',sykehusNavn$x)
-# sykehusValg <- sykehusValg
-
-RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
-sykehusValg_df <-
-  data.frame(
-    resh = unique(RegData$ReshId),
-    shus = RegData$ShNavn[match(unique(RegData$ReshId),
-                                RegData$ReshId)])
-sykehusValg_df <- sykehusValg_df[order(sykehusValg_df$shus), ]
-duplikatshus <- as.character(names(table(sykehusValg_df$shus))[
-  which(table(sykehusValg_df$shus)>1)])
-sykehusValg_df$shus <- as.character(sykehusValg_df$shus)
-sykehusValg_df$shus[which(sykehusValg_df$shus %in% duplikatshus)] <-
-  paste0(sykehusValg_df$shus[which(sykehusValg_df$shus %in% duplikatshus)], " (",
-         sykehusValg_df$resh[which(sykehusValg_df$shus %in% duplikatshus)], ")")
-sykehusValg <- c(0, as.numeric(as.character(sykehusValg_df$resh)))
-names(sykehusValg) <- c("Alle", sykehusValg_df$shus)
 
 hovedkatValg <- c('Alle'=99,
                   'Andre inngrep'=0,
@@ -89,12 +44,13 @@ hovedkatValg <- c('Alle'=99,
 
 
 # Define UI for application
-pdf(file = NULL)
+#pdf(file = NULL)
+
 ui <- navbarPage(
-  id = "tab1nivaa",
+  id = "hovedark",
 
   title = div(a(includeHTML(system.file('www/logo.svg', package='rapbase'))),
-              regTitle),# sett inn tittel også i browser-vindu
+              regTitle),
   windowTitle = regTitle,
   theme = "rap/bootstrap.css",
 
@@ -111,7 +67,6 @@ ui <- navbarPage(
              h4('I feltet til venstre på hver side kan man velge hvilken variabel man ønsker å se
                             resultater for. Der kan man også gjøre ulike filtreringer/utvalg av data.'),
              h4(tags$b('Registreringsoversikter '), 'viser aktivitet i registeret.'),
-             #h4(tags$b('Kvalitetsindikatorer '), 'viser på fordelinger (figur/tabell) av ulike variable.'),
              h4(tags$b('Fordelinger '), 'viser fordelinger (figur/tabell) av ulike variabler.'),
              h4(tags$b('Andeler: per sykehus og over tid'), ' viser andeler(prosent) per sykehus og utvikling over tid.
                              Man kan velge hvilken tidsskala man vi se på.'),
@@ -131,9 +86,9 @@ ui <- navbarPage(
            ),
            mainPanel(
              tags$head(tags$link(rel="shortcut icon", href="rap/favicon.ico")),
-             if (context %in% c("DEV", "TEST", "QA", "PRODUCTION", "QAC", "PRODUCTIONC")) {
-               rapbase::navbarWidgetInput("navbar-widget", selectOrganization = TRUE)
-             },
+         #    if (context %in% c("DEV", "TEST", "QA", "PRODUCTION", "QAC", "PRODUCTIONC")) {
+               rapbase::navbarWidgetInput("navbar-widget", selectOrganization = TRUE),
+       #      },
              br(),
              h5('Her kan du se på figurer og tabeller som viser resultater fra registeret.
                             Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
@@ -201,9 +156,7 @@ ui <- navbarPage(
                      label = "Tidsperiode", separator="t.o.m.", language="nb"),
       uiOutput('OppsumAntReg'),
       br(),
-      selectInput(inputId = 'velgReshReg', label='Velg sykehus',
-                  selected = 0,
-                  choices = sykehusValg),
+      uiOutput("velgReshReg"),
       downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
       br(),
       br(),
@@ -249,12 +202,33 @@ ui <- navbarPage(
         h4("Utsending av rapporter"),
         sidebarPanel(
           rapbase::autoReportOrgInput("RyggUtsending"),
-          rapbase::autoReportInput("RyggUtsending")
+          rapbase::autoReportInput("RyggUtsending"),
+
+          #Tørrkjøring
+          br(),
+          shiny::actionButton(inputId = "run_autoreport",
+                              label = "Kjør autorapporter"),
+          shiny::dateInput(inputId = "rapportdato",
+                           label = "Kjør rapporter med dato:",
+                           value = Sys.Date(),
+                           min = Sys.Date(),
+                           max = Sys.Date() + 366
+          ),
+          shiny::checkboxInput(inputId = "dryRun", label = "Send e-post")
+
+
+
         ),
         mainPanel(
-          rapbase::autoReportUI("RyggUtsending")
+          rapbase::autoReportUI("RyggUtsending"),
+
+          br(),
+          p(em("System message:")),
+          verbatimTextOutput("sysMessage"),
+          p(em("Function message:")),
+          verbatimTextOutput("funMessage")
+
         )
-        #)
       ), #Utsending-tab
 
       shiny::tabPanel(
@@ -268,15 +242,7 @@ ui <- navbarPage(
                        max = NA,
                        step = 1
                        , width = '100px'
-          ),
-          # br(),
-          # br(),
-          # h3('Last ned data fra versjon 2.0:'),
-          # h4('NB: Dette er kun rådata, dvs. tabellen uttrekk_rapport_from_tore'),
-          # h4('uten noe prosessering av data'),
-          # downloadButton(outputId = 'lastNed_dataV2', label='Last ned data V2'),
-          # br(),
-
+          )
         ),
         mainPanel(
           h3('Potensielle dobbeltregistreringer'),
@@ -285,8 +251,6 @@ ui <- navbarPage(
                        vises alle operasjoner for de aktuelle pasientene.'),
           downloadButton(outputId = 'lastNed_tabDblReg', label='Last ned tabell med mulige dobbeltregistreringer'),
           br(),
-
-
           tableOutput("tabDblReg")
         )
       ), #Datakvalitet-tab
@@ -341,7 +305,7 @@ ui <- navbarPage(
                            'Nytte av operasjonen, 12 mnd. etter' = 'nytte12mnd',
                            'Operasjonsindikasjon' = 'opInd',
                            'Operasjonsindikasjon, paresegrad' = 'opIndPareseGrad',
-                           #'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
+                        # 'Operasjonsindikasjon, smertetype' = 'opIndSmeType',
                            'Operasjonskategori' = 'opKat',
                            'Radiologisk undersøkelse' = 'radUnders',
                            'Registreringsavvik, utf. pas.skjema - operasjon' ='regDiffOp',
@@ -385,8 +349,7 @@ ui <- navbarPage(
              selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                          choices = enhetsUtvalg,
              ),
-             selectInput(inputId = 'velgReshFord', label='Velg eget Sykehus',
-                         choices = sykehusValg),
+             uiOutput("velgReshFord"),
              selectInput(inputId = "bildeformatFord",
                          label = "Velg format for nedlasting av figur",
                          choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
@@ -556,10 +519,46 @@ ui <- navbarPage(
 
 
 ) #fluidpage, dvs. alt som vises på skjermen
-
+} #UI
 
 #----------------- Define server logic required  -----------------------
-server <- function(input, output,session) {
+#' Server-del til appen
+#'
+#' @param input shiny input object
+#' @param output shiny output object
+#' @param session shiny session object
+#'
+#' @return Server-delen til Rygg-appen
+#' @export
+
+server_rygg <- function(input, output, session) {
+  #server <- function(input, output,session) {
+
+  dataRegistry <- 'data'
+  RegData <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
+  RegData <- RyggPreprosess(RegData = RegData)
+  RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
+
+  qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
+                    DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
+  ePROMadmTab <- rapbase::loadRegData(registryName=dataRegistry, query=qEprom)
+  ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
+  ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
+
+  qskjemaoversikt <- 'SELECT * from skjemaoversikt'
+  skjemaoversikt_orig <- rapbase::loadRegData(registryName=dataRegistry, query=qskjemaoversikt, dbType="mysql")
+  skjemaoversikt <- merge(skjemaoversikt_orig, ePROMadmTab,
+                          by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
+
+  skjemaoversikt <- dplyr::rename(.data=skjemaoversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
+
+  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from forlopsoversikt'
+  RegOversikt <- rapbase::loadRegData(registryName=dataRegistry, query=qForlop, dbType="mysql")
+  RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
+
+
+
+
 
   # rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
   map_avdeling <- data.frame(
@@ -574,19 +573,24 @@ server <- function(input, output,session) {
     caller = "rygg"
   )
 
+
+  # Duplikat er tatt hånd om i preprosess-fila
+  sykehusValg  <- c(0, map_avdeling$UnitId)
+  names(sykehusValg) <- c('Alle', map_avdeling$orgname)
+
   output$egetShTxt <- renderText(paste('Drift og resultater, ',
                                        as.character(RegData$ShNavn[match(user$org(), RegData$ReshId)])))
 
   observeEvent(user$role(), {
     if (user$role() == 'SC') {
-      showTab(inputId = "tab1nivaa", target = "Registeradministrasjon")
-      shinyjs::show(id = 'velgResh')
+      showTab(inputId = "hovedark", target = "Registeradministrasjon")
+     # shinyjs::show(id = 'velgResh')
       shinyjs::show(id = 'velgReshReg')
       shinyjs::show(id = 'velgReshFord')
       shinyjs::show(id = 'lastNed_dataDump')
     } else {
-      hideTab(inputId = "tab1nivaa", target = "Registeradministrasjon")
-      shinyjs::hide(id = 'velgResh')
+      hideTab(inputId = "hovedark", target = "Registeradministrasjon")
+     # shinyjs::hide(id = 'velgResh')
       shinyjs::hide(id = 'velgReshReg')
       shinyjs::hide(id = 'velgReshFord')
       shinyjs::hide(id = 'lastNed_dataDump')
@@ -595,6 +599,9 @@ server <- function(input, output,session) {
 
 
   observeEvent(input$reset_fordValg, shinyjs::reset("brukervalg_fordeling"))
+
+  context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
+  paaServer <- (context %in% c("DEV", "TEST", "QA", "QAC", "PRODUCTIONC", "PRODUCTION")) #rapbase::isRapContext()
 
   # widget
   if (paaServer) {
@@ -708,6 +715,10 @@ server <- function(input, output,session) {
       content = function(file, filename){write.csv2(AntSkjemaAvHver, file, row.names = T, fileEncoding = 'latin1', na = '')})
   })
 
+  output$velgReshReg <- renderUI({
+    selectInput(inputId = 'velgReshReg', label='Velg sykehus',
+                selected = 0,
+                choices = sykehusValg) })
 
   # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato), samt datadump
   observe({
@@ -738,11 +749,6 @@ server <- function(input, output,session) {
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
-    # dataDumpV2 <- rapbase::loadRegData(registryName = 'data',  # "rygg",
-    #                                    query='select * FROM uttrekk_rapport_from_tore', dbType="mysql")
-    # output$lastNed_dataV2 <- downloadHandler(
-    #   filename = function(){'dataDumpV2.csv'},
-    #   content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
   })
 
   #-----------Registeradministrasjon-----------
@@ -773,6 +779,15 @@ server <- function(input, output,session) {
     shinyjs::reset("erMann")
     shinyjs::reset("alder")
   })
+
+  output$velgSykehusFord <- renderUI({
+    selectInput(inputId = 'velgReshFord', label='Velg sykehus',
+                selected = 0,
+                choices = sykehusValg)
+  })
+
+
+
   output$fordelinger <- renderPlot({
     reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
     RyggFigAndeler(RegData=RegData, preprosess = 0,
@@ -1005,14 +1020,14 @@ server <- function(input, output,session) {
 
   #------------------ Abonnement ----------------------------------------------
   orgs <- as.list(sykehusValg[-1])
-  paramNames <- shiny::reactive(c('reshID', 'brukernavn'))
-  paramValues <- shiny::reactive(c(user$org(), user$name()))
+  paramNamesAbb <- shiny::reactive(c('reshID', 'brukernavn'))
+  paramValuesAbb <- shiny::reactive(c(user$org(), user$name()))
   rapbase::autoReportServer(
     id = "RyggAbb",
     registryName = "rygg",
     type = "subscription",
-    paramNames = paramNames,
-    paramValues = paramValues,
+    paramNames = paramNamesAbb,
+    paramValues = paramValuesAbb,
     reports = list(
       Kvartalsrapp = list(
         synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
@@ -1055,8 +1070,28 @@ server <- function(input, output,session) {
     eligible = vis_rapp,
     user = user
   )
+
+  #Tørrkjøring
+  kjor_autorapport <- shiny::observeEvent(input$run_autoreport, {
+    dato <- input$rapportdato
+    dryRun <- !(input$dryRun)
+    withCallingHandlers({
+      shinyjs::html("sysMessage", "")
+      shinyjs::html("funMessage", "")
+      shinyjs::html("funMessage",
+                    rapbase::runAutoReport(group = "nger",
+                                           dato = dato, dryRun = dryRun))
+    },
+    message = function(m) {
+      shinyjs::html(id = "sysMessage", html = m$message, add = TRUE)
+    })
+  })
+
+
+
+
 } #server
 
 # Run the application
-shinyApp(ui = ui, server = server)
+# shinyApp(ui = ui, server = server)
 
