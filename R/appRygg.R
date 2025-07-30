@@ -722,7 +722,8 @@ server_rygg <- function(input, output, session) {
 
   # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato), samt datadump
   observe({
-    reshKtr <- ifelse(user$role()=='SC', input$velgReshReg, user$org() )
+    # reshKtr <- ifelse(user$role()=='SC', input$velgReshReg, user$org() )
+    reshKtr <- ifelse(is.null(input$velgReshReg), user$org(), input$velgReshReg )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
                                 as.Date(InnDato) >= input$datovalgRegKtr[1],
@@ -732,6 +733,7 @@ server_rygg <- function(input, output, session) {
       filename = function(){'dataTilKtr.csv'},
       content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
+    if (user$role()=='SC') {
     RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1, datoFra = input$datovalgRegKtr[1])
     RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
     fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
@@ -741,14 +743,14 @@ server_rygg <- function(input, output, session) {
     dataDump <- tilretteleggDataDumper(RegData=RegDataV2V3,
                                        datoFra = input$datovalgRegKtr[1],
                                        datoTil = input$datovalgRegKtr[2],
-                                       reshID=input$velgReshReg) #Bare SC får hente disse dataene
+                                       reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg)) #Bare SC får hente disse dataene
     dataDump <- finnReoperasjoner(RegData = dataDump)
 
 
     output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
-
+    }
   })
 
   #-----------Registeradministrasjon-----------
@@ -789,10 +791,11 @@ server_rygg <- function(input, output, session) {
 
 
   output$fordelinger <- renderPlot({
-    reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
+    #reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
+    #reshIDford <- ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord)
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
-                   reshID=reshIDford,
+                   reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
                    enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                    datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                    minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
@@ -805,10 +808,10 @@ server_rygg <- function(input, output, session) {
   )
 
   observe({
-    reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
+    # reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
     UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0,
                                  valgtVar=input$valgtVar,
-                                 reshID=reshIDford,
+                                 reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
                                  enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                                  datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                                  minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
