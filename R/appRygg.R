@@ -86,9 +86,7 @@ ui <- navbarPage(
            ),
            mainPanel(
              tags$head(tags$link(rel="shortcut icon", href="rap/favicon.ico")),
-         #    if (context %in% c("DEV", "TEST", "QA", "PRODUCTION", "QAC", "PRODUCTIONC")) {
-               rapbase::navbarWidgetInput("navbar-widget", selectOrganization = TRUE),
-       #      },
+             rapbase::navbarWidgetInput("navbar-widget", selectOrganization = TRUE),
              br(),
              h5('Her kan du se på figurer og tabeller som viser resultater fra registeret.
                             Du kan se på resultater for eget sykehus, nasjonale tall og eget sykehus sett opp
@@ -210,7 +208,7 @@ ui <- navbarPage(
                               label = "Kjør autorapporter"),
           shiny::dateInput(inputId = "rapportdato",
                            label = "Kjør rapporter med dato:",
-                           value = Sys.Date(),
+                           value = Sys.Date()+1,
                            min = Sys.Date(),
                            max = Sys.Date() + 366
           ),
@@ -1023,8 +1021,8 @@ server_rygg <- function(input, output, session) {
 
   #------------------ Abonnement ----------------------------------------------
   orgs <- as.list(sykehusValg[-1])
-  paramNamesAbb <- shiny::reactive(c('reshID', 'brukernavn'))
-  paramValuesAbb <- shiny::reactive(c(user$org(), user$name()))
+  paramNamesAbb <- shiny::reactive(c('reshID'))
+  paramValuesAbb <- shiny::reactive(c(user$org()))
   rapbase::autoReportServer(
     id = "RyggAbb",
     registryName = "rygg",
@@ -1035,8 +1033,8 @@ server_rygg <- function(input, output, session) {
       Kvartalsrapp = list(
         synopsis = "NKR_Rygg/Rapporteket: Kvartalsrapport, abonnement",
         fun = "abonnementRygg",
-        paramNames = c('rnwFil', 'reshID', 'brukernavn'),
-        paramValues = c('RyggMndRapp.Rnw', "user$org()", "user$name()")
+        paramNames = c('rnwFil', 'reshID'),
+        paramValues = c('RyggMndRapp.Rnw', "user$org()")
       )
     ),
     orgs = orgs,
@@ -1082,7 +1080,7 @@ server_rygg <- function(input, output, session) {
       shinyjs::html("sysMessage", "")
       shinyjs::html("funMessage", "")
       shinyjs::html("funMessage",
-                    rapbase::runAutoReport(group = "nger",
+                    rapbase::runAutoReport(group = "rygg",
                                            dato = dato, dryRun = dryRun))
     },
     message = function(m) {
