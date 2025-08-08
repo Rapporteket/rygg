@@ -53,7 +53,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
   medSml <- 0
 
   #
-  if(ktr==2) {datoFra <- as.Date(min(as.Date(datoTil)-500, as.Date(datoFra)))}
+  if (ktr==2) {datoFra <- as.Date(min(as.Date(datoTil)-500, as.Date(datoFra)))}
 
   if (reshID==0) {enhetsUtvalg <- 0}
   if (valgtVar == 'trombProfylLettKI') {
@@ -64,11 +64,11 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                               hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
                               enhetsUtvalg=enhetsUtvalg) #, grType=grType
-  # RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID,
-  #                             enhetsUtvalg=enhetsUtvalg)
+
   hovedgrTxt <- RyggUtvalg$hovedgrTxt
   smltxt <- RyggUtvalg$smltxt
   medSml <- RyggUtvalg$medSml
+  grtxt2 <- ''
   utvalgTxt <- RyggUtvalg$utvalgTxt
   ind <- RyggUtvalg$ind
   RegData <- RyggUtvalg$RegData
