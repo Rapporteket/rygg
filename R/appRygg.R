@@ -436,7 +436,6 @@ ui <- navbarPage(
                ),
                selected = 'regForsinkelse'
              ),
-             #uiOutput("datovalgAndel"),
              dateRangeInput(inputId = 'datovalgAndel', start = startDato, end = idag,
                             label = "Tidsperiode", separator="t.o.m.", language="nb"),
              selectInput(inputId = 'ktrAndel', label='Oppfølgingsskjema',
@@ -556,11 +555,9 @@ server_rygg <- function(input, output, session) {
   RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
 
 
+  rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
-
-
-  # rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
-  map_avdeling <- data.frame(
+   map_avdeling <- data.frame(
     UnitId = unique(RegData$ReshId),
     orgname = RegData$ShNavn[match(unique(RegData$ReshId),
                                    RegData$ReshId)])
@@ -574,8 +571,8 @@ server_rygg <- function(input, output, session) {
 
 
   # Duplikat er tatt hånd om i preprosess-fila
-  sykehusValg  <- c(0, map_avdeling$UnitId)
-  names(sykehusValg) <- c('Alle', map_avdeling$orgname)
+  sykehusValg  <- c(0, map_avdeling$UnitId[order(map_avdeling$orgname)])
+  names(sykehusValg) <- c('Alle', map_avdeling$orgname[order(map_avdeling$orgname)])
 
   output$egetShTxt <- renderText(paste('Drift og resultater, ',
                                        as.character(RegData$ShNavn[match(user$org(), RegData$ReshId)])))
@@ -583,13 +580,11 @@ server_rygg <- function(input, output, session) {
   observeEvent(user$role(), {
     if (user$role() == 'SC') {
       showTab(inputId = "hovedark", target = "Registeradministrasjon")
-     # shinyjs::show(id = 'velgResh')
       shinyjs::show(id = 'velgReshReg')
       shinyjs::show(id = 'velgReshFord')
       shinyjs::show(id = 'lastNed_dataDump')
     } else {
       hideTab(inputId = "hovedark", target = "Registeradministrasjon")
-     # shinyjs::hide(id = 'velgResh')
       shinyjs::hide(id = 'velgReshReg')
       shinyjs::hide(id = 'velgReshFord')
       shinyjs::hide(id = 'lastNed_dataDump')
@@ -781,12 +776,16 @@ server_rygg <- function(input, output, session) {
     shinyjs::reset("alder")
   })
 
-  output$velgSykehusFord <- renderUI({
+  output$velgReshFord <- renderUI({
     selectInput(inputId = 'velgReshFord', label='Velg sykehus',
                 selected = 0,
                 choices = sykehusValg)
   })
 
+  # output$velgReshReg <- renderUI({
+  #   selectInput(inputId = 'velgReshReg', label='Velg sykehus',
+  #               selected = 0,
+  #               choices = sykehusValg) })
 
 
   output$fordelinger <- renderPlot({
@@ -921,9 +920,9 @@ server_rygg <- function(input, output, session) {
   }, height = 300, width = 1000
   )
 
-  observe({
-    #AndelTid
-    AndelerTid <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
+observe({
+    AndelerTid <-
+      RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
                                   reshID = user$org(),
                                   datoFra=as.Date(input$datovalgAndel[1]), datoTil=input$datovalgAndel[2],
                                   minald=as.numeric(input$alderAndel[1]), maxald=as.numeric(input$alderAndel[2]),
@@ -976,9 +975,9 @@ server_rygg <- function(input, output, session) {
                         session=session,
                         outfile = file)
       })
+})
 
-
-    #AndelGrVar
+observe({    #AndelGrVar
     AndelerShus <- RyggFigAndelerGrVar(
       RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
       datoFra=input$datovalgAndel[1], datoTil=input$datovalgAndel[2],
@@ -1011,14 +1010,14 @@ server_rygg <- function(input, output, session) {
       content = function(file, filename){
         write.csv2(tabAndelerShus, file, row.names = T, fileEncoding = 'latin1', na = '')
       })
-  }) #observe
+
 
   output$tittelAndel <- renderUI({
     tagList(
       h3(AndelerShus$tittel),
       h5(HTML(paste0(AndelerShus$utvalgTxt, '<br />')))
     )}) #, align='center'
-
+})
 
   #------------------ Abonnement ----------------------------------------------
   orgs <- as.list(sykehusValg[-1])
