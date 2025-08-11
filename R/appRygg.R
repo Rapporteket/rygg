@@ -60,6 +60,7 @@ ui <- navbarPage(
            shinyjs::useShinyjs(),
            tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color#fluidRow(
            h2('Velkommen til Rapporteket for NKR, Rygg!', align='center'),
+           h6('Versjon 11.aug 2025', col='lightgrey'),
 
 
            sidebarPanel(
