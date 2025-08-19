@@ -737,15 +737,18 @@ server_rygg <- function(input, output, session) {
     dataDump <- tilretteleggDataDumper(RegData=RegDataV2V3,
                                        datoFra = input$datovalgRegKtr[1],
                                        datoTil = input$datovalgRegKtr[2],
-                                       reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg)) #Bare SC får hente disse dataene
-    dataDump <- finnReoperasjoner(RegData = dataDump)
+                                       reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg),
+                                       session = session
+                                       ) #Bare SC får hente disse dataene
+    if (dim(dataDump)[1] > 0) {
+      dataDump <- finnReoperasjoner(RegData = dataDump)}
 
 
     output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
     }
-  })
+  }) #observe
 
   #-----------Registeradministrasjon-----------
 

@@ -348,7 +348,14 @@ if (ktr==2) {
 #' @return Datafil med entydige PID
 #' @export
 #'
-tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0){
+tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0, ...){
+  if ("session" %in% names(list(...))) {
+    rapbase::repLogger(session = list(...)[["session"]],
+                       msg = paste0('Lastet ned datadump for Rygg: ',
+                                    'tidsperiode_', datoFra, '_', datoTil,
+                                    'resh_', reshID))
+  }
+
   #Koble på KryptertFnr fra forlopsoversikt via ForlopsID
   PIDtab <- rapbase::loadRegData(registryName="data", query='SELECT * FROM koblingstabell')
   RegData <- merge(RegData, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)
