@@ -1,25 +1,25 @@
-#' Hjelpefunksjoner. Group of functions page title
-#'
-#' Fil med div hjelpefunksjoner.Group of functions Description section
-#'
-#' Detaljer. kommer senereGroup of functions Details paragraph.
-#'
-
+#Hjelpefunksjoner.
 
 #' Kjør Shiny Application
-#' @return Et objekt som representerer den Rygg-app'en
+#'
+#' @param browser App åpner i browser
+#' @param logAsJson Logg i json-format
+#'
+#' @return Et objekt som representerer Rygg-app'en
 #' @export
-
 kjorRyggApp <- function(browser = FALSE, logAsJson = FALSE) {
+
   if (logAsJson) {
     rapbase::loggerSetup()
   }
-
-  app <- shiny::runApp(system.file('appErHer/appRygg.R', package = 'rygg'))
+  app <- shiny::shinyApp(
+    ui = rygg::ui_rygg,
+    server = rygg::server_rygg,
+    options = list(launch.browser = browser)
+  )
 
   return(app)
 }
-
 
 
 #' Tilrettelegge tidsenhetvariabel:
@@ -273,6 +273,7 @@ if (ktr==2) {
             '4211883' = '943545634', #Aleris Bodø
             '107508' = '943545634',	#Aleris Bergen	Aleris Bergen
             '107240' = '943545634',	#Aleris Drammen	Aleris Drammen
+            '4211881' = '943545634', #Aleris Drammen
             '4211880' = '943545634', #Aleris Helse AS / Aleris Nesttun (ny 2023)
             '107511' = '943545634',  #Aleris Oslo
             '999975' = '943545634',	#Aleris Oslo	Aleris Colosseum Nobel
@@ -347,7 +348,14 @@ if (ktr==2) {
 #' @return Datafil med entydige PID
 #' @export
 #'
-tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0){
+tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0, ...){
+  if ("session" %in% names(list(...))) {
+    rapbase::repLogger(session = list(...)[["session"]],
+                       msg = paste0('Lastet ned datadump for Rygg: ',
+                                    'tidsperiode_', datoFra, '_', datoTil,
+                                    'resh_', reshID))
+  }
+
   #Koble på KryptertFnr fra forlopsoversikt via ForlopsID
   PIDtab <- rapbase::loadRegData(registryName="data", query='SELECT * FROM koblingstabell')
   RegData <- merge(RegData, PIDtab, by.x = 'PasientID', by.y = 'ID', all.x = T)

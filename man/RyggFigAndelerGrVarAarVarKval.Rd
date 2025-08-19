@@ -17,7 +17,7 @@ RyggFigAndelerGrVarAarVarKval(
   hastegrad = 99,
   hentData = 0,
   preprosess = 1,
-  grVar = "ShNavn",
+  grVar = "SykehusNavn",
   tittel = 1,
   ktr = 0,
   outfile = "",

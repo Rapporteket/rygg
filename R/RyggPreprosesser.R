@@ -23,7 +23,9 @@ RyggPreprosess <- function(RegData=RegData)
 
 	#Variabel som identifiserer avdelinga
 	RegData$SykehusNavn <- trimws(RegData$SykehusNavn)
-	RegData$SykehusNavn[which(RegData$AvdRESH %in% c(999975, 107511))] <- 'Aleris Oslo'
+	indAleris <- which(RegData$AvdRESH %in% c(999975, 107511))
+	RegData$SykehusNavn[indAleris] <- 'Aleris Oslo'
+	RegData$AvdRESH[indAleris] <- 999975
 	RegData$ShNavn <- RegData$SykehusNavn
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 

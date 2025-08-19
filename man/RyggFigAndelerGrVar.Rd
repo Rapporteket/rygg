@@ -19,7 +19,7 @@ RyggFigAndelerGrVar(
   preprosess = 1,
   hastegrad = 99,
   enhetsUtvalg = 0,
-  grVar = "ShNavn",
+  grVar = "SykehusNavn",
   tittel = 1,
   ktr = 0,
   Ngrense = 10,

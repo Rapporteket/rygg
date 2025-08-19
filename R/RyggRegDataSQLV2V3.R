@@ -19,6 +19,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 #NB: datovalg enyttes kun til å avgjøre om kobling til V2 skal utføres.
 #?Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
+  message('Henter data, RyggRegDataSQLV2V3')
   registryName <- "data"   # "rygg"
 
   #Kan ikke hente data fra V2:
@@ -352,6 +353,7 @@ if (kunV3 == 0){
   RegDataV2V3$OswTot3mnd <- round(RegDataV2V3$OswTot3mnd,1)
   RegDataV2V3$OswTot12mnd <- round(RegDataV2V3$OswTot12mnd,1)
 
+  message('Ferdig med RegDataV2V3')
   return(RegDataV2V3)
 }
 

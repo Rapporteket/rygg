@@ -18,7 +18,7 @@ RyggFigAndelerGrVarAar(
   hentData = 0,
   preprosess = 1,
   enhetsUtvalg = 0,
-  grVar = "ShNavn",
+  grVar = "SykehusNavn",
   tittel = 1,
   ktr = 0,
   reshID = 0,

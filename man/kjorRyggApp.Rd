@@ -2,18 +2,18 @@
 % Please edit documentation in R/RyggHjelpefunksjoner.R
 \name{kjorRyggApp}
 \alias{kjorRyggApp}
-\title{Hjelpefunksjoner. Group of functions page title}
+\title{Kjør Shiny Application}
 \usage{
-kjorRyggApp()
+kjorRyggApp(browser = FALSE, logAsJson = FALSE)
+}
+\arguments{
+\item{browser}{App åpner i browser}
+
+\item{logAsJson}{Logg i json-format}
 }
 \value{
-Et objekt som representerer den Rygg-app'en
+Et objekt som representerer Rygg-app'en
 }
 \description{
-Fil med div hjelpefunksjoner.Group of functions Description section
-}
-\details{
-Detaljer. kommer senereGroup of functions Details paragraph.
-
 Kjør Shiny Application
 }

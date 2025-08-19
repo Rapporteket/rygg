@@ -47,13 +47,13 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
   KImaalGrenser <- RyggVarSpes$KImaalGrenser
   tittel <- RyggVarSpes$tittel
 
-
-  #------- Gjøre utvalg
   smltxt <- ''
   medSml <- 0
+  grtxt2 <- ''
+  yAkseTxt <- 'Andel (%)'
 
-  #
-  if(ktr==2) {datoFra <- as.Date(min(as.Date(datoTil)-500, as.Date(datoFra)))}
+  #------- Gjøre utvalg
+  if (ktr==2) {datoFra <- as.Date(min(as.Date(datoTil)-500, as.Date(datoFra)))}
 
   if (reshID==0) {enhetsUtvalg <- 0}
   if (valgtVar == 'trombProfylLettKI') {
@@ -64,8 +64,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                               hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
                               enhetsUtvalg=enhetsUtvalg) #, grType=grType
-  # RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID,
-  #                             enhetsUtvalg=enhetsUtvalg)
+
   hovedgrTxt <- RyggUtvalg$hovedgrTxt
   smltxt <- RyggUtvalg$smltxt
   medSml <- RyggUtvalg$medSml
@@ -123,7 +122,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2011-01-01', datoTil=Sys
     Ngr <- list(Hoved = NAarHendHoved, Rest = NAarHendRest)
 
     grtxt2 <- paste0('(', sprintf('%.1f',AggVerdier$Hoved), '%)')
-    yAkseTxt <- 'Andel (%)'
     vektor <- c('Aar','Halvaar','Kvartal','Mnd')
     xAkseTxt <- paste0(c('Innleggelsesår', 'Innleggelsesår', 'Innleggelseskvartal', 'Innleggelsesmåned')
                        [which(tidsenhet==vektor)])

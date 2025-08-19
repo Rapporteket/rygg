@@ -15,8 +15,6 @@
 knitr::opts_chunk$set(warnings=FALSE,echo=FALSE)
 knitr::opts_knit$set(root.dir = './')
 library(rygg)
-#library(xtable)
-#library(lubridate)
 @
 
 <<'hentDataOgTilrettelegg', include=FALSE>>=
@@ -37,10 +35,10 @@ datoFra6mnd <- paste0(substr(as.character(dato %m-% months(6, abbreviate=FALSE))
 #Ønsker eget datasett for forrige måned
 datoFraMnd <- format(datoTil, "%Y-%m-01")
 
-if (!exists('RegData')){
+# if (!exists('RegData')){
       RegData <- RyggRegDataSQLV2V3(datoFra = datoFra) #, datoTil = datoTil)
       RegData <- RyggPreprosess(RegData=RegData)
-}
+#}
 
 RegData <- RyggUtvalgEnh(RegData = RegData, datoFra = datoFra)$RegData
 
