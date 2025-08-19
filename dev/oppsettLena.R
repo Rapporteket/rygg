@@ -9,7 +9,6 @@ devtools::install("../rapbase/.")
 source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
 
-test <- rygg::RyggRegDataSQLV2V3()
 
 setwd('../data')
 setwd('../rygg')
@@ -18,3 +17,15 @@ setwd('../rygg')
 
 remotes::install_github('Rapporteket/rapbase', ref = 'main')
 
+source("dev/sysSetenv.R")
+library(rygg)
+RyggData <- RyggPreprosess(RyggRegDataSQLV2V3(datoFra = '2020-01-01'))
+alleResh <- unique(RyggData$ReshId)
+
+for (resh in alleResh) {
+  #reshID <- alleResh[1]
+  reshID <- resh
+  print(reshID)
+#  knitr::knit2pdf(input='inst/RyggMndRapp.Rnw')
+  test <- c(test, testing(RegData=RyggData, reshID=reshID))
+}
