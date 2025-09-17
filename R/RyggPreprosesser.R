@@ -55,9 +55,9 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtskrivelseDato), units = 'days'))
 	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDato), as.Date(RegData$OpDato), units = 'days'))
 	RegData$Dod30 <- 0
-	RegData$Dod30[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 30)] <- 1
+	RegData$Dod30[which(as.numeric(as.Date(RegData$AvDodDato) - as.Date(RegData$InnDato)) < 30)] <- 1
 	RegData$Dod365 <- 0
-	RegData$Dod365[which(as.numeric(as.Date(RegData$AvdodDato) - as.Date(RegData$InnDato)) < 365)] <- 1
+	RegData$Dod365[which(as.numeric(as.Date(RegData$AvDodDato) - as.Date(RegData$InnDato)) < 365)] <- 1
 
 	  return(invisible(RegData))
 }

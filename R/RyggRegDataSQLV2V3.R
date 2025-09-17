@@ -17,20 +17,28 @@
 RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
                                alleVarV3=1, alleVarV2=0){
 #NB: datovalg enyttes kun til å avgjøre om kobling til V2 skal utføres.
-#?Legg inn sjekk på at ikke trenger å koble hvis: if (datoFra < '2019-01-01'){
 
   message('Henter data, RyggRegDataSQLV2V3')
   registryName <- "data"   # "rygg"
 
-  #Kan ikke hente data fra V2:
-  #alleVarV2 <- 0
   kunV3 <- ifelse(datoFra >= '2020-01-01' & !is.na(datoFra), 1, 0)
-  datoFra <- max(datoFra, '2020-01-01')
+  #datoFra <- max(datoFra, '2020-01-01') #For å fjerne V2
 
 
   if (kunV3 == 0) {
-    RegDataV2 <- rapbase::loadRegData(registryName=registryName,
-                                    query='SELECT * FROM uttrekk_rapport_from_tore')
+
+    V2oper <- rapbase::loadRegData(registryName=registryName,
+                                   query='SELECT * FROM ryggV2_operation')
+    V2pas <- rapbase::loadRegData(registryName=registryName,
+                                  query='SELECT * FROM ryggV2_patient_preop')
+    V2oppf <- rapbase::loadRegData(registryName=registryName,
+                                   query='SELECT * FROM ryggV2_followup')
+
+    V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='old_pid')], by = 'mceid')
+    RegDataV2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='old_pid')], by = 'mceid')
+
+    # RegDataV2 <- rapbase::loadRegData(registryName=registryName,
+    #                                 query='SELECT * FROM uttrekk_rapport_from_tore')
     }
   RegDataV3AVN <- rapbase::loadRegData(registryName=registryName,
                                      query='SELECT * FROM allevarnum')
@@ -123,7 +131,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 
   #-----Tilrettelegging av V2-data-------------------------
 if (kunV3 == 0) {
-   RegDataV2$PID <- paste0(RegDataV2$PID, 'V2')
+  #FJERNES ? !!!!!!!!!!
+   RegDataV2$PID <- paste0(RegDataV2$old_pid, 'V2')
 
    # Arbstatus3mnd OG Arbstatus12mnd V2:
    # De som har verdi 11 settes TIL MANGLENDE
