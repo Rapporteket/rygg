@@ -1,4 +1,15 @@
 
+RyggDataRaaAlle <- RyggRegDataSQLV2V3()
+RyggData <- RyggPreprosess(RegData = RyggDataRaa)
+
+
+# 'AvDodDato' ='DodsDato'
+varDod <- c('AvDodDato','DodsDato')
+RyggDataRaa[,varDod]
+RyggDataRaa$InnDato <- as.Date(RyggDataRaa$OpDato, format="%Y-%m-%d") #, tz='UTC')
+RyggDataRaa$Dod30[which(as.numeric(as.Date(RyggDataRaa$AvdodDato) - as.Date(RyggDataRaa$InnDato)) < 30)] <- 1
+table(RyggData$Dod365)
+
 
 library(rygg)
 RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())

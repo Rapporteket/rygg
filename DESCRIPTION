@@ -15,13 +15,11 @@ Encoding: UTF-8
 LazyData: true
 Remotes: 
     Rapporteket/rapbase@main,
-    Rapporteket/rapFigurer,
-    Rapporteket/nakke
+    Rapporteket/rapFigurer
 Imports: 
     kableExtra,
     knitr,
     magrittr,
-    nakke,
     plyr,
     rapbase,
     rapFigurer,
