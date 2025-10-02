@@ -34,8 +34,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     V2oppf <- rapbase::loadRegData(registryName=registryName,
                                    query='SELECT * FROM ryggV2_followup')
 
-    V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='old_pid')], by = 'mceid')
-    RegDataV2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='old_pid')], by = 'mceid')
+    V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
+    RegDataV2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
 
     # RegDataV2 <- rapbase::loadRegData(registryName=registryName,
     #                                 query='SELECT * FROM uttrekk_rapport_from_tore')
@@ -132,7 +132,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
   #-----Tilrettelegging av V2-data-------------------------
 if (kunV3 == 0) {
   #FJERNES ? !!!!!!!!!!
-   RegDataV2$PID <- paste0(RegDataV2$old_pid, 'V2')
+   RegDataV2$PID <- paste0(RegDataV2$OLD_PID, 'V2')
 
    # Arbstatus3mnd OG Arbstatus12mnd V2:
    # De som har verdi 11 settes TIL MANGLENDE

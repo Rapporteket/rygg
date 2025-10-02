@@ -190,11 +190,11 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
 
 finnReoperasjoner <- function(RegData){
 
-  antPas <- length(names(table(RegData$PID)))
-RegDataSort <-RegData[order(RegData$PID, RegData$OpDato), ]
+antPas <- length(names(table(RegData$PasientID)))
+RegDataSort <-RegData[order(RegData$PasientID, RegData$OpDato), ]
 
 N <- dim(RegData)[1]
-RegDataSort$OpNr <- ave(RegDataSort$PID, RegDataSort$PID, FUN=seq_along)
+RegDataSort$OpNr <- ave(RegDataSort$PasientID, RegDataSort$PasientID, FUN=seq_along)
 indPasFlereOp <- which(RegDataSort$OpNr>1)
 RegDataSort$DagerNesteOp <- NA
 RegDataSort$DagerNesteOp[indPasFlereOp-1] <-

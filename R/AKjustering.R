@@ -36,7 +36,7 @@ StandAlderKjonn  <- function(RegData, stdPop, antAldgr, katVariable) {
 		 }
 		 #Registerpopulasjon:
 		 if (stdPop == 'Register') {
-		 PopAldKjGr <- aggregate(RegData$PID, RegData[ ,c('ErMann','AlderGr')], FUN=length)}
+		 PopAldKjGr <- aggregate(RegData$PasientID, RegData[ ,c('ErMann','AlderGr')], FUN=length)}
 
 		 names(PopAldKjGr)[3] <- 'Ant'
 		 PopAldKjGr$Vekt <- prop.table((PopAldKjGr$Ant))#PopAldKjGr$AntInnb/sum(PopAldKjGr$AntInnb)

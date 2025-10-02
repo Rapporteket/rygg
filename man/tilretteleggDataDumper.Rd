@@ -10,7 +10,8 @@ tilretteleggDataDumper(
   RegData,
   datoFra = "2000-01-01",
   datoTil = Sys.Date(),
-  reshID = 0
+  reshID = 0,
+  ...
 )
 }
 \arguments{
