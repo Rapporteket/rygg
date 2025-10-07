@@ -351,7 +351,7 @@ if (ktr==2) {
 tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0, ...){
   if ("session" %in% names(list(...))) {
     rapbase::repLogger(session = list(...)[["session"]],
-                       msg = paste0('Lastet ned datadump for Rygg: ',
+                       msg = paste0('Datadump for Rygg: ',
                                     'tidsperiode_', datoFra, '_', datoTil,
                                     'resh_', reshID))
   }

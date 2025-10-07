@@ -738,7 +738,7 @@ server_rygg <- function(input, output, session) {
                                        datoFra = input$datovalgRegKtr[1],
                                        datoTil = input$datovalgRegKtr[2],
                                        reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg),
-                                       session = session
+                                       session = session #For å loggge nedlastinga
                                        ) #Bare SC får hente disse dataene
     if (dim(dataDump)[1] > 0) {
       dataDump <- finnReoperasjoner(RegData = dataDump)}
