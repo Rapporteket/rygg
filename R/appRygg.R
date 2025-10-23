@@ -12,9 +12,6 @@ idag <- Sys.Date()
 startDato <- paste0(as.numeric(format(idag-180, "%Y")), '-01-01')
 datofra12 <- lubridate::floor_date(as.Date(idag)- months(12, abbreviate = T), unit='month')
 
-# gjør Rapportekets www-felleskomponenter tilgjengelig for applikasjonen
-shiny::addResourcePath('rap', system.file('www', package='rapbase'))
-
 regTitle = 'NKR: Nasjonalt kvalitetsregister for ryggkirurgi'
 
 #Definere innhold i felles rullegardinmenyer:
@@ -49,10 +46,9 @@ hovedkatValg <- c('Alle'=99,
 ui <- navbarPage(
   id = "hovedark",
 
-  title = div(a(includeHTML(system.file('www/logo.svg', package='rapbase'))),
-              regTitle),
+  title = rapbase::title(regTitle),
   windowTitle = regTitle,
-  theme = "rap/bootstrap.css",
+  theme = rapbase::theme(),
 
 
   #------------ Startside -----------------
