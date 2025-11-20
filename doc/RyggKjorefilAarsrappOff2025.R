@@ -375,6 +375,7 @@ round(AntDegenSpondSS/sum(RegDataSS$Aar==rappAar)*100,1)
 # nkr_rygg_durarift_stenose, nkr_rygg_lav_bensmerte_prolaps, nkr_rygg_odi20p12mnd_prolaps, nkr_rygg_odi30pst12mnd_stenose, nkr_rygg_saarinfeksjon_prolaps, nkr_rygg_saarinfeksjon_stenose, nkr_rygg_trombProfylLettKI, nkr_rygg_varighet_bensmerter, nkr_rygg_ventetid_kirurgi.
 library(rygg)
 library(magrittr)
+setwd('../../rygg')
 source("dev/sysSetenv.R")
 RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2019-01-01'))
 valgteAar <- 2011:2025
@@ -404,7 +405,7 @@ ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp',
 ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
                           hovedkat=1,
                           aar = valgteAar,
-                          slaaSmToAar=1,
+                          slaaSmToAar=0,
                           indID = 'nkr_rygg_lav_bensmerte_prolaps',
                           filUt = 'ind2_lav_bensmerte_prolaps')
 
@@ -416,7 +417,7 @@ ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
 ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
                           hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
                           aar = valgteAar,
-                          slaaSmToAar=1,
+                          slaaSmToAar=0,
                           indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind3_OswEndr20poengPro')
 # Forbedring av fysisk funksjon i dagliglivet, spinal stenose kirurgi
 # Andel som oppnår 30 % forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter kirurgi for spinal stenose
@@ -425,7 +426,7 @@ ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
 ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
                           hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
                           aar = valgteAar,
-                          slaaSmToAar=1,
+                          slaaSmToAar=0,
                           indID = 'nkr_rygg_odi30pst12mnd_stenose', filUt = 'ind4_OswEndr30pstSS')
 
 # Kl 5. Andel pasienter med degenerativ spondylolistese som blir operert med
@@ -435,7 +436,7 @@ ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
 
 ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
                           aar = valgteAar,
-                          slaaSmToAar=1,
+                          slaaSmToAar=0,
                           indID = 'nkr_rygg_degSponFusj1op', filUt = 'ind5_degSponFusj1op')
 
 # Andel pasienter med degenerativ spondylolistese som blir operert med
