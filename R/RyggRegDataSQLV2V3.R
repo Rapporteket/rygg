@@ -21,7 +21,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
   message('Henter data, RyggRegDataSQLV2V3')
   registryName <- "data"   # "rygg"
 
-  kunV3 <- ifelse(datoFra >= '2020-01-01' & !is.na(datoFra), 1, 0)
+  kunV3 <- ifelse(datoFra >= '2019-01-01' & !is.na(datoFra), 1, 0)
   #datoFra <- max(datoFra, '2020-01-01') #For å fjerne V2
 
 

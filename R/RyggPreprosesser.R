@@ -25,7 +25,7 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$SykehusNavn <- trimws(RegData$SykehusNavn)
 	indAleris <- which(RegData$AvdRESH %in% c(999975, 107511))
 	RegData$SykehusNavn[indAleris] <- 'Aleris Oslo'
-	RegData$AvdRESH[indAleris] <- 999975
+	RegData$AvdRESH[indAleris] <- 107511
 	RegData$ShNavn <- RegData$SykehusNavn
 	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 
