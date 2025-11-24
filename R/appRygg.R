@@ -533,7 +533,7 @@ server_rygg <- function(input, output, session) {
   #server <- function(input, output,session) {
 
   dataRegistry <- 'data'
-  RegData <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
+  RegData <- RyggRegDataSQLV2V3(datoFra = '2000-01-01')
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 
@@ -670,7 +670,7 @@ server_rygg <- function(input, output, session) {
   output$OppsumAntReg <- renderUI({
     Registreringer <- RyggUtvalgEnh(RegData=RegData,
                                     datoFra = input$datovalgRegKtr[1],
-                                    datoTil=input$datovalgRegKtr[2])$RegData[,'PID']
+                                    datoTil=input$datovalgRegKtr[2])$RegData[,'PasientID']
     antallReg <- length(Registreringer)
     antallPers <- length(unique(Registreringer))
     HTML(paste0('<b> I perioden ',format.Date(input$datovalgRegKtr[1], '%d. %B %Y'), ' - ',
@@ -728,25 +728,38 @@ server_rygg <- function(input, output, session) {
       content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
     if (user$role()=='SC') {
-    RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1, datoFra = input$datovalgRegKtr[1])
-    RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
+    #RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1, datoFra = input$datovalgRegKtr[1])
+    #RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
     fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
                    "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
                    "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
-    RegDataV2V3 <- RegDataV2V3[ ,-which(names(RegDataV2V3) %in% fritxtVar)]
-    dataDump <- tilretteleggDataDumper(RegData=RegDataV2V3,
-                                       datoFra = input$datovalgRegKtr[1],
-                                       datoTil = input$datovalgRegKtr[2],
-                                       reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg),
-                                       session = session #For å loggge nedlastinga
-                                       ) #Bare SC får hente disse dataene
+    RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
+    print(input$datovalgRegKtr[1])
+    print(input$datovalgRegKtr[2])
+    print(ifelse(is.null(input$velgReshReg),0,input$velgReshReg))
+    dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,
+                              datoFra = input$datovalgRegKtr[1],
+                              datoTil = input$datovalgRegKtr[2],
+                              enhetsUtvalg = 2,
+                              reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg))$RegData
+    # dataDump <- tilretteleggDataDumper(RegData=RegDataV2V3,
+    #                                    datoFra = input$datovalgRegKtr[1],
+    #                                    datoTil = input$datovalgRegKtr[2],
+    #                                    reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg),
+    #                                    session = session #For å loggge nedlastinga
+    #                                    ) #Bare SC får hente disse dataene
     if (dim(dataDump)[1] > 0) {
       dataDump <- finnReoperasjoner(RegData = dataDump)}
 
 
     output$lastNed_dataDump <- downloadHandler(
       filename = function(){'dataDump.csv'},
-      content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')})
+      content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')
+        rapbase::repLogger(session = list(...)[["session"]],
+                           msg = paste0('Datadump for Rygg: ',
+                                        'tidsperiode_', input$datovalgRegKtr[1], '_', input$datovalgRegKtr[2],
+                                        'resh_', ifelse(is.null(input$velgReshReg),0,input$velgReshReg)))
+        })
     }
   }) #observe
 
