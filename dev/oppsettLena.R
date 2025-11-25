@@ -8,6 +8,7 @@ devtools::install("../rapbase/.")
 
 source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
+library(rygg)
 
 
 
@@ -16,21 +17,13 @@ remotes::install_github('Rapporteket/rapbase', ref = 'main')
 
 
 test <- RyggRegDataSQLV2V3(datoFra = '2000-01-01')
+
 liste <- unique(test[,c('SykehusNavn', 'AvdRESH')])
 liste[order(liste$SykehusNavn),]
 table(liste$SykehusNavn)
-source("dev/sysSetenv.R")
-library(rygg)
-RyggData <- RyggPreprosess(RyggRegDataSQLV2V3(datoFra = '2000-01-01'))
-alleResh <- unique(RyggData$ReshId)
 
-for (resh in alleResh) {
-  #reshID <- alleResh[1]
-  reshID <- resh
-  print(reshID)
-#  knitr::knit2pdf(input='inst/RyggMndRapp.Rnw')
-  test <- c(test, testing(RegData=RyggData, reshID=reshID))
-}
+RyggData <- RyggPreprosess(RyggRegDataSQLV2V3(datoFra = '2000-01-01'))
+test <- RyggData[,c("AvDodDato", "InnDato", "PasientID", "ASA", "Alder")]
 
 setwd('../data')
 sship::dec('rygg16609ecfb.sql.gz__20251113_123205.tar.gz',

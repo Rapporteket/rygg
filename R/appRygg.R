@@ -141,29 +141,23 @@ ui <- navbarPage(
       conditionalPanel(
         condition = "input.ark == 'Antall operasjoner'",
         selectInput(inputId = "tidsenhetReg", label="Velg tidsenhet",
-                    choices = rev(c('År'= 'Aar', 'Måned'='Mnd')))),
+                    choices = rev(c('År'= 'Aar', 'Måned'='Mnd'))),
+      br(),
+      br(),
+      br(),
+      h4('Sjekk egne registreringer'),
+      dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
+                     label = "Tidsperiode", separator="t.o.m.", language="nb"),
+      downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
+      br()),
+
       conditionalPanel(
         condition = "input.ark == 'Antall skjema'",
         dateRangeInput(inputId = 'datovalgReg', start = startDato, end = Sys.Date(),
                        label = "Tidsperiode", separator="t.o.m.", language="nb")
       ),
 
-      br(),
-      br(),
-      h3('Last ned egne data'),
-      dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
-                     label = "Tidsperiode", separator="t.o.m.", language="nb"),
-      uiOutput('OppsumAntReg'),
-      br(),
-      uiOutput("velgReshReg"),
-      downloadButton(outputId = 'lastNed_dataTilRegKtr', label='Last ned fødselsdato og operasjonsdato'),
-      br(),
-      br(),
-      downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
-      h5('Datadumpen inneholder alle variabler fra registeret.
-                           Velger man en dato etter 1.januar 2020, er det kun registreringer for versjon 3')
-
-    ),
+          ),
 
     mainPanel(
       tabsetPanel(id='ark',
@@ -197,8 +191,8 @@ ui <- navbarPage(
     value = "Registeradministrasjon",
     h3('Egen side for registeradministratorer. Siden er bare synlig for SC-bruker'),
     tabsetPanel(
-      tabPanel(
-        h4("Utsending av rapporter"),
+      tabPanel("Utsending av rapporter",
+        # h4("Utsending av rapporter"),
         sidebarPanel(
           rapbase::autoReportOrgInput("RyggUtsending"),
           rapbase::autoReportInput("RyggUtsending"),
@@ -214,9 +208,6 @@ ui <- navbarPage(
                            max = Sys.Date() + 366
           ),
           shiny::checkboxInput(inputId = "dryRun", label = "Send e-post")
-
-
-
         ),
         mainPanel(
           rapbase::autoReportUI("RyggUtsending"),
@@ -230,10 +221,8 @@ ui <- navbarPage(
         )
       ), #Utsending-tab
 
-      shiny::tabPanel(
-        "Datakvalitet",
-        #shiny::sidebarLayout(
-        sidebarPanel(
+      shiny::tabPanel("Datakvalitet",
+            sidebarPanel(
           numericInput(inputId = 'valgtTidsavvik',
                        label = 'Dager mellom registrerte operasjoner:',
                        value = 30,
@@ -253,6 +242,24 @@ ui <- navbarPage(
           tableOutput("tabDblReg")
         )
       ), #Datakvalitet-tab
+
+      shiny::tabPanel("Datadump",
+        # sidebarPanel(
+        #   ),
+        # mainPanel(
+          h3('Last ned data'),
+          br(),
+          dateRangeInput(inputId = 'datovalgDatadump', start = startDato, end = idag,
+                         label = "Tidsperiode", separator="t.o.m.", language="nb"),
+          uiOutput('OppsumAntReg'),
+          br(),
+          br(),
+          uiOutput("velgReshReg"),
+          br(),
+          downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
+         # h5('Velger man en dato etter 1.januar 2019, er det kun registreringer for versjon 3')
+       #   )
+      ), #Datadump-tab
 
       shiny::tabPanel(
         "Eksport",
@@ -275,7 +282,7 @@ ui <- navbarPage(
            sidebarPanel(
              id = "brukervalg_fordeling",
              width = 3,
-             h4('Her kan man velge hvilken variabel man ønsker å se og gjøre ulike filtreringer.'),
+             h4('Her kan man velge hvilken variabel man ønsker å se, samt gjøre ulike filtreringer.'),
              br(),
              selectInput(
                inputId = "valgtVar", label="Velg variabel",
@@ -669,12 +676,12 @@ server_rygg <- function(input, output, session) {
   #------Registreringsoversikter---------------------
   output$OppsumAntReg <- renderUI({
     Registreringer <- RyggUtvalgEnh(RegData=RegData,
-                                    datoFra = input$datovalgRegKtr[1],
-                                    datoTil=input$datovalgRegKtr[2])$RegData[,'PasientID']
+                                    datoFra = input$datovalgDatadump[1],
+                                    datoTil=input$datovalgDatadump[2])$RegData[,'PasientID']
     antallReg <- length(Registreringer)
     antallPers <- length(unique(Registreringer))
-    HTML(paste0('<b> I perioden ',format.Date(input$datovalgRegKtr[1], '%d. %B %Y'), ' - ',
-                format.Date(input$datovalgRegKtr[2], '%d. %B %Y'),
+    HTML(paste0('<b> I perioden ',format.Date(input$datovalgDatadump[1], '%d. %B %Y'), ' - ',
+                format.Date(input$datovalgDatadump[2], '%d. %B %Y'),
                 ' er det totalt registrert ', antallReg, ' operasjoner.
                 Disse er utført på tilsammen ',
                 antallPers, ' personer.', '</b>' ))})
@@ -716,7 +723,6 @@ server_rygg <- function(input, output, session) {
 
   # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato), samt datadump
   observe({
-    # reshKtr <- ifelse(user$role()=='SC', input$velgReshReg, user$org() )
     reshKtr <- ifelse(is.null(input$velgReshReg), user$org(), input$velgReshReg )
     indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
@@ -728,26 +734,17 @@ server_rygg <- function(input, output, session) {
       content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
     if (user$role()=='SC') {
-    #RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1, datoFra = input$datovalgRegKtr[1])
-    #RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
+
+
     fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
                    "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
                    "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
     RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
-    print(input$datovalgRegKtr[1])
-    print(input$datovalgRegKtr[2])
-    print(ifelse(is.null(input$velgReshReg),0,input$velgReshReg))
     dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,
-                              datoFra = input$datovalgRegKtr[1],
-                              datoTil = input$datovalgRegKtr[2],
+                              datoFra = input$datovalgDatadump[1],
+                              datoTil = input$datovalgDatadump[2],
                               enhetsUtvalg = 2,
                               reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg))$RegData
-    # dataDump <- tilretteleggDataDumper(RegData=RegDataV2V3,
-    #                                    datoFra = input$datovalgRegKtr[1],
-    #                                    datoTil = input$datovalgRegKtr[2],
-    #                                    reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg),
-    #                                    session = session #For å loggge nedlastinga
-    #                                    ) #Bare SC får hente disse dataene
     if (dim(dataDump)[1] > 0) {
       dataDump <- finnReoperasjoner(RegData = dataDump)}
 
@@ -757,7 +754,7 @@ server_rygg <- function(input, output, session) {
       content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')
         rapbase::repLogger(session = list(...)[["session"]],
                            msg = paste0('Datadump for Rygg: ',
-                                        'tidsperiode_', input$datovalgRegKtr[1], '_', input$datovalgRegKtr[2],
+                                        'tidsperiode_', input$datovalgDatadump[1], '_', input$datovalgDatadump[2],
                                         'resh_', ifelse(is.null(input$velgReshReg),0,input$velgReshReg)))
         })
     }

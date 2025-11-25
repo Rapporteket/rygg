@@ -38,9 +38,13 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
     MCEtab <- rapbase::loadRegData(registryName=registryName,
                                    query='SELECT * FROM mce')
-
+    dodsdato <- rapbase::loadRegData(registryName=registryName,
+                                   query='SELECT DECEASED_DATE as AvDodDato,
+                                   DECEASED as PasientDod,
+                                   ID as PATIENT_ID FROM patient')
     RegDataV2 <- merge(V2, MCEtab[,c("MCEID", "PATIENT_ID")], by = 'MCEID' )
-#Legg til
+    RegDataV2 <- merge(RegDataV2, dodsdato, by = 'PATIENT_ID')
+
 
     # table(table(RegDataV2$OLD_PID))
     }
@@ -99,9 +103,9 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     krypterteV3 <- c("Adresse", "Adressetype", "PostNr", "PostSted", "Bydelskode",	"Bydelsnavn",
                      "KommuneNr", "KommuneNavn", "Fylke", "HelseRegion",
                      "KryptertFnr")
-    fjernes < c('MceType')
+    fjernes <- c('MceType', 'DodsDato')
 
-    RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% krypterteV3)]
+    RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% c(krypterteV3, fjernes))]
 
   if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
