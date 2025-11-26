@@ -160,7 +160,7 @@ tabNokkeltall <- function(RegData, utvid=0, tidsenhet='Mnd', datoTil=Sys.Date(),
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
     'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum, na.rm=T),
     'Liggetid, postop., (gj.sn.)' = tapply(RegData$LiggetidPostOp, RegData$TidsEnhet, FUN=mean, na.rm=T),
-    'Fornøyde 3 mnd. etter operasjon (%)' = tapply(RegData$Fornoyd3mnd, RegData$TidsEnhet,
+    'Fornøyde 3 mnd. etter opr. (%)' = tapply(RegData$Fornoyd3mnd, RegData$TidsEnhet,
                                                FUN=function(x){100*sum(x %in% 1:2)/sum(!is.na(x))}),
     'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean, na.rm=T)
     )

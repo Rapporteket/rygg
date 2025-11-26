@@ -190,11 +190,11 @@ abonnementRygg <- function(rnwFil, brukernavn='tullebukk', reshID=0,
 
 finnReoperasjoner <- function(RegData){
 
-  antPas <- length(names(table(RegData$PID)))
-RegDataSort <-RegData[order(RegData$PID, RegData$OpDato), ]
+antPas <- length(names(table(RegData$PasientID)))
+RegDataSort <-RegData[order(RegData$PasientID, RegData$OpDato), ]
 
 N <- dim(RegData)[1]
-RegDataSort$OpNr <- ave(RegDataSort$PID, RegDataSort$PID, FUN=seq_along)
+RegDataSort$OpNr <- ave(RegDataSort$PasientID, RegDataSort$PasientID, FUN=seq_along)
 indPasFlereOp <- which(RegDataSort$OpNr>1)
 RegDataSort$DagerNesteOp <- NA
 RegDataSort$DagerNesteOp[indPasFlereOp-1] <-
@@ -349,12 +349,6 @@ if (ktr==2) {
 #' @export
 #'
 tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Date(), reshID=0, ...){
-  if ("session" %in% names(list(...))) {
-    rapbase::repLogger(session = list(...)[["session"]],
-                       msg = paste0('Lastet ned datadump for Rygg: ',
-                                    'tidsperiode_', datoFra, '_', datoTil,
-                                    'resh_', reshID))
-  }
 
   #Koble på KryptertFnr fra forlopsoversikt via ForlopsID
   PIDtab <- rapbase::loadRegData(registryName="data", query='SELECT * FROM koblingstabell')
@@ -369,15 +363,6 @@ tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Da
   tidlPas <- match(RegData$SSN, RegData$Personnummer, nomatch = 0, incomparables = NA) #match(RegData$KryptertFnr, RegData$Personnummer, nomatch = 0, incomparables = NA)
   hvilkePas <- which(tidlPas>0)
   RegData$PID[hvilkePas] <- RegData$PID[tidlPas[hvilkePas]]
-
-  #Pas med flere op i V2:
-  # table(RegData$SSN[hvilkePas])[table(RegData$SSN[hvilkePas])>2]
-  #   names(table(RegData$SSN)[table(RegData$SSN) == 5])
-  # RegData$SSN ==
-  # pas4 <- names(table(tidlPas)[table(tidlPas)==4])
-  # which(tidlPas == pas4)
-  # RegData[which(tidlPas == pas4), c('OpDato','SSN')]
-  # RegData[pas4, c('OpDato', 'Personnummer')]
 
   #SSN i en variabel
   fraV3 <- which(is.na(RegData$Personnummer))

@@ -3,6 +3,17 @@ RyggDataRaaAlle <- RyggRegDataSQLV2V3()
 RyggData <- RyggPreprosess(RegData = RyggDataRaa)
 
 
+V3 <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
+head(V3$PasientID)
+V3[1:10,c('PasientID', 'PID')]
+test <- unique(V2oper[,c("MCEID", 'OpDato')])
+
+V2pas[,c('Personnummer')]
+
+begge <- intersect(V2pas$MCEID, V3$PasientID)
+V2pas[V2pas$MCEID==begge[1],]
+V3[V3$PasientID==begge[1],]
+
 # 'AvDodDato' ='DodsDato'
 varDod <- c('AvDodDato','DodsDato')
 RyggDataRaa[,varDod]

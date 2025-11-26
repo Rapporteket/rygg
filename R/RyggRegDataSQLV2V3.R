@@ -21,7 +21,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
   message('Henter data, RyggRegDataSQLV2V3')
   registryName <- "data"   # "rygg"
 
-  kunV3 <- ifelse(datoFra >= '2020-01-01' & !is.na(datoFra), 1, 0)
+  kunV3 <- ifelse(datoFra >= '2019-01-01' & !is.na(datoFra), 1, 0)
   #datoFra <- max(datoFra, '2020-01-01') #For å fjerne V2
 
 
@@ -34,11 +34,19 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     V2oppf <- rapbase::loadRegData(registryName=registryName,
                                    query='SELECT * FROM ryggV2_followup')
 
-    V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='old_pid')], by = 'mceid')
-    RegDataV2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='old_pid')], by = 'mceid')
+    V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
+    V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
+    MCEtab <- rapbase::loadRegData(registryName=registryName,
+                                   query='SELECT * FROM mce')
+    dodsdato <- rapbase::loadRegData(registryName=registryName,
+                                   query='SELECT DECEASED_DATE as AvDodDato,
+                                   DECEASED as PasientDod,
+                                   ID as PATIENT_ID FROM patient')
+    RegDataV2 <- merge(V2, MCEtab[,c("MCEID", "PATIENT_ID")], by = 'MCEID' )
+    RegDataV2 <- merge(RegDataV2, dodsdato, by = 'PATIENT_ID')
 
-    # RegDataV2 <- rapbase::loadRegData(registryName=registryName,
-    #                                 query='SELECT * FROM uttrekk_rapport_from_tore')
+
+    # table(table(RegDataV2$OLD_PID))
     }
   RegDataV3AVN <- rapbase::loadRegData(registryName=registryName,
                                      query='SELECT * FROM allevarnum')
@@ -91,9 +99,16 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     RegDataV3$KpInfDyp3Mnd[indIkkeSaarInf] <- NA
     RegDataV3$KpInfDyp12mnd[indIkkeSaarInf] <- NA
 
+
+    krypterteV3 <- c("Adresse", "Adressetype", "PostNr", "PostSted", "Bydelskode",	"Bydelsnavn",
+                     "KommuneNr", "KommuneNavn", "Fylke", "HelseRegion",
+                     "KryptertFnr")
+    fjernes <- c('MceType', 'DodsDato')
+
+    RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% c(krypterteV3, fjernes))]
+
   if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
     #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
-  fjernesV3 <- c("Adresse", "Adressetype")
       # ,"AntibiotikaAntDogn", "AntibiotikaAntDoser", "AntibiotikaDose", "AntibiotikaEvtAntDogn",
       # "AntibiotikaKunOprDag", "BenAutogrType", "BenAutoHofte", "BenAutoLokalt", "BenBank", "BenSubstitutt",
       # "BlodfortynnendeFast", "BlodfortynnendePreop", "BlodfortynnendeSepDato", "BlodfortynnendeSpes",
@@ -126,13 +141,13 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
       # "RvBlokadeFacett", "RvBlokadeNerverot", "RvFunksjoTranslMM", "RvFunksjoVinkelEndrGr",
       # "SpesTrombProfyl", "Utfdato12mnd", "Utfdato3mnd", "UtfyltDato")
 
-    RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% fjernesV3)]
+
   }
 
   #-----Tilrettelegging av V2-data-------------------------
 if (kunV3 == 0) {
   #FJERNES ? !!!!!!!!!!
-   RegDataV2$PID <- paste0(RegDataV2$old_pid, 'V2')
+   RegDataV2$PID <- paste0(RegDataV2$OLD_PID, 'V2')
 
    # Arbstatus3mnd OG Arbstatus12mnd V2:
    # De som har verdi 11 settes TIL MANGLENDE
@@ -185,11 +200,9 @@ if (kunV3 == 0) {
     'UNN, nevrokir' = 'Tromsø')
   )
 
-  RegDataV2$AvdReshID <- plyr::revalue(RegDataV2$AvdReshID,  #Gammelt navn V2 - nytt navn (V3), dvs. gmlresh	nyresh
-                                     c('107137' =	'107508', #Aleris Bergen
-                                       '107511' =	'999975', #Aleris Oslo
-                                       '999999' =	'110771') #Volvat
-)
+               # RegDataV2$AvdReshID <- plyr::revalue(RegDataV2$AvdReshID,  #Gammelt navn V2 - nytt navn (V3), dvs. gmlresh	nyresh
+                                   #Mappes om i preprosess:  c('107511' =	'999975')) #Aleris Oslo
+                                     # Disse ikke med i ny versjon: '107137' =	'107508', #Aleris Bergen '999999' =	'110771') #Volvat
 
   # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
   # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
@@ -202,7 +215,9 @@ if (kunV3 == 0) {
                              Bydelsnavn = Bydelsted,
                              KommuneNr = Kommunenr, #Kommunenavn ikke med i V2
                              KpInfDyp12mnd = KpInfDyp12Mnd,
+                             ForlopsID = MCEID,
                              #PIDV2 = PID, #Heter PasientID i V3. NB: Må ikke slås sammen.
+                             PasientID = PATIENT_ID,
                              RokerV2 = Roker,
                              #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
                              SykehusNavn = AvdNavn,
@@ -221,7 +236,7 @@ if (kunV3 == 0) {
   RegDataV3 <- RegDataV3[RegDataV3$Ferdig1a==1 & RegDataV3$Ferdig2a==1, ]
   RegDataV3$Versjon <- 'V3'
 
-  RegDataV3$PID <- RegDataV3$PasientID #PID vil kobles med variabel PID fra V2 og tilpasses, ønsker å beholde PasientID fra V3
+  # RegDataV3$PID <- RegDataV3$PasientID #PID vil kobles med variabel PID fra V2 og tilpasses, ønsker å beholde PasientID fra V3
   #Navneendring av V3:
   RegDataV3 <- dplyr::rename(RegDataV3,
                              OpProlap = OprProlap #Siden Alle andre heter Op..
