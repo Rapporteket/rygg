@@ -732,26 +732,26 @@ server_rygg <- function(input, output, session) {
     if (user$role()=='SC') {
 
 
-    fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
-                   "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
-                   "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
-    RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
-    dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,
-                              datoFra = input$datovalgDatadump[1],
-                              datoTil = input$datovalgDatadump[2],
-                              enhetsUtvalg = 2,
-                              reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg))$RegData
-    if (dim(dataDump)[1] > 0) {
-      dataDump <- finnReoperasjoner(RegData = dataDump)}
+      fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
+                     "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
+                     "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
+      RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
+      dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,
+                                datoFra = input$datovalgDatadump[1],
+                                datoTil = input$datovalgDatadump[2],
+                                enhetsUtvalg = 2,
+                                reshID = ifelse(is.null(input$velgReshReg),0,input$velgReshReg))$RegData
+      if (dim(dataDump)[1] > 0) {
+        dataDump <- finnReoperasjoner(RegData = dataDump)}
 
+      txtLog <- paste0('Datadump for Rygg: ',
+                       'tidsperiode_', input$datovalgDatadump[1], '_', input$datovalgDatadump[2],
+                       '_resh_', ifelse(is.null(input$velgReshReg),0,input$velgReshReg))
 
-    output$lastNed_dataDump <- downloadHandler(
-      filename = function(){'dataDump.csv'},
-      content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')
-        rapbase::repLogger(session = list(...)[["session"]],
-                           msg = paste0('Datadump for Rygg: ',
-                                        'tidsperiode_', input$datovalgDatadump[1], '_', input$datovalgDatadump[2],
-                                        'resh_', ifelse(is.null(input$velgReshReg),0,input$velgReshReg)))
+      output$lastNed_dataDump <- downloadHandler(
+        filename = function(){'dataDump.csv'},
+        content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')
+          rapbase::repLogger(session = session, msg = txtLog)
         })
     }
   }) #observe
