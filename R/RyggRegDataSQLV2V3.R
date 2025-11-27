@@ -28,11 +28,11 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
   if (kunV3 == 0) {
 
     V2oper <- rapbase::loadRegData(registryName=registryName,
-                                   query='SELECT * FROM ryggV2_operation')
+                                   query='SELECT * FROM ryggv2_operation')
     V2pas <- rapbase::loadRegData(registryName=registryName,
-                                  query='SELECT * FROM ryggV2_patient_preop')
+                                  query='SELECT * FROM ryggv2_patient_preop')
     V2oppf <- rapbase::loadRegData(registryName=registryName,
-                                   query='SELECT * FROM ryggV2_followup')
+                                   query='SELECT * FROM ryggv2_followup')
 
     V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
     V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
