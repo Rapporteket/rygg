@@ -534,6 +534,7 @@ ui <- navbarPage(
 
 server_rygg <- function(input, output, session) {
   #server <- function(input, output,session) {
+  rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
   dataRegistry <- 'data'
   RegData <- RyggRegDataSQLV2V3(datoFra = '2000-01-01')
@@ -556,9 +557,6 @@ server_rygg <- function(input, output, session) {
   qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from forlopsoversikt'
   RegOversikt <- rapbase::loadRegData(registryName=dataRegistry, query=qForlop, dbType="mysql")
   RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
-
-
-  rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
    map_avdeling <- data.frame(
     UnitId = unique(RegData$ReshId),
@@ -719,8 +717,8 @@ server_rygg <- function(input, output, session) {
 
   # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato), samt datadump
   observe({
-    reshKtr <- ifelse(is.null(input$velgReshReg), user$org(), input$velgReshReg )
-    indKtr <- if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
+    #reshKtr <- ifelse(is.null(input$velgReshReg), user$org(), input$velgReshReg )
+    indKtr <- which(RegOversikt$ReshId == user$org())  # if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
     dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
                                 as.Date(InnDato) >= input$datovalgRegKtr[1],
                                 as.Date(InnDato) <= input$datovalgRegKtr[2])
@@ -770,9 +768,9 @@ server_rygg <- function(input, output, session) {
 
   #----------- Eksport ----------------
   ## brukerkontroller
-  rapbase::exportUCServer("ryggExport", dbName = "rygg")
+  rapbase::exportUCServer("ryggExport", "rygg")
   ## veileding
-  rapbase::exportGuideServer("ryggExportGuide", dbName = "rygg")
+  rapbase::exportGuideServer("ryggExportGuide", "rygg")
 
 
   #------------Fordelinger---------------------
