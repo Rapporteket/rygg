@@ -770,9 +770,9 @@ server_rygg <- function(input, output, session) {
 
   #----------- Eksport ----------------
   ## brukerkontroller
-  rapbase::exportUCServer("ryggExport", registryName="rygg")
+  rapbase::exportUCServer("ryggExport", dbName = "rygg")
   ## veileding
-  rapbase::exportGuideServer("ryggExportGuide", registryName="rygg")
+  rapbase::exportGuideServer("ryggExportGuide", dbName = "rygg")
 
 
   #------------Fordelinger---------------------
