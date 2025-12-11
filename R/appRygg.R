@@ -252,8 +252,8 @@ ui <- navbarPage(
           br(),
           uiOutput("velgReshReg"),
           br(),
-          downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
-         # h5('Velger man en dato etter 1.januar 2019, er det kun registreringer for versjon 3')
+          downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
+          h5('Velger man startdato 1.januar 2019 eller senere, inneholder datadumpen kun registreringer fra versjon 3')
        #   )
       ), #Datadump-tab
 
@@ -537,7 +537,7 @@ server_rygg <- function(input, output, session) {
   rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
   dataRegistry <- 'data'
-  RegData <- RyggRegDataSQLV2V3(datoFra = '2000-01-01')
+  RegData <- RyggRegDataSQLV2V3(alleVarV3=1, alleVarV2=1)
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 
