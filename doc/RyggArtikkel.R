@@ -22,7 +22,7 @@ library(rygg)
 library(ggplot2)
 library(tidyverse)
 source("dev/sysSetenv.R")
-RyggDataAlle <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2019-01-01'))
+RyggDataAlle <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2011-01-01'))
 
 
 #Data
@@ -85,6 +85,7 @@ VentU3m <- tapply(X=RegDataElektiv$VentetidSpesialistTilOpr,
                  INDEX = RegDataElektiv$Aar,
                  FUN =  function(x) {sum(x==1)/sum(x %in% 1:4)} )
 
+#Andel pasienter med < 12 måneder varighet av beinsmerte ---------------------
 U12mndVarigh <- tapply(RegDataElektivProlaps$SympVarighUtstr,
                       INDEX = RegDataElektivProlaps$Aar,
                       FUN = function(x){sum(x %in% 1:3)/sum(x %in% 1:5)} )
@@ -325,8 +326,40 @@ p
 ggsave("DuraSS.png", p) #, width = 5, height = 5)
 
 
-#--------Andel pasienter med < 12 måneder varighet av beinsmerte ---------------------
-# Utvalg: Elektive, prolaps
+
+#--- Andel forverring-------------------
+#Andel som ble verre etter prolapsoperasjon (ODI raw score > 48 poeng ved 12 måneder)
+#Utvalg: prolaps
+
+#Andel med Oswestry-skår fortsatt over 48.
+
+RyggDataProODI48 <- RyggVarTilrettelegg(RegData = RyggDataProlaps,
+                      valgtVar = 'Osw4812mnd', ktr = 2)$RegData
+
+var1 <- tapply(X=RyggDataProODI48$Variabel,
+               INDEX = RyggDataProODI48$Aar,
+               FUN =  mean )
+
+#y1: Andel som ble verre etter LSSoperasjon (ODI raw score ≥ 39 poeng ved 12 måneder)
+#Utvalg: lumbal spinal stenose
+#Kan vurderes inbakt i suksess figurer
+
+RyggDataSS$Variabel <- 0
+RyggDataSS$Variabel[which(RyggDataSS$OswTot12mnd %in% 1:39)] <- 1
+RyggDataSS12mnd <- RyggDataSS %>%
+  dplyr::filter(OswTot12mnd %in% 0:100)
+
+var2 <- tapply(RyggDataSS12mnd$Variabel,
+               INDEX = RyggDataSS12mnd$Aar,
+               FUN = 'mean' )
+
+p <- plotArt(dataRygg = dataRygg(var1=var1, var2=var2,
+                                 txt1='Prolaps: ODI>48, 12mnd',
+                                 txt2='SS: ODI>38, 12mnd'),
+             tittel = 'Forverring')
+p
+ggsave("Forverring.png", p) #, width = 5, height = 5)
+
 
 
 #--- Indikasjonsstilling ---------------------
@@ -334,24 +367,34 @@ ggsave("DuraSS.png", p) #, width = 5, height = 5)
 # Utvalg: prolaps
 # Kan vurderes inbakt i suksess prolapsfirgur
 
+RyggFigAndelTid(RegData = RyggDataAlle, preprosess = 0,
+                valgtVar ='smBePreLav',
+                outfile = 'lavIndikasjon.png')
+
+
 #--- Unødvendig tromboseprofylakse ---------------------
 #  Andel menn uten risikofaktorer som får tromboseprofylekse i forbindelse med lett ryggkirurgi
 #Utvalg: Menn med ASA < 3
 #Statistisk prosesskontroll senere?
 
+# Filtrerer på:
+#   ASA<3, ErMann==1, HovedInngrepV2V3 %in% 1:2), BlodfortynnendeFast==0
+
+RyggFigAndelTid(RegData = RyggDataAlle, preprosess = 0,
+                valgtVar ='trombProfylLettKI',
+                outfile = 'TrombProfylLettKI.png')
 
 #--- BMI og alder, alle pasienter ikke med i artikkelen ---------------------
-  #--Vektreduksjon	Gjennomsnittlig BMI
-  #  Røykere	Andel røykere
 
-
-#--- Andel forverring
-  #Andel som ble verre etter prolapsoperasjon (ODI raw score > 48 poeng ved 12 måneder)
-  #Utvalg: prolaps
-  #y1: Andel som ble verre etter LSSoperasjon (ODI raw score ≥ 39 poeng ved 12 måneder)
-  #Utvalg: lumbal spinal stenose
-  #Kan vurderes inbakt i suksess figurer
-
+#--	Gjennomsnittlig BMI
+#Viser andel BMI>30
+RyggFigAndelTid(RegData=RyggDataAlle, preprosess=0,
+               valgtVar = 'BMI',
+               outfile = 'BMIfedme.png')
+#  Røykere	Andel røykere
+RyggFigAndelTid(RegData=RyggDataAlle, preprosess=0,
+                valgtVar = 'roker',
+                outfile = 'Rokere.png')
 
 
 #--------EGENKURSING--------
