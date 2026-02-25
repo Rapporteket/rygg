@@ -19,7 +19,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 #NB: datovalg enyttes kun til å avgjøre om kobling til V2 skal utføres.
 
   message('Henter data, RyggRegDataSQLV2V3')
-  registryName <- "data"   # "rygg"
+ # registryName <- "data"   # "rygg"
 
   kunV3 <- ifelse(datoFra >= '2019-01-01' & !is.na(datoFra), 1, 0)
   #datoFra <- max(datoFra, '2020-01-01') #For å fjerne V2
@@ -27,18 +27,18 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 
   if (kunV3 == 0) {
 
-    V2oper <- rapbase::loadRegData(registryName=registryName,
+    V2oper <- rapbase::loadRegData(registryName = 'data',
                                    query='SELECT * FROM ryggv2_operation')
-    V2pas <- rapbase::loadRegData(registryName=registryName,
+    V2pas <- rapbase::loadRegData(registryName = 'data',
                                   query='SELECT * FROM ryggv2_patient_preop')
-    V2oppf <- rapbase::loadRegData(registryName=registryName,
+    V2oppf <- rapbase::loadRegData(registryName = 'data',
                                    query='SELECT * FROM ryggv2_followup')
 
     V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
     V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
-    MCEtab <- rapbase::loadRegData(registryName=registryName,
+    MCEtab <- rapbase::loadRegData(registryName = 'data',
                                    query='SELECT * FROM mce')
-    dodsdato <- rapbase::loadRegData(registryName=registryName,
+    dodsdato <- rapbase::loadRegData(registryName = 'data',
                                    query='SELECT DECEASED_DATE as AvDodDato,
                                    DECEASED as PasientDod,
                                    ID as PATIENT_ID FROM patient')
@@ -48,10 +48,10 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 
     # table(table(RegDataV2$OLD_PID))
     }
-  RegDataV3AVN <- rapbase::loadRegData(registryName=registryName,
+  RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
                                      query='SELECT * FROM allevarnum')
   RegDataV3Forl <- rapbase::loadRegData(
-    registryName=registryName,
+    registryName = 'data',
     query='SELECT ForlopsID, Kommune, Kommunenr, Fylkenr,     #Fylke er med i AVN
                  AvDodDato, BasisRegStatus, KryptertFnr FROM forlopsoversikt')
 
@@ -59,7 +59,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
                      RegDataV3Forl, by='ForlopsID',
                      all.x = TRUE, all.y = FALSE)
 
-  ePROMadmTab <- rapbase::loadRegData(registryName=registryName,
+  ePROMadmTab <- rapbase::loadRegData(registryName = 'data',
                                    query='SELECT * FROM proms')
   ePROMvar <- c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
                 'REGISTRATION_TYPE')

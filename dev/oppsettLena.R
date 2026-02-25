@@ -11,6 +11,10 @@ rygg::kjorRyggApp(browser = TRUE)
 library(rygg)
 
 
+sort(names(RegData))
+setdiff(names(RegData), names(RegDataV3AVN))
+setdiff(names(RegDataV3AVN), names(RegData))
+
 
 remotes::install_github('Rapporteket/rapbase', ref = 'main')
 # Generelt: mce.PATIENT_ID kobles til patient.ID
