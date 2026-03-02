@@ -6,7 +6,7 @@
 #'
 #' @export
 
-RyggPreprosess2 <- function(RegData=RegData)
+RyggPreprosess <- function(RegData=RegData)
 {
   #Kun ferdigstilte registreringer: Kun ferdigstilte skjema i V2
   #V3: Alle legeskjema ferdigstilt.

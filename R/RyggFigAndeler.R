@@ -90,7 +90,7 @@ RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', d
 
 
   # if ("session" %in% names(list(...))) {
-  #   rapbase::repLogger(session = list(...)[["session"]], msg = paste0('Fordelingsfigur: ',valgtVar))
+  #   rapbase::repLogger2(session = list(...)[["session"]], msg = paste0('Fordelingsfigur: ',valgtVar))
   # }
 
   #if (reshID==0){stopifnot(enhetsUtvalg ==0 )}

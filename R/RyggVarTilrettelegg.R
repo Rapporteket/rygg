@@ -217,7 +217,8 @@ valgtVarTest <- valgtVar
             }}
 
       if (valgtVar == 'degSponFusj') { #AndelGrVar, AndelTid
-        hovedkat=10 #Degen. spondylolistese
+        #Degen. spondylolistese:
+        hovedkat <- 10
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
         RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
         varTxt <- 'tilfeller'
@@ -233,7 +234,7 @@ valgtVarTest <- valgtVar
         # med fusjonskirurgi ved første operasjon
         #hovedkat=10 #Degen. spondylolistese
         #RegData <- finnReoperasjoner(RegData = RegData)
-        hovedkat=10 #Degen. spondylolistese
+        hovedkat <- 10 #Degen. spondylolistese
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
         RegData <- RegData[which(RegData$TidlOpr == 4), ]
         RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1 # & RegData$TidlOpr == 4

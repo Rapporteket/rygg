@@ -29,7 +29,7 @@ RyggFigGrupperLinjelTid <- function(RegData, valgtVar = 'gruppeAndel' , gr1='', 
   tidsenhet <- 'Aar'
 
   if ("session" %in% names(list(...))) {
-    rapbase::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
+    rapbase::repLogger2(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
   }
 
   if (hentData == 1) {

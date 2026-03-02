@@ -18,7 +18,9 @@ library(rygg)
 
 RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
                                      query='SELECT * FROM allevarnum')
-RegData <- RyggHentRegDataV3()
+
+RegData <- RyggHentRegDataV3(medOppf = 0)
+RegData$ForstLukketLege <- RegData$FIRST_TIME_CLOSED
 RegData <- RyggPreprosess(RegData = RegData)
 sort(names(RegData))
 setdiff(names(RegData), names(RegDataV3AVN))

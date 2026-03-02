@@ -34,7 +34,7 @@ RyggFigGjsnGrVar <- function(RegData, valgtVar, valgtMaal='Gjsn', datoFra='2007-
 
 
   if ("session" %in% names(list(...))) {
-    rapbase::repLogger(session = list(...)[["session"]], msg = paste0("AndelGrVar: ", valgtVar))
+    rapbase::repLogger2(session = list(...)[["session"]], msg = paste0("AndelGrVar: ", valgtVar))
   }
 
 if (hentData == 1) {
