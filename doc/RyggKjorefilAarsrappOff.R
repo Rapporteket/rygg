@@ -317,7 +317,7 @@ VentetidKirData <- RyggVarTilrettelegg(RegData = RyggData,
 NokkeltallRygg <- rbind(
   'Antall avdelinger' = length(unique((RyggData$ShNavn))),
   'Antall operasjoner' = dim(RyggData)[1],
-  'Svart på oppfølging, 3 mnd.' = mean(RyggData$Ferdigstilt1b3mnd==1, na.rm=T),
+  'Svart på oppfølging, 3 mnd.' = mean(RyggData$Status3mnd==1, na.rm=T),
   'Andel over 70 år'	= mean(RyggData$Alder>=70, na.rm=T),
   'Gjennomsnittsalder' = mean(RyggData$Alder, na.rm=T),
   'Andel kvinner' = 1-mean(RyggData$ErMann, na.rm=T),
@@ -337,11 +337,11 @@ antSh <- colSums(table(as.character(RyggData$ShNavn),RyggData$Aar)>0)
 antOp <- table(RyggData$Aar)
 
 #Andel som svarer på oppfølging 3 og 12 mnd.
-ind <- RyggData$Ferdigstilt1b3mnd %in% 0:1
-#andelSvart3mnd <- tapply(RyggData$Ferdigstilt1b3mnd,RyggData$Aar, FUN='mean', na.rm=T)
-#andelSvart12mnd <- tapply(RyggData$Ferdigstilt1b12mnd,RyggData$Aar, FUN='mean', na.rm=T)
-andelSvart3mnd <- tapply(RyggData$Ferdigstilt1b3mnd==1, RyggData$Aar, FUN='mean', na.rm=T)
-andelSvart12mnd <- tapply(RyggData$Ferdigstilt1b12mnd==1, RyggData$Aar, FUN='mean', na.rm=T)
+ind <- RyggData$Status3mnd %in% 0:1
+#andelSvart3mnd <- tapply(RyggData$Status3mnd,RyggData$Aar, FUN='mean', na.rm=T)
+#andelSvart12mnd <- tapply(RyggData$Status12mnd,RyggData$Aar, FUN='mean', na.rm=T)
+andelSvart3mnd <- tapply(RyggData$Status3mnd==1, RyggData$Aar, FUN='mean', na.rm=T)
+andelSvart12mnd <- tapply(RyggData$Status12mnd==1, RyggData$Aar, FUN='mean', na.rm=T)
 
 RyggData$over70 <- 0
 RyggData$over70[RyggData$Alder>=70] <- 1

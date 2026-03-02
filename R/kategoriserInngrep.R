@@ -50,9 +50,9 @@ RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$FusjonKirTlif == 1 & RegData$
 RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$FusjonKirPlif == 1 & RegData$FusjonKir == 1] <- 12
 
 #*PLF.
-#DO IF InngrepV3 = 0 & (FusjonKirPlfV3 = 1 & FusjonKir =1).
+#DO IF InngrepV3 = 0 & (FusjonKirPlf = 1 & FusjonKir =1).
 #RECODE InngrepV3  (0 = 11).
-RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$FusjonKirPlfV3 == 1 & RegData$FusjonKir == 1] <- 11
+RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$FusjonKirPlf == 1 & RegData$FusjonKir == 1] <- 11
 
 # *Laminectomi.
 # DO IF InngrepV3 = 0 & (OpLaminektomi = 1 & FusjonKir =0).
@@ -93,10 +93,10 @@ RegData$InngrepV3[RegData$InngrepV3 == 0 &
 RegData$InngrepV3[RegData$InngrepV3 == 0 & RegData$FusjonKir == 1] <- 5
 
 # *Udefinert fusjon_2.
-# DO IF InngrepV3 = 0 & (OpFusjonPerkutan = 1 or OpFusjonUtenDekomprV3 = 1).
+# DO IF InngrepV3 = 0 & (OpAndrePerkutanFusjon = 1 or FusjonUtenDekompr = 1).
 # RECODE InngrepV3 (0 = 5).
 RegData$InngrepV3[RegData$InngrepV3 == 0
-                  & ((RegData$OpFusjonPerkutan == 1) | (RegData$OpFusjonUtenDekomprV3 == 1))] <- 5
+                  & ((RegData$OpAndrePerkutanFusjon == 1) | (RegData$FusjonUtenDekompr == 1))] <- 5
 
 # *Udefinert, defineres inn i Midlinje bevarende dekompresjon.
 # DO IF InngrepV3 = 0 & (RfSkive = 0 & OpLaminektomi ~= 1) & OpProlap = 0.

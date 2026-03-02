@@ -14,11 +14,11 @@ begge <- intersect(V2pas$MCEID, V3$PasientID)
 V2pas[V2pas$MCEID==begge[1],]
 V3[V3$PasientID==begge[1],]
 
-# 'AvDodDato' ='DodsDato'
-varDod <- c('AvDodDato','DodsDato')
+# 'DodsDato' ='DodsDato'
+varDod <- c('DodsDato','DodsDato')
 RyggDataRaa[,varDod]
 RyggDataRaa$InnDato <- as.Date(RyggDataRaa$OpDato, format="%Y-%m-%d") #, tz='UTC')
-RyggDataRaa$Dod30[which(as.numeric(as.Date(RyggDataRaa$AvdodDato) - as.Date(RyggDataRaa$InnDato)) < 30)] <- 1
+RyggDataRaa$Dod30[which(as.numeric(as.Date(RyggDataRaa$DodsDato) - as.Date(RyggDataRaa$InnDato)) < 30)] <- 1
 table(RyggData$Dod365)
 
 

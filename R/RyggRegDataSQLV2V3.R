@@ -39,8 +39,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     MCEtab <- rapbase::loadRegData(registryName = 'data',
                                    query='SELECT * FROM mce')
     dodsdato <- rapbase::loadRegData(registryName = 'data',
-                                   query='SELECT DECEASED_DATE as AvDodDato,
-                                   DECEASED as PasientDod,
+                                   query='SELECT DECEASED_DATE as DodsDato,
+                                   DECEASED as DodPasient,
                                    ID as PATIENT_ID FROM patient')
     RegDataV2 <- merge(V2, MCEtab[,c("MCEID", "PATIENT_ID")], by = 'MCEID' )
     RegDataV2 <- merge(RegDataV2, dodsdato, by = 'PATIENT_ID')
@@ -53,7 +53,7 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
   RegDataV3Forl <- rapbase::loadRegData(
     registryName = 'data',
     query='SELECT ForlopsID, Kommune, Kommunenr, Fylkenr,     #Fylke er med i AVN
-                 AvDodDato, BasisRegStatus, KryptertFnr FROM forlopsoversikt')
+                 DodsDato, BasisRegStatus, KryptertFnr FROM forlopsoversikt')
 
   RegDataV3 <- merge(RegDataV3AVN,
                      RegDataV3Forl, by='ForlopsID',
@@ -81,22 +81,22 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     indIkkeEprom3mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
     indIkkeEprom12mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind12mnd]))
     #indEprom <-  which((RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
-    RegDataV3$Ferdig1b3mndGML <- RegDataV3$Ferdigstilt1b3mnd
-    RegDataV3$Ferdigstilt1b3mnd <- 0
-    RegDataV3$Ferdigstilt1b3mnd[RegDataV3$ForlopsID %in% ePROM3mnd$MCEID] <- 1
-    RegDataV3$Ferdigstilt1b3mnd[intersect(which(RegDataV3$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
+    RegDataV3$Ferdig1b3mndGML <- RegDataV3$Status3mnd
+    RegDataV3$Status3mnd <- 0
+    RegDataV3$Status3mnd[RegDataV3$ForlopsID %in% ePROM3mnd$MCEID] <- 1
+    RegDataV3$Status3mnd[intersect(which(RegDataV3$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
 
-    RegDataV3$Ferdig1b12mndGML <- RegDataV3$Ferdigstilt1b12mnd
-    RegDataV3$Ferdigstilt1b12mnd <- 0
-    RegDataV3$Ferdigstilt1b12mnd[RegDataV3$ForlopsID %in% ePROM12mnd$MCEID] <- 1
-    RegDataV3$Ferdigstilt1b12mnd[intersect(which(RegDataV3$Ferdig1b12mndGML ==1), indIkkeEprom12mnd)] <- 1
+    RegDataV3$Ferdig1b12mndGML <- RegDataV3$Status12mnd
+    RegDataV3$Status12mnd <- 0
+    RegDataV3$Status12mnd[RegDataV3$ForlopsID %in% ePROM12mnd$MCEID] <- 1
+    RegDataV3$Status12mnd[intersect(which(RegDataV3$Ferdig1b12mndGML ==1), indIkkeEprom12mnd)] <- 1
 
 
     #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
     indIkkeSaarInf <- which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31')
-    RegDataV3$KpInfOverfla3Mnd[indIkkeSaarInf] <- NA
+    RegDataV3$KpInfOverfla3mnd[indIkkeSaarInf] <- NA
     RegDataV3$KpInfOverfla12mnd[indIkkeSaarInf] <- NA
-    RegDataV3$KpInfDyp3Mnd[indIkkeSaarInf] <- NA
+    RegDataV3$KpInfDyp3mnd[indIkkeSaarInf] <- NA
     RegDataV3$KpInfDyp12mnd[indIkkeSaarInf] <- NA
 
 
@@ -107,42 +107,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 
     RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% c(krypterteV3, fjernes))]
 
-  if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
-    #!DENNE MÅ GÅS GJENNOM. SER UT TIL AT NOEN NØDVENDIGE VARIABLER FJERNES
-      # ,"AntibiotikaAntDogn", "AntibiotikaAntDoser", "AntibiotikaDose", "AntibiotikaEvtAntDogn",
-      # "AntibiotikaKunOprDag", "BenAutogrType", "BenAutoHofte", "BenAutoLokalt", "BenBank", "BenSubstitutt",
-      # "BlodfortynnendeFast", "BlodfortynnendePreop", "BlodfortynnendeSepDato", "BlodfortynnendeSpes",
-      # "CaudaAntDogn", "CaudaAntTimer", "CaudaAntUker", "CaudaEnUkeTilTreMnd", "CaudaOverTreMnd",
-      # "CaudaUnderEnUke", "CaudaUnderEttDogn", "DekompAntNivaa", "DekomprAnnetNivaa",
-      # "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "EtnKultTilhorighet", "FodtiNorge", "ForrigeInngrep",
-      # "Fritekstadresse", "FusjonAntNivaa", "FusjonIleumSkrue", "FusjonKir", "FusjonKirAlif",
-      # "FusjonKirPlfIkkeInstrV3", "FusjonKirPlfInstrV3", "FusjonKirPlfV3", "FusjonKirPlif", "FusjonKirTlif",
-      # "FusjonKirXlif", "FusjonNedreNivaa", "FusjonOvreNivaa", "FusjonSement",
-      # "FysioAnnenBeh", "FysioPsykoMotorisk", "FysioTrening", "HKirurgErfaring", "HKirurgErfaringAar",
-      # "HovedSpinalKirurg", "Hoyde", "HoydeMangler", "KliniskFleksjonLindring",
-      # "KliniskPosLasegue", "KnivSluttKlokkeMin", "KnivSluttKlokkeTime", "KnivStartKlokkeMin",
-      # "KnivStartKlokkeTime", "KnivTidMinVarighet", "KnivTidTimerVarighet",
-      # "NyAnnen12mnd", "NyAnnen3mnd", "NyHjerteKar12mnd", "NyHjerteKar3mnd", "Nykreft12mnd", "Nykreft3mnd",
-      # "NyLeddSm12mnd", "NyLeddSm3mnd", "NyNerveSkyd12mnd", "NyNerveSkyd3mnd", "NyOprAnt12mnd", "NyOprAnt3mnd",
-      # "NyOprNivaa12mnd", "NyOprNivaa3mnd", "NyRyggOpr12mnd", "NyRyggOpr3mnd", "NySkade12mnd", "NySkade3mnd",
-      # "NySykdSkade12mnd", "NySykdSkade3mnd",
-      # "OpAndreSkiveprotese", "OpAnnenOsteotomi", "OpAnnenOstetosyntSpes", "OpComputerNav",
-      # "OpFusjonPerkutan", "OpFusjonUtenDekomprV3",
-      # "OpKileOsteotomi", "OpKyfoseLL", "OpKyfoseLLGrader", "OpKyfosePI", "OpKyfosePIGrader",
-      # "OpKyfosePT", "OpKyfosePTGrader", "OpKyfoseSVA", "OpKyfoseSVAcm", "OpKysfoseSS", "OpKysfoseSSGrader",
-      # "OpL1L2", "OpL23", "OpL34", "OpL45", "OpL5S1", "OpOsteosyntFjerningV3",
-      # "OpOsteosyntRevV3", "OpPonteSPOsteotomi", "OpProOsteotomi", "OpSkolioseCobb", "OpSkolioseCobbGrader",
-      # "OpSkolioseKyfose", "OpTh12L1", "OpTilgangV3",
-      # "PostNr", "PostopTrombProfyl", "PostSted",
-      # "RfDegenListeseMM", "RfEkstrLatProl", "RfIntrforaminaltProl", "RfIstmiskLyse",
-      # "RFKunDegenerasjon", "RfKyfose", "RfMeyerdingGrad", "RfModic", "RfModicTypeI",
-      # "RfModicTypeII", "RfSkive", "RfSynovpre",
-      # "RfTypeIAktNivaa", "RfTypeIAnnetNivaa", "RfTypeIIAktNivaa", "RfTypeIIAnnetNivaa",
-      # "RvBlokadeFacett", "RvBlokadeNerverot", "RvFunksjoTranslMM", "RvFunksjoVinkelEndrGr",
-      # "SpesTrombProfyl", "Utfdato12mnd", "Utfdato3mnd", "UtfyltDato")
-
-
-  }
+  # if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
+  # }
 
   #-----Tilrettelegging av V2-data-------------------------
 if (kunV3 == 0) {
@@ -221,8 +187,8 @@ if (kunV3 == 0) {
                              RokerV2 = Roker,
                              #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
                              SykehusNavn = AvdNavn,
-                             Ferdigstilt1b3mnd = Utfylt3Mnd,
-                             Ferdigstilt1b12mnd = Utfylt12Mnd,
+                             Status3mnd = Utfylt3Mnd,
+                             Status12mnd = Utfylt12Mnd,
                              SykDprebetesMellitus = SykdDiabetesMellitus
   )
 
@@ -233,14 +199,14 @@ if (kunV3 == 0) {
 }
   #-----Tilrettelegging av V3-data-------------------------
 #Fjerner ikke-ferdigstilte pasientskjema
-  RegDataV3 <- RegDataV3[RegDataV3$Ferdig1a==1 & RegDataV3$Ferdig2a==1, ]
+  RegDataV3 <- RegDataV3[RegDataV3$StatusPasSkjema==1 & RegDataV3$StatusLegeSkjema==1, ]
   RegDataV3$Versjon <- 'V3'
 
   # RegDataV3$PID <- RegDataV3$PasientID #PID vil kobles med variabel PID fra V2 og tilpasses, ønsker å beholde PasientID fra V3
   #Navneendring av V3:
-  RegDataV3 <- dplyr::rename(RegDataV3,
-                             OpProlap = OprProlap #Siden Alle andre heter Op..
-                             ) #PIDV3 = PasientID)
+  # RegDataV3 <- dplyr::rename(RegDataV3,
+  #                            OpProlap = OprProlap #Siden Alle andre heter Op..
+  #                            ) #PIDV3 = PasientID)
   #Ønsker tom for manglende
   RegDataV3$SmBePre[RegDataV3$SmBePre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
   RegDataV3$SmRyPre[RegDataV3$SmRyPre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
@@ -312,11 +278,11 @@ if (kunV3 == 0) {
   RegDataV3$LSSopr[utvalg] <- 1
 
   RegDataV3$Kp3Mnd <- NULL
-  RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd', 'KpUVI3Mnd',
-                                         'KpLungebet3Mnd', 'KpBlod3Mnd','KpDVT3Mnd','KpLE3Mnd')],
+  RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd',
+                                         'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')],
                            na.rm = T) > 0] <- 1
   RegDataV3$KpInf3Mnd <- NULL
-  RegDataV3$KpInf3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3Mnd','KpInfDyp3Mnd')], na.rm = T) > 0] <- 1
+  RegDataV3$KpInf3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd')], na.rm = T) > 0] <- 1
 
 
   #TidlOp. V2: 1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
@@ -330,7 +296,7 @@ if (kunV3 == 0) {
   RegDataV3$OpMikro <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,1,1,1,0))
   RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,0,0,1,0))
 
-  RegDataV3$MedForstLukket <- as.character(as.Date(RegDataV3$MedForstLukket)) #Kobling med NA fungerer ikke for datotid-var
+  RegDataV3$ForstLukketLege <- as.character(as.Date(RegDataV3$ForstLukketLege)) #Kobling med NA fungerer ikke for datotid-var
 
 
 if (kunV3 == 0){
@@ -349,7 +315,7 @@ if (kunV3 == 0){
     RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
                          RegDataV3[ ,VarV3])
   } else {
-    #RegDataV3$AvdodDato <- as.Date(RegDataV3$AvdodDato)
+    #RegDataV3$DodsDato <- as.Date(RegDataV3$DodsDato)
     RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
     RegDataV3[, V2ikkeV3] <- NA
     RegDataV2V3 <- rbind(RegDataV2,
@@ -370,7 +336,7 @@ if (kunV3 == 0){
   EndreNavnInd <- grep('3Mnd', names(RegDataV2V3)) #names(RyggData)[grep('3Mnd', names(RyggData))]
   names(RegDataV2V3)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2V3)[EndreNavnInd])
 
-  #RegDataV2V3$AvdodDato <- as.Date(RegDataV2V3$AvdodDato) #, origin='1970-01-01')
+  #RegDataV2V3$DodsDato <- as.Date(RegDataV2V3$DodsDato) #, origin='1970-01-01')
   #En desimal
   RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)
   RegDataV2V3$OswTotPre <- round(RegDataV2V3$OswTotPre,1)

@@ -26,8 +26,8 @@ RegData <- RyggPreprosess(RegData=RyggData)
 Ntot07 <- dim(RegData)[1]
 
 # RegDataV3 <- RegData[RegData$Aar >2018, ]
-table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
-# test <- RegData[ ,c('Aar', "Ferdigstilt1b3mnd", 'Utfdato3mnd', "Nytte3mnd")]
+table(RegData[,c('Aar', "Status12mnd")])
+# test <- RegData[ ,c('Aar', "Status3mnd", 'Utfdato3mnd', "Nytte3mnd")]
 table(RegData$Aar, !is.na(RegData$OswTot12mnd), useNA = 'a')
 
 #Gjør utvalg/tilrettelegge årsfiler
@@ -365,7 +365,7 @@ VentetidKirData <- RyggVarTilrettelegg(RegData = RyggData1aar,
 NokkeltallRygg <- rbind(
   'Antall avdelinger' = length(unique((RyggData1aar$ShNavn))),
   'Antall operasjoner' = dim(RyggData1aar)[1],
-  'Svart på oppfølging, 3 mnd.' = mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T),
+  'Svart på oppfølging, 3 mnd.' = mean(RyggData1aar$Status3mnd==1, na.rm=T),
   'Andel over 70 år'	= mean(RyggData1aar$Alder>=70, na.rm=T),
   'Gjennomsnittsalder' = mean(RyggData1aar$Alder, na.rm=T),
   'Andel kvinner' = 1-mean(RyggData1aar$ErMann, na.rm=T),

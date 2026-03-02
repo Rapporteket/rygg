@@ -109,7 +109,7 @@ delTekst <- function(x, len) #x -tekststreng/vektor av tekststrenger, len - Leng
 #' @return registreringsforsinkelse
 #' @export
 forsinketReg <- function(RegData, fraDato, tilDato, forsinkelse, reshID=0){
-  RegData$Diff <- as.numeric(difftime(as.Date(RegData$MedForstLukket),
+  RegData$Diff <- as.numeric(difftime(as.Date(RegData$ForstLukketLege),
                                       RegData$OpDato ,units = 'days')) #UtskrivelseDato
   Data <- RegData[ , c('OpDato', 'MndAar', 'Diff', 'ReshId')]%>%
     dplyr::filter(OpDato > fraDato & (OpDato < tilDato))
@@ -253,10 +253,7 @@ if (ktr==2) {
   if (slaaSmToAar==1 & antAar>1) { #duplisering av data
     RegDataDupl <- RegDataUt[RegDataUt$Aar %in% aarMed[1:(antAar-1)], ]
     RegDataDupl$Aar <- RegDataDupl$Aar+1
-    #table(RegDataDupl$Aar)
-    #table(RegDataUt$Aar)
     RegDataUt <- rbind(RegDataUt[-which(RegDataUt$Aar == aarMed[1]), ], RegDataDupl)
-    #table(RegDataUt$Aar)
   }
 
   #Variabler: year, orgnr, var, denominator, ind_id

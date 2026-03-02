@@ -22,8 +22,8 @@ RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 RegData <- RyggUtvalgEnh(RegData=RegData, datoTil=datoTil)$RegData
 Ntot07 <- dim(RegData)[1]
-# table(RegData[,c('Aar', "Ferdigstilt1b12mnd")])
-# table(RegData[,c('Aar', "Ferdigstilt1b3mnd")])
+# table(RegData[,c('Aar', "Status12mnd")])
+# table(RegData[,c('Aar', "Status3mnd")])
 
 #Gjør utvalg/tilrettelegge årsfiler
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData
@@ -411,13 +411,13 @@ VerreData <- RyggVarTilrettelegg(RegData = RyggData1aar,
 VentetidKirData <- RyggVarTilrettelegg(RegData = RyggData1aar,
                                  valgtVar = 'ventetidSpesOp', ktr = 1, figurtype = 'andelGrVar')$RegData
 
-tall <- 100*mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T)
+tall <- 100*mean(RyggData1aar$Status3mnd==1, na.rm=T)
 paste(sprintf('%.1f', tall), '%')
 
 NokkeltallRygg <- rbind(
   'Antall avdelinger' = length(unique((RyggData1aar$ShNavn))),
   'Antall operasjoner' = dim(RyggData1aar)[1],
-  'Svart på oppfølging, 3 mnd.' = paste(sprintf('%.1f', 100*mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T)), '%'),
+  'Svart på oppfølging, 3 mnd.' = paste(sprintf('%.1f', 100*mean(RyggData1aar$Status3mnd==1, na.rm=T)), '%'),
   'Andel over 70 år'	= paste(sprintf('%.1f', 100*mean(RyggData1aar$Alder>=70, na.rm=T)), '%'),
   'Gjennomsnittsalder' = sprintf('%.1f',mean(RyggData1aar$Alder, na.rm=T)),
   'Andel kvinner' = paste(sprintf('%.1f', 100*(1-mean(RyggData1aar$ErMann, na.rm=T))), '%'),

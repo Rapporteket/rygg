@@ -14,22 +14,22 @@ mappingEgneNavn <- function(tabell, tabType) {
 
   indTabType <- which(friendlyVarTab$REGISTRATION_TYPE %in% tabType)
   if (!length(indTabType)==0) {
-    navnFr <- friendlyVarTab$FIELD_NAME[indTabType]
+    friendlyVarTabType <- friendlyVarTab[indTabType,]
     kuttTabPrefiks <- if (tabType == 'PATIENTFOLLOWUP12') {'PATIENTFOLLOWUP_'} else {paste0(tabType, '_')}
-    navn <- gsub(kuttTabPrefiks, "", navnFr)
 
-    rydd <- which(friendlyVarTab$USER_SUGGESTION[indTabType] == 'VERBOTEN')
+    rydd <- which(friendlyVarTabType$USER_SUGGESTION == 'VERBOTEN')
 
     #Fjerner variabler merket 'VERBOTEN'
     if (length(rydd)>0) {
-      fjernvar <- gsub(kuttTabPrefiks, "", friendlyVarTab$FIELD_NAME[rydd])
+      fjernvar <- gsub(kuttTabPrefiks, "", friendlyVarTabType$FIELD_NAME[rydd])
       indFjern <- which(names(tabell) %in% fjernvar)
-      if (indFjern > 0) {
+      if (length(indFjern) > 0) {
         tabell <- tabell[ , -indFjern]}
-      friendlyVarTab <- friendlyVarTab[-rydd, ]
+      friendlyVarTabType <- friendlyVarTabType[-rydd, ]
     }
 
-    names(navn) <- friendlyVarTab$USER_SUGGESTION[indTabType]
+    navn <- gsub(kuttTabPrefiks, "", friendlyVarTabType$FIELD_NAME)
+    names(navn) <- friendlyVarTabType$USER_SUGGESTION
     tabell <- dplyr::rename(tabell, dplyr::any_of(navn)) #all_of(navn
   }
   return(tabell)
@@ -92,7 +92,7 @@ RyggHentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   #mce Trenger nok ganske få av disse variablene
   # mce_patient_data # eneste som inneholder kobling mellom mceid og pasientid
-  qmce <- 'CENTREID AS ReshId, CREATEDBY, MCEID, PATIENT_ID,
+  qmce <- 'CENTREID AS ReshId, CREATEDBY, MCEID, PATIENT_ID AS PasientID,
              sendtSMS12mnd, sendtSMS3mnd, TSCREATED, TSUPDATED'
 
   mceSkjema <- hentDataTabell(tabellnavn = "mce",
@@ -131,7 +131,7 @@ RyggHentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
   # SAMMENSTILL SKJEMA:
   RegData <-
     merge(mceSkjema,
-          PasInfoSkjema, by.x = "PATIENT_ID", by.y = "ID",
+          PasInfoSkjema, by.x = "PasientID", by.y = "ID",
           suffixes = c("", "_pas"), all = F) |>
     merge(LegeSkjema, by = "MCEID", all = F, suffixes = c("", "_lege")) |>
     merge(PasSkjema,

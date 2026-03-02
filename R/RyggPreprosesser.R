@@ -11,8 +11,8 @@ RyggPreprosess2 <- function(RegData=RegData)
   #Kun ferdigstilte registreringer: Kun ferdigstilte skjema i V2
   #V3: Alle legeskjema ferdigstilt.
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
-  RegData$ErMann <- RegData$Kjonn
-  RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
+  RegData$ErMann <- RegData$GENDER
+  RegData$ErMann[which(RegData$GENDER == 2)] <- 0
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
@@ -22,11 +22,11 @@ RyggPreprosess2 <- function(RegData=RegData)
 
 	#Variabel som identifiserer avdelinga
 	RegData$SykehusNavn <- trimws(RegData$SykehusNavn)
-	indAleris <- which(RegData$AvdRESH %in% c(999975, 107511))
+	indAleris <- which(RegData$ReshId %in% c(999975, 107511))
 	RegData$SykehusNavn[indAleris] <- 'Aleris Oslo'
-	RegData$AvdRESH[indAleris] <- 107511
+	RegData$ReshId[indAleris] <- 107511
 	RegData$ShNavn <- RegData$SykehusNavn
-	names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
+	# names(RegData)[which(names(RegData) == 'AvdRESH')] <- 'ReshId'
 
 
 	#Tomme sykehusnavn får resh som navn:
@@ -51,12 +51,12 @@ RyggPreprosess2 <- function(RegData=RegData)
 	RegData$Kvartal <- ceiling(RegData$MndNum/3)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
-	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$MedForstLukket), as.Date(RegData$UtskrivelseDato), units = 'days'))
+	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$ForstLukketLege), as.Date(RegData$UtskrivelseDato), units = 'days'))
 	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDato), as.Date(RegData$OpDato), units = 'days'))
 	RegData$Dod30 <- 0
-	RegData$Dod30[which(as.numeric(as.Date(RegData$AvDodDato) - as.Date(RegData$InnDato)) < 30)] <- 1
+	RegData$Dod30[which(as.numeric(as.Date(RegData$DodsDato) - as.Date(RegData$InnDato)) < 30)] <- 1
 	RegData$Dod365 <- 0
-	RegData$Dod365[which(as.numeric(as.Date(RegData$AvDodDato) - as.Date(RegData$InnDato)) < 365)] <- 1
+	RegData$Dod365[which(as.numeric(as.Date(RegData$DodsDato) - as.Date(RegData$InnDato)) < 365)] <- 1
 
 	  return(invisible(RegData))
 }

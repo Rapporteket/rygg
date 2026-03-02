@@ -731,7 +731,7 @@ server_rygg <- function(input, output, session) {
 
 
       fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
-                     "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
+                     "FusjonSpes", "OpAndreSpes", "OpAndreSpes", "OpIndAnSpe", "RfAnnetspes",
                      "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
       RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
       dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,
