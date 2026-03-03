@@ -749,7 +749,7 @@ server_rygg <- function(input, output, session) {
       output$lastNed_dataDump <- downloadHandler(
         filename = function(){'dataDump.csv'},
         content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')
-          rapbase::repLogger2(session = session, msg = txtLog)
+          rapbase::repLogger(session = session, msg = txtLog)
         })
     }
   }) #observe

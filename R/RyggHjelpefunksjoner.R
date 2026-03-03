@@ -71,7 +71,6 @@ SorterOgNavngiTidsEnhet <- function(RegData, tidsenhet='Aar', tab=0) {
 lageTulleData <- function(RegData, varBort='', antSh=26, antObs=20000) {
   library(synthpop)
   library(dplyr)
-  #ForlopsID <- RegData$ForlopsID
   RegData <- RegData[,-which(names(RegData) %in% varBort)]
   RegData <- RegData[sample(1:dim(RegData)[1], antObs, replace = T),]
   sykehus <- paste('Sykehus', LETTERS[1:antSh])

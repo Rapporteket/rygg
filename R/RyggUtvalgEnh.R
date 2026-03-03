@@ -84,10 +84,6 @@ indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1
             } else {indHovedInngr <- 0}
 
       ##Spinal stenose:
-      # if (length(intersect(c(8:9), hovedkat)>0)) {indSS <- with(RegData, which((RfSentr == 1 | RfLateral == 1)
-      #                                                            & RfSpondtypeIsmisk==0
-      #               & (OpDeUlamin==1 | OpLaminektomi==1 | OpDeFasett==1)
-      #               & (HovedInngrep %in% c(2:5,7))))}
       if (is.element(9, hovedkat)) {indHovedInngr <- union(indHovedInngr, which(RegData$LSSopr==1))}
       #Degenerativ spondylolistese:
       if (is.element(10, hovedkat)) {indHovedInngr <- union(indHovedInngr,
@@ -102,23 +98,6 @@ indhastegrad <- if (hastegrad %in% 1:2) {
 indMed <- indAld %i% indDato %i% indAar  %i% indKj %i% indHovedInngr %i% indTidlOp %i% indhastegrad
 RegData <- RegData[indMed,]
 
-#Definifjon av spinal stenose:
-#      COMPUTE filter_$=((RfSentr = 1 or RfLateral = 1)
-#                        & (RfSpondtypeIsmisk = 0)
-#                        & (OpDeUlamin=1 or OpLaminektomi=1 or OpDeFasett=1)
-#                        & (HovedInngrep=2 or HovedInngrep=3 or HovedInngrep=4  or HovedInngrep=5 or HovedInngrep=7) )
-
-# hkatnavn <- c( #0:9
-# 	'Operasjonskategori: "ukjent"',	#hkat=0
-# 	'Prolapskirurgi',
-# 	'Foramenotomi',
-# 	'Laminektomi',
-# 	'Interspinøst implantat',
-# 	'Fusjonskirurgi',
-# 	'Skiveprotese',
-# 	'Fjerning/rev. av implantat',
-# 	'Spinal stenose',
-# 	'Degen. spondylolistese')
 HovedInngrepV2V3_txt <- c('Udef.', 'Prolaps', 'Dekomp.', 'Laminektomi', 'Eksp. intersp impl.',
                           'Fusjon', 'Deformitet', 'Revisjon', 'Skiveprotese') #0:8
 hkatnavn <- c(HovedInngrepV2V3_txt, 'Spinal stenose', 'Degen. spondylolistese og LSS')
@@ -131,9 +110,8 @@ N <- dim(RegData)[1]
 utvalgTxt <- c(paste0('Operasjonsdato: ', if (N>0) {min(RegData$InnDato, na.rm=T)} else {datoFra},
 			' til ', if (N>0) {max(RegData$InnDato, na.rm=T)} else {datoTil}),
 	#År, flervalgsutvalg, ikke ha med egen tekst for dette?
-#	if (aar[1] > 2000 ){
 #	      AarMed <- min(RegData$Aar, na.rm=T):max(RegData$Aar, na.rm=T)
-#	      if (length(AarMed)>1) {paste0('År: ', AarMed[1], ':', max(AarMed))} else {paste0('År: ', AarMed)}},
+#	      if (length(AarMed)>1) {paste0('År: ', AarMed[1], ':', max(AarMed))} else {paste0('År: ', AarMed)}
 	if ((minald>0) | (maxald<110)) {paste0('Pasienter fra ', if (N>0) {min(RegData$Alder, na.rm=T)} else {minald},
 						' til ', if (N>0) {max(RegData$Alder, na.rm=T)} else {maxald}, ' år')},
 	if (erMann %in% 0:1) {paste0('Kjønn: ', c('Kvinner', 'Menn')[erMann+1])},

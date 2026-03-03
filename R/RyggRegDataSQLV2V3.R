@@ -16,80 +16,29 @@
 
 RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
                                alleVarV3=1, alleVarV2=0){
-#NB: datovalg enyttes kun til å avgjøre om kobling til V2 skal utføres.
+#NB: datovalg benyttes foreløpig kun til å avgjøre om kobling til V2 skal utføres.
 
   message('Henter data, RyggRegDataSQLV2V3')
- # registryName <- "data"   # "rygg"
-
   kunV3 <- ifelse(datoFra >= '2019-01-01' & !is.na(datoFra), 1, 0)
-  #datoFra <- max(datoFra, '2020-01-01') #For å fjerne V2
-
 
   if (kunV3 == 0) {
-
-    V2oper <- rapbase::loadRegData(registryName = 'data',
-                                   query='SELECT * FROM ryggv2_operation')
-    V2pas <- rapbase::loadRegData(registryName = 'data',
-                                  query='SELECT * FROM ryggv2_patient_preop')
-    V2oppf <- rapbase::loadRegData(registryName = 'data',
-                                   query='SELECT * FROM ryggv2_followup')
-
-    V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
-    V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
-    MCEtab <- rapbase::loadRegData(registryName = 'data',
-                                   query='SELECT * FROM mce')
-    dodsdato <- rapbase::loadRegData(registryName = 'data',
-                                   query='SELECT DECEASED_DATE as DodsDato,
-                                   DECEASED as DodPasient,
-                                   ID as PATIENT_ID FROM patient')
-    RegDataV2 <- merge(V2, MCEtab[,c("MCEID", "PATIENT_ID")], by = 'MCEID' )
-    RegDataV2 <- merge(RegDataV2, dodsdato, by = 'PATIENT_ID')
-
-
-    # table(table(RegDataV2$OLD_PID))
+    RegDataV2 <- hentDataV2()
+    tilpassV2data(RegDataV2=RegDataV2)
     }
-  RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
-                                     query='SELECT * FROM allevarnum')
-  RegDataV3Forl <- rapbase::loadRegData(
-    registryName = 'data',
-    query='SELECT ForlopsID, Kommune, Kommunenr, Fylkenr,     #Fylke er med i AVN
-                 DodsDato, BasisRegStatus, KryptertFnr FROM forlopsoversikt')
 
-  RegDataV3 <- merge(RegDataV3AVN,
-                     RegDataV3Forl, by='ForlopsID',
-                     all.x = TRUE, all.y = FALSE)
+  RegDataV3 <- hentRegDataV3(datoFra = '2019-01-01', datoTil = Sys.Date(),
+                             medOppf = 1)
+  # RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
+  #                                    query='SELECT * FROM allevarnum')
+  # RegDataV3Forl <- rapbase::loadRegData(
+  #   registryName = 'data',
+  #   query='SELECT ForlopsID, Kommune, Kommunenr, Fylkenr,     #Fylke er med i AVN
+  #                DodsDato, BasisRegStatus, KryptertFnr FROM forlopsoversikt')
+  #
+  # RegDataV3 <- merge(RegDataV3AVN,
+  #                    RegDataV3Forl, by='ForlopsID',
+  #                    all.x = TRUE, all.y = FALSE)
 
-  ePROMadmTab <- rapbase::loadRegData(registryName = 'data',
-                                   query='SELECT * FROM proms')
-  ePROMvar <- c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
-                'REGISTRATION_TYPE')
-  # «EpromStatus» er definert av HNIKT, og den som er viktigst med tanke på svarprosent.
-  # Verdien 3 betyr at pasienten har besvart.
-  # OBS at den skiller seg litt fra tilsvarende variabel i MRS som er definert slik:
-  # 0 = Created, 1 = Ordered, 2 = Expired, 3 = Completed, 4 = Failed
-  ind3mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
-                         c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
-
-  ind12mnd <- which(ePROMadmTab$REGISTRATION_TYPE %in%
-                      c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
-
-  ePROM3mnd <- ePROMadmTab[intersect(ind3mnd, which(ePROMadmTab$STATUS==3)), ePROMvar] #STATUS==3 completed
-  names(ePROM3mnd) <- paste0(ePROMvar, '3mnd')
-  ePROM12mnd <- ePROMadmTab[intersect(ind12mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
-  names(ePROM12mnd) <- paste0(ePROMvar, '12mnd')
-
-    indIkkeEprom3mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
-    indIkkeEprom12mnd <-  which(!(RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind12mnd]))
-    #indEprom <-  which((RegDataV3$ForlopsID %in% ePROMadmTab$MCEID[ind3mnd]))
-    RegDataV3$Ferdig1b3mndGML <- RegDataV3$Status3mnd
-    RegDataV3$Status3mnd <- 0
-    RegDataV3$Status3mnd[RegDataV3$ForlopsID %in% ePROM3mnd$MCEID] <- 1
-    RegDataV3$Status3mnd[intersect(which(RegDataV3$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
-
-    RegDataV3$Ferdig1b12mndGML <- RegDataV3$Status12mnd
-    RegDataV3$Status12mnd <- 0
-    RegDataV3$Status12mnd[RegDataV3$ForlopsID %in% ePROM12mnd$MCEID] <- 1
-    RegDataV3$Status12mnd[intersect(which(RegDataV3$Ferdig1b12mndGML ==1), indIkkeEprom12mnd)] <- 1
 
 
     #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
@@ -100,121 +49,20 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
     RegDataV3$KpInfDyp12mnd[indIkkeSaarInf] <- NA
 
 
-    krypterteV3 <- c("Adresse", "Adressetype", "PostNr", "PostSted", "Bydelskode",	"Bydelsnavn",
-                     "KommuneNr", "KommuneNavn", "Fylke", "HelseRegion",
-                     "KryptertFnr")
-    fjernes <- c('MceType', 'DodsDato')
 
-    RegDataV3 <- RegDataV3[ ,-which(names(RegDataV3) %in% c(krypterteV3, fjernes))]
-
-  # if (alleVarV3 == 0) { #Tar bort noen variabler for å spare tid
-  # }
-
-  #-----Tilrettelegging av V2-data-------------------------
-if (kunV3 == 0) {
-  #FJERNES ? !!!!!!!!!!
-   RegDataV2$PID <- paste0(RegDataV2$OLD_PID, 'V2')
-
-   # Arbstatus3mnd OG Arbstatus12mnd V2:
-   # De som har verdi 11 settes TIL MANGLENDE
-  # 2: Hjemmeværende - bare i V2 - settes tom
-   # 7:Delvis sykemeldt - V2: 7+8,
-   # 8: Arbeidsavklaring - V2:9
-   # 9: Ufør - V2: 10,
-
-   RegDataV2$ArbstatusPreV2V3 <- as.numeric(RegDataV2$ArbstatusPre)
-   RegDataV2$Arbstatus3mndV2V3 <- as.numeric(RegDataV2$Arbstatus3mnd)
-   RegDataV2$Arbstatus12mndV2V3 <- as.numeric(RegDataV2$Arbstatus12mnd)
-   RegDataV2$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV2$ArbstatusPreV2V3, from = c(2,8,9,10), to = c(NA,7,8,9))
-   RegDataV2$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus3mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
-   RegDataV2$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus12mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
-
-
-  #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
-  RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
-                                                  breaks=c(-Inf, 90, 182, 365, Inf),
-                                                  right = FALSE, labels=c(1:4)))
-  RegDataV2$SykemeldVarighPreV3[is.na(RegDataV2$SykemeldVarighPreV3)] <- 9
-
-  RegDataV2$AntibiotikaV3 <-  plyr::mapvalues(as.numeric(RegDataV2$Antibiotika), from = c(0, 1, NA), to = c(0,1,9))
-
-  #V2: Kode 1:4,NA: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
-  #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger","Innvilget","Ikke utfylt"]
-  RegDataV2$ErstatningPre <- plyr::mapvalues(as.numeric(RegDataV2$ErstatningPre), from = c(2,3,4,NA), to = c(0,2,3,9))
-  RegDataV2$UforetrygdPre <- plyr::mapvalues(as.numeric(RegDataV2$UforetrygdPre), from = c(2,3,4,NA), to = c(0,2,3,9))
-
-  #Ønsker tom for manglende RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
-  #Ønsker tom for manglende RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
-  RegDataV2$OpIndPareseGrad[is.na(RegDataV2$OpIndPareseGrad)] <- 9
-  RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
-  RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
-  RegDataV2$Utd[is.na(RegDataV2$Utd)] <- 9
-  RegDataV2$KpInf3Mnd[RegDataV2$KpInf3Mnd==0] <- NA #Tilpasning til V3
-  RegDataV2$Versjon <- 'V2'
-
-
-  RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
-    'Aleris, Bergen' = 'Aleris Bergen',
-    'Aleris, Oslo' = 'Aleris Oslo',
-    'Larvik' = 'Tønsberg',
-    'Oslofjordklinikken Øst' = 'Oslofjordklinikken',
-    'Teres Colloseum, Oslo' = 'Aleris Oslo',
-    'Teres Colloseum, Stavanger'  = 'Aleris Stavanger',
-    'Teres, Bergen' = 'Aleris Bergen',
-    'Teres, Drammen' =  'Aleris Drammen'  ,
-    'Ulriksdal' = 'Volvat',
-    'UNN, nevrokir' = 'Tromsø')
-  )
-
-               # RegDataV2$AvdReshID <- plyr::revalue(RegDataV2$AvdReshID,  #Gammelt navn V2 - nytt navn (V3), dvs. gmlresh	nyresh
-                                   #Mappes om i preprosess:  c('107511' =	'999975')) #Aleris Oslo
-                                     # Disse ikke med i ny versjon: '107137' =	'107508', #Aleris Bergen '999999' =	'110771') #Volvat
-
-  # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
-  # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
-  RegDataV2 <- dplyr::rename(RegDataV2,
-                             AlderVedOpr = Alder,
-                             EQ5DV212mnd = EQ5D12mnd,
-                             EQ5DV23mnd = EQ5D3mnd,
-                             AvdRESH = AvdReshID,
-                             Bydelskode = Bydelkode,
-                             Bydelsnavn = Bydelsted,
-                             KommuneNr = Kommunenr, #Kommunenavn ikke med i V2
-                             KpInfDyp12mnd = KpInfDyp12Mnd,
-                             ForlopsID = MCEID,
-                             #PIDV2 = PID, #Heter PasientID i V3. NB: Må ikke slås sammen.
-                             PasientID = PATIENT_ID,
-                             RokerV2 = Roker,
-                             #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
-                             SykehusNavn = AvdNavn,
-                             Status3mnd = Utfylt3Mnd,
-                             Status12mnd = Utfylt12Mnd,
-                             SykDprebetesMellitus = SykdDiabetesMellitus
-  )
-
-
-  #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
-  RegDataV2$SivilStatusV3 <- plyr::mapvalues(as.numeric(RegDataV2$SivilStatus), from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
-
-}
-  #-----Tilrettelegging av V3-data-------------------------
+    #-----Tilrettelegg V3-data-------------------------
 #Fjerner ikke-ferdigstilte pasientskjema
-  RegDataV3 <- RegDataV3[RegDataV3$StatusPasSkjema==1 & RegDataV3$StatusLegeSkjema==1, ]
+
+  #  RegDataV3 <- RegDataV3[RegDataV3$StatusPasSkjema==1 & RegDataV3$StatusLegeSkjema==1, ]
   RegDataV3$Versjon <- 'V3'
 
-  # RegDataV3$PID <- RegDataV3$PasientID #PID vil kobles med variabel PID fra V2 og tilpasses, ønsker å beholde PasientID fra V3
-  #Navneendring av V3:
-  # RegDataV3 <- dplyr::rename(RegDataV3,
-  #                            OpProlap = OprProlap #Siden Alle andre heter Op..
-  #                            ) #PIDV3 = PasientID)
   #Ønsker tom for manglende
   RegDataV3$SmBePre[RegDataV3$SmBePre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
   RegDataV3$SmRyPre[RegDataV3$SmRyPre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
 
-
-
-  #Ny arbedisstatus-variabel, basert på V2 og V3:
-  #Arbstatus3mndV3 - de med verdi 11 eller 99 eller tom som har oppgitt sykemeldingsgrad., Skal ha verdien 7.
+  #Ny ARBEIDSSTATUS-variabel, basert på V2 og V3:
+  #Arbstatus3mndV3 - de med verdi 11 eller 99 eller tom som har oppgitt sykemeldingsgrad.,
+  # Skal ha verdien 7.
   RegDataV3$Arbstatus3mndV3[which(RegDataV3$Arbstatus3mndV3 %in% c(11,99))] <- NA
   ind7_3mnd <- which(is.na(RegDataV3$Arbstatus3mndV3) & RegDataV3$SykemeldPros3mnd>0) #17 per 1.mars 2024
   RegDataV3$Arbstatus3mndV3[ind7_3mnd] <- 7
@@ -224,58 +72,16 @@ if (kunV3 == 0) {
   RegDataV3$Arbstatus12mndV3[ind7_12mnd] <- 7
 
   # 1: I arbeid - V3- 1+2
-  RegDataV3$ArbstatusPreV2V3 <- RegDataV3$ArbstatusPreV3
-  RegDataV3$Arbstatus3mndV2V3 <- RegDataV3$Arbstatus3mndV3
-  RegDataV3$Arbstatus12mndV2V3 <- RegDataV3$Arbstatus12mndV3
-  RegDataV3$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV3$ArbstatusPreV2V3, from = c(2, 99), to = c(1, NA))
-  RegDataV3$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus3mndV2V3, from = 2, to = 1)
-  RegDataV3$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus12mndV2V3, from = 2, to = 1)
-
+  RegDataV3$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV3$ArbstatusPreV3, from = c(2, 99), to = c(1, NA))
+  RegDataV3$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus3mndV3, from = 2, to = 1)
+  RegDataV3$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus12mndV3, from = 2, to = 1)
 
   #Legge til underkategori for hovedkategori.
-  ny <- rygg::kategoriserInngrep(RegData=RegDataV3)
-  RegDataV3 <- ny$RegData
+  #ny <- rygg::kategoriserInngrep(RegData=RegDataV3)
+  RegDataV3 <- kategoriserInngrep(RegData=RegDataV3)$RegData
 
-  #--------Definasjon av diagnosegrupper prolaps og spinal stenose V3----
-  # COMPUTE filter_$=(HovedInngrepV2V3 = 4 or (RfSentr = 1 or RfLateral = 1 or RfForaminalSS = 1)
-  #                   & (OpDeUlamin = 1 or OpDeUlaminTilgang > 0 or OpLaminektomi  = 1)
-  #                   & (HovedInngrepV2V3 = 2 or HovedInngrepV2V3 = 3
-  #                                            or HovedInngrepV2V3 = 5 or HovedInngrepV2V3 = 7) ).
-  RegDataV3$LSSopr <- ifelse(RegDataV3$HovedInngrepV2V3 == 4
-                           | (RegDataV3$RfSentr == 1 | RegDataV3$RfLateral == 1 | RegDataV3$RfForaminalSS == 1)
-                           & (RegDataV3$OpDeUlamin == 1 | RegDataV3$OpDeUlaminTilgang %in% 1:3 | RegDataV3$OpLaminektomi == 1)
-                           & (RegDataV3$HovedInngrepV2V3 %in% c(2,3,5,7)),
-                           1, 0)
-
-  #*Definisjon av prolapsgruppen, dekompresjon, kvalitetssikre, først gr uten fusjon..
-  #COMPUTE filter_$=(HovedInngrepV2V3 = 1 &  LSS_opr = 0).
-  # 1  'Ja operert med dekopressjon for prolaps'
-  # 0 ' Nei ikke operert med dekopressjon for prolaps'.
-  RegDataV3$ProlapsDekr <- ifelse(RegDataV3$HovedInngrepV2V3 == 1 &  RegDataV3$LSSopr == 0, 1, 0)
-
-  #*Definisjon av prolapsgruppen,med fusjon.
-  # 1  'Ja operert med fusjon for prolaps'
-  # 0 ' Nei ikke operert med fusjon for prolaps'.
-  # COMPUTE filter_$=((Prolaps_dekr = 0 & LSS_opr = 0) & (HovedInngrepV2V3 = 5 & OpProlap > 0) &
-  #                     (RfDegskol =  0 & RfSpondtypeDegen = 0 & RfSpondtypeIsmisk = 0)).
-  RegDataV3$ProlapsFusjonert <-
-    ifelse((RegDataV3$ProlapsDekr == 0 & RegDataV3$LSSopr == 0) &
-             (RegDataV3$HovedInngrepV2V3 == 5 & RegDataV3$OpProlap > 0) &
-             (RegDataV3$RfDegskol ==  0 & RegDataV3$RfSpondtypeDegen == 0 & RegDataV3$RfSpondtypeIsmisk == 0),
-           1, 0)
-
-  #*Definisjon av prolapsgruppen, prolapsopr med og uten fusjon.
-  #COMPUTE filter_$=(Prolaps_dekr = 1 or Prolaps_fusjonert = 1).
-  # VARIABLE LABELS  Prolapsopr_alle 'både dekr og fusjon'.
-  # 1  'Ja  alle typer prolapsoperason'
-  # 0 ' Nei ikke operert for prolaps'.
-  RegDataV3$ProlapsoprAlle <- ifelse(RegDataV3$ProlapsDekr == 1 | RegDataV3$ProlapsFusjonert == 1, 1, 0)
-
-
-  # DO IF (LSS_opr = 0 & Prolapsopr_alle = 0   & OpDeUlamin = 1).
-  # RECODE LSS_opr (0=1).
-  utvalg <- which(RegDataV3$LSSopr == 0 & RegDataV3$ProlapsoprAlle == 0   & RegDataV3$OpDeUlamin == 1)
-  RegDataV3$LSSopr[utvalg] <- 1
+  #Definasjon av diagnosegrupper prolaps og spinal stenose
+  RegDataV3 <- defProSS(RegDataV3)
 
   RegDataV3$Kp3Mnd <- NULL
   RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd',
@@ -296,7 +102,8 @@ if (kunV3 == 0) {
   RegDataV3$OpMikro <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,1,1,1,0))
   RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3, from = c(0,1,2,3,9), to = c(0,0,0,1,0))
 
-  RegDataV3$ForstLukketLege <- as.character(as.Date(RegDataV3$ForstLukketLege)) #Kobling med NA fungerer ikke for datotid-var
+  RegDataV3$ForstLukketLege <- as.character(as.Date(RegDataV3$ForstLukketLege))
+  #Kobling med NA fungerer ikke for datotid-var
 
 
 if (kunV3 == 0){
