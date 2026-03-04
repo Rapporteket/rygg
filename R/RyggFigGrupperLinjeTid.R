@@ -33,7 +33,7 @@ RyggFigGrupperLinjelTid <- function(RegData, valgtVar = 'gruppeAndel' , gr1='', 
   }
 
   if (hentData == 1) {
-    RegData <- RyggRegDataSQLV2V3()
+    RegData <- RyggRegDataV2V3()
   }
 
   # Preprosessering av data. I samledokument gjøre dette i samledokumentet.

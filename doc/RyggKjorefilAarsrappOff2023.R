@@ -18,7 +18,7 @@ aar2_12mnd <- aar2-1
 tidlAar <- rappAar-1
 tidlAar2 <- (rappAar-3):(rappAar-2)
 
-RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
+RyggData <- RyggRegDataV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 RegData <- RyggUtvalgEnh(RegData=RegData, datoTil=datoTil)$RegData
 Ntot07 <- dim(RegData)[1]
@@ -218,7 +218,7 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 library(rygg)
 library(magrittr)
 setwd('/home/rstudio/Aarsrappresultater/NETTsider/')
-RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+RyggData <- RyggPreprosess(RegData = RyggRegDataV2V3())
 valgteAar <- 2011:2024
 #Ønsker å vise alle data
 RyggData <- RyggUtvalgEnh(RegData=RyggData, datoFra = '2011-01-01')$RegData
@@ -399,7 +399,7 @@ write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
 #---- R Y G G
 
 RyggData <- RyggPreprosess(
-  RegData=RyggRegDataSQLV2V3())
+  RegData=RyggRegDataV2V3())
 RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
 
 FornoydData <- RyggVarTilrettelegg(RegData = RyggData1aar,

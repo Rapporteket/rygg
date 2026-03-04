@@ -19,7 +19,7 @@ RegData <- RyggPreprosess(RegData =RegDataV3)
 RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
                                      query='SELECT * FROM allevarnum')
 
-RegData <- RyggRegDataSQLV2V3(datoFra = '2023-01-01')
+RegData <- RyggRegDataV2V3(datoFra = '2023-01-01')
 RegData <- RyggPreprosess(RegData = RegData)
 
 RyggFigAndelerGrVar(RegData=RegData,  valgtVar='degSponFusj1op',
@@ -30,13 +30,13 @@ remotes::install_github('Rapporteket/rapbase', ref = 'main')
 # Generelt: mce.PATIENT_ID kobles til patient.ID
 
 
-test <- RyggRegDataSQLV2V3(datoFra = '2000-01-01')
+test <- RyggRegDataV2V3(datoFra = '2000-01-01')
 
 liste <- unique(test[,c('SykehusNavn', 'AvdRESH')])
 liste[order(liste$SykehusNavn),]
 table(liste$SykehusNavn)
 
-RyggData <- RyggPreprosess(RyggRegDataSQLV2V3(datoFra = '2000-01-01'))
+RyggData <- RyggPreprosess(RyggRegDataV2V3(datoFra = '2000-01-01'))
 test <- RyggData[,c("DodsDato", "InnDato", "PasientID", "ASA", "Alder")]
 
 reshID <- 110633

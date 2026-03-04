@@ -20,7 +20,7 @@ aar2_12mnd <- aar2-1
 tidlAar <- rappAar-1
 tidlAar2 <- (rappAar-3):(rappAar-2)
 
-RyggData <- RyggRegDataSQLV2V3(datoFra = '2007-01-01', alleVarV3 = 0)
+RyggData <- RyggRegDataV2V3(datoFra = '2007-01-01', alleVarV3 = 0)
 #ReshSh <- unique(RyggData[,c('SykehusNavn', 'AvdRESH')])
 #ReshSh <- unique(ReshSh[order(ReshSh$SykehusNavn), ])
 #Lagt til i preprosseser:
@@ -178,7 +178,7 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 RyggData <- RegData
 RyggData1aar <- RegData1aar
 RyggData <- RyggPreprosess(
-  RegData=RyggRegDataSQLV2V3())
+  RegData=RyggRegDataV2V3())
 RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
 
 FornoydData <- RyggVarTilrettelegg(RegData = RyggData1aar,
@@ -377,7 +377,7 @@ library(rygg)
 library(magrittr)
 setwd('../../rygg')
 source("dev/sysSetenv.R")
-RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2019-01-01'))
+RyggData <- RyggPreprosess(RegData = RyggRegDataV2V3(datoFra = '2019-01-01'))
 valgteAar <- 2011:2025
 #Ønsker å vise alle data
 RyggData <- RyggUtvalgEnh(RegData=RyggData, datoFra = '2011-01-01')$RegData

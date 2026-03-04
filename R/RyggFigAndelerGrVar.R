@@ -106,7 +106,7 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
   } else {
 
     if (hentData == 1) {
-      RegData <- RyggRegDataSQLV2V3()  #RyggRegDataSQL()
+      RegData <- RyggRegDataV2V3()  #RyggRegDataSQL()
     }
 
     # Preprosessere data

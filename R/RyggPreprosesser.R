@@ -1,4 +1,12 @@
 
+#' Justere V2-data
+#'
+#' @param RegDataV2
+#'
+#' @return dataramme med tilpassede V2-data
+#' @export
+#'
+
 tilpassV2data <- function(RegDataV2){
 
   #--------- Arbstatus3mnd OG Arbstatus12mnd V2:
@@ -69,11 +77,8 @@ tilpassV2data <- function(RegDataV2){
                              Bydelsnavn = Bydelsted,
                              KommuneNr = Kommunenr, #Kommunenavn ikke med i V2
                              KpInfDyp12mnd = KpInfDyp12Mnd,
-                             # ForlopsID = MCEID,
-                             #PIDV2 = PID, #Heter PasientID i V3. NB: Må ikke slås sammen.
                              PasientID = PATIENT_ID,
                              RokerV2 = Roker,
-                             #Region = HelseRegion #Navn må evt. mappes om i ettertid. Private bare i V2.
                              SykehusNavn = AvdNavn,
                              Status3mnd = Utfylt3Mnd,
                              Status12mnd = Utfylt12Mnd,
@@ -85,6 +90,84 @@ tilpassV2data <- function(RegDataV2){
   RegDataV2$SivilStatusV3 <- plyr::mapvalues(as.numeric(RegDataV2$SivilStatus),
                                              from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
 }
+
+
+
+
+#' Justere V3-data
+#'
+#' @param RegDataV3
+#'
+#' @return dataramme med tilpassede V3-data
+#' @export
+#'
+tilpassV3data <- function(RegDataV3){
+  #-----Tilrettelegg V3-data-------------------------
+
+
+  #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
+  RegDataV3[which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31'),
+            c('KpInfOverfla3mnd', 'indIkkeSaarInf', 'KpInfDyp3mnd', 'KpInfDyp12mnd')] <- NA
+
+
+  #Ønsker tom for manglende
+  RegDataV3$SmBePre[RegDataV3$SmBePre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
+  RegDataV3$SmRyPre[RegDataV3$SmRyPre == 99] <- NA #99: Ikke utfylt i V3, NA i V2
+
+  #Ny ARBEIDSSTATUS-variabel, basert på V2 og V3:
+  #Arbstatus3mndV3 - for verdi 11, 99 eller NA hvor sykemeldingsgrad angitt: verdien 7.
+  RegDataV3$Arbstatus3mndV3[which(RegDataV3$Arbstatus3mndV3 %in% c(11,99))] <- NA
+  ind7_3mnd <- which(is.na(RegDataV3$Arbstatus3mndV3) & RegDataV3$SykemeldPros3mnd > 0) #17 per 1.mars 2024
+  RegDataV3$Arbstatus3mndV3[ind7_3mnd] <- 7
+
+  RegDataV3$Arbstatus12mndV3[which(RegDataV3$Arbstatus12mndV3 %in% c(10,99))] <- NA
+  ind7_12mnd <- which( is.na(RegDataV3$Arbstatus12mndV3) & RegDataV3$SykemeldPros12mnd>0) #6 per 1.mars 2024
+  RegDataV3$Arbstatus12mndV3[ind7_12mnd] <- 7
+
+  # 1: I arbeid - V3- 1+2
+  RegDataV3$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV3$ArbstatusPreV3, from = c(2, 99), to = c(1, NA))
+  RegDataV3$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus3mndV3, from = 2, to = 1)
+  RegDataV3$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus12mndV3, from = 2, to = 1)
+
+  # RegDataV3 <- RegDataV3[ , -which(names(RegDataV3) %in%
+  #                                    c('ArbstatusPreV3', 'Arbstatus3mndV3', 'Arbstatus12mndV3'))]
+  RegDataV3 <- dplyr::mutate(RegDataV3,
+                      ArbstatusPreV3 = NULL, Arbstatus3mndV3=NULL, Arbstatus12mndV3=NULL)
+
+  #Legge til underkategori for hovedkategori.
+  RegDataV3 <- kategoriserInngrep(RegData=RegDataV3)$RegData
+
+  #Definasjon av diagnosegrupper prolaps og spinal stenose
+  RegDataV3 <- defProSS(RegDataV3)
+
+  RegDataV3$Kp3Mnd <- NULL
+  RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd',
+                                         'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')],
+                           na.rm = T) > 0] <- 1
+  RegDataV3$KpInf3Mnd <- NULL
+  RegDataV3$KpInf3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd')], na.rm = T) > 0] <- 1
+
+
+  #TidlOp. V2: 1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
+  #TidlIkkeOp, TidlOpAnnetNiv, TidlOpsammeNiv
+  RegDataV3$TidlOpr <- ifelse(RegDataV3$TidlIkkeOp==1, 4, 9)
+  RegDataV3$TidlOpr[RegDataV3$TidlOpsammeNiv==1] <- 1
+  RegDataV3$TidlOpr[RegDataV3$TidlOpAnnetNiv==1] <- 2
+  RegDataV3$TidlOpr[RegDataV3$TidlOpsammeNiv==1 & RegDataV3$TidlOpAnnetNiv==1] <- 3
+
+  RegDataV3$OpMikro <- plyr::mapvalues(RegDataV3$OpMikroV3,
+                                       from = c(0,1,2,3,9), to = c(0,1,1,1,0))
+  RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3,
+                                             from = c(0,1,2,3,9), to = c(0,0,0,1,0))
+
+  RegDataV3$ForstLukketLege <- as.character(as.Date(RegDataV3$ForstLukketLege))
+  #Kobling med NA fungerer ikke for datotid-var
+
+  RegDataV3$Versjon <- 'V3'
+
+return(RegDataV3)
+}
+
 
 
 #' Preprosesser data fra Degenerativ Rygg

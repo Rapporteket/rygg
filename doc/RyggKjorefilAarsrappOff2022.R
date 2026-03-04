@@ -21,7 +21,7 @@ Ngrense <- 20
 AKjust <- 0
 ktr <- 2
 
-RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
+RyggData <- RyggRegDataV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 Ntot07 <- dim(RegData)[1]
 
@@ -193,7 +193,7 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 library(rygg)
 library(magrittr)
 setwd('/home/rstudio/Aarsrappresultater/NETTsider/')
-RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+RyggData <- RyggPreprosess(RegData = RyggRegDataV2V3())
 rappAar <- 2023
 valgteAar <- 2011:rappAar
 #Viktig å angi valgte år siden vi
@@ -349,7 +349,7 @@ write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
 #---- R Y G G
 
 RyggData <- RyggPreprosess(
-  RegData=RyggRegDataSQLV2V3())
+  RegData=RyggRegDataV2V3())
 RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, datoFra = datoFra1aar, datoTil = datoTil)$RegData
 Dum <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
 

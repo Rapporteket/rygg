@@ -21,7 +21,7 @@ Ngrense <- 20
 AKjust <- 0
 ktr <- 2
 
-RyggData <- RyggRegDataSQLV2V3(alleVarV3 = 0)
+RyggData <- RyggRegDataV2V3(alleVarV3 = 0)
 RegData <- RyggPreprosess(RegData=RyggData)
 Ntot07 <- dim(RegData)[1]
 
@@ -182,7 +182,7 @@ RyggFigAndelTid(RegData=RegData, valgtVar='ventetidSpesOp', outfile='VentetidSpe
 library(rygg)
 library(magrittr)
 setwd('/home/rstudio/speil/aarsrapp/')
-RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+RyggData <- RyggPreprosess(RegData = RyggRegDataV2V3())
 rappAar <- 2021
 valgteAar <- 2011:rappAar
 #Viktig å angi valgte år siden vi
@@ -301,7 +301,7 @@ write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
 #---- R Y G G
 
 RyggData <- RyggPreprosess(
-  RegData=RyggRegDataSQLV2V3())
+  RegData=RyggRegDataV2V3())
 RyggData <- RyggUtvalgEnh(RegData = RyggData, datoFra = '2019-01-01', datoTil = '2019-12-31')$RegData
 Dum <- RyggUtvalgEnh(RegData = RyggData, aar=2019)$RegData
 

@@ -536,7 +536,7 @@ server_rygg <- function(input, output, session) {
   rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
   dataRegistry <- 'data'
-  RegData <- RyggRegDataSQLV2V3(datoFra = '2000-01-01')
+  RegData <- RyggRegDataV2V3(datoFra = '2000-01-01')
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 

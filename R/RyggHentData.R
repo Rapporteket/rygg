@@ -14,12 +14,13 @@ hentDataV2 <- function(){
   V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
   V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
   MCEtab <- rapbase::loadRegData(registryName = 'data',
-                                 query='SELECT * FROM mce')
+                                 query='SELECT * FROM mce
+                                 WHERE MCETYPE = 9 ')
   dodsdato <- rapbase::loadRegData(registryName = 'data',
                                    query='SELECT DECEASED_DATE as DodsDato,
                                    DECEASED as DodPasient,
                                    ID as PATIENT_ID FROM patient')
-  RegDataV2 <- merge(V2, MCEtab[,c("MCEID", "PATIENT_ID")], by = 'MCEID' )
+  RegDataV2 <- merge(V2, MCEtab[,c("MCEID", "PATIENT_ID", "MCETYPE")], by = 'MCEID' )
   RegDataV2 <- merge(RegDataV2, dodsdato, by = 'PATIENT_ID')
 }
 
@@ -75,12 +76,21 @@ mappingEgneNavn <- function(tabell, tabType) {
 #'
 #' @export
 
-hentDataTabell <- function(tabellnavn = "surgeonform",
+hentDataTabellV3 <- function(tabellnavn = "surgeonform",
                            qVar = '*',
+                           datoFra = '2019-01-01',
+                           datoTil = Sys.Date(),
                            egneVarNavn = 1) { #  status = 1
 
   tabType <- toupper(tabellnavn)
   query <- paste0("SELECT ", qVar, " FROM ", tabellnavn)
+
+  if (tabellnavn == 'surgeonform'){
+    query <- paste0(query,
+                    ' WHERE OPERASJONSDATO >= \'', datoFra,
+                    '\' AND OPERASJONSDATO <= \'', datoTil, '\' ')
+  }
+
 
   if (tabellnavn == 'patientfollowup3') {
     query <- paste0("SELECT ", qVar, ' FROM patientfollowup
@@ -122,7 +132,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
   qmce <- 'CENTREID AS ReshId, CREATEDBY, MCEID, PATIENT_ID AS PasientID,
              sendtSMS12mnd, sendtSMS3mnd, TSCREATED, TSUPDATED'
 
-  mceSkjema <- hentDataTabell(tabellnavn = "mce",
+  mceSkjema <- hentDataTabellV3(tabellnavn = "mce",
                               qVar = qmce,
                               egneVarNavn = 0) #Ingen selvvalgte navn
 
@@ -138,22 +148,23 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
              TSCREATED,
              TSUPDATED'
 
-  PasInfoSkjema <- hentDataTabell(tabellnavn = "patient",
+  PasInfoSkjema <- hentDataTabellV3(tabellnavn = "patient",
                                   qVar = qPas,
                                   egneVarNavn = 0)
   #Legeskjema
-  LegeSkjema <- hentDataTabell(tabellnavn = "surgeonform",
+  LegeSkjema <- hentDataTabellV3(tabellnavn = "surgeonform",
                                qVar = '*',
+                               datoFra = datoFra, datoTil = datoTil,
                                egneVarNavn = 1)
   LegeSkjema <- dplyr::rename(LegeSkjema,
                               'ForstLukketLege' = 'FIRST_TIME_CLOSED')
   #Pasientens spørreskjema
-  PasSkjema <- hentDataTabell(tabellnavn = "patientform",
+  PasSkjema <- hentDataTabellV3(tabellnavn = "patientform",
                               qVar = '*',
                               egneVarNavn = 1)
 
   #Sykehusnavn
-  EnhetsNavn <- hentDataTabell(tabellnavn = "centreattribute",
+  EnhetsNavn <- hentDataTabellV3(tabellnavn = "centreattribute",
                                qVar = 'ID, ATTRIBUTEVALUE as SykehusNavn')
 
   # SAMMENSTILL SKJEMA:
@@ -180,11 +191,11 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   if (medOppf == 1) {
     #Oppfølging, 3 mnd
-    Oppf3Skjema <- hentDataTabell(tabellnavn = "patientfollowup3",
+    Oppf3Skjema <- hentDataTabellV3(tabellnavn = "patientfollowup3",
                                   qVar = '*',
                                   egneVarNavn = 1)
     #Oppfølging, 12 mnd
-    Oppf12Skjema <- hentDataTabell(tabellnavn = "patientfollowup12",
+    Oppf12Skjema <- hentDataTabellV3(tabellnavn = "patientfollowup12",
                                    qVar = '*',
                                    egneVarNavn = 1)
 

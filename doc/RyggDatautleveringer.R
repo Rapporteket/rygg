@@ -110,7 +110,7 @@ varTilUtlev <- c(
   'RokerV3'
 )
 
-AlleData <- RyggPreprosess(RyggRegDataSQLV2V3(alleVarV2 = 1))
+AlleData <- RyggPreprosess(RyggRegDataV2V3(alleVarV2 = 1))
 setdiff(varTilUtlev, names(AlleData))
 setdiff(koblingsPID$PID, sort(unique(AlleData$PID)))
 setdiff(koblingsPID$koblKode, dataDump$koblKode)
