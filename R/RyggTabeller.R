@@ -190,16 +190,18 @@ tabPasMdblReg <- function(RegData, datoFra = '2019-03-01', tidsavvik=30){
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra)$RegData
 
   FlereReg <- RegData %>% dplyr::group_by(PasientID) %>%
-    dplyr::summarise(N = length(PasientID), #n(),
-                     KortTid = ifelse(N>1,
-                                      ifelse(difftime(InnDato[order(InnDato)][2:N], InnDato[order(InnDato)][1:(N-1)], units = 'days') <= tidsavvik,
-                                             1, 0), 0),
-                     PasientID = PasientID[1]
+    dplyr::summarise(
+      N = length(PasientID), #n(),
+      KortTid = ifelse(N>1,
+                       ifelse(difftime(InnDato[order(InnDato)][2:N],
+                                       InnDato[order(InnDato)][1:(N-1)], units = 'days') <= tidsavvik,
+                              1, 0), 0),
+      PasientID = PasientID[1]
     )
 
   PasMdbl <- FlereReg$PasientID[which(FlereReg$KortTid == 1)]
   TabDbl <- RegData[which(RegData$PasientID %in% PasMdbl),
-                    c("PasientID", "InnDato", "ShNavn", "ReshId", "ForlopsID")] #, 'SkjemaGUID'
+                    c("PasientID", "InnDato", "ShNavn", "ReshId", "MCEID")]
   TabDbl <- TabDbl[order(TabDbl$InnDato), ]
   N <- dim(TabDbl)[1]
 

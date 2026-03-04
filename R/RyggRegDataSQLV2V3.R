@@ -39,6 +39,8 @@ RyggRegDataSQLV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
   #                    RegDataV3Forl, by='ForlopsID',
   #                    all.x = TRUE, all.y = FALSE)
 
+ RegDataV3 <- RegDataV3[ , -which(names(RegDataV3) %in%
+                      c('ArbstatusPreV3', 'Arbstatus3mndV3', 'Arbstatus12mndV3'))]
 
 
     #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.

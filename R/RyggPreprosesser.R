@@ -15,6 +15,8 @@ tilpassV2data <- function(RegDataV2){
   RegDataV2$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus3mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
   RegDataV2$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus12mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
 
+  RegDataV2 <- RegDataV2[ , -which(names(RegDataV2) %in%
+                                     c('ArbstatusPre', 'Arbstatus3mnd', 'Arbstatus12mnd'))]
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
   RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),

@@ -89,7 +89,7 @@ hentDataTabell <- function(tabellnavn = "surgeonform",
   }
 
   if (tabellnavn == 'patientfollowup12') {
-    query <- query <- paste0("SELECT ", qVar, ' FROM patientfollowup
+    query <- paste0("SELECT ", qVar, ' FROM patientfollowup
                               WHERE CONTROL_TYPE = 12')}
 
   tabell <- rapbase::loadRegData(registryName = "data",
@@ -173,7 +173,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
                    "KryptertFnr")
   fjernes <- c('MceType', 'DodsDato')
 
-  RegData <- RegDataV3[ ,-which(names(RegData) %in% c(krypterteV3, fjernes))]
+  RegData <- RegData[ ,-which(names(RegData) %in% c(krypterteV3, fjernes))]
 
 
 
@@ -215,17 +215,17 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
     ePROM12mnd <- ePROMadmTab[intersect(ind12mnd, which(ePROMadmTab$STATUS==3)), ePROMvar]
     names(ePROM12mnd) <- paste0(ePROMvar, '12mnd')
 
-    indIkkeEprom3mnd <-  which(!(RegDataV3$MCEID %in% ePROMadmTab$MCEID[ind3mnd]))
-    indIkkeEprom12mnd <-  which(!(RegDataV3$MCEID %in% ePROMadmTab$MCEID[ind12mnd]))
-    RegDataV3$Ferdig1b3mndGML <- RegDataV3$Status3mnd
-    RegDataV3$Status3mnd <- 0
-    RegDataV3$Status3mnd[RegDataV3$MCEID %in% ePROM3mnd$MCEID] <- 1
-    RegDataV3$Status3mnd[intersect(which(RegDataV3$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
+    indIkkeEprom3mnd <-  which(!(RegData$MCEID %in% ePROMadmTab$MCEID[ind3mnd]))
+    indIkkeEprom12mnd <-  which(!(RegData$MCEID %in% ePROMadmTab$MCEID[ind12mnd]))
+    RegData$Ferdig1b3mndGML <- RegData$Status3mnd
+    RegData$Status3mnd <- 0
+    RegData$Status3mnd[RegData$MCEID %in% ePROM3mnd$MCEID] <- 1
+    RegData$Status3mnd[intersect(which(RegData$Ferdig1b3mndGML ==1), indIkkeEprom3mnd)] <- 1
 
-    RegDataV3$Status12mndGML <- RegDataV3$Status12mnd
-    RegDataV3$Status12mnd <- 0
-    RegDataV3$Status12mnd[RegDataV3$MCEID %in% ePROM12mnd$MCEID] <- 1
-    RegDataV3$Status12mnd[intersect(which(RegDataV3$Status12mndGML ==1), indIkkeEprom12mnd)] <- 1
+    RegData$Status12mndGML <- RegData$Status12mnd
+    RegData$Status12mnd <- 0
+    RegData$Status12mnd[RegData$MCEID %in% ePROM12mnd$MCEID] <- 1
+    RegData$Status12mnd[intersect(which(RegData$Status12mndGML ==1), indIkkeEprom12mnd)] <- 1
      }
 
   return(invisible(RegData))
