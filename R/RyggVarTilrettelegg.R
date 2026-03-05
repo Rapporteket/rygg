@@ -168,8 +168,8 @@ valgtVarTest <- valgtVar
                                         '2'= RegData$Arbstatus12mndV2V3) #Arbstatus12mndV3
             ind <- switch(as.character(ktr),
                           '0' = 1:dim(RegData)[1],
-                          '1' = which(RegData$Ferdigstilt1b3mnd==1),
-                          '2' = which(RegData$Ferdigstilt1b12mnd == 1))
+                          '1' = which(RegData$Status3mnd==1),
+                          '2' = which(RegData$Status12mnd == 1))
             RegData <- RegData[ind, ]
             retn <- 'H'
             grtxt <- c("I arbeid", "Student/skoleelev",
@@ -217,7 +217,8 @@ valgtVarTest <- valgtVar
             }}
 
       if (valgtVar == 'degSponFusj') { #AndelGrVar, AndelTid
-        hovedkat=10 #Degen. spondylolistese
+        #Degen. spondylolistese:
+        hovedkat <- 10
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
         RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
         varTxt <- 'tilfeller'
@@ -233,7 +234,7 @@ valgtVarTest <- valgtVar
         # med fusjonskirurgi ved første operasjon
         #hovedkat=10 #Degen. spondylolistese
         #RegData <- finnReoperasjoner(RegData = RegData)
-        hovedkat=10 #Degen. spondylolistese
+        hovedkat <- 10 #Degen. spondylolistese
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
         RegData <- RegData[which(RegData$TidlOpr == 4), ]
         RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1 # & RegData$TidlOpr == 4
@@ -252,29 +253,29 @@ valgtVarTest <- valgtVar
       }
 
       if (valgtVar == 'EQ5DPre') {#ford gjsnPre (gjsnBox)
-            RegData <- RegData[which(RegData$EQ5DV3Pre > -0.6),]
+            RegData <- RegData[which(RegData$EQ5DPreV3 > -0.6),]
             gr <- c(-0.6, seq(-0.2, 0.9, 0.1), 1)
             #gr <- c(0,seq(20,90,10),150)
-            RegData$VariabelGr <- cut(round(RegData$EQ5DV3Pre,3), breaks=gr, include.lowest=TRUE, right=FALSE)
+            RegData$VariabelGr <- cut(round(RegData$EQ5DPreV3,3), breaks=gr, include.lowest=TRUE, right=FALSE)
             #grtxt <- c('0-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90+')
             grtxt <- levels(RegData$VariabelGr)
             #grtxt <- c(levels(RegData$VariabelGr)[-length(gr)], '90+')
             tittel <- 'EQ5D før operasjon'
             if (figurtype %in% c('gjsnBox', 'gjsnGrVar')){
                tittel <- 'EQ5D før operasjonen'}
-            RegData$Variabel <- RegData$EQ5DV3Pre
+            RegData$Variabel <- RegData$EQ5DPreV3
             KIekstrem <- c(-0.6, 1)
       }
 
       if (valgtVar %in% c('EQ5DEndr', 'EQ5DEndr3mnd', 'EQ5DEndr12mnd')) {#gjsnPre (gjsnBox)
             tittel <- paste0('forbedring av EQ5D', ktrtxt)
             RegData$Variabel <- switch(as.character(ktr),
-                                       '1'= (RegData$EQ5DV33mnd - RegData$EQ5DV3Pre),
-                                       '2'= (RegData$EQ5D12V3mnd - RegData$EQ5DV3Pre))
+                                       '1'= (RegData$EQ5D3mndV3 - RegData$EQ5DPreV3),
+                                       '2'= (RegData$EQ5D12V3mnd - RegData$EQ5DPreV3))
             RegData <- RegData[which(!is.na(RegData$Variabel)),]
             Xlab <- 'EQ5D før operasjon'
             gr <- c(round(seq(-0.6,0.8,0.2),1),1.6)	#round(seq(-0.6,1.6,0.3),1)}
-            RegData$Gr <- cut(RegData$EQ5DV3Pre, gr, right=F)
+            RegData$Gr <- cut(RegData$EQ5DPreV3, gr, right=F)
             GrNavn <- levels(RegData$Gr)
             AntGr <- length(GrNavn)
             GrNavn[AntGr] <- '0.8+'
@@ -284,13 +285,13 @@ valgtVarTest <- valgtVar
       if (valgtVar == 'EQangstPre') {#fordeling
          tittel <- 'Problemer med angst/depresjon'
          grtxt <- c('Ingen', 'Litt','Middels', 'Svært','Ekstremt', 'Ikke utfylt')
-         RegData$VariabelGr <- factor(RegData$EqangstV3Pre, levels = c(1:5,9))
+         RegData$VariabelGr <- factor(RegData$EqAngstV3Pre, levels = c(1:5,9))
          subtxt <- 'Grad av engstelighet/deprimerthet'	#Tilstand i forhold til angst'
       }
       if (valgtVar == 'EQgangePre') { #fordeling
          tittel <- 'Problemer med gangfunksjon før operasjon'
          grtxt <- c('Ingen', 'Litt','Middels', 'Store', 'Ute av stand til å gå', 'Ikke utfylt')
-         RegData$VariabelGr <- factor(RegData$EqgangeV3Pre, levels = c(1:5,9))
+         RegData$VariabelGr <- factor(RegData$EqGangePreV3, levels = c(1:5,9))
          subtxt <- 'problemer med gange'
       }
       if (valgtVar == 'erstatningPre') { #fordeling, AndelGrVar, #AndelTid
@@ -402,7 +403,7 @@ valgtVarTest <- valgtVar
                     'Urinveisinfeksjon', 'Pneumoni', #'Problem, vannlatning/avføring',
                     'Transf./opr. pga. blødning', 'DVT','Lungeemboli', 'Postop. kompl. totalt') #'Tot. komplikasjoner'
          #Andel kun av de som har svart på 3 mnd ktr:
-         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
+         RegData <- RegData[which(RegData$Status3mnd==1), ]
          indNA <- which(rowSums(is.na(RegData[ ,variable])) == length(variable))
          if (length(indNA)>0){ #Fjerner rader hvor alle Kp-variabler er NA
            RegData <- RegData[-indNA, ] }
@@ -410,7 +411,7 @@ valgtVarTest <- valgtVar
 
       if (valgtVar == 'kp3mnd') { #AndelGrVar
          #Komplikasjoner 0:nei, 1:ja
-         #ind <- which(RegData$Ferdigstilt1b3mnd==1)
+         #ind <- which(RegData$Status3mnd==1)
          #RegData <- RegData[ind, ]
         variable <- c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd', #'KpMiktProb3mnd',
                        'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')
@@ -425,7 +426,7 @@ valgtVarTest <- valgtVar
       if (valgtVar == 'kpInf3mnd') { #AndelGrVar, AndelTid
          #Komplikasjoner 0:nei, 1:ja
         #Antar at de som ikke har fylt ut ikke har hatt infeksjon
-         RegData <- RegData[which(RegData$Ferdigstilt1b3mnd==1), ]
+         RegData <- RegData[which(RegData$Status3mnd==1), ]
          RegData$Variabel[rowSums(RegData[ ,c('KpInfOverfla3mnd', 'KpInfDyp3mnd')], na.rm = T) > 0] <- 1
          indIkkeSaarInf <- which(RegData$OpDato >= '2019-01-01' & RegData$OpDato <= '2021-12-31')
          RegData$Variabel[indIkkeSaarInf] <- NA
@@ -441,8 +442,8 @@ valgtVarTest <- valgtVar
         #Lena: Tilpass ktr
         #Komplikasjoner 0:nei, 1:ja
         ind <- switch(as.character(ktr),
-                      '1' = which(RegData$Ferdigstilt1b3mnd==1),
-                      '2' = which(RegData$Ferdigstilt1b12mnd == 1))
+                      '1' = which(RegData$Status3mnd==1),
+                      '2' = which(RegData$Status12mnd == 1))
         RegData <- RegData[ind, ]
         RegData$Variabel[RegData$KpInfOverfla3mnd==1] <- 1
         indIkkeSaarInf <- which(RegData$OpDato >= '2019-01-01' & RegData$OpDato <= '2021-12-31')
@@ -481,12 +482,12 @@ valgtVarTest <- valgtVar
          #For opphold registrert som dagkirurgi uten at liggedogn er reg., settes liggedogn=0
          tittel <- 'Liggetid etter operasjon'
          RegData <- RegData[which(RegData$OpDato >= '2019-01-01'), ]
-         dagind <- which( (is.na(RegData$LiggetidPostOp) | is.nan(RegData$LiggetidPostOp))  & RegData$Dagkirurgi==1)
-         RegData$LiggetidPostOp[dagind]<-0
-         RegData <- RegData[which(RegData$LiggetidPostOp>=0),]
-         RegData$Variabel <- RegData$LiggetidPostOp #gjsnGrVar
+         dagind <- which( (is.na(RegData$LiggetidPostop) | is.nan(RegData$LiggetidPostop))  & RegData$Dagkirurgi==1)
+         RegData$LiggetidPostop[dagind]<-0
+         RegData <- RegData[which(RegData$LiggetidPostop>=0),]
+         RegData$Variabel <- RegData$LiggetidPostop #gjsnGrVar
          gr <- c(0:7,100)
-         RegData$VariabelGr <- cut(RegData$LiggetidPostOp, breaks=gr, include.lowest=TRUE, right=FALSE)
+         RegData$VariabelGr <- cut(RegData$LiggetidPostop, breaks=gr, include.lowest=TRUE, right=FALSE)
          grtxt <- c(0:6, '7+')
          xAkseTxt <- 'Antall liggedøgn' #(subtxt
          subtxt <- 'døgn'
@@ -560,12 +561,12 @@ valgtVarTest <- valgtVar
 
       if (valgtVar %in% c('oppf3mnd', 'oppf12mnd', 'oppf3og12mnd')) { #AndelGrVar
         #Oppfølgingsskjema.
-        #"Ferdig1a", "Ferdig2a", "Ferdigstilt1b12mnd", "Ferdigstilt1b3mnd"
+        #"StatusPasSkjema", "StatusLegeSkjema", "Status12mnd", "Status3mnd"
         datoTil <- min(datoTil, Sys.Date()-trekkfraDager)
         ind <- switch(valgtVar,
-                      oppf3mnd = which(RegData$Ferdigstilt1b3mnd==1),
-                      oppf12mnd = which(RegData$Ferdigstilt1b12mnd==1),
-                      oppf3og12mnd = which(RegData$Ferdigstilt1b3mnd==1 & RegData$Ferdigstilt1b12mnd==1 ))
+                      oppf3mnd = which(RegData$Status3mnd==1),
+                      oppf12mnd = which(RegData$Status12mnd==1),
+                      oppf3og12mnd = which(RegData$Status3mnd==1 & RegData$Status12mnd==1 ))
 
         RegData$Variabel[ind] <- 1
 

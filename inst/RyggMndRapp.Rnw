@@ -36,7 +36,7 @@ datoFra6mnd <- paste0(substr(as.character(dato %m-% months(6, abbreviate=FALSE))
 datoFraMnd <- format(datoTil, "%Y-%m-01")
 
 # if (!exists('RegData')){
-      RegData <- RyggRegDataSQLV2V3(datoFra = datoFra) #, datoTil = datoTil)
+      RegData <- RyggRegDataV2V3(datoFra = datoFra) #, datoTil = datoTil)
       RegData <- RyggPreprosess(RegData=RegData)
 #}
 

@@ -1,9 +1,9 @@
 
-RyggDataRaaAlle <- RyggRegDataSQLV2V3()
+RyggDataRaaAlle <- RyggRegDataV2V3()
 RyggData <- RyggPreprosess(RegData = RyggDataRaa)
 
 
-V3 <- RyggRegDataSQLV2V3(datoFra = '2020-01-01')
+V3 <- RyggRegDataV2V3(datoFra = '2020-01-01')
 head(V3$PasientID)
 V3[1:10,c('PasientID', 'PID')]
 test <- unique(V2oper[,c("MCEID", 'OpDato')])
@@ -14,16 +14,16 @@ begge <- intersect(V2pas$MCEID, V3$PasientID)
 V2pas[V2pas$MCEID==begge[1],]
 V3[V3$PasientID==begge[1],]
 
-# 'AvDodDato' ='DodsDato'
-varDod <- c('AvDodDato','DodsDato')
+# 'DodsDato' ='DodsDato'
+varDod <- c('DodsDato','DodsDato')
 RyggDataRaa[,varDod]
 RyggDataRaa$InnDato <- as.Date(RyggDataRaa$OpDato, format="%Y-%m-%d") #, tz='UTC')
-RyggDataRaa$Dod30[which(as.numeric(as.Date(RyggDataRaa$AvdodDato) - as.Date(RyggDataRaa$InnDato)) < 30)] <- 1
+RyggDataRaa$Dod30[which(as.numeric(as.Date(RyggDataRaa$DodsDato) - as.Date(RyggDataRaa$InnDato)) < 30)] <- 1
 table(RyggData$Dod365)
 
 
 library(rygg)
-RyggData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+RyggData <- RyggPreprosess(RegData = RyggRegDataV2V3())
 test <- unique(RyggData[,c("ReshId", "ShNavn")])
 table(test$ReshId)[table(test$ReshId)>1]
 table(test$ShNavn)[table(test$ShNavn)>1]
@@ -40,7 +40,7 @@ KImaalGrenser <- c(0,50,80,100)
 
 valgtVar <- 'smBePreLav'
 KImaalGrenser <- c(0,3,100)
-RyggData <- RyggPreprosess(RyggRegDataSQLV2V3())
+RyggData <- RyggPreprosess(RyggRegDataV2V3())
 RyggVarSpes <- RyggVarTilrettelegg(RegData=RyggData, valgtVar=valgtVar,
                                    figurtype = 'andelGrVar')
 grVar <- 'ShNavn'
@@ -166,7 +166,7 @@ write.csv2(InnholdSpesTrombProfyl, file = 'Frekv_SpesTrombProfyl.csv', row.names
 #Sjekk
 library(rygg)
 library(magrittr)
-RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3())
+RegData <- RyggPreprosess(RegData = RyggRegDataV2V3())
 forsinketReg(RegData=RegData, fraDato=Sys.Date()-400,
              tilDato=Sys.Date()-100, forsinkelse=100, reshID=601161)
 
@@ -186,7 +186,7 @@ tab[tab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'P
 
 #----Sjekk av utfyltdato----
 setwd('/home/rstudio/speil/aarsrapp/Rygg')
-RegData <- RyggPreprosess(RegData = RyggRegDataSQLV2V3(datoFra = '2010-01-01'))
+RegData <- RyggPreprosess(RegData = RyggRegDataV2V3(datoFra = '2010-01-01'))
 RegData$Diff3 <- as.integer(difftime(RegData$Utfdato3mnd, RegData$InnDato, units = 'days'))
 RegData$Diff12 <- as.integer(difftime(RegData$Utfdato12mnd, RegData$InnDato, units = 'days'))
 
@@ -239,7 +239,7 @@ load(file=paste0(fil, '.Rdata'))
 #RegData <- RegData[sample(1:dim(RegData)[1],10000), ]
 load('A:/Rygg/RyggData.RData')
 
-RegData <- RyggRegDataSQLV2V3()
+RegData <- RyggRegDataV2V3()
 
 
 #--------------Kompletthet---------------------------
@@ -249,7 +249,7 @@ RegData <- RyggRegDataSQLV2V3()
 RyggDataRaa <- read.table('C:/Registerdata/Rygg/RyggdataDump2022-12-09fra2018.csv',
                       sep=';', header=T, encoding = 'latin1', dec = ',')
 #RyggDataRaa <- RyggDataRaa[-which(RyggDataRaa$ForlopsID == 8274),]
-RyggDataRaa <- RyggRegDataSQLV2V3(datoFra = '2021-01-01', datoTil = '2021-12-31')
+RyggDataRaa <- RyggRegDataV2V3(datoFra = '2021-01-01', datoTil = '2021-12-31')
 RyggData <- RyggPreprosess(RyggDataRaa)
 
 Variabler <- c('AntibiotikaV3',	'ASA',	'TidlOpr',	'OpKat',	'BMI',	'SympVarighUtstr',
@@ -323,7 +323,7 @@ valgtVar <- 'regForsinkelse'
 
 # RegData <- read.table('A:/Rygg/allevarnum2019-08-12.csv',
 #                       sep=';', header=T, encoding = 'UTF-8')
-RegData <- RyggRegDataSQLV2V3()
+RegData <- RyggRegDataV2V3()
 test <- RyggFigAndeler(RegData=RegData)  #, valgtVar=valgtVar, enhetsUtvalg = 1, reshID = reshID) #, outfile='test.pdf')
 utdata <- RyggFigAndelerGrVar(RegData=RegData) #, valgtVar=valgtVar,outfile=outfile)
 utdata <- RyggFigAndelTid(RegData=RegData, valgtVar='roker', tidsenhet = 'Aar') #, outfile=outfile
@@ -413,7 +413,7 @@ for (valgtVar in variable) {
  #----------------------------------------------------------
  #------- Endring i effektmål som funksjon av tid eller prescore
  library(rygg)
- RegData <- RyggRegDataSQLV2V3()
+ RegData <- RyggRegDataV2V3()
 
  RyggFigGjsnGrVar(RegData=RegData, outfile='', valgtVar='OswTotPre')
  #, tidlOp=tidlOp, erMann=erMann,
@@ -441,7 +441,7 @@ for (var in variable) {
 #-------- Andel per sykehus eller annen gr.variabel (AndelGrVar)-----------------------------------------
 #---------AndelTid
 #-------------------------------------------------------
-RegData <- RyggRegDataSQLV2V3() #read.table('A:/Rygg/allevarnum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
+RegData <- RyggRegDataV2V3() #read.table('A:/Rygg/allevarnum2019-08-12.csv', sep=';', header=T, encoding = 'UTF-8')
 
 
 DataUt <- RyggFigAndelerGrVar(valgtVar='fornoydhet', RegData=RegData, #hovedkat = hovedkat, tidlOp=tidlOp,  Ngrense=20, hastegrad=hastegrad,
@@ -662,7 +662,7 @@ RegDataV2 <- rapbase::LoadRegData(registryName="rygg",
                                   query='SELECT * FROM uttrekk_rapport_from_tore')
 RegDataV3 <- rapbase::LoadRegData(registryName="rygg",
                                   query='SELECT * FROM allevarnum')
-RegData <- RyggRegDataSQLV2V3()
+RegData <- RyggRegDataV2V3()
 #table(RegData[,c(ReshId)])
 tab <- unique(RegData[, c("ShNavn", "ReshId")])
 tab[order(tab$ShNavn),]

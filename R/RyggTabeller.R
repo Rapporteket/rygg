@@ -58,8 +58,8 @@ tabAntSkjema <- function(RegData, datoFra = '2019-01-01', datoTil=Sys.Date()){
   RegData <- RegData[indDato, ]
   RegData$ShNavn <- as.factor(RegData$ShNavn)
   Registreringer <- table(RegData$ShNavn)
-  TreMnd <- table(RegData$ShNavn[RegData$Ferdigstilt1b3mnd==1])
-  TolvMnd <- table(RegData$ShNavn[RegData$Ferdigstilt1b12mnd==1])
+  TreMnd <- table(RegData$ShNavn[RegData$Status3mnd==1])
+  TolvMnd <- table(RegData$ShNavn[RegData$Status12mnd==1])
 
   tab <- cbind('Basisskjema' = Registreringer,
                'Oppfølging, 3mnd' = TreMnd,
@@ -159,7 +159,7 @@ tabNokkeltall <- function(RegData, utvid=0, tidsenhet='Mnd', datoTil=Sys.Date(),
       'Alder (gj.sn)' = tapply(RegData$Alder, RegData$TidsEnhet, FUN=mean, na.rm=T),
       'Kvinneandel (%)' = tapply(RegData$ErMann==0, RegData$TidsEnhet, FUN=prosent),
     'Liggedøgn, totalt' = tapply(RegData$Liggedogn, RegData$TidsEnhet, FUN=sum, na.rm=T),
-    'Liggetid, postop., (gj.sn.)' = tapply(RegData$LiggetidPostOp, RegData$TidsEnhet, FUN=mean, na.rm=T),
+    'Liggetid, postop., (gj.sn.)' = tapply(RegData$LiggetidPostop, RegData$TidsEnhet, FUN=mean, na.rm=T),
     'Fornøyde 3 mnd. etter opr. (%)' = tapply(RegData$Fornoyd3mnd, RegData$TidsEnhet,
                                                FUN=function(x){100*sum(x %in% 1:2)/sum(!is.na(x))}),
     'Reg.forsinkelse (gj.sn., dager)' = tapply(RegData$DiffUtFerdig, RegData$TidsEnhet, FUN=mean, na.rm=T)
@@ -169,7 +169,7 @@ tabNokkeltall <- function(RegData, utvid=0, tidsenhet='Mnd', datoTil=Sys.Date(),
     tabUtvid <- rbind(
     'Antall avdelinger' = tapply(RegData$ShNavn, RegData$TidsEnhet, FUN=length), #length(unique((RyggData1aar$ShNavn))),
     tabNokkeltall,
-    'Svart på oppfølging, 3 mnd.' = tapply(RyggData1aar$Ferdigstilt1b3mnd==1, RegData$TidsEnhet, FUN=prosent) #mean(RyggData1aar$Ferdigstilt1b3mnd==1, na.rm=T),
+    'Svart på oppfølging, 3 mnd.' = tapply(RyggData1aar$Status3mnd==1, RegData$TidsEnhet, FUN=prosent) #mean(RyggData1aar$Status3mnd==1, na.rm=T),
     )
 
      tabNokkeltall <- tabUtvid
@@ -190,16 +190,18 @@ tabPasMdblReg <- function(RegData, datoFra = '2019-03-01', tidsavvik=30){
   RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra)$RegData
 
   FlereReg <- RegData %>% dplyr::group_by(PasientID) %>%
-    dplyr::summarise(N = length(PasientID), #n(),
-                     KortTid = ifelse(N>1,
-                                      ifelse(difftime(InnDato[order(InnDato)][2:N], InnDato[order(InnDato)][1:(N-1)], units = 'days') <= tidsavvik,
-                                             1, 0), 0),
-                     PasientID = PasientID[1]
+    dplyr::summarise(
+      N = length(PasientID), #n(),
+      KortTid = ifelse(N>1,
+                       ifelse(difftime(InnDato[order(InnDato)][2:N],
+                                       InnDato[order(InnDato)][1:(N-1)], units = 'days') <= tidsavvik,
+                              1, 0), 0),
+      PasientID = PasientID[1]
     )
 
   PasMdbl <- FlereReg$PasientID[which(FlereReg$KortTid == 1)]
   TabDbl <- RegData[which(RegData$PasientID %in% PasMdbl),
-                    c("PasientID", "InnDato", "ShNavn", "ReshId", "ForlopsID")] #, 'SkjemaGUID'
+                    c("PasientID", "InnDato", "ShNavn", "ReshId", "MCEID")]
   TabDbl <- TabDbl[order(TabDbl$InnDato), ]
   N <- dim(TabDbl)[1]
 
