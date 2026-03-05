@@ -19,10 +19,12 @@ Remotes:
 Imports: 
     kableExtra,
     knitr,
+    lubridate,
     magrittr,
     plyr,
     rapbase,
     rapFigurer,
+    rlang,
     shiny,
     shinyalert,
     shinyjs,
