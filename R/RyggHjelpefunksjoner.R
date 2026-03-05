@@ -12,10 +12,12 @@ kjorRyggApp <- function(browser = FALSE, logAsJson = FALSE) {
   if (logAsJson) {
     rapbase::loggerSetup()
   }
+  if (browser) {
+    options(shiny.launch.browser = TRUE)
+  }
   app <- shiny::shinyApp(
     ui = rygg::ui_rygg,
-    server = rygg::server_rygg,
-    options = list(launch.browser = browser)
+    server = rygg::server_rygg
   )
 
   return(app)

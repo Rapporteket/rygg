@@ -252,8 +252,8 @@ ui <- navbarPage(
           br(),
           uiOutput("velgReshReg"),
           br(),
-          downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump')
-         # h5('Velger man en dato etter 1.januar 2019, er det kun registreringer for versjon 3')
+          downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
+          h5('Velger man startdato 1.januar 2019 eller senere, inneholder datadumpen kun registreringer fra versjon 3')
        #   )
       ), #Datadump-tab
 
