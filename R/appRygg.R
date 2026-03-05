@@ -98,12 +98,12 @@ ui <- navbarPage(
              h2((uiOutput("egetShTxt"))),
              br(),
              fluidRow(
-               column(4,
-                      h4('Antall skjema i kladd'),
-                      uiOutput("iKladdPas"),
-                      uiOutput("iKladdLege")
-               ),
-               column(6,
+               # column(4,
+               #        h4('Antall skjema i kladd'),
+               #        uiOutput("iKladdPas"),
+               #        uiOutput("iKladdLege")
+               # ),
+               column(4, # 6,
                       h4('Registreringsforsinkelse'),
                       uiOutput('forSen3mnd'),
                       br(),
@@ -533,11 +533,10 @@ ui <- navbarPage(
 #' @export
 
 server_rygg <- function(input, output, session) {
-  #server <- function(input, output,session) {
   rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
   dataRegistry <- 'data'
-  RegData <- RyggRegDataSQLV2V3(alleVarV3=1, alleVarV2=1)
+  RegData <- RyggRegDataV2V3(datoFra = '2000-01-01')
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 
@@ -547,16 +546,16 @@ server_rygg <- function(input, output, session) {
   ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
   ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
 
-  qskjemaoversikt <- 'SELECT * from skjemaoversikt'
-  skjemaoversikt_orig <- rapbase::loadRegData(registryName=dataRegistry, query=qskjemaoversikt, dbType="mysql")
-  skjemaoversikt <- merge(skjemaoversikt_orig, ePROMadmTab,
-                          by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
+  # qskjemaoversikt <- 'SELECT * from skjemaoversikt'
+  # skjemaoversikt_orig <- rapbase::loadRegData(registryName=dataRegistry, query=qskjemaoversikt, dbType="mysql")
+  # skjemaoversikt <- merge(skjemaoversikt_orig, ePROMadmTab,
+  #                         by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
+  #
+  # skjemaoversikt <- dplyr::rename(.data=skjemaoversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
 
-  skjemaoversikt <- dplyr::rename(.data=skjemaoversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
-
-  qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from forlopsoversikt'
-  RegOversikt <- rapbase::loadRegData(registryName=dataRegistry, query=qForlop, dbType="mysql")
-  RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
+  # qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from forlopsoversikt'
+  # RegOversikt <- rapbase::loadRegData(query=qForlop, dbType="mysql")
+  # RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
 
    map_avdeling <- data.frame(
     UnitId = unique(RegData$ReshId),
@@ -614,16 +613,16 @@ server_rygg <- function(input, output, session) {
 
   #------ Dæsjbord ---------------------
 
-  indKladd <- which(skjemaoversikt_orig$SkjemaStatus == 0)
-  tabKladd <- skjemaoversikt_orig[skjemaoversikt_orig$SkjemaStatus == 0, c("AvdRESH", "SkjemaRekkeflg")]
+  # indKladd <- which(skjemaoversikt_orig$SkjemaStatus == 0)
+  # tabKladd <- skjemaoversikt_orig[skjemaoversikt_orig$SkjemaStatus == 0, c("AvdRESH", "SkjemaRekkeflg")]
 
-  output$iKladdPas <- renderText(
-    paste('Pasientskjema: ',
-          sum(tabKladd$SkjemaRekkeflg==5 & tabKladd$AvdRESH == user$org())))
+  # output$iKladdPas <- renderText(
+  #   paste('Pasientskjema: ',
+  #         sum(tabKladd$SkjemaRekkeflg==5 & tabKladd$AvdRESH == user$org())))
 
-  output$iKladdLege <- renderText(
-    paste('Legeskjema',
-          sum(tabKladd$SkjemaRekkeflg==10 & tabKladd$AvdRESH == user$org())))
+  # output$iKladdLege <- renderText(
+  #   paste('Legeskjema',
+  #         sum(tabKladd$SkjemaRekkeflg==10 & tabKladd$AvdRESH == user$org())))
 
   output$forSen3mnd <- renderText(
     paste0('<b>', forsinketReg(RegData=RegData,
@@ -715,13 +714,13 @@ server_rygg <- function(input, output, session) {
                 selected = 0,
                 choices = sykehusValg) })
 
-  # Hente oversikt over hvilke registrereinger som er gjort (opdato og fødselsdato), samt datadump
+  # Hente oversikt over registreringer (opdato og fødselsdato), samt datadump
   observe({
-    #reshKtr <- ifelse(is.null(input$velgReshReg), user$org(), input$velgReshReg )
-    indKtr <- which(RegOversikt$ReshId == user$org())  # if (reshKtr == 0) {1:dim(RegOversikt)[1]} else {which(RegOversikt$ReshId == reshKtr)}
-    dataRegKtr <- dplyr::filter(RegOversikt[indKtr, ],
-                                as.Date(InnDato) >= input$datovalgRegKtr[1],
-                                as.Date(InnDato) <= input$datovalgRegKtr[2])
+    indKtr <- which(RegData$ReshId == user$org())
+    dataRegKtr <- dplyr::filter(
+      RegData[indKtr, c("ReshId", "SykehusNavn", "BIRTH_DATE", "InnDato")],
+      as.Date(InnDato) >= input$datovalgRegKtr[1],
+      as.Date(InnDato) <= input$datovalgRegKtr[2])
 
     output$lastNed_dataTilRegKtr <- downloadHandler(
       filename = function(){'dataTilKtr.csv'},
@@ -731,7 +730,7 @@ server_rygg <- function(input, output, session) {
 
 
       fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
-                     "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
+                     "FusjonSpes", "OpAndreSpes", "OpAndreSpes", "OpIndAnSpe", "RfAnnetspes",
                      "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
       RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
       dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,

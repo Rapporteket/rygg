@@ -1,10 +1,10 @@
 #Alle data
 #AlleData <-    read.table(file = 'C:/Registerdata/rygg/RyggV2V3_2023_01_03.csv', sep=';', header=T) #'UTF-8', stringsAsFactors = FALSE, na.strings = "NULL",
 library(rygg)
-RegDataV2V3 <- RyggRegDataSQLV2V3(alleVarV2=1)
+RegDataV2V3 <- RyggRegDataV2V3(alleVarV2=1)
 RegDataV2V3 <- RyggPreprosess(RegDataV2V3)
 fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
-               "FusjonSpes", "OpAndreSpes", "OpAnnenOstetosyntSpes", "OpIndAnSpe", "RfAnnetspes",
+               "FusjonSpes", "OpAndreSpes", "OpAndreSpes", "OpIndAnSpe", "RfAnnetspes",
                "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
 RegData <- RegDataV2V3[ ,-which(names(RegDataV2V3) %in% fritxtVar)]
 #PID er ikke personentydig. V2-PID har endinga ..V2

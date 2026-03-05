@@ -38,7 +38,7 @@ RyggFigGjsnGrVar <- function(RegData, valgtVar, valgtMaal='Gjsn', datoFra='2007-
   }
 
 if (hentData == 1) {
-  RegData <- RyggRegDataSQLV2V3()
+  RegData <- RyggRegDataV2V3()
 }
 
 # Hvis RegData ikke har blitt preprosessert. (I samledokument gjøres dette i samledokumentet)
