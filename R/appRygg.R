@@ -98,11 +98,6 @@ ui <- navbarPage(
              h2((uiOutput("egetShTxt"))),
              br(),
              fluidRow(
-               # column(4,
-               #        h4('Antall skjema i kladd'),
-               #        uiOutput("iKladdPas"),
-               #        uiOutput("iKladdLege")
-               # ),
                column(4, # 6,
                       h4('Registreringsforsinkelse'),
                       uiOutput('forSen3mnd'),
@@ -539,23 +534,13 @@ server_rygg <- function(input, output, session) {
   RegData <- RyggRegDataV2V3(datoFra = '2000-01-01')
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
+  RegData$DatoFodt <- as.Date(RegData$DatoFodt)
 
   qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
                     DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
   ePROMadmTab <- rapbase::loadRegData(registryName=dataRegistry, query=qEprom)
   ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
   ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
-
-  # qskjemaoversikt <- 'SELECT * from skjemaoversikt'
-  # skjemaoversikt_orig <- rapbase::loadRegData(registryName=dataRegistry, query=qskjemaoversikt, dbType="mysql")
-  # skjemaoversikt <- merge(skjemaoversikt_orig, ePROMadmTab,
-  #                         by.x='ForlopsID', by.y='MCEID', all.x = TRUE, all.y = FALSE)
-  #
-  # skjemaoversikt <- dplyr::rename(.data=skjemaoversikt, !!c(InnDato='HovedDato', ShNavn='Sykehusnavn'))
-
-  # qForlop <- 'SELECT AvdRESH, SykehusNavn, Fodselsdato, HovedDato, BasisRegStatus from forlopsoversikt'
-  # RegOversikt <- rapbase::loadRegData(query=qForlop, dbType="mysql")
-  # RegOversikt <- dplyr::rename(RegOversikt, 'ReshId'='AvdRESH', 'InnDato'='HovedDato')
 
    map_avdeling <- data.frame(
     UnitId = unique(RegData$ReshId),
@@ -612,17 +597,6 @@ server_rygg <- function(input, output, session) {
   })
 
   #------ Dæsjbord ---------------------
-
-  # indKladd <- which(skjemaoversikt_orig$SkjemaStatus == 0)
-  # tabKladd <- skjemaoversikt_orig[skjemaoversikt_orig$SkjemaStatus == 0, c("AvdRESH", "SkjemaRekkeflg")]
-
-  # output$iKladdPas <- renderText(
-  #   paste('Pasientskjema: ',
-  #         sum(tabKladd$SkjemaRekkeflg==5 & tabKladd$AvdRESH == user$org())))
-
-  # output$iKladdLege <- renderText(
-  #   paste('Legeskjema',
-  #         sum(tabKladd$SkjemaRekkeflg==10 & tabKladd$AvdRESH == user$org())))
 
   output$forSen3mnd <- renderText(
     paste0('<b>', forsinketReg(RegData=RegData,
@@ -718,13 +692,14 @@ server_rygg <- function(input, output, session) {
   observe({
     indKtr <- which(RegData$ReshId == user$org())
     dataRegKtr <- dplyr::filter(
-      RegData[indKtr, c("ReshId", "SykehusNavn", "BIRTH_DATE", "InnDato")],
-      as.Date(InnDato) >= input$datovalgRegKtr[1],
-      as.Date(InnDato) <= input$datovalgRegKtr[2])
+      RegData[indKtr, c("ReshId", "SykehusNavn", "DatoFodt", "OpDato")],
+      as.Date(OpDato) >= input$datovalgRegKtr[1],
+      as.Date(OpDato) <= input$datovalgRegKtr[2])
 
     output$lastNed_dataTilRegKtr <- downloadHandler(
       filename = function(){'dataTilKtr.csv'},
-      content = function(file, filename){write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
+      content = function(file, filename){
+        write.csv2(dataRegKtr, file, row.names = F, fileEncoding = 'latin1', na = '')})
 
     if (user$role()=='SC') {
 
@@ -747,7 +722,8 @@ server_rygg <- function(input, output, session) {
 
       output$lastNed_dataDump <- downloadHandler(
         filename = function(){'dataDump.csv'},
-        content = function(file, filename){write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')
+        content = function(file, filename){
+          write.csv2(dataDump, file, row.names = F, fileEncoding = 'latin1', na = '')
           rapbase::repLogger(session = session, msg = txtLog)
         })
     }

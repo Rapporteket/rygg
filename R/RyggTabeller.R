@@ -1,6 +1,6 @@
 #' Tabell som viser antall operasjoner per måned og sykehus siste x måneder
 #'
-#' Hvis reshID oppgis kommer månedlig oversikt kun for det aktuelle sykehuset. RegData må inneholde InnDato og Aar.
+#' Hvis reshID oppgis kommer månedlig oversikt kun for det aktuelle sykehuset. RegData må inneholde OpDato og Aar.
 #' Tabellen returneres som en xtable
 #' @param RegData data
 #' @param personIDvar Variabelen som angir pasientidentifikasjon
@@ -14,10 +14,10 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       #RegData må inneholde ..
   if (reshID!=0){RegData <- RegData[which(RegData$ReshId==reshID), ]}
       datoFra <- lubridate::floor_date(as.Date(datoTil) %m-% months(antMnd), unit='month')
-      aggVar <-  c('ShNavn', 'InnDato')
-      RegDataDum <- RegData[intersect(which(as.Date(RegData$InnDato) <= as.Date(datoTil, tz='UTC')),
-                               which(as.Date(RegData$InnDato, tz='uTC') > as.Date(datoFra, tz='UTC'))), aggVar]
-      RegDataDum$Maaned1 <- lubridate::floor_date(RegDataDum$InnDato, 'month')
+      aggVar <-  c('ShNavn', 'OpDato')
+      RegDataDum <- RegData[intersect(which(as.Date(RegData$OpDato) <= as.Date(datoTil, tz='UTC')),
+                               which(as.Date(RegData$OpDato, tz='uTC') > as.Date(datoFra, tz='UTC'))), aggVar]
+      RegDataDum$Maaned1 <- lubridate::floor_date(RegDataDum$OpDato, 'month')
       tabAvdMnd1 <- table(RegDataDum[ , c('ShNavn', 'Maaned1')])
       colnames(tabAvdMnd1) <- format(lubridate::ymd(colnames(tabAvdMnd1)), '%b %y') #month(ymd(colnames(tabAvdMnd1)), label = T)
       if (reshID==0 & !is.na(datoTil)) {
@@ -33,7 +33,7 @@ tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
 #' @return Antall opphold per sykehus og år, siste 5 år
 #' @export
 tabAntOpphSh5Aar <- function(RegData, datoTil=Sys.Date()){
-  RegData <- RegData[which(as.Date(RegData$InnDato) <= as.Date(datoTil, tz='UTC')), ]
+  RegData <- RegData[which(as.Date(RegData$OpDato) <= as.Date(datoTil, tz='UTC')), ]
       AarNaa <- as.numeric(format.Date(datoTil, "%Y"))
       tabAvdAarN <- addmargins(table(RegData[which(RegData$Aar %in% (AarNaa-4):AarNaa), c('ShNavn','Aar')]))
       rownames(tabAvdAarN)[dim(tabAvdAarN)[1] ]<- 'TOTALT, alle enheter:'
@@ -54,7 +54,7 @@ tabAntOpphSh5Aar <- function(RegData, datoTil=Sys.Date()){
 #' @export
 tabAntSkjema <- function(RegData, datoFra = '2019-01-01', datoTil=Sys.Date()){
 
-  indDato <- which(as.Date(RegData$InnDato) >= datoFra & as.Date(RegData$InnDato) <= datoTil)
+  indDato <- which(as.Date(RegData$OpDato) >= datoFra & as.Date(RegData$OpDato) <= datoTil)
   RegData <- RegData[indDato, ]
   RegData$ShNavn <- as.factor(RegData$ShNavn)
   Registreringer <- table(RegData$ShNavn)
@@ -193,23 +193,23 @@ tabPasMdblReg <- function(RegData, datoFra = '2019-03-01', tidsavvik=30){
     dplyr::summarise(
       N = length(PasientID), #n(),
       KortTid = ifelse(N>1,
-                       ifelse(difftime(InnDato[order(InnDato)][2:N],
-                                       InnDato[order(InnDato)][1:(N-1)], units = 'days') <= tidsavvik,
+                       ifelse(difftime(OpDato[order(OpDato)][2:N],
+                                       OpDato[order(OpDato)][1:(N-1)], units = 'days') <= tidsavvik,
                               1, 0), 0),
       PasientID = PasientID[1]
     )
 
   PasMdbl <- FlereReg$PasientID[which(FlereReg$KortTid == 1)]
   TabDbl <- RegData[which(RegData$PasientID %in% PasMdbl),
-                    c("PasientID", "InnDato", "ShNavn", "ReshId", "MCEID")]
-  TabDbl <- TabDbl[order(TabDbl$InnDato), ]
+                    c("PasientID", "OpDato", "ShNavn", "ReshId", "MCEID")]
+  TabDbl <- TabDbl[order(TabDbl$OpDato), ]
   N <- dim(TabDbl)[1]
 
   if (N>0) {
-    indSmTid <- which(difftime(TabDbl$InnDato[2:N], TabDbl$InnDato[1:(N-1)], units = 'days') <= tidsavvik)
+    indSmTid <- which(difftime(TabDbl$OpDato[2:N], TabDbl$OpDato[1:(N-1)], units = 'days') <= tidsavvik)
     TabDbl <- TabDbl[unique(sort(c(indSmTid, (indSmTid+1)))), ]
-    TabDbl$InnDato <- format(TabDbl$InnDato, '%Y-%m-%d') #'%d.%m.%Y')
-    tabUt <- TabDbl[order(TabDbl$PasientID, TabDbl$InnDato), ]
+    TabDbl$OpDato <- format(TabDbl$OpDato, '%Y-%m-%d') #'%d.%m.%Y')
+    tabUt <- TabDbl[order(TabDbl$PasientID, TabDbl$OpDato), ]
   } else {tabUt <- paste0('Ingen registreringer med mindre enn ', tidsavvik, 'minutter mellom registreringene for samme pasient.')}
 }
 

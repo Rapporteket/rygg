@@ -1067,7 +1067,7 @@ valgtVarTest <- valgtVar
 
       RegData <- RegData[which(!is.na(RegData$Variabel)),]
       #print(datoTil)
-      RegData <- RegData[RegData$InnDato < datoTil,]
+      RegData <- RegData[RegData$OpDato < datoTil,]
 
       UtData <- list(RegData=RegData, grtxt=grtxt, cexgr=cexgr, varTxt=varTxt, xAkseTxt=xAkseTxt,
                      KImaalGrenser=KImaalGrenser, KIekstrem=KIekstrem, #KImaal=KImaalRetn,

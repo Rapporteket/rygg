@@ -183,11 +183,12 @@ RyggPreprosess <- function(RegData=RegData)
   #Kun ferdigstilte registreringer: Kun ferdigstilte skjema i V2
   #V3: Alle legeskjema ferdigstilt.
 	#Kjønnsvariabel:Kjonn 1:mann, 2:kvinne
-  RegData$ErMann <- RegData$GENDER
-  RegData$ErMann[which(RegData$GENDER == 2)] <- 0
+  RegData$ErMann <- RegData$Kjonn
+  RegData$ErMann[which(RegData$Kjonn == 2)] <- 0
 
 	#Riktig datoformat og hoveddato
-	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
+	RegData$OpDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
+	#RegData$dato
 	RegData$ProsKode1 <- substr(RegData$ProsKode1, 1, 5)
 	RegData$ProsKode2 <- substr(RegData$ProsKode2, 1, 5)
 
@@ -219,9 +220,9 @@ RyggPreprosess <- function(RegData=RegData)
 
 
 	# Nye variable:
-	RegData$Aar <- lubridate::year(RegData$InnDato)
-	RegData$MndNum <- as.numeric(format(RegData$InnDato, '%m'))
-	RegData$MndAar <- format(RegData$InnDato, '%b%y')
+	RegData$Aar <- lubridate::year(RegData$OpDato)
+	RegData$MndNum <- as.numeric(format(RegData$OpDato, '%m'))
+	RegData$MndAar <- format(RegData$OpDato, '%b%y')
 	RegData$Kvartal <- ceiling(RegData$MndNum/3)
 	RegData$Halvaar <- ceiling(RegData$MndNum/6)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
@@ -230,9 +231,9 @@ RyggPreprosess <- function(RegData=RegData)
 	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDato),
 	                                         as.Date(RegData$OpDato), units = 'days'))
 	RegData$Dod30 <- 0
-	RegData$Dod30[which(as.numeric(as.Date(RegData$DodsDato) - as.Date(RegData$InnDato)) < 30)] <- 1
+	RegData$Dod30[which(as.numeric(as.Date(RegData$DodsDato) - as.Date(RegData$OpDato)) < 30)] <- 1
 	RegData$Dod365 <- 0
-	RegData$Dod365[which(as.numeric(as.Date(RegData$DodsDato) - as.Date(RegData$InnDato)) < 365)] <- 1
+	RegData$Dod365[which(as.numeric(as.Date(RegData$DodsDato) - as.Date(RegData$OpDato)) < 365)] <- 1
 
 	  return(invisible(RegData))
 }

@@ -129,28 +129,27 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   #mce Trenger nok ganske få av disse variablene
   # mce_patient_data # eneste som inneholder kobling mellom mceid og pasientid
-  qmce <- 'CENTREID AS ReshId, CREATEDBY, MCEID, PATIENT_ID AS PasientID,
-             sendtSMS12mnd, sendtSMS3mnd, TSCREATED, TSUPDATED'
+  qmce <- 'CENTREID AS ReshId, CREATEDBY, MCEID, PATIENT_ID AS PasientID'
 
   mceSkjema <- hentDataTabellV3(tabellnavn = "mce",
                               qVar = qmce,
                               egneVarNavn = 0) #Ingen selvvalgte navn
 
   #Pasientskjema:
-  qPas <- 'BIRTH_DATE,
+  qPas <- 'BIRTH_DATE as DatoFodt,
              DECEASED,
              DECEASED_DATE,
              GENDER,
              ID,
-             OWNING_CENTRE,
-             REAPER_DATE,
-             REGISTERED_DATE,
-             TSCREATED,
-             TSUPDATED'
+             REGISTERED_DATE'
 
   PasInfoSkjema <- hentDataTabellV3(tabellnavn = "patient",
                                   qVar = qPas,
-                                  egneVarNavn = 0)
+                                  egneVarNavn = 1)
+
+  varFjernes <- c('TSCREATED', 'TSUPDATED', 'FIRST_TIME_CLOSED_BY', 'FIRST_TIME_CLOSED',
+                  'CENTREID', 'TYPE_UNDERSOEKELSE_UTFYLT', 'CREATED_BY')
+
   #Legeskjema
   LegeSkjema <- hentDataTabellV3(tabellnavn = "surgeonform",
                                qVar = '*',
@@ -158,10 +157,13 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
                                egneVarNavn = 1)
   LegeSkjema <- dplyr::rename(LegeSkjema,
                               'ForstLukketLege' = 'FIRST_TIME_CLOSED')
+  LegeSkjema <- LegeSkjema[ ,-which(names(LegeSkjema) %in% varFjernes)]
+
   #Pasientens spørreskjema
   PasSkjema <- hentDataTabellV3(tabellnavn = "patientform",
                               qVar = '*',
                               egneVarNavn = 1)
+  PasSkjema <- PasSkjema[ ,-which(names(PasSkjema) %in% varFjernes)]
 
   #Sykehusnavn
   EnhetsNavn <- hentDataTabellV3(tabellnavn = "centreattribute",
@@ -170,7 +172,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
   # SAMMENSTILL SKJEMA:
   RegData <-
     merge(mceSkjema,
-          PasInfoSkjema, by.x = "PasientID", by.y = "ID",
+          PasInfoSkjema, by = "PasientID",
           suffixes = c("", "_pas"), all = F) |>
     merge(LegeSkjema, by = "MCEID", all = F, suffixes = c("", "_lege")) |>
     merge(PasSkjema,
@@ -179,12 +181,9 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
           by.x = "ReshId", by.y = 'ID', all.x = TRUE)
 
   #Evt flytt dette til skjemaet det hører hjemme...
-  krypterteV3 <- c("Adresse", "Adressetype", "PostNr", "PostSted", "Bydelskode",	"Bydelsnavn",
-                   "KommuneNr", "KommuneNavn", "Fylke", "HelseRegion",
-                   "KryptertFnr")
-  fjernes <- c('MceType', 'DodsDato')
+  fjernes <- c( "Bydelskode",	"Bydelsnavn","Fylke", "HelseRegion", 'MceType', 'DodsDato')
 
-  RegData <- RegData[ ,-which(names(RegData) %in% c(krypterteV3, fjernes))]
+  RegData <- RegData[ ,-c(grep('_MISS', names(RegData)), which(names(RegData) %in% fjernes))]
 
 
 

@@ -543,7 +543,7 @@ RegData <- RyggPreprosess(RegData=RegData)
 PIDop <- table(RegData$PID, RegData$OpDato)
 testDato <- aggregate(RegData$PID, by=RegData[ ,c('PID','OpDato')], drop=TRUE, FUN=length)
 testDato[which(testDato$x >1), ]
-testMnd <- aggregate(RegData$InnDato, by=RegData[ ,c('PID','Mnd','OpAar')], drop=TRUE, FUN=length)
+testMnd <- aggregate(RegData$OpDato, by=RegData[ ,c('PID','Mnd','OpAar')], drop=TRUE, FUN=length)
 duplMnd <- testMnd[which(testMnd$x >1), ]
 testAar <- aggregate(RegData$PID, by=RegData[ ,c('PID','OpAar')], drop=TRUE, FUN=length)
 sum(testAar$x >1)
@@ -561,7 +561,7 @@ RegData <- NakkePreprosess(RegData=NakkeData)
 #PIDop <- table(RegData$PasientID, RegData$OprDato)
 testDato <- aggregate(RegData$PasientID, by=RegData[ ,c('PasientID','OprDato')], drop=TRUE, FUN=length)
 testDato[which(testDato$x >1), ]
-RegData$Mnd <- RegData$InnDato$mon +1
+RegData$Mnd <- RegData$OpDato$mon +1
 RegData$Mnd <- RegData$Mnd-min(RegData$Mnd[RegData$Aar==min(RegData$Aar)])+1
 testMnd <- aggregate(RegData$OprDato, by=RegData[ ,c('PasientID','Mnd','Aar')], drop=TRUE, FUN=length)
 duplMnd <- testMnd[which(testMnd$x >1), ]
