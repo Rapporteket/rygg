@@ -188,6 +188,8 @@ RyggPreprosess <- function(RegData=RegData)
 
 	#Riktig datoformat og hoveddato
 	RegData$InnDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
+	RegData$ProsKode1 <- substr(RegData$ProsKode1, 1, 5)
+	RegData$ProsKode2 <- substr(RegData$ProsKode2, 1, 5)
 
 	#Endre variabelnavn:
 	names(RegData)[which(names(RegData) == 'AlderVedOpr')] <- 'Alder'
