@@ -728,7 +728,7 @@ valgtVarTest <- valgtVar
 
       if (valgtVar == 'regDiffOp') {  #Andeler
       #Verdier: 0-3402
-      tittel <- 'Tid fra utfylling av pasientskjema(?) til operasjon'
+      tittel <- 'Tid fra utfylling av pasientskjema til operasjon'
       #if (figurtype == 'andeler') {	#Fordelingsfigur
       #14 dager, mellom 15 dager og 3 mnd, mer enn 3 mnd
         gr <- c(-1000,-30, -14, 0, 15, 91, 2000)

@@ -45,9 +45,9 @@ mappingEgneNavn <- function(tabell, tabType) {
     friendlyVarTabType <- friendlyVarTab[indTabType,]
     kuttTabPrefiks <- if (tabType == 'PATIENTFOLLOWUP12') {'PATIENTFOLLOWUP_'} else {paste0(tabType, '_')}
 
-    rydd <- which(friendlyVarTabType$USER_SUGGESTION == 'VERBOTEN')
+    rydd <- which(friendlyVarTabType$USER_SUGGESTION %in% c('VERBOTEN', 'NEINNICHTS'))
 
-    #Fjerner variabler merket 'VERBOTEN'
+    #Fjerner variabler merket 'VERBOTEN' eller NEINNICHTS
     if (length(rydd)>0) {
       fjernvar <- gsub(kuttTabPrefiks, "", friendlyVarTabType$FIELD_NAME[rydd])
       indFjern <- which(names(tabell) %in% fjernvar)
@@ -148,7 +148,8 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
                                   egneVarNavn = 1)
 
   varFjernes <- c('TSCREATED', 'TSUPDATED', 'FIRST_TIME_CLOSED_BY', 'FIRST_TIME_CLOSED',
-                  'CENTREID', 'TYPE_UNDERSOEKELSE_UTFYLT', 'CREATED_BY')
+                  'CENTREID', 'TYPE_UNDERSOEKELSE_UTFYLT', 'CREATED_BY', 'CREATEDBY',
+                  'UPDATEDBY')
 
   #Legeskjema
   LegeSkjema <- hentDataTabellV3(tabellnavn = "surgeonform",
@@ -156,7 +157,8 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
                                datoFra = datoFra, datoTil = datoTil,
                                egneVarNavn = 1)
   LegeSkjema <- dplyr::rename(LegeSkjema,
-                              'ForstLukketLege' = 'FIRST_TIME_CLOSED')
+                              'ForstLukketLege' = 'FIRST_TIME_CLOSED',
+                              'UtfyltDatoLege' = 'TSCREATED')
   LegeSkjema <- LegeSkjema[ ,-which(names(LegeSkjema) %in% varFjernes)]
 
   #Pasientens spørreskjema
@@ -180,10 +182,6 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
     merge(EnhetsNavn,
           by.x = "ReshId", by.y = 'ID', all.x = TRUE)
 
-  #Evt flytt dette til skjemaet det hører hjemme...
-  fjernes <- c( "Bydelskode",	"Bydelsnavn","Fylke", "HelseRegion", 'MceType', 'DodsDato')
-
-  RegData <- RegData[ ,-c(grep('_MISS', names(RegData)), which(names(RegData) %in% fjernes))]
 
 
 
@@ -237,6 +235,13 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
     RegData$Status12mnd[RegData$MCEID %in% ePROM12mnd$MCEID] <- 1
     RegData$Status12mnd[intersect(which(RegData$Status12mndGML ==1), indIkkeEprom12mnd)] <- 1
      }
+
+  #Evt flytt dette til skjemaet det hører hjemme...
+  fjernes <- c(varFjernes, "Bydelskode",	"Bydelsnavn","Fylke", "HelseRegion",
+               'MceType', 'DodsDato', 'KommuneNr',	'KommuneNavn',
+               'REGIONAL_HEALTH_AUTHORITY')
+
+  RegData <- RegData[ ,-c(grep('_MISS', names(RegData)), which(names(RegData) %in% fjernes))]
 
   return(invisible(RegData))
 }

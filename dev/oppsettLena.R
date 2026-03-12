@@ -27,7 +27,6 @@ test <- RegData[ ,c(grep(pattern = 'dato',names(RegData), ignore.case = T))]
 #FormatTrøbbel: DECEASED_DATE, REGISTERED_DATE, InnlagtDato,
 head(test)
 head(RegData$OpDato)
-test <- as.Date(test[,names(test)])
 
 RyggFigAndelerGrVar(RegData=RegData,  valgtVar='degSponFusj1op',
                     datoFra = '2024-01-01', datoTil = '2024-12-31',

@@ -188,6 +188,14 @@ RyggPreprosess <- function(RegData=RegData)
 
 	#Riktig datoformat og hoveddato
 	RegData$OpDato <- as.Date(RegData$OpDato, format="%Y-%m-%d") #, tz='UTC')
+  RegData$InnlagtDato <- as.Date(RegData$InnlagtDato)
+  RegData$BlodfortynnendeSepDato <- as.Date(RegData$BlodfortynnendeSepDato)
+  RegData$UtskrivelseDato <- as.Date(RegData$UtskrivelseDato)
+  RegData$UtfyltDatoLege <- as.Date(RegData$UtfyltDatoLege, format="%Y-%m-%d")
+  RegData$UtfyltDatoPas <- as.Date(RegData$UtfyltDatoPas)
+  RegData$UtfyltDato3mnd <- as.Date(RegData$UtfyltDato3mnd)
+	RegData$UtfyltDato12mnd <- as.Date(RegData$UtfyltDato12mnd)
+
 	#RegData$dato
 	RegData$ProsKode1 <- substr(RegData$ProsKode1, 1, 5)
 	RegData$ProsKode2 <- substr(RegData$ProsKode2, 1, 5)
@@ -228,7 +236,7 @@ RyggPreprosess <- function(RegData=RegData)
 	#?Trenger kanskje ikke de over siden legger på tidsenhet når bruk for det.
 	RegData$DiffUtFerdig <- as.numeric(difftime(as.Date(RegData$ForstLukketLege),
 	                                            as.Date(RegData$UtskrivelseDato), units = 'days'))
-	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDato),
+	RegData$DiffUtfOp <- as.numeric(difftime(as.Date(RegData$UtfyltDatoPas),
 	                                         as.Date(RegData$OpDato), units = 'days'))
 	RegData$Dod30 <- 0
 	RegData$Dod30[which(as.numeric(as.Date(RegData$DodsDato) - as.Date(RegData$OpDato)) < 30)] <- 1
