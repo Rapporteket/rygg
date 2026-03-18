@@ -39,14 +39,6 @@ tilpassV2data <- function(RegDataV2){
   RegDataV2$ErstatningPre <- plyr::mapvalues(as.numeric(RegDataV2$ErstatningPre), from = c(2,3,4,NA), to = c(0,2,3,9))
   RegDataV2$UforetrygdPre <- plyr::mapvalues(as.numeric(RegDataV2$UforetrygdPre), from = c(2,3,4,NA), to = c(0,2,3,9))
 
-  #Ønsker tom for manglende RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
-  #Ønsker tom for manglende RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
-  RegDataV2$OpIndPareseGrad[is.na(RegDataV2$OpIndPareseGrad)] <- 9
-  RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
-  RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
-  RegDataV2$Utd[is.na(RegDataV2$Utd)] <- 9
-  RegDataV2$KpInf3Mnd[RegDataV2$KpInf3Mnd==0] <- NA #Tilpasning til V3
-  RegDataV2$Versjon <- 'V2'
 
 
   RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
@@ -72,11 +64,12 @@ tilpassV2data <- function(RegDataV2){
                              AlderVedOpr = Alder,
                              EQ5DV212mnd = EQ5D12mnd,
                              EQ5DV23mnd = EQ5D3mnd,
-                             AvdRESH = AvdReshID,
+                             ReshId = AvdReshID,
                              Bydelskode = Bydelkode,
                              Bydelsnavn = Bydelsted,
                              KommuneNr = Kommunenr, #Kommunenavn ikke med i V2
-                             KpInfDyp12mnd = KpInfDyp12Mnd,
+                           #  KpInf3mnd = KpInf3Mnd,
+                           #  KpInfDyp12mnd = KpInfDyp12Mnd,
                              PasientID = PATIENT_ID,
                              RokerV2 = Roker,
                              SykehusNavn = AvdNavn,
@@ -84,11 +77,22 @@ tilpassV2data <- function(RegDataV2){
                              Status12mnd = Utfylt12Mnd,
                              SykDprebetesMellitus = SykdDiabetesMellitus
   )
+  EndreNavnInd <- grep('3Mnd', names(RegDataV2)) #names(RyggData)[grep('3Mnd', names(RyggData))]
+  names(RegDataV2)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2)[EndreNavnInd])
 
+   #Ønsker tom for manglende RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
+  #Ønsker tom for manglende RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
+  RegDataV2$OpIndPareseGrad[is.na(RegDataV2$OpIndPareseGrad)] <- 9
+  RegDataV2$Roker[is.na(RegDataV2$Roker)] <- 9
+  RegDataV2$Morsmal[is.na(RegDataV2$Morsmal)] <- 9
+  RegDataV2$Utd[is.na(RegDataV2$Utd)] <- 9
+  RegDataV2$KpInf3mnd[RegDataV2$KpInf3mnd==0] <- NA #Tilpasning til V3
+  RegDataV2$Versjon <- 'V2'
 
   #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
   RegDataV2$SivilStatusV3 <- plyr::mapvalues(as.numeric(RegDataV2$SivilStatus),
                                              from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
+  return(RegDataV2)
 }
 
 
@@ -140,12 +144,12 @@ tilpassV3data <- function(RegDataV3){
   #Definasjon av diagnosegrupper prolaps og spinal stenose
   RegDataV3 <- defProSS(RegDataV3)
 
-  RegDataV3$Kp3Mnd <- NULL
-  RegDataV3$Kp3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd',
+  RegDataV3$Kp3mnd <- NULL
+  RegDataV3$Kp3mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd', 'KpUVI3mnd',
                                          'KpLungebet3mnd', 'KpBlod3mnd','KpDVT3mnd','KpLE3mnd')],
                            na.rm = T) > 0] <- 1
-  RegDataV3$KpInf3Mnd <- NULL
-  RegDataV3$KpInf3Mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd')], na.rm = T) > 0] <- 1
+  RegDataV3$KpInf3mnd <- NULL
+  RegDataV3$KpInf3mnd[rowSums(RegDataV3[ ,c('KpInfOverfla3mnd','KpInfDyp3mnd')], na.rm = T) > 0] <- 1
 
 
   #TidlOp. V2: 1:4,9 c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon', 'Ukjent')
@@ -195,6 +199,7 @@ RyggPreprosess <- function(RegData=RegData)
   RegData$UtfyltDatoPas <- as.Date(RegData$UtfyltDatoPas)
   RegData$UtfyltDato3mnd <- as.Date(RegData$UtfyltDato3mnd)
 	RegData$UtfyltDato12mnd <- as.Date(RegData$UtfyltDato12mnd)
+	RegData$DatoFodt <- as.Date(RegData$DatoFodt)
 
 	#RegData$dato
 	RegData$ProsKode1 <- substr(RegData$ProsKode1, 1, 5)

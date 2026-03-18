@@ -457,7 +457,7 @@ tab <- lagTabavFig(UtDataFraFig=DataUt, figurtype='andelTid')
 #Sjekk Oswestry-skår for V3
  variable <- c('alder70', 'antibiotika', 'arbstatus', 'ASA', 'smBePreLav',
               'beinsmEndrLav', 'BMI', 'degSponFusj', 'degSponSSSten', 'erstatningPre', 'fornoydhet',
-              'KpInf3Mnd', 'Kp3Mnd', 'misfornoyd', 'nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
+              'KpInf3mnd', 'Kp3mnd', 'misfornoyd', 'nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
               'Osw22', 'Osw48', 'peropKompDura', 'roker', 'saardren', 'smStiPre', 'symptVarighRyggHof',
               'sympVarighUtstr', 'tidlOp3', 'uforetrygdPre', 'utd', 'verre')
 for (var in variable) {
@@ -507,7 +507,7 @@ RegData <- merge(NKRdata, BoStederInnb2015, by.x = "Kommunenr", by.y = "KommNr",
 
 
 
-valgtVar <- 'SympVarighUtstr'   #, #BeinsmEndrLav', BeinsmLavPre, DegSponSSSten, KpInf3Mnd
+valgtVar <- 'SympVarighUtstr'   #, #BeinsmEndrLav', BeinsmLavPre, DegSponSSSten, KpInf3mnd
                               # OswEndr13, OswEndr20, OswEndr30pst, Osw48, SympVarighUtstr, Verre,
 
 #Indikatorprosjekt: BeinsmLavPre, OswEndr20
@@ -520,7 +520,7 @@ RyggFigAndelerGrVarAar(RegData=RegData, valgtVar=valgtVar, datoFra=datoFra, dato
 
 variableInd <- c('BeinsmLavPre', 'OswEndr20','SympVarighUtstr')
 variable <- c('Alder', 'Antibiotika', 'ArbstatusPre', 'Arbstatus3mnd', 'Arbstatus12mnd', 'ASA', 'BMI',
-             'ErstatningPre', 'Fornoyd3mnd','Fornoyd12mnd', 'Kp3Mnd', 'Misfor3mnd', 'Misfor12mnd',
+             'ErstatningPre', 'Fornoyd3mnd','Fornoyd12mnd', 'Kp3mnd', 'Misfor3mnd', 'Misfor12mnd',
           'Nytte3mnd', 'Nytte12mnd', 'PeropKomp', 'Osw30_3mnd', 'Osw30_12mnd', 'PeropKompDura', 'Roker',
           'Saardren', 'SmStiPre', 'SymptVarighRyggHof', 'SympVarighUtstr', 'UforetrygdPre', 'Utd', 'Verre3mnd', 'Verre12mnd')
 #for (grVar in c('Fylke', 'ShNavn', 'BoRHF')){

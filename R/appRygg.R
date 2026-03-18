@@ -530,17 +530,15 @@ ui <- navbarPage(
 server_rygg <- function(input, output, session) {
   rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
-  dataRegistry <- 'data'
-  RegData <- RyggRegDataV2V3(datoFra = '2000-01-01')
+  RegData <- RyggRegDataV2V3(datoFra = '2007-01-01')
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
-  RegData$DatoFodt <- as.Date(RegData$DatoFodt)
 
-  qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
-                    DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
-  ePROMadmTab <- rapbase::loadRegData(registryName=dataRegistry, query=qEprom)
-  ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
-  ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
+  # qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
+  #                   DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
+  # ePROMadmTab <- rapbase::loadRegData(registryName='data', query=qEprom)
+  # ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
+  # ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
 
    map_avdeling <- data.frame(
     UnitId = unique(RegData$ReshId),
@@ -579,13 +577,9 @@ server_rygg <- function(input, output, session) {
 
   observeEvent(input$reset_fordValg, shinyjs::reset("brukervalg_fordeling"))
 
-  context <- Sys.getenv("R_RAP_INSTANCE") #Blir tom hvis jobber lokalt
-  paaServer <- (context %in% c("DEV", "TEST", "QA", "QAC", "PRODUCTIONC", "PRODUCTION")) #rapbase::isRapContext()
-
   # widget
-  if (paaServer) {
     output$appUserName <- renderText(rapbase::getUserFullName(session))
-    output$appOrgName <- renderText(paste0('rolle: ', user$role(), '<br> ReshID: ', user$org()) )}
+    output$appOrgName <- renderText(paste0('rolle: ', user$role(), '<br> ReshID: ', user$org()) )
 
   # User info in widget
   userInfo <- rapbase::howWeDealWithPersonalData(session)

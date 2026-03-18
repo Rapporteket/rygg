@@ -14,8 +14,8 @@
 #' @return RegData, dataramme med data f.o.m. 2007.
 #' @export
 
-RyggRegDataV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
-                               alleVarV3=1, alleVarV2=0){
+RyggRegDataV2V3 <- function(datoFra = '2007-01-01') {
+  #, datoTil = '2099-01-01', alleVarV3=1 ){ #alleVarV2=0
 #NB: datovalg benyttes foreløpig kun til å avgjøre om kobling til V2 skal utføres.
 
   message('Henter data, RyggRegDataV2V3')
@@ -23,7 +23,8 @@ RyggRegDataV2V3 <- function(datoFra = '2007-01-01', #datoTil = '2099-01-01',
 
   if (kunV3 == 0) {
     RegDataV2 <- hentDataV2()
-    tilpassV2data(RegDataV2=RegDataV2)
+
+    RegDataV2 <- tilpassV2data(RegDataV2=RegDataV2)
     }
 
   RegDataV3 <- hentRegDataV3(datoFra = datoFra, datoTil = Sys.Date(),
@@ -38,25 +39,22 @@ if (kunV3 == 0){
   V2ogV3 <- intersect(VarV2, VarV3)
   V3ikkeV2 <- setdiff(VarV3, V2ogV3)
   V2ikkeV3 <- setdiff(VarV2, V2ogV3)
-  if (alleVarV2 == 0){
-    RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
-    RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
-                         RegDataV3[ ,VarV3])
-  } else {
+  # if (alleVarV2 == 0){
+  #   RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
+  #   RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
+  #                        RegDataV3[ ,VarV3])
+  # } else {
     RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
     RegDataV3[, V2ikkeV3] <- NA
     RegDataV2V3 <- rbind(RegDataV2,
                          RegDataV3)
-  }
+  # }
 }
 
   if (kunV3 == 1) {RegDataV2V3 <- RegDataV3}
   #Avvik? PeropKompAnnet
   #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3
 
-  #Mars 2021: KpInf-variabler, 3mnd er navngitt ..3Mnd i begge versjoner. Endrer navngiving
-  EndreNavnInd <- grep('3Mnd', names(RegDataV2V3)) #names(RyggData)[grep('3Mnd', names(RyggData))]
-  names(RegDataV2V3)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2V3)[EndreNavnInd])
 
   #En desimal
   RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)

@@ -115,7 +115,7 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \item BMI: Pasienter med fedme (BMI>30)
 \item ErstatningPre: Søkt/planlegger å søke erstatning?
 \item Fornoyd: Fornøyde pasienter (ENDRET fra Fornoyd3mnd, Fornoyd12mnd  )
-\item Kp3Mnd: Pasientrapporterte komplikasjoner
+\item Kp3mnd: Pasientrapporterte komplikasjoner
 \item Misfornoyd:  Andel med Misfornøyd/litt misfornøyd (ENDRET fra Misfor3mnd, Misfor12mnd)
 \item Nytte: Klart bedre    (ENDRET fra Nytte3mnd, Nytte12mnd)
 \item OswEndr30pst: Mer enn 30\% forbedring i Oswestry-skår, 3 mnd. (ENDRET fra Osw30_3mnd, Osw30_12mnd)
@@ -136,7 +136,7 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \item OswEndrLav: Mer enn 20 poeng forbedring i Oswestry-skår, 3 mnd/12mnd.
 \item OswEndr20:
 \item Osw48: Oswestry-skår fortsatt over 48
-\item KpInf3Mnd: Sårinfeksjoner
+\item KpInf3mnd: Sårinfeksjoner
 \item Morsmal: Fremmedspråklige (ikke norsk som morsmål)
 }
 }

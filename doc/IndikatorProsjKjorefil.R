@@ -86,7 +86,7 @@ for (grVar in grupperingInd) {
                   maxald = maxald, erMann=erMann, hovedkat = hovedkat, ktr = ktr,preprosess=1, opKat=opKat, tidlOp=tidlOp,
                   enhetsUtvalg = 10, reshID = reshID, outfile = outfile, grVar = grVar, siste3aar=siste3aar, AKjust=AKjust)
       }
-      valgtVar <- 'KpInf3Mnd'
+      valgtVar <- 'KpInf3mnd'
             hovedkat <- 1:3
             outfile <- paste0(valgtVar, '123_', grVar, AKjust,'Aar.pdf')
             RyggFigAndelerGrVarAarVarKval(
