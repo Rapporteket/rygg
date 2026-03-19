@@ -235,9 +235,6 @@ ui <- navbarPage(
       ), #Datakvalitet-tab
 
       shiny::tabPanel("Datadump",
-        # sidebarPanel(
-        #   ),
-        # mainPanel(
           h3('Last ned data'),
           br(),
           dateRangeInput(inputId = 'datovalgDatadump', start = startDato, end = idag,
@@ -248,8 +245,6 @@ ui <- navbarPage(
           uiOutput("velgReshReg"),
           br(),
           downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
-          h5('Velger man startdato 1.januar 2019 eller senere, inneholder datadumpen kun registreringer fra versjon 3')
-       #   )
       ), #Datadump-tab
 
       shiny::tabPanel(

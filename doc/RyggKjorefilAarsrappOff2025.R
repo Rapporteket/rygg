@@ -242,7 +242,7 @@ FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = 
 
 #--------------TABELLER OG TALL---------------------------
 library(xtable)
-RegDataPro <- RegData[which(RegData$HovedInngrep==1),]
+RegDataPro <- RegData[which(RegData$HovedInngrepV2V3==1),]
 RegDataPro12mnd <- RegDataPro[which(RegDataPro$Aar<rappAar), ]
 RegDataSS <- RyggUtvalgEnh(RegData, hovedkat=9)$RegData
 

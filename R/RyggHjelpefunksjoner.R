@@ -206,17 +206,6 @@ RegDataSort$Reop90dEtterOp <- 0
 indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d==1)
 RegDataSort$Reop90dEtterOp[indReop] <- 1
 
-#Tar bort den gamle Reop90d-variabelen for å unngå misforståelse
-#RegDataSort <- RegDataSort[ ,-which(names(RegDataSort) == 'Reop90d')]
-#Ikke med lenger når henter data.
-
-# RegDataSort <-
-#   RegDataSort %>%
-#   dplyr::mutate(Reop2 =
-#            ifelse(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d,
-#                   1,0))
-
-# table(RegDataSort$Reop2)
 return(invisible(RegDataSort))
 }
 
@@ -336,7 +325,7 @@ if (ktr==2) {
 }
 
 
-#' Lage entydig PID
+#' Lage entydig PID DEPRECATED - slette?
 #' Lager entydig PID basert på personnummer. Alle PID i V2 har ending suffiks V2. Pasienter i V3 får PID fra V2 hvis personnummeret
 #' deres finnes i begge versjoner. NB: For at dette skal bli riktig er vi avhengig av kilde med oppdatert koblingsfil (PID-personnummer)
 #' @param data tilnavn for utdatatabell. Hvis ikke angitt, lastes ikke fil ned

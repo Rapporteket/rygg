@@ -19,7 +19,7 @@ RyggRegDataV2V3 <- function(datoFra = '2007-01-01') {
 #NB: datovalg benyttes foreløpig kun til å avgjøre om kobling til V2 skal utføres.
 
   message('Henter data, RyggRegDataV2V3')
-  kunV3 <- ifelse(datoFra >= '2019-01-01' & !is.na(datoFra), 1, 0)
+  kunV3 <- ifelse(datoFra >= '2019-11-01' & !is.na(datoFra), 1, 0)
 
   if (kunV3 == 0) {
     RegDataV2 <- hentDataV2()

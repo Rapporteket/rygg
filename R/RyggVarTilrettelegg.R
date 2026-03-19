@@ -220,7 +220,7 @@ valgtVarTest <- valgtVar
         #Degen. spondylolistese:
         hovedkat <- 10
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
-        RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1
+        RegData$Variabel[which(RegData$HovedInngrepV2V3 ==5)] <- 1
         varTxt <- 'tilfeller'
         tittel <- 'Degen. spondylolistese operert med fusjonskirurgi'
         sortAvtagende <- F
@@ -237,7 +237,7 @@ valgtVarTest <- valgtVar
         hovedkat <- 10 #Degen. spondylolistese
         RegData <- RyggUtvalgEnh(RegData, hovedkat=10)$RegData
         RegData <- RegData[which(RegData$TidlOpr == 4), ]
-        RegData$Variabel[which(RegData$HovedInngrep ==5)] <- 1 # & RegData$TidlOpr == 4
+        RegData$Variabel[which(RegData$HovedInngrepV2V3 ==5)] <- 1 # & RegData$TidlOpr == 4
         varTxt <- 'tilfeller'
         tittel <- 'Degen. spondylolistese, fusjonskirurgi ved første operasjon'
         sortAvtagende <- F
@@ -338,7 +338,7 @@ valgtVarTest <- valgtVar
          #            'Interspin. implantat', 'Fusjonskirurgi', 'Skiveprotese', 'Rev. av implantat')
          grtxt <- c('Udefinerbart', 'Prolapskirurgi', 'Dekompresjon', 'Laminektomi', 'Eksp. intersp impl.',
                     'Fusjonskirurgi', 'Deformitet', 'Rev. av implantat', 'Skiveprotese')
-         RegData$VariabelGr <- factor(RegData$HovedInngrep, levels = 0:8)
+         RegData$VariabelGr <- factor(RegData$HovedInngrepV2V3, levels = 0:8)
          retn <- 'H'
       }
       if (valgtVar=='inngrep'){ #fordeling

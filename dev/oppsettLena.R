@@ -20,8 +20,10 @@ library(rygg)
 RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
                                      query='SELECT * FROM allevarnum')
 
-RegData <- RyggRegDataV2V3(datoFra = '2023-01-01')
+RegData <- RyggRegDataV2V3(datoFra = '2017-01-01')
 RegData <- RyggPreprosess(RegData =RegData)
+
+table(RegData$Aar, RegData$HovedInngrep)
 
 test <- RegData[ ,c(grep(pattern = 'dato',names(RegData), ignore.case = T))]
 #FormatTrøbbel: DECEASED_DATE, REGISTERED_DATE, InnlagtDato,
