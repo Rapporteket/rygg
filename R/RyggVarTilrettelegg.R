@@ -23,7 +23,7 @@
 #'
 
 
-RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0, datoFra='2007-01-01',
+RyggVarTilrettelegg  <- function(RegData=NULL, valgtVar, ktr=0,
                                  datoTil=Sys.Date(), hovedkat=99, figurtype='andeler'){ #grVar='',
 
 
@@ -216,6 +216,17 @@ valgtVarTest <- valgtVar
                   sortAvtagende <- FALSE
             }}
 
+      if (valgtVar == 'computerNav') { #AndelGrVar, AndelTid
+        #Fusjonskirurgi:
+        tittel <- 'Datanavigasjon benyttet til skrueplassering, fusjonskirurgi'
+        hovedkat <- 5
+        RegData <- RyggUtvalgEnh(RegData, hovedkat=5)$RegData
+        RegData <- RegData[which(RegData$OpComputerNav %in% 0:1), ]
+        RegData$Variabel[which(RegData$OpComputerNav ==1)] <- 1
+        varTxt <- 'tilfeller'
+        xAkseTxt <- 'Andel hvor datanavigasjon benyttet (%)'
+      }
+
       if (valgtVar == 'degSponFusj') { #AndelGrVar, AndelTid
         #Degen. spondylolistese:
         hovedkat <- 10
@@ -226,6 +237,7 @@ valgtVarTest <- valgtVar
         sortAvtagende <- F
         xAkseTxt <- 'Andel med fusjonskirurgi (%)'
       }
+
       if (valgtVar == 'degSponFusj1op') { #AndelGrVar, AndelTid
         # Kl 5. Andel pasienter med degenerativ spondylolistese som blir operert med
         # fusjonskirurgi ved første operasjon
@@ -251,6 +263,61 @@ valgtVarTest <- valgtVar
             varTxt <- 'som har dette'
             sortAvtagende <- FALSE
       }
+
+      if (valgtVar == 'diffPasUtfOp') {  #Fordeling, Andeler
+        # diff Pasientutfyllingsdato på skjema vs. Operasjonsdato,
+        tittel <- 'Tid mellom operasjon og utfylling av pasientskjema'
+        RegData$DiffUtfyltOp <- as.numeric(difftime(as.Date(RegData$UtfyltDatoPas),
+                                                    as.Date(RegData$OpDato), units = 'days'))
+        gr <- c(-1000,-30, -14, 0, 15, 91, 2000)
+        RegData$VariabelGr <- cut(RegData$DiffUtfyltOp, breaks=gr, include.lowest=TRUE, right=FALSE)
+        grtxt <- c('<-30d', levels(RegData$VariabelGr)[2:(length(gr)-2)], '>3mnd')
+        subtxt <- 'dager fra operasjon til utfylling'
+        if (figurtype %in% c('andelTid', 'andelGrVar')) {
+          RegData$Variabel[which(RegData$DiffUtfyltOp < -14)] <- 1
+          tittel <- 'Pasientskjema fylt ut mer enn to uker før operasjon'
+          varTxt <- 'for sent registrert'
+          sortAvtagende <- F}
+      }
+
+      if (valgtVar %in% c('diffUtf3mnd', 'diffUtf12mnd')) {  #Gjsn
+        # diff svar på skjema vs. Operasjonsdato,
+        RegData$Variabel <- as.numeric(difftime(switch(valgtVar,
+                                                       diffUtf3mnd = as.Date(RegData$UtfyltDato3mnd),
+                                                       diffUtf12mnd = as.Date(RegData$UtfyltDato12mnd)),
+                                                as.Date(RegData$OpDato), units = 'days'))
+        if (figurtype %in% c('gjsnGrVar', 'gjsnBox')){
+          tittel <- switch(valgtVar,
+                              diffUtf3mnd = ' ant. dager fra operasjon til utf. av 3mnd-skjema',
+                              diffUtf12mnd = 'ant. dager fra operasjon til utf. av 12mnd-skjema')
+          ind <- which(RegData$Variabel > 0 & (RegData$Variabel < ifelse(valgtVar == 'diffUtf3mnd', 360, 700)))
+          RegData <- RegData[ind, ]
+          sortAvtagende <- F
+        }
+        if (figurtype == 'andeler') {
+          gr <- switch(valgtVar,
+                       diffUtf3mnd = c(-1000, 0, 60, 85, 96, 120, 2000),
+                       diffUtf12mnd = c(-1000, 0, 300, 350, 380, 450, 2000))
+          RegData$VariabelGr <- cut(RegData$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
+          grtxt <- c('<-0', levels(RegData$VariabelGr)[2:(length(gr)-2)],
+                     ifelse(valgtVar == 'diffUtf3mnd', '>120', '>450'))
+          subtxt <- 'dager fra operasjon til utfylling'
+          tittel <-  paste0('Tid mellom operasjon og utfylling av ',
+                            ifelse(valgtVar == 'diffUtf3mnd', '3mnd-skjema', '12mnd-skjema'))
+        }
+      }
+
+      if (valgtVar=='dod30') {	#AndelTid, AndelerGrVar
+        RegData$Variabel[which(RegData$Dod30==1)] <- 1
+        varTxt <- 'døde innen 30 dager'
+        tittel <- '30-dagers dødelighet'
+      }
+      if (valgtVar=='dod365') {	#AndelTid, AndelerGrVar
+        RegData$Variabel[which(RegData$Dod365==1)] <- 1
+        varTxt <- 'døde innen ett år'
+        tittel <- '1-års dødelighet'
+      }
+
 
       if (valgtVar == 'EQ5DPre') {#ford gjsnPre (gjsnBox)
             RegData <- RegData[which(RegData$EQ5DPreV3 > -0.6),]
@@ -393,7 +460,7 @@ valgtVarTest <- valgtVar
 
       if (valgtVar=='komplPost') {
          tittel <- 'Pasientrapporterte komplikasjoner'
-         datoFra <- max(datoFra, '2020-01-01')
+         RegData <- RegData[which(RegData$OpDato > '2020-01-01'), ]
          datoTil <- min(datoTil, as.character(Sys.Date()-90))
          retn <- 'H'
          flerevar <- 1
@@ -541,6 +608,15 @@ valgtVarTest <- valgtVar
                   RegData$Variabel[RegData$Nytte %in% 1:2] <- 1
                   tittel <- paste0('Helt bra eller mye bedre' , ktrtxt)
             }}
+
+      if (valgtVar == 'opAndreEndoskopi') { #AndelGrVar
+        # Andel bruk OpAndreEndosk= 1 hos hhv. «LSSopr»= 1 og «ProlapsDekr»=1
+        RegData$Variabel[which(RegData$OpAndreEndosk ==1)] <- 1
+        tittel <- 'Har operatør brukt synsfremmende midler?'
+        varTxt <- 'hvor synsfremmende midler benyttet'
+      }
+
+
 
       if (valgtVar=='opInd') { #fordeling
             tittel <- 'Operasjonsindikasjon'
@@ -785,7 +861,6 @@ valgtVarTest <- valgtVar
                   varTxt <- 'røykere'
                   sortAvtagende <- FALSE}
       }
-
 
       if (valgtVar == 'saardren') { #AndelGrVar
             #LegeSkjema. Andel med Saardren=1

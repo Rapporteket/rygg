@@ -20,7 +20,7 @@ aar2_12mnd <- aar2-1
 tidlAar <- rappAar-1
 tidlAar2 <- (rappAar-3):(rappAar-2)
 
-RyggData <- RyggRegDataV2V3(datoFra = '2007-01-01', alleVarV3 = 0)
+RyggData <- RyggRegDataV2V3(datoFra = '2007-01-01')
 #ReshSh <- unique(RyggData[,c('SykehusNavn', 'AvdRESH')])
 #ReshSh <- unique(ReshSh[order(ReshSh$SykehusNavn), ])
 #Lagt til i preprosseser:
@@ -46,6 +46,46 @@ RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoT
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
 AntAvd <- length(unique(RegData$ShNavn))
+
+#-------------------Nye figurer------------------------
+source("dev/sysSetenv.R")
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
+RegData <- RyggPreprosess(RegData =RegDataRaa)
+
+#Ant dager fra Operasjonsdato til utfyllingsdato 3 og 12 mnd.
+valgtVar <- 'diffUtf12mnd'       # 'diffUtf3mnd' # 'diffUtf12mnd' (Bare V3)
+RyggFigAndeler(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, outfile = paste0(valgtVar, '_ford.pdf') )
+RyggFigGjsnGrVar(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, outfile = paste0(valgtVar, '_gjsnSh.pdf') )
+RyggFigGjsnBox(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, tidsenhet = 'Aar', outfile = paste0(valgtVar, '_gjsnTid.pdf') )
+
+#Pasientutfyllingsdato på skjema vs. Operasjonsdato. Andel gamle sjema, dvs. >14 dager.
+valgtVar <- 'diffPasUtfOp'
+RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_ford.pdf') )
+RyggFigAndelerGrVar(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
+RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
+
+# Andel fusjonskirurgi der det er brukt navigasjon til skrueplassering -.> Hvilke variabler? OpComputerNav
+valgtVar <- 'computerNav'
+RyggFigAndelerGrVar(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
+RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
+
+# Antall tidligere ryggoperasjoner - > Fordelingsfig, andel, per hendelse (ikke max per pas)
+valgtVar <- 'antTidlOp'
+RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_ford.pdf') )
+
+#  0     1     2     3     4     5     6     7    8     9    10    11    12    20    22  <NA>
+# 27  6819  2156   721   250    91    37    16    3     5     2     1     1     1     1 29682
+
+# Tidsutvikling for 30-dagers mortalitet. Dvs. 30-dagers mort. per år. AndelGrVar og -Tid? ja
+valgtVar <- 'dod30' # dod30 dod365
+RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
+
+# Andel bruk OpAndreEndosk= 1 hos hhv. «LSSopr»= 1 og «ProlapsDekr»=1, per sykehus (siste 2 år?) Andel over tid (hele Norge).
+valgtVar <- 'opAndreEndoskopi'
+RyggFigAndelerGrVar(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
+RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
+
+# Vurder om “V3” kan fjernes fra EQ-variabler
 
 #---------FIGURER, årsrapport --------------
 #Registreringsforsinkelse

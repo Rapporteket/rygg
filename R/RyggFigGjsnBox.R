@@ -38,7 +38,7 @@
 #' @return Linjediagram som viser utvikling over tid for valgt variabel
 #'
 #' @export
-RyggFigGjsnBox <- function(RegData, outfile, valgtVar, tidlOp='', erMann='', hovedkat=99, aar=0,
+RyggFigGjsnBox <- function(RegData, outfile='', valgtVar, tidlOp='', erMann='', hovedkat=99, aar=0,
                            tidsenhet = 'Mnd', hastegrad=99, minald=0, maxald=130, ktr=0, tittel=1,
                            datoFra='2007-01-01', datoTil='3000-01-01',
                            valgtMaal='Gjsn',enhetsUtvalg=0, hentData=0, preprosess=1, reshID=0){
