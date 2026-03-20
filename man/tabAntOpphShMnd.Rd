@@ -19,6 +19,6 @@ tabAntOpphShMnd(RegData, datoTil = Sys.Date(), antMnd = 6, reshID = 0)
 Antall operasjoner per måned og sykehus.
 }
 \description{
-Hvis reshID oppgis kommer månedlig oversikt kun for det aktuelle sykehuset. RegData må inneholde InnDato og Aar.
+Hvis reshID oppgis kommer månedlig oversikt kun for det aktuelle sykehuset. RegData må inneholde OpDato og Aar.
 Tabellen returneres som en xtable
 }

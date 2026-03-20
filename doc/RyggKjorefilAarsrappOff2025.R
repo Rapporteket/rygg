@@ -242,7 +242,7 @@ FremmedSpraakAar <-  RyggFigAndelTid(RegData=RegData, valgtVar='morsmal', aar = 
 
 #--------------TABELLER OG TALL---------------------------
 library(xtable)
-RegDataPro <- RegData[which(RegData$HovedInngrep==1),]
+RegDataPro <- RegData[which(RegData$HovedInngrepV2V3==1),]
 RegDataPro12mnd <- RegDataPro[which(RegDataPro$Aar<rappAar), ]
 RegDataSS <- RyggUtvalgEnh(RegData, hovedkat=9)$RegData
 
@@ -512,4 +512,72 @@ DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus"))]
 write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
 
 
+#---------------Data til dekningsgradsanalyser-----------------
+
+# Se den vedlagte PDFen for oppsett av filer og format:
+
+library(rygg)
+source("dev/sysSetenv.R")
+Ryggdata <- hentRegDataV3(datoFra='2025-01-01', datoTil = '2025-12-31', medOppf = 0)
+Ryggdata <- RyggPreprosess(RegData = Ryggdata)
+RyggdataFHI <- Ryggdata[ , c("PasientID", "ReshId", "ShNavn", "OpDato", "ProsKode1", "ProsKode2", "Dagkirurgi")]
+write.csv2(RyggdataFHI, file = '../data/RyggAktivitet2025.csv', row.names = F)
+
+#   •	Fil med fødselsnummer og koblingsnøkkel (PID). Hentes fra Qreg
+KoblnokkelRygg <- read.csv2(file = '../data/Degenerativ_Rygg_koblingstabell_datadump_10.03.2026.csv')
+# For å få filtert på 2025, må den filtreres mot ryggdata for 2025.
+KoblRygg2025 <- KoblnokkelRygg[which(KoblnokkelRygg$PID %in% RyggdataFHI$PasientID), ]
+KoblRygg2025$SSN <- stringr::str_pad(KoblRygg2025$SSN, width = 11, pad = "0", side = "left")
+write.csv2(KoblRygg2025[ ,c('SSN', 'PID')], file = '../data/KoblRygg2025.csv', row.names = F)
+# vec <- c(1, 12, 12323423111, 1234, 12345)
+# vec_padded <- sprintf("%011d", vec)
+# vec_padded <- stringr::str_pad(vec, width = 11, pad = "0", side = "left")
+
+
+#NAKKE
+library(nakke)
+source("../nakke/dev/sysSetenv.R")
+Nakkedata <- NakkeHentRegData(datoFra='2025-01-01', datoTil = '2025-12-31', medOppf = 1)
+Nakkedata <- NakkePreprosess(RegData = Nakkedata)
+NakkedataFHI <- Nakkedata[ , c("PasientID", "ReshId", "SykehusNavn", "OprDato", "OprKode", "Dagkirurgi")]
+write.csv2(NakkedataFHI, file = '../data/NakkeAktivitet2025.csv', row.names = F)
+
+#   •	Fil med fødselsnummer og koblingsnøkkel (PID). Hentes fra Qreg
+KoblnokkelNakke <- read.csv2(file = '../data/Degenerativ_Nakke_koblingstabell_datadump_10.03.2026.csv')
+# For å få filtert på 2025, må den filtreres mot Nakkedata for 2025.
+KoblNakke2025 <- KoblnokkelNakke[which(KoblnokkelNakke$PID %in% NakkedataFHI$PasientID), ]
+KoblNakke2025$SSN <- stringr::str_pad(KoblNakke2025$SSN, width = 11, pad = "0", side = "left")
+write.csv2(KoblNakke2025[ ,c('SSN', 'PID')], file = '../data/KoblNakke2025.csv', row.names = F)
+
+
+#-------------- Bestille CCI------------
+#Ønsker å bestille CCI for 2024->
+#Hvilke variabler trengs? Antar operasjonsdato og Pros-kode
+
+library(rygg)
+source("dev/sysSetenv.R")
+Ryggdata <- hentRegDataV3(datoFra='2024-01-01', medOppf = 0)
+Ryggdata <- RyggPreprosess(RegData = Ryggdata)
+RyggCCI <- Ryggdata[ , c("PasientID", "OpDato", "ProsKode1", "ProsKode2", "Dagkirurgi")]
+write.csv2(RyggCCI, file = '../data/RyggCCI_fom2024.csv', row.names = F)
+
+# Fil med fødselsnummer og koblingsnøkkel (PID). Hentes fra Qreg
+KoblRygg <- read.csv2(file = '../data/Degenerativ_Rygg_koblingstabell_datadump_10.03.2026.csv')
+KoblRygg_CCI <- KoblRygg[which(KoblRygg$PID %in% RyggCCI$PasientID), ]
+KoblRygg_CCI$SSN <- stringr::str_pad(KoblRygg_CCI$SSN, width = 11, pad = "0", side = "left")
+write.csv2(KoblRygg_CCI[ ,c('SSN', 'PID')], file = '../data/KoblRygg_CCI.csv', row.names = F)
+
+
+library(nakke)
+source("../nakke/dev/sysSetenv.R")
+Nakkedata <- NakkeHentRegData( medOppf = 1)
+Nakkedata <- NakkePreprosess(RegData = Nakkedata)
+NakkeCCI <- Nakkedata[ , c("PasientID",  "OprDato", "OprKode", "Dagkirurgi")]
+write.csv2(NakkeCCI, file = '../data/NakkeCCI_alleAar.csv', row.names = F)
+
+# Fil med fødselsnummer og koblingsnøkkel (PID). Hentes fra Qreg
+KoblNakke <- read.csv2(file = '../data/Degenerativ_Nakke_koblingstabell_datadump_10.03.2026.csv')
+KoblNakke_CCI <- KoblNakke[which(KoblNakke$PID %in% NakkeCCI$PasientID), ]
+KoblNakke_CCI$SSN <- stringr::str_pad(KoblNakke_CCI$SSN, width = 11, pad = "0", side = "left")
+write.csv2(KoblNakke_CCI[ ,c('SSN', 'PID')], file = '../data/KoblNakke_CCI.csv', row.names = F)
 

@@ -304,7 +304,7 @@ SELECT
     getFriendlyName(mce.CENTREID) AS SykehusNavn,
     mce.MCEID AS ForlopsID,
     mce.MCETYPE AS MceType,
-    date_format(patientform.UTFYLLING_DATO,'%Y-%m-%d') as  UtfyltDato,
+    date_format(patientform.UTFYLLING_DATO,'%Y-%m-%d') as  UtfyltDatoLege,
     patientform.ADDR_TYPE AS Adressetype,
     patientform.ADDRESS AS Adresse,
     patientform.ZIPCODE AS PostNr,

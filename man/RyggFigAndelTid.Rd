@@ -96,7 +96,7 @@ Argumentet \emph{valgtVar} har følgende valgmuligheter:
 \itemize{
 \item alder70: Alder over 70år,
 \item degSponFusj: Andel av degenerativ spondylolistese er operert  med fusjonskirurgi (hovedinngr=5)
-\item KpInf3Mnd: Sårinfeksjon, pasientrapportert
+\item KpInf3mnd: Sårinfeksjon, pasientrapportert
 \item OswEndr20: Forbedring av Oswestry-skår > 20 poeng
 }
 }

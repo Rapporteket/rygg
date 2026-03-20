@@ -22,8 +22,8 @@
 #'     \item degSponSSSten: Degenerativ spondylolistese og sentral spinal stenose
 #'     \item ErstatningPre: Søkt/planlegger å søke erstatning?
 #'     \item Fornoyd: Fornøyde pasienter
-#'     \item KpInf3Mnd: Sårinfeksjon, pasientrapportert
-#'     \item Kp3Mnd: Pasientrapporterte komplikasjoner
+#'     \item KpInf3mnd: Sårinfeksjon, pasientrapportert
+#'     \item Kp3mnd: Pasientrapporterte komplikasjoner
 #'     \item Misfornoyd:  Andel med Misfornøyd/litt misfornøyd
 #'     \item Nytte: Klart bedre
 #'	 \item OswEndrLav: Forbedring av Oswestry-skår < 13 poeng

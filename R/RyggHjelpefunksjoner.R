@@ -36,7 +36,7 @@ SorterOgNavngiTidsEnhet <- function(RegData, tidsenhet='Aar', tab=0) {
   RegData$TidsEnhetSort <- switch(tidsenhet,
                                   Aar = RegData$Aar-min(RegData$Aar)+1,
                                   Mnd = RegData$MndNum-min(RegData$MndNum[RegData$Aar==min(RegData$Aar)])+1
-                                  +(RegData$Aar-min(RegData$Aar))*12, #format(RegData$InnDato, '%b%y'), #
+                                  +(RegData$Aar-min(RegData$Aar))*12, #format(RegData$OpDato, '%b%y'), #
                                   Kvartal = RegData$Kvartal-min(RegData$Kvartal[RegData$Aar==min(RegData$Aar)])+1+
                                     (RegData$Aar-min(RegData$Aar))*4,
                                   Halvaar = RegData$Halvaar-min(RegData$Halvaar[RegData$Aar==min(RegData$Aar)])+1+
@@ -46,8 +46,8 @@ SorterOgNavngiTidsEnhet <- function(RegData, tidsenhet='Aar', tab=0) {
   #                 to=as.Date('2018-09-01'), by='month'), format = '%b%y')
 
   tidtxt <- switch(tidsenhet,
-                   Mnd = format.Date(seq(from=lubridate::floor_date(as.Date(min(as.Date(RegData$InnDato), na.rm = T)), 'month'),
-                                         to=max(as.Date(RegData$InnDato), na.rm = T), by='month'), format = '%B%y'), #Hele måneden
+                   Mnd = format.Date(seq(from=lubridate::floor_date(as.Date(min(as.Date(RegData$OpDato), na.rm = T)), 'month'),
+                                         to=max(as.Date(RegData$OpDato), na.rm = T), by='month'), format = '%B%y'), #Hele måneden
                    Kvartal = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhetSort), RegData$TidsEnhetSort)], 3,4),
                                    sprintf('%01.0f', RegData$Kvartal[match(1:max(RegData$TidsEnhetSort), RegData$TidsEnhetSort)]), sep='-'),
                    Halvaar = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhetSort), RegData$TidsEnhetSort)], 3,4),
@@ -206,17 +206,6 @@ RegDataSort$Reop90dEtterOp <- 0
 indReop <- which(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d==1)
 RegDataSort$Reop90dEtterOp[indReop] <- 1
 
-#Tar bort den gamle Reop90d-variabelen for å unngå misforståelse
-#RegDataSort <- RegDataSort[ ,-which(names(RegDataSort) == 'Reop90d')]
-#Ikke med lenger når henter data.
-
-# RegDataSort <-
-#   RegDataSort %>%
-#   dplyr::mutate(Reop2 =
-#            ifelse(RegDataSort$DagerNesteOp<90 | RegDataSort$NyRyggOpr3mnd==1 | RegDataSort$Reop90d,
-#                   1,0))
-
-# table(RegDataSort$Reop2)
 return(invisible(RegDataSort))
 }
 
@@ -336,7 +325,7 @@ if (ktr==2) {
 }
 
 
-#' Lage entydig PID
+#' Lage entydig PID DEPRECATED - slette?
 #' Lager entydig PID basert på personnummer. Alle PID i V2 har ending suffiks V2. Pasienter i V3 får PID fra V2 hvis personnummeret
 #' deres finnes i begge versjoner. NB: For at dette skal bli riktig er vi avhengig av kilde med oppdatert koblingsfil (PID-personnummer)
 #' @param data tilnavn for utdatatabell. Hvis ikke angitt, lastes ikke fil ned
@@ -367,8 +356,8 @@ tilretteleggDataDumper <- function(RegData, datoFra='2000-01-01', datoTil=Sys.Da
   RegData$Personnummer[fraV3] <- RegData$KryptertFnr[fraV3]
 
   RegData <- dplyr::filter(RegData,
-                        as.Date(InnDato) >= datoFra, # datovalg[1],
-                        as.Date(InnDato) <= datoTil) #datovalg[2])
+                        as.Date(OpDato) >= datoFra, # datovalg[1],
+                        as.Date(OpDato) <= datoTil) #datovalg[2])
   if (reshID != 0) {
     RegData <- RegData[which(as.numeric(RegData$ReshId) %in% as.numeric(reshID)), ]}
 

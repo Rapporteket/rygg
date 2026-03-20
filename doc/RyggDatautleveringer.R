@@ -73,8 +73,8 @@ write.csv2(RyggAkt, file = 'C:/Registerdata/rygg/TilCharlson/RyggOpDato.csv', ro
 #Har fått PID (felles for V2 og V2) og innleggelsesdato. Vi har ikke innleggelsesdato, men benytter operasjonsdato.
 library(rygg)
 koblVar <- c('PID', 'OpDato')
-#koblingsPID <- readxl::read_xlsx('C:/Registerinfo/Rygg/DataUtlev/PIDinndato_mer_baseline.xlsx',
-koblingsPID <- readxl::read_xlsx('data-raw/PIDinndato_mer_baseline.xlsx',
+#koblingsPID <- readxl::read_xlsx('C:/Registerinfo/Rygg/DataUtlev/PIDOpDato_mer_baseline.xlsx',
+koblingsPID <- readxl::read_xlsx('data-raw/PIDOpDato_mer_baseline.xlsx',
                              col_names = F)
 colnames(koblingsPID) <- koblVar
 koblingsPID$PID <-toupper(koblingsPID$PID)

@@ -6,21 +6,29 @@ devtools::install("../rapbase/.")
 # devtools::install(upgrade = FALSE)
 
 setwd('../data')
-sship::dec("c://Users/lro2402unn/RegistreGIT/data/rygg1518b6c9.sql.gz__20260303_081824.tar.gz",
+setwd('C:/Users/lro2402unn/RegistreGIT/rygg')
+
+sship::dec("c://Users/lro2402unn/RegistreGIT/data/rygg17fd8d901.sql.gz__20260305_110853.tar.gz",
 keyfile = "c://Users/lro2402unn/.ssh/id_rsa", target_dir = "c://Users/lro2402unn/RegistreGIT/data/.")
-# source c://Users/lro2402unn/RegistreGIT/data/rygg1518b6c9.sql;
+# source c://Users/lro2402unn/RegistreGIT/data/rygg17fd8d901.sql;
 
 
 source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
 library(rygg)
-RegData <- RyggPreprosess(RegData =RegDataV3)
 
 RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
                                      query='SELECT * FROM allevarnum')
 
-RegData <- RyggRegDataV2V3(datoFra = '2023-01-01')
-RegData <- RyggPreprosess(RegData = RegData)
+RegData <- RyggRegDataV2V3(datoFra = '2017-01-01')
+RegData <- RyggPreprosess(RegData =RegData)
+
+table(RegData$Aar, RegData$HovedInngrep)
+
+test <- RegData[ ,c(grep(pattern = 'dato',names(RegData), ignore.case = T))]
+#FormatTrøbbel: DECEASED_DATE, REGISTERED_DATE, InnlagtDato,
+head(test)
+head(RegData$OpDato)
 
 RyggFigAndelerGrVar(RegData=RegData,  valgtVar='degSponFusj1op',
                     datoFra = '2024-01-01', datoTil = '2024-12-31',
@@ -37,7 +45,7 @@ liste[order(liste$SykehusNavn),]
 table(liste$SykehusNavn)
 
 RyggData <- RyggPreprosess(RyggRegDataV2V3(datoFra = '2000-01-01'))
-test <- RyggData[,c("DodsDato", "InnDato", "PasientID", "ASA", "Alder")]
+test <- RyggData[,c("DodsDato", "OpDato", "PasientID", "ASA", "Alder")]
 
 reshID <- 110633
 4211878

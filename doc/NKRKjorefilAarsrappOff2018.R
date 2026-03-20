@@ -155,24 +155,24 @@ RyggFigAndelTid(RegData=RegData, valgtVar='beinsmLavPre',  #datoFra=datoFra, dat
 # Stenose 3 % høy måloppnåelse (grønt)
 # Fusjonskirurgi (LSS+Deg. Sp.listese)
 # Hensikt: 	Redusere postoperative sårinfeksjoner
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=1,  #Prolaps
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=1,  #Prolaps
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile=paste0('KpInf3MndProAar.', format))
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=8,  #Stenose
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=8,  #Stenose
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile=paste0('KpInf3MndSSAar.', format))
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=5, #Fusjonskirurgi  
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=5, #Fusjonskirurgi  
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile=paste0('KpInf3MndFusjAar.', format))
 
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=1,  #Prolaps
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=1,  #Prolaps
                        Ngrense=30, aar=aar2,  outfile=paste0('KpInf3MndPro.', format))
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=8,  #Stenose
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=8,  #Stenose
                        Ngrense=30, aar=aar2, outfile=paste0('KpInf3MndSS.', format))
-RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=5, #Fusjonskirurgi  
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=5, #Fusjonskirurgi  
                        Ngrense=30, aar=aar2, outfile=paste0('KpInf3MndFusj.', format))
 
 
-RyggFigAndelTid(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=1, outfile=paste0('KpInf3MndProTid.', format))
-RyggFigAndelTid(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=5, outfile=paste0('KpInf3MndFusjTid.', format))
-RyggFigAndelTid(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=8, outfile=paste0('KpInf3MndSSTid.', format))
+RyggFigAndelTid(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=1, outfile=paste0('KpInf3MndProTid.', format))
+RyggFigAndelTid(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=5, outfile=paste0('KpInf3MndFusjTid.', format))
+RyggFigAndelTid(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=8, outfile=paste0('KpInf3MndSSTid.', format))
 
 #-----------Durarift
 #Mål: 		Prolaps 2 % høy måloppnåelse (grønt),
@@ -274,9 +274,9 @@ DataTilResultatportalen(RegData = RyggData, valgtVar='beinsmLavPre', datoFra = '
                         filUt = 'ind2_lav_bensmerte_prolaps_Rygg')
 
 #--Sårinfeksjon, dyp og overfladisk
-DataTilResultatportalen(RegData = RyggData, valgtVar='KpInf3Mnd', datoFra = '2011-01-01', hovedkat=1, 
+DataTilResultatportalen(RegData = RyggData, valgtVar='KpInf3mnd', datoFra = '2011-01-01', hovedkat=1, 
                         filUt = 'ind3_Saarinfeksjon_prolaps')
-DataTilResultatportalen(RegData = RyggData, valgtVar='KpInf3Mnd', datoFra = '2011-01-01', hovedkat=8,
+DataTilResultatportalen(RegData = RyggData, valgtVar='KpInf3mnd', datoFra = '2011-01-01', hovedkat=8,
                         filUt = 'ind4_Saarinfeksjon_stenose')
 
 #-----------Durarift
@@ -392,10 +392,10 @@ tabNokkeltallRygg[,c('2017','2018')]
   
 #------------------------------Tidligere Kvalitetsindikatorer og andre figurer til årsrapp/off----------------------
 #Sårinfeksjon, pasientrapportert (prolaps) – lav
-RyggFigAndelerGrVarAar(RegData=RegData, preprosess=0, valgtVar='KpInf3Mnd', hovedkat=1,  
+RyggFigAndelerGrVarAar(RegData=RegData, preprosess=0, valgtVar='KpInf3mnd', hovedkat=1,  
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='KpInf3MndPro.png') 
 #Sårinfeksjon, pasientrapportert (spinal stenose) – lav
-RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3Mnd', hovedkat=8,  
+RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='KpInf3mnd', hovedkat=8,  
                        Ngrense=30, aar=aar2, tidlAar=tidlAar2, outfile='KpInf3MndSS.png') 
 #Komplikasjon durarift ved operasjon (prolaps, elektiv, primærop.), - lav
 RyggFigAndelerGrVarAar(RegData=RegData, preprosess=0, valgtVar='PeropKompDura', hovedkat=1, tidlOp=4, opKat=1, 
@@ -485,9 +485,9 @@ outfile <- paste0(valgtVar, '_1', grVar,'.png')
 RyggFigAndelerGrVarAar(RegData=RegData, preprosess=0, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, 
                     ktr=ktr, hovedkat=hovedkat, opKat=opKat, tidlOp=tidlOp, enhetsUtvalg=enhetsUtvalg, reshID=reshID, outfile=outfile)
 
-#KpInf3Mnd: Andel sårinfeksjon (enhver). Variabel: KpInf3Mnd 
+#KpInf3mnd: Andel sårinfeksjon (enhver). Variabel: KpInf3mnd 
 #Utvalg: prolaps, foraminotomi+ laminectomi slått sammen i en gruppe og fusjonskirurgi)
-valgtVar <- 'KpInf3Mnd'
+valgtVar <- 'KpInf3mnd'
 ktr <- 1
 outfile <- paste0(valgtVar, '_1', grVar,'.png')
 RyggFigAndelerGrVarAar(RegData=RegData, preprosess=0, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, 
@@ -543,7 +543,7 @@ RegData <- RyggPreprosess(RegData=RegData)
 PIDop <- table(RegData$PID, RegData$OpDato)
 testDato <- aggregate(RegData$PID, by=RegData[ ,c('PID','OpDato')], drop=TRUE, FUN=length)
 testDato[which(testDato$x >1), ]
-testMnd <- aggregate(RegData$InnDato, by=RegData[ ,c('PID','Mnd','OpAar')], drop=TRUE, FUN=length)
+testMnd <- aggregate(RegData$OpDato, by=RegData[ ,c('PID','Mnd','OpAar')], drop=TRUE, FUN=length)
 duplMnd <- testMnd[which(testMnd$x >1), ]
 testAar <- aggregate(RegData$PID, by=RegData[ ,c('PID','OpAar')], drop=TRUE, FUN=length)
 sum(testAar$x >1)
@@ -561,7 +561,7 @@ RegData <- NakkePreprosess(RegData=NakkeData)
 #PIDop <- table(RegData$PasientID, RegData$OprDato)
 testDato <- aggregate(RegData$PasientID, by=RegData[ ,c('PasientID','OprDato')], drop=TRUE, FUN=length)
 testDato[which(testDato$x >1), ]
-RegData$Mnd <- RegData$InnDato$mon +1
+RegData$Mnd <- RegData$OpDato$mon +1
 RegData$Mnd <- RegData$Mnd-min(RegData$Mnd[RegData$Aar==min(RegData$Aar)])+1
 testMnd <- aggregate(RegData$OprDato, by=RegData[ ,c('PasientID','Mnd','Aar')], drop=TRUE, FUN=length)
 duplMnd <- testMnd[which(testMnd$x >1), ]
@@ -586,9 +586,9 @@ RyggFigAndelerGrVar(RegData=DeknData, preprosess = 0, valgtVar='deknGrad', datoF
 rm(list = ls())
 library(nkr)
 load('A:/Rygg/Rygg2010-2018aarsrapp.Rdata')
-#Aktuelle variable: KpInf3Mnd (1,5,8), PeropKompDura(1,5,8), OswEndr (1,5,8+9) (gj.sn)
+#Aktuelle variable: KpInf3mnd (1,5,8), PeropKompDura(1,5,8), OswEndr (1,5,8+9) (gj.sn)
 
-valgtVar <- 'PeropKompDura' #'KpInf3Mnd' 'PeropKompDura' 'OswEndr' 
+valgtVar <- 'PeropKompDura' #'KpInf3mnd' 'PeropKompDura' 'OswEndr' 
 if (valgtVar == 'OswEndr'){
    datoTil <- '2017-12-31'
    BerData <- RyggFigGjsnBox(RegData=RegData, valgtVar=valgtVar, ktr=2, hovedkat=9, tidlOp = 4, opKat=1,

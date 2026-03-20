@@ -57,10 +57,10 @@ ind <- RyggUtvalg$ind
 N <- dim(RegData6mnd)[1]
 
 RegDataEget6mnd <- RegData6mnd[ind$Hoved, ]
-RegDataEgetMnd <- RegDataEget6mnd[which(as.Date(RegDataEget6mnd$InnDato, tz='UTC') >= datoFraMnd), ]
+RegDataEgetMnd <- RegDataEget6mnd[which(as.Date(RegDataEget6mnd$OpDato, tz='UTC') >= datoFraMnd), ]
 RegDataResten6mnd <- RegData6mnd[setdiff(1:N,ind$Hoved), ]
 
-maxDatoEget <- format.Date(max(RegDataEget6mnd$InnDato), format='%d.%m.%Y', tz='UTC')
+maxDatoEget <- format.Date(max(RegDataEget6mnd$OpDato), format='%d.%m.%Y', tz='UTC')
 Neget <- dim(RegDataEget6mnd)[1]
 tabKjPstEget <- round(table(RegDataEget6mnd$ErMann)/Neget*100, digits=1)
 

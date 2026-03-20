@@ -17,8 +17,8 @@ V3[V3$PasientID==begge[1],]
 # 'DodsDato' ='DodsDato'
 varDod <- c('DodsDato','DodsDato')
 RyggDataRaa[,varDod]
-RyggDataRaa$InnDato <- as.Date(RyggDataRaa$OpDato, format="%Y-%m-%d") #, tz='UTC')
-RyggDataRaa$Dod30[which(as.numeric(as.Date(RyggDataRaa$DodsDato) - as.Date(RyggDataRaa$InnDato)) < 30)] <- 1
+RyggDataRaa$OpDato <- as.Date(RyggDataRaa$OpDato, format="%Y-%m-%d") #, tz='UTC')
+RyggDataRaa$Dod30[which(as.numeric(as.Date(RyggDataRaa$DodsDato) - as.Date(RyggDataRaa$OpDato)) < 30)] <- 1
 table(RyggData$Dod365)
 
 
@@ -187,15 +187,15 @@ tab[tab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'P
 #----Sjekk av utfyltdato----
 setwd('/home/rstudio/speil/aarsrapp/Rygg')
 RegData <- RyggPreprosess(RegData = RyggRegDataV2V3(datoFra = '2010-01-01'))
-RegData$Diff3 <- as.integer(difftime(RegData$Utfdato3mnd, RegData$InnDato, units = 'days'))
-RegData$Diff12 <- as.integer(difftime(RegData$Utfdato12mnd, RegData$InnDato, units = 'days'))
+RegData$Diff3 <- as.integer(difftime(RegData$Utfdato3mnd, RegData$OpDato, units = 'days'))
+RegData$Diff12 <- as.integer(difftime(RegData$Utfdato12mnd, RegData$OpDato, units = 'days'))
 
 ind3 <- which(RegData$Diff3 < 70)
-feil3 <- RegData[ind3, c("ForlopsID", "ShNavn", 'InnDato',  "Utfdato3mnd", "Diff3")]
+feil3 <- RegData[ind3, c("ForlopsID", "ShNavn", 'OpDato',  "Utfdato3mnd", "Diff3")]
 write.table(feil3, file="Feil3mnd.csv", sep=';')
 
 ind12 <- which(RegData$Diff12 < 300)
-feil12 <- RegData[ind12, c("ForlopsID", "ShNavn", 'InnDato',  "Utfdato12mnd", "Diff12")]
+feil12 <- RegData[ind12, c("ForlopsID", "ShNavn", 'OpDato',  "Utfdato12mnd", "Diff12")]
 write.table(feil12, file="Feil12mnd.csv", sep=';')
 
 #V2 og V3
@@ -457,7 +457,7 @@ tab <- lagTabavFig(UtDataFraFig=DataUt, figurtype='andelTid')
 #Sjekk Oswestry-skår for V3
  variable <- c('alder70', 'antibiotika', 'arbstatus', 'ASA', 'smBePreLav',
               'beinsmEndrLav', 'BMI', 'degSponFusj', 'degSponSSSten', 'erstatningPre', 'fornoydhet',
-              'KpInf3Mnd', 'Kp3Mnd', 'misfornoyd', 'nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
+              'KpInf3mnd', 'Kp3mnd', 'misfornoyd', 'nytte', 'OswEndrLav', 'OswEndr20', 'OswEndr30pst',
               'Osw22', 'Osw48', 'peropKompDura', 'roker', 'saardren', 'smStiPre', 'symptVarighRyggHof',
               'sympVarighUtstr', 'tidlOp3', 'uforetrygdPre', 'utd', 'verre')
 for (var in variable) {
@@ -507,7 +507,7 @@ RegData <- merge(NKRdata, BoStederInnb2015, by.x = "Kommunenr", by.y = "KommNr",
 
 
 
-valgtVar <- 'SympVarighUtstr'   #, #BeinsmEndrLav', BeinsmLavPre, DegSponSSSten, KpInf3Mnd
+valgtVar <- 'SympVarighUtstr'   #, #BeinsmEndrLav', BeinsmLavPre, DegSponSSSten, KpInf3mnd
                               # OswEndr13, OswEndr20, OswEndr30pst, Osw48, SympVarighUtstr, Verre,
 
 #Indikatorprosjekt: BeinsmLavPre, OswEndr20
@@ -520,7 +520,7 @@ RyggFigAndelerGrVarAar(RegData=RegData, valgtVar=valgtVar, datoFra=datoFra, dato
 
 variableInd <- c('BeinsmLavPre', 'OswEndr20','SympVarighUtstr')
 variable <- c('Alder', 'Antibiotika', 'ArbstatusPre', 'Arbstatus3mnd', 'Arbstatus12mnd', 'ASA', 'BMI',
-             'ErstatningPre', 'Fornoyd3mnd','Fornoyd12mnd', 'Kp3Mnd', 'Misfor3mnd', 'Misfor12mnd',
+             'ErstatningPre', 'Fornoyd3mnd','Fornoyd12mnd', 'Kp3mnd', 'Misfor3mnd', 'Misfor12mnd',
           'Nytte3mnd', 'Nytte12mnd', 'PeropKomp', 'Osw30_3mnd', 'Osw30_12mnd', 'PeropKompDura', 'Roker',
           'Saardren', 'SmStiPre', 'SymptVarighRyggHof', 'SympVarighUtstr', 'UforetrygdPre', 'Utd', 'Verre3mnd', 'Verre12mnd')
 #for (grVar in c('Fylke', 'ShNavn', 'BoRHF')){
@@ -635,7 +635,7 @@ PIDop <- table(RegData$PID, RegData$OpDato)
 names(PIDop[which(PIDop>1)])
 testDato <- aggregate(RegData$PID, by=RegData[ ,c('PID','OpDato')], drop=TRUE, FUN=length)
 test[which(test$x >1), ]
-testMnd <- aggregate(RegData$InnDato, by=RegData[ ,c('PID','Mnd','OpAar')], drop=TRUE, FUN=length)
+testMnd <- aggregate(RegData$OpDato, by=RegData[ ,c('PID','Mnd','OpAar')], drop=TRUE, FUN=length)
 duplMnd <- testMnd[which(testMnd$x >1), ]
 testAar <- aggregate(RegData$PID, by=RegData[ ,c('PID','OpAar')], drop=TRUE, FUN=length)
 sum(testAar$x >1)
