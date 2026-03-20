@@ -20,9 +20,10 @@ library(rygg)
 RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
                                      query='SELECT * FROM allevarnum')
 
-RegData <- RyggRegDataV2V3(datoFra = '2017-01-01')
-RegData <- RyggPreprosess(RegData =RegData)
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
+RegData <- RyggPreprosess(RegData =RegDataRaa)
 
+tapply(RegData$TidlOprAntall, RegData$Aar, FUN = max, na.rm=T)
 table(RegData$Aar, RegData$HovedInngrep)
 
 test <- RegData[ ,c(grep(pattern = 'dato',names(RegData), ignore.case = T))]
@@ -39,7 +40,7 @@ remotes::install_github('Rapporteket/rapbase', ref = 'main')
 
 
 test <- RyggRegDataV2V3(datoFra = '2000-01-01')
-
+names(RegDataV2)[grep('dato', names(RegDataV2), ignore.case = T)]
 liste <- unique(test[,c('SykehusNavn', 'AvdRESH')])
 liste[order(liste$SykehusNavn),]
 table(liste$SykehusNavn)

@@ -238,8 +238,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   #Evt flytt dette til skjemaet det hører hjemme...
   fjernes <- c(varFjernes, "Bydelskode",	"Bydelsnavn","Fylke", "HelseRegion",
-               'MceType', 'DodsDato', 'KommuneNr',	'KommuneNavn',
-               'REGIONAL_HEALTH_AUTHORITY')
+               'MceType', 'KommuneNr',	'KommuneNavn', 'REGIONAL_HEALTH_AUTHORITY')
 
   RegData <- RegData[ ,-c(grep('_MISS', names(RegData)), which(names(RegData) %in% fjernes))]
 
