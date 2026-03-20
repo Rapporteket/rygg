@@ -73,9 +73,6 @@ RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVa
 valgtVar <- 'antTidlOp'
 RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_ford.pdf') )
 
-#  0     1     2     3     4     5     6     7    8     9    10    11    12    20    22  <NA>
-# 27  6819  2156   721   250    91    37    16    3     5     2     1     1     1     1 29682
-
 # Tidsutvikling for 30-dagers mortalitet. Dvs. 30-dagers mort. per år. AndelGrVar og -Tid? ja
 valgtVar <- 'dod30' # dod30 dod365
 RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
@@ -88,8 +85,24 @@ RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVa
 # Vurder om “V3” kan fjernes fra EQ-variabler
 
 #---------FIGURER, årsrapport --------------
-#Registreringsforsinkelse
 
+# Andel bruk OpAndreEndosk= 1 hos hhv. «LSSopr»= 1 og «ProlapsDekr»=1, per sykehus (siste 2 år?) Andel over tid (hele Norge).
+RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'opAndreEndoskopi', hovedkat = 1,
+                    outfile ='opAndreEndoskopiPro_Sh.pdf')
+RyggFigAndelTid(RegData = RegData, valgtVar = 'opAndreEndoskopi', hovedkat = 1,
+                outfile = 'opAndreEndoskopiPro_Tid.pdf')
+RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'opAndreEndoskopi', hovedkat = 9,
+                    outfile ='opAndreEndoskopiSS_Sh.pdf')
+RyggFigAndelTid(RegData = RegData, valgtVar = 'opAndreEndoskopi', hovedkat = 9,
+                outfile = 'opAndreEndoskopiSS_Tid.pdf')
+
+# Andel fusjonskirurgi der det er brukt navigasjon til skrueplassering -.> Hvilke variabler? OpComputerNav
+RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar = 'computerNav', outfile = 'computerNav_Sh.pdf')
+RyggFigAndelTid(RegData = RegData, valgtVar = 'computerNav', outfile = 'computerNav_Tid.pdf')
+
+dum <- RyggFigAndeler(RegData = RegData1aar, valgtVar = 'antTidlOp', outfile = 'AntTidlOpFord.pdf')
+
+#Registreringsforsinkelse
 dum <- RyggFigAndeler(RegData=RegData1aar, valgtVar='regForsinkelse', datoFra=datoFra1aar,
                             outfile='RegForsinkelseFord.pdf')
 dum <-  RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='regForsinkelse', Ngrense = 10,
