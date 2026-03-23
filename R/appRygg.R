@@ -176,92 +176,6 @@ ui <- navbarPage(
   ), #tab
 
 
-  #-------Registeradministrasjon----------
-  tabPanel(
-    p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
-    value = "Registeradministrasjon",
-    h3('Egen side for registeradministratorer. Siden er bare synlig for SC-bruker'),
-    tabsetPanel(
-      tabPanel("Utsending av rapporter",
-        # h4("Utsending av rapporter"),
-        sidebarPanel(
-          rapbase::autoReportOrgInput("RyggUtsending"),
-          rapbase::autoReportInput("RyggUtsending"),
-
-          #Tørrkjøring
-          br(),
-          shiny::actionButton(inputId = "run_autoreport",
-                              label = "Kjør autorapporter"),
-          shiny::dateInput(inputId = "rapportdato",
-                           label = "Kjør rapporter med dato:",
-                           value = Sys.Date()+1,
-                           min = Sys.Date(),
-                           max = Sys.Date() + 366
-          ),
-          shiny::checkboxInput(inputId = "dryRun", label = "Send e-post")
-        ),
-        mainPanel(
-          rapbase::autoReportUI("RyggUtsending"),
-
-          br(),
-          p(em("System message:")),
-          verbatimTextOutput("sysMessage"),
-          p(em("Function message:")),
-          verbatimTextOutput("funMessage")
-
-        )
-      ), #Utsending-tab
-
-      shiny::tabPanel("Datakvalitet",
-            sidebarPanel(
-          numericInput(inputId = 'valgtTidsavvik',
-                       label = 'Dager mellom registrerte operasjoner:',
-                       value = 30,
-                       min = 0,
-                       max = NA,
-                       step = 1
-                       , width = '100px'
-          )
-        ),
-        mainPanel(
-          h3('Potensielle dobbeltregistreringer'),
-          br(),
-          h4('Funksjonen finner alle PID med to operasjoner gjort med valgt tidsintervall eller kortere. I tabellen
-                       vises alle operasjoner for de aktuelle pasientene.'),
-          downloadButton(outputId = 'lastNed_tabDblReg', label='Last ned tabell med mulige dobbeltregistreringer'),
-          br(),
-          tableOutput("tabDblReg")
-        )
-      ), #Datakvalitet-tab
-
-      shiny::tabPanel("Datadump",
-          h3('Last ned data'),
-          br(),
-          dateRangeInput(inputId = 'datovalgDatadump', start = startDato, end = idag,
-                         label = "Tidsperiode", separator="t.o.m.", language="nb"),
-          uiOutput('OppsumAntReg'),
-          br(),
-          br(),
-          uiOutput("velgReshReg"),
-          br(),
-          downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
-      ), #Datadump-tab
-
-      shiny::tabPanel(
-        "Eksport",
-        #shiny::sidebarLayout(
-        shiny::sidebarPanel(
-          rapbase::exportUCInput("ryggExport")
-        ),
-        shiny::mainPanel(
-          rapbase::exportGuideUI("ryggExportGuide")
-        )
-        #)
-      ) #Eksport-tab
-    ) #tabsetPanel
-  ), #Registeradm-tab
-
-
   #-------------Fordelinger---------------------
   tabPanel(p('Fordelinger',
              title='Alder, Innkomstmåte,... '),
@@ -559,18 +473,109 @@ server_rygg <- function(input, output, session) {
 
   output$egetShTxt <- renderText(paste('Drift og resultater, ',
                                        as.character(RegData$ShNavn[match(user$org(), RegData$ReshId)])))
-
+  
+  #-------Registeradministrasjon----------
   observeEvent(user$role(), {
     if (user$role() == 'SC') {
-      showTab(inputId = "hovedark", target = "Registeradministrasjon")
-      shinyjs::show(id = 'velgReshReg')
-      shinyjs::show(id = 'velgReshFord')
-      shinyjs::show(id = 'lastNed_dataDump')
+      shiny::insertTab(
+        inputId = "hovedark",
+        tab = tabPanel(
+          p("Registeradministrasjon", title='Registrators side for registreringer og resultater'),
+          value = "Registeradministrasjon",
+          h3('Egen side for registeradministratorer. Siden er bare synlig for SC-bruker'),
+          tabsetPanel(
+            tabPanel("Utsending av rapporter",
+              # h4("Utsending av rapporter"),
+              sidebarPanel(
+                rapbase::autoReportOrgInput("RyggUtsending"),
+                rapbase::autoReportInput("RyggUtsending"),
+
+                #Tørrkjøring
+                br(),
+                shiny::actionButton(inputId = "run_autoreport",
+                                    label = "Kjør autorapporter"),
+                shiny::dateInput(inputId = "rapportdato",
+                                label = "Kjør rapporter med dato:",
+                                value = Sys.Date()+1,
+                                min = Sys.Date(),
+                                max = Sys.Date() + 366
+                ),
+                shiny::checkboxInput(inputId = "dryRun", label = "Send e-post")
+              ),
+              mainPanel(
+                rapbase::autoReportUI("RyggUtsending"),
+
+                br(),
+                p(em("System message:")),
+                verbatimTextOutput("sysMessage"),
+                p(em("Function message:")),
+                verbatimTextOutput("funMessage")
+
+              )
+            ), #Utsending-tab
+
+            shiny::tabPanel("Datakvalitet",
+                  sidebarPanel(
+                numericInput(inputId = 'valgtTidsavvik',
+                            label = 'Dager mellom registrerte operasjoner:',
+                            value = 30,
+                            min = 0,
+                            max = NA,
+                            step = 1
+                            , width = '100px'
+                )
+              ),
+              mainPanel(
+                h3('Potensielle dobbeltregistreringer'),
+                br(),
+                h4('Funksjonen finner alle PID med to operasjoner gjort med valgt tidsintervall eller kortere. I tabellen
+                            vises alle operasjoner for de aktuelle pasientene.'),
+                downloadButton(outputId = 'lastNed_tabDblReg', label='Last ned tabell med mulige dobbeltregistreringer'),
+                br(),
+                tableOutput("tabDblReg")
+              )
+            ), #Datakvalitet-tab
+
+            shiny::tabPanel("Datadump",
+                h3('Last ned data'),
+                br(),
+                dateRangeInput(
+                  inputId = 'datovalgDatadump',
+                  start = startDato <- paste0(as.numeric(format(Sys.Date()-180, "%Y")), '-01-01'),
+                  end = Sys.Date(),
+                  label = "Tidsperiode",
+                  separator="t.o.m.",
+                  language="nb"
+                ),
+                uiOutput('OppsumAntReg'),
+                br(),
+                br(),
+                uiOutput("velgReshReg"),
+                br(),
+                downloadButton(outputId = 'lastNed_dataDump', label='Last ned datadump'),
+            ), #Datadump-tab
+
+            shiny::tabPanel(
+              "Eksport",
+              #shiny::sidebarLayout(
+              shiny::sidebarPanel(
+                rapbase::exportUCInput("ryggExport")
+              ),
+              shiny::mainPanel(
+                rapbase::exportGuideUI("ryggExportGuide")
+              )
+              #)
+            ) #Eksport-tab
+          ) #tabsetPanel
+        ), #Registeradm-tab,
+        target = "Registreringsoversikter",
+        position = "after"
+      )
     } else {
-      hideTab(inputId = "hovedark", target = "Registeradministrasjon")
-      shinyjs::hide(id = 'velgReshReg')
-      shinyjs::hide(id = 'velgReshFord')
-      shinyjs::hide(id = 'lastNed_dataDump')
+      shiny::removeTab(
+        inputId = "hovedark",
+        target = "Registeradministrasjon"
+      )
     }
   })
 
@@ -678,9 +683,14 @@ server_rygg <- function(input, output, session) {
   })
 
   output$velgReshReg <- renderUI({
+    if (user$role()=='SC') {
     selectInput(inputId = 'velgReshReg', label='Velg sykehus',
                 selected = 0,
-                choices = sykehusValg) })
+                choices = sykehusValg) 
+    } else {
+      NULL
+    }
+    })
 
   # Hente oversikt over registreringer (opdato og fødselsdato), samt datadump
   observe({
@@ -753,9 +763,13 @@ server_rygg <- function(input, output, session) {
   })
 
   output$velgReshFord <- renderUI({
+    if (user$role()=='SC') {
     selectInput(inputId = 'velgReshFord', label='Velg sykehus',
                 selected = 0,
                 choices = sykehusValg)
+    } else {
+      NULL
+    }
   })
 
   # output$velgReshReg <- renderUI({
