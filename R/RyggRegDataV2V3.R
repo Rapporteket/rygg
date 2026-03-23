@@ -32,7 +32,8 @@ RyggRegDataV2V3 <- function(datoFra = '2007-01-01') {
   RegDataV3 <- tilpassV3data(RegDataV3 = RegDataV3)
 
 if (kunV3 == 0){
-  RegDataV3$RokerV2 <- plyr::mapvalues(RegDataV3$RokerV3, from = 2, to = 0)
+  RegDataV3$RokerV2 <- dplyr::replace_values(RegDataV3$RokerV3, from = 2, to = 0)
+
   VarV2 <- names(RegDataV2) #sort
   VarV3 <- names(RegDataV3) #sort
 

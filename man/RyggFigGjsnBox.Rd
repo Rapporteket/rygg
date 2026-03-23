@@ -6,7 +6,7 @@
 \usage{
 RyggFigGjsnBox(
   RegData,
-  outfile,
+  outfile = "",
   valgtVar,
   tidlOp = "",
   erMann = "",

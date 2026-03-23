@@ -4,7 +4,7 @@
 \alias{RyggRegDataV2V3}
 \title{Henter data registrert for Degenerativ Rygg}
 \usage{
-RyggRegDataV2V3(datoFra = "2007-01-01", alleVarV3 = 1, alleVarV2 = 0)
+RyggRegDataV2V3(datoFra = "2007-01-01")
 }
 \arguments{
 \item{datoFra}{Benyttes kun til å avgjøre om kobling til V2 skal utføres.}
