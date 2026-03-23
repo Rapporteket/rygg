@@ -107,7 +107,7 @@ tilpassV3data <- function(RegDataV3){
 
   #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
   RegDataV3[which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31'),
-            c('KpInfOverfla3mnd', 'indIkkeSaarInf', 'KpInfDyp3mnd', 'KpInfDyp12mnd')] <- NA
+            c('KpInfOverfla3mnd', 'KpInfDyp3mnd', 'KpInfDyp12mnd')] <- NA
 
 
   #Ønsker tom for manglende
@@ -156,7 +156,9 @@ tilpassV3data <- function(RegDataV3){
   RegDataV3$OpMikro <- dplyr::replace_values(RegDataV3$OpMikroV3,
                                        from = c(0,1,2,3,9), to = c(0,1,1,1,0))
   RegDataV3$OpAndreEndosk <- dplyr::replace_values(RegDataV3$OpMikroV3,
-                                             from = c(0,1,2,3,9), to = c(0,0,0,1,0))
+                                             from = c(0,1,2,3,9), to = c(0,0,0,1,0)) #OpMikroV3= 3 OR
+  RegDataV3$OpAndreEndosk[with(RegDataV3, which(EndoSkopTilg == 1 | EndoSkopTilg == 2 |
+                                                   EndoSkopTekn == 1 | EndoSkopTekn == 2))] <- 1
 
   RegDataV3$ForstLukketLege <- as.character(as.Date(RegDataV3$ForstLukketLege))
   #Kobling med NA fungerer ikke for datotid-var

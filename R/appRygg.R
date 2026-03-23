@@ -308,6 +308,8 @@ ui <- navbarPage(
                            'Smertestillende, bruk preop.' = 'smStiPre',
                            'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
                            'Tid fra utf. av pasientskjema til operasjon' = 'diffPasUtfOp',
+                           'Tid fra operasjon til utfylt 3mnd-skjema' = 'diffUtf3mnd',
+                           'Tid fra operasjon til utfylt 12mnd-skjema' = 'diffUtf12mnd',
                            'Tidligere ryggoperert?' = 'tidlOpr',
                            'Tidligere operasjoner, antall' = 'tidlOprAntall',
                            'Søkt erstatning?' = 'erstatningPre',
@@ -395,8 +397,8 @@ ui <- navbarPage(
                            'ASA-grad > II' = 'ASA',
                            'Degen. spondy. op. m/fusjon' = 'degSponFusj',
                            'Degen. spondy. 1. op. m/fusjon' = 'degSponFusj1op',
-                           'Dødelighet, 30 dager' = 'dod30',
-                           'Dødelighet, 1 år' = 'dod365',
+                           # 'Dødelighet, 30 dager' = 'dod30',
+                           # 'Dødelighet, 1 år' = 'dod365',
                            'Fedme (BMI>30)' = 'BMI',
                            'Flere enn to tidligere operasjoner' = 'tidlOp3',
                            'Fusjon, ryggsmerter uten utstråling, ingen dekompresjon' = 'opFusjonUtenDekompr',
@@ -698,10 +700,11 @@ server_rygg <- function(input, output, session) {
     if (user$role()=='SC') {
 
 
-      fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
-                     "FusjonSpes", "OpAndreSpes", "OpAndreSpes", "OpIndAnSpe", "RfAnnetspes",
-                     "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
-      RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
+      varFjernes <- c("AnnetMorsm",
+                     "FusjonSpes", "OpAndreSpes", "OpIndAnSpe", "RfAnnetspes",
+                     "SpesifiserReopArsak", "SykdAnnetspesifiser", "SykdAnnetSpesifiser",
+                     'DatoFodt', 'InngrepV3')
+      RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% varFjernes)]
       dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,
                                 datoFra = input$datovalgDatadump[1],
                                 datoTil = input$datovalgDatadump[2],
