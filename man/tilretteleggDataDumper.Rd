@@ -2,7 +2,7 @@
 % Please edit documentation in R/RyggHjelpefunksjoner.R
 \name{tilretteleggDataDumper}
 \alias{tilretteleggDataDumper}
-\title{Lage entydig PID
+\title{Lage entydig PID DEPRECATED - slette?
 Lager entydig PID basert på personnummer. Alle PID i V2 har ending suffiks V2. Pasienter i V3 får PID fra V2 hvis personnummeret
 deres finnes i begge versjoner. NB: For at dette skal bli riktig er vi avhengig av kilde med oppdatert koblingsfil (PID-personnummer)}
 \usage{
@@ -27,7 +27,7 @@ tilretteleggDataDumper(
 Datafil med entydige PID
 }
 \description{
-Lage entydig PID
+Lage entydig PID DEPRECATED - slette?
 Lager entydig PID basert på personnummer. Alle PID i V2 har ending suffiks V2. Pasienter i V3 får PID fra V2 hvis personnummeret
 deres finnes i begge versjoner. NB: For at dette skal bli riktig er vi avhengig av kilde med oppdatert koblingsfil (PID-personnummer)
 }
