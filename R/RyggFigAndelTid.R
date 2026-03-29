@@ -60,6 +60,10 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
     erMann=1
     hovedkat <- 1:2
   }
+  if (valgtVar %in% c('dod30', 'dod365')){
+    enhetsUtvalg <- 0
+  }
+
   RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                               hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
