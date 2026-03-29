@@ -23,8 +23,15 @@ RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
 RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
-tapply(RegData$TidlOprAntall, RegData$Aar, FUN = max, na.rm=T)
-table(RegData$Aar, RegData$HovedInngrep)
+
+RegData[which(RegData$TidlOprAntall>10), c('PasientID', 'OpDato', 'ShNavn', 'TidlOprAntall')]
+RegData$ShNavn
+
+# Aleris Drammen (4211881)
+# Aleris Drammen (107240) V2
+
+unique(RegDataV3[grep('Aleris', RegDataV3$SykehusNavn) ,c("SykehusNavn", "ReshId")])
+
 
 test <- RegData[ ,c(grep(pattern = 'dato',names(RegData), ignore.case = T))]
 #FormatTrøbbel: DECEASED_DATE, REGISTERED_DATE, InnlagtDato,

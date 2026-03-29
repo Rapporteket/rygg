@@ -19,12 +19,10 @@ tilpassV2data <- function(RegDataV2){
   RegDataV2$ArbstatusPreV2V3 <- as.numeric(RegDataV2$ArbstatusPre)
   RegDataV2$Arbstatus3mndV2V3 <- as.numeric(RegDataV2$Arbstatus3mnd)
   RegDataV2$Arbstatus12mndV2V3 <- as.numeric(RegDataV2$Arbstatus12mnd)
-  RegDataV2$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV2$ArbstatusPreV2V3, from = c(2,8,9,10), to = c(NA,7,8,9))
-  RegDataV2$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus3mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
-  RegDataV2$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV2$Arbstatus12mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
-
-  RegDataV2 <- RegDataV2[ , -which(names(RegDataV2) %in%
-                                     c('ArbstatusPre', 'Arbstatus3mnd', 'Arbstatus12mnd'))]
+  RegDataV2 <- RegDataV2 |> dplyr::mutate(ArbstatusPre=NULL, Arbstatus3mnd=NULL, Arbstatus12mnd=NULL)
+  RegDataV2$ArbstatusPreV2V3 <- dplyr::replace_values(RegDataV2$ArbstatusPreV2V3, from = c(2,8,9,10), to = c(NA,7,8,9))
+  RegDataV2$Arbstatus3mndV2V3 <- dplyr::replace_values(RegDataV2$Arbstatus3mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
+  RegDataV2$Arbstatus12mndV2V3 <- dplyr::replace_values(RegDataV2$Arbstatus12mndV2V3, from = c(2,8,9,10,11), to = c(NA,7,8,9,NA))
 
   #SykemeldVarighPre V2-numerisk, V3 - 1: <3mnd, 2:3-6mnd, 3:6-12mnd, 4:>12mnd, 9:Ikke utfylt
   RegDataV2$SykemeldVarighPreV3 <- as.numeric(cut(as.numeric(RegDataV2$SykemeldVarighPre),
@@ -32,31 +30,12 @@ tilpassV2data <- function(RegDataV2){
                                                   right = FALSE, labels=c(1:4)))
   RegDataV2$SykemeldVarighPreV3[is.na(RegDataV2$SykemeldVarighPreV3)] <- 9
 
-  RegDataV2$AntibiotikaV3 <-  plyr::mapvalues(as.numeric(RegDataV2$Antibiotika), from = c(0, 1, NA), to = c(0,1,9))
+  RegDataV2$AntibiotikaV3 <-  dplyr::replace_values(as.numeric(RegDataV2$Antibiotika), from = c(0, 1, NA), to = c(0,1,9))
 
   #V2: Kode 1:4,NA: 'Ja', 'Nei', 'Planlegger', 'Innvilget', 'Ukjent'
   #V3: [0,1,2,3,9]	["Nei","Ja","Planlegger","Innvilget","Ikke utfylt"]
-  RegDataV2$ErstatningPre <- plyr::mapvalues(as.numeric(RegDataV2$ErstatningPre), from = c(2,3,4,NA), to = c(0,2,3,9))
-  RegDataV2$UforetrygdPre <- plyr::mapvalues(as.numeric(RegDataV2$UforetrygdPre), from = c(2,3,4,NA), to = c(0,2,3,9))
-
-
-
-  RegDataV2$AvdNavn <- plyr::revalue(RegDataV2$AvdNavn, c( #Gammelt navn V2 - nytt navn (V3)
-    'Aleris, Bergen' = 'Aleris Bergen',
-    'Aleris, Oslo' = 'Aleris Oslo',
-    'Larvik' = 'Tønsberg',
-    'Oslofjordklinikken Øst' = 'Oslofjordklinikken',
-    'Teres Colloseum, Oslo' = 'Aleris Oslo',
-    'Teres Colloseum, Stavanger'  = 'Aleris Stavanger',
-    'Teres, Bergen' = 'Aleris Bergen',
-    'Teres, Drammen' =  'Aleris Drammen'  ,
-    'Ulriksdal' = 'Volvat',
-    'UNN, nevrokir' = 'Tromsø')
-  )
-
-  # RegDataV2$AvdReshID <- plyr::revalue(RegDataV2$AvdReshID,  #Gammelt navn V2 - nytt navn (V3), dvs. gmlresh	nyresh
-  #Mappes om i preprosess:  c('107511' =	'999975')) #Aleris Oslo
-  # Disse ikke med i ny versjon: '107137' =	'107508', #Aleris Bergen '999999' =	'110771') #Volvat
+  RegDataV2$ErstatningPre <- dplyr::replace_values(as.numeric(RegDataV2$ErstatningPre), from = c(2,3,4,NA), to = c(0,2,3,9))
+  RegDataV2$UforetrygdPre <- dplyr::replace_values(as.numeric(RegDataV2$UforetrygdPre), from = c(2,3,4,NA), to = c(0,2,3,9))
 
   # Variabler med samme innhold i V2 og V3, men avvikende variabelnavn.
   # (navnV3 = navnV2) dvs. nytt navn, V3 = gammelt navn, V2
@@ -77,8 +56,23 @@ tilpassV2data <- function(RegDataV2){
                              Status12mnd = Utfylt12Mnd,
                              SykDprebetesMellitus = SykdDiabetesMellitus
   )
-  EndreNavnInd <- grep('3Mnd', names(RegDataV2)) #names(RyggData)[grep('3Mnd', names(RyggData))]
+  EndreNavnInd <- grep('3Mnd', names(RegDataV2))
   names(RegDataV2)[EndreNavnInd] <- gsub("3Mnd", "3mnd", names(RegDataV2)[EndreNavnInd])
+
+  RegDataV2$SykehusNavn <- dplyr::replace_values(RegDataV2$SykehusNavn,   #Gammelt navn V2 - nytt navn (V3)
+                                             'Aleris, Bergen' ~ 'Aleris Bergen',
+                                             'Aleris, Oslo' ~ 'Aleris Oslo',
+                                             'Larvik' ~ 'Tønsberg',
+                                             'Oslofjordklinikken Øst' ~ 'Oslofjordklinikken',
+                                             'Teres Colloseum, Oslo' ~ 'Aleris Oslo',
+                                             'Teres Colloseum, Stavanger'  ~ 'Aleris Stavanger',
+                                             'Teres, Bergen' ~ 'Aleris Bergen',
+                                             'Teres, Drammen' ~  'Aleris Drammen'  ,
+                                             'Ulriksdal' ~ 'Volvat',
+                                             'UNN, nevrokir' ~ 'Tromsø'
+  )
+
+  RegDataV2$ReshId <- dplyr::replace_values(RegDataV2$ReshId, '107240' ~ '4211881')
 
    #Ønsker tom for manglende RegDataV2$SmBePre[is.na(RegDataV2$SmBePre)] <- 99 #99: Ikke utfylt i V3, NA i V2
   #Ønsker tom for manglende RegDataV2$SmRyPre[is.na(RegDataV2$SmRyPre)] <- 99 #99: Ikke utfylt i V3, NA i V2
@@ -90,8 +84,10 @@ tilpassV2data <- function(RegDataV2){
   RegDataV2$Versjon <- 'V2'
 
   #V2 SivilStatus - 1:Gift, 2:Samboer, 3:Enslig, NA. SivilStatusV3 - 1:Gift/sambo, 2:Enslig, 3:Ikke utfylt
-  RegDataV2$SivilStatusV3 <- plyr::mapvalues(as.numeric(RegDataV2$SivilStatus),
+  RegDataV2$SivilStatusV3 <-dplyr::replace_values(as.numeric(RegDataV2$SivilStatus),
                                              from = c(1,2,3,NA), to = c(1,1,2,9)) #c(2 = 1, 3 = 2, NA=9))
+
+  table(RegDataV2$SivilStatusV3GML, useNA = 'a')
   return(RegDataV2)
 }
 
@@ -111,7 +107,7 @@ tilpassV3data <- function(RegDataV3){
 
   #I perioden 2019-21 ble ikke dyp og overfladisk sårinfeksjon registrert.
   RegDataV3[which(RegDataV3$OpDato >= '2019-01-01' & RegDataV3$OpDato <= '2021-12-31'),
-            c('KpInfOverfla3mnd', 'indIkkeSaarInf', 'KpInfDyp3mnd', 'KpInfDyp12mnd')] <- NA
+            c('KpInfOverfla3mnd', 'KpInfDyp3mnd', 'KpInfDyp12mnd')] <- NA
 
 
   #Ønsker tom for manglende
@@ -129,12 +125,10 @@ tilpassV3data <- function(RegDataV3){
   RegDataV3$Arbstatus12mndV3[ind7_12mnd] <- 7
 
   # 1: I arbeid - V3- 1+2
-  RegDataV3$ArbstatusPreV2V3 <- plyr::mapvalues(RegDataV3$ArbstatusPreV3, from = c(2, 99), to = c(1, NA))
-  RegDataV3$Arbstatus3mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus3mndV3, from = 2, to = 1)
-  RegDataV3$Arbstatus12mndV2V3 <- plyr::mapvalues(RegDataV3$Arbstatus12mndV3, from = 2, to = 1)
+  RegDataV3$ArbstatusPreV2V3 <- dplyr::replace_values(RegDataV3$ArbstatusPreV3, from = c(2, 99), to = c(1, NA))
+  RegDataV3$Arbstatus3mndV2V3 <- dplyr::replace_values(RegDataV3$Arbstatus3mndV3, from = 2, to = 1)
+  RegDataV3$Arbstatus12mndV2V3 <- dplyr::replace_values(RegDataV3$Arbstatus12mndV3, from = 2, to = 1)
 
-  # RegDataV3 <- RegDataV3[ , -which(names(RegDataV3) %in%
-  #                                    c('ArbstatusPreV3', 'Arbstatus3mndV3', 'Arbstatus12mndV3'))]
   RegDataV3 <- dplyr::mutate(RegDataV3,
                       ArbstatusPreV3 = NULL, Arbstatus3mndV3=NULL, Arbstatus12mndV3=NULL)
 
@@ -159,10 +153,12 @@ tilpassV3data <- function(RegDataV3){
   RegDataV3$TidlOpr[RegDataV3$TidlOpAnnetNiv==1] <- 2
   RegDataV3$TidlOpr[RegDataV3$TidlOpsammeNiv==1 & RegDataV3$TidlOpAnnetNiv==1] <- 3
 
-  RegDataV3$OpMikro <- plyr::mapvalues(RegDataV3$OpMikroV3,
+  RegDataV3$OpMikro <- dplyr::replace_values(RegDataV3$OpMikroV3,
                                        from = c(0,1,2,3,9), to = c(0,1,1,1,0))
-  RegDataV3$OpAndreEndosk <- plyr::mapvalues(RegDataV3$OpMikroV3,
-                                             from = c(0,1,2,3,9), to = c(0,0,0,1,0))
+  RegDataV3$OpAndreEndosk <- dplyr::replace_values(RegDataV3$OpMikroV3,
+                                             from = c(0,1,2,3,9), to = c(0,0,0,1,0)) #OpMikroV3= 3 OR
+  RegDataV3$OpAndreEndosk[with(RegDataV3, which(EndoSkopTilg == 1 | EndoSkopTilg == 2 |
+                                                   EndoSkopTekn == 1 | EndoSkopTekn == 2))] <- 1
 
   RegDataV3$ForstLukketLege <- as.character(as.Date(RegDataV3$ForstLukketLege))
   #Kobling med NA fungerer ikke for datotid-var

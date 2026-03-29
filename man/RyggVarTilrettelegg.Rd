@@ -8,7 +8,6 @@ RyggVarTilrettelegg(
   RegData = NULL,
   valgtVar,
   ktr = 0,
-  datoFra = "2007-01-01",
   datoTil = Sys.Date(),
   hovedkat = 99,
   figurtype = "andeler"
@@ -18,8 +17,6 @@ RyggVarTilrettelegg(
 \item{RegData}{En dataramme med alle nødvendige variabler fra registeret}
 
 \item{valgtVar}{Hvilken variabel som skal visualiseres. Se \strong{Details} for oversikt.}
-
-\item{datoFra}{Tidligste operasjonsdato i utvalget (vises alltid i figuren).}
 
 \item{datoTil}{Seneste operasjonsdato i utvalget (vises alltid i figuren).}
 

@@ -222,6 +222,8 @@ ui <- navbarPage(
                            'Smertestillende, bruk preop.' = 'smStiPre',
                            'Smertestillende, hyppighet preop.' = 'smStiPreHypp',
                            'Tid fra utf. av pasientskjema til operasjon' = 'diffPasUtfOp',
+                           'Tid fra operasjon til utfylt 3mnd-skjema' = 'diffUtf3mnd',
+                           'Tid fra operasjon til utfylt 12mnd-skjema' = 'diffUtf12mnd',
                            'Tidligere ryggoperert?' = 'tidlOpr',
                            'Tidligere operasjoner, antall' = 'tidlOprAntall',
                            'Søkt erstatning?' = 'erstatningPre',
@@ -708,10 +710,11 @@ server_rygg <- function(input, output, session) {
     if (user$role()=='SC') {
 
 
-      fritxtVar <- c("AnnetMorsm", "DekomrSpesAnnetNivaaDekomrSpesAnnetNivaa", "Fritekstadresse",
-                     "FusjonSpes", "OpAndreSpes", "OpAndreSpes", "OpIndAnSpe", "RfAnnetspes",
-                     "SpesifiserReopArsak", "SpesTrombProfyl", "SykdAnnetspesifiser", "SykdAnnetSpesifiser")
-      RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% fritxtVar)]
+      varFjernes <- c("AnnetMorsm",
+                     "FusjonSpes", "OpAndreSpes", "OpIndAnSpe", "RfAnnetspes",
+                     "SpesifiserReopArsak", "SykdAnnetspesifiser", "SykdAnnetSpesifiser",
+                     'DatoFodt', 'InngrepV3')
+      RegDataV2V3 <- RegData[ ,-which(names(RegData) %in% varFjernes)]
       dataDump <- RyggUtvalgEnh(RegData = RegDataV2V3,
                                 datoFra = input$datovalgDatadump[1],
                                 datoTil = input$datovalgDatadump[2],

@@ -13,6 +13,8 @@ hentDataV2 <- function(){
 
   V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
   V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
+  V2 <- V2[,-which(names(V2) %in% c('OLD_PID'))]
+
   MCEtab <- rapbase::loadRegData(registryName = 'data',
                                  query='SELECT * FROM mce
                                  WHERE MCETYPE = 9 ')
@@ -129,7 +131,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   #mce Trenger nok ganske få av disse variablene
   # mce_patient_data # eneste som inneholder kobling mellom mceid og pasientid
-  qmce <- 'CENTREID AS ReshId, CREATEDBY, MCEID, PATIENT_ID AS PasientID'
+  qmce <- 'CENTREID AS ReshId, MCEID, PATIENT_ID AS PasientID'
 
   mceSkjema <- hentDataTabellV3(tabellnavn = "mce",
                               qVar = qmce,
@@ -140,8 +142,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
              DECEASED,
              DECEASED_DATE,
              GENDER,
-             ID,
-             REGISTERED_DATE'
+             ID'
 
   PasInfoSkjema <- hentDataTabellV3(tabellnavn = "patient",
                                   qVar = qPas,
@@ -187,14 +188,21 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
 
   if (medOppf == 1) {
+    varFjernes <- c(varFjernes, 'CONTROL_TYPE', 'CREATEDBY', 'FOLLOWUP_TYPE',
+                    'FORM_COMPLETED_VIA_PROMS', 'HELSETILSTAND_SCALE', 'ID',
+                    'PROM_ANSWERED', 'STATUS_CONTROL', 'UPDATEDBY',
+                    'KOMPLIKASJONER_ANNEN_VESENTLIG_SYKDOM_SPESIFISER')
     #Oppfølging, 3 mnd
     Oppf3Skjema <- hentDataTabellV3(tabellnavn = "patientfollowup3",
                                   qVar = '*',
                                   egneVarNavn = 1)
+    Oppf3Skjema <- Oppf3Skjema[ ,-which(names(Oppf3Skjema) %in% varFjernes)]
+
     #Oppfølging, 12 mnd
     Oppf12Skjema <- hentDataTabellV3(tabellnavn = "patientfollowup12",
                                    qVar = '*',
                                    egneVarNavn = 1)
+    Oppf12Skjema <- Oppf12Skjema[ ,-which(names(Oppf12Skjema) %in% varFjernes)]
 
     # SAMMENSTILL SKJEMA:
     RegData <- RegData |>

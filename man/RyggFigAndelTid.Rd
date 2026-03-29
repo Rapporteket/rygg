@@ -7,7 +7,7 @@
 RyggFigAndelTid(
   RegData,
   valgtVar,
-  datoFra = "2011-01-01",
+  datoFra = "2007-01-01",
   datoTil = Sys.Date(),
   aar = 0,
   tidsenhet = "Aar",

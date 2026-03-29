@@ -129,15 +129,16 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     if (RyggVarSpes$hovedkat[1] != 99) {
       hovedkat <- RyggVarSpes$hovedkat
     }
-    #print(RyggVarSpes$hovedkat)
 
     if (valgtVar == 'trombProfylLettKI') {
       erMann=1
-      # hovedkat <- 1:2
     }
     if (valgtVar %in% c('OswEndr20ProKI', 'OswEndr30pstSSKI')) {
       hastegrad = 1
       tidlOp = 4}
+    if (valgtVar %in% c('dod30', 'dod365')){
+      Ngrense <- 50
+    }
 
     RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                                 minald=minald, maxald=maxald, erMann=erMann, aar=aar,
