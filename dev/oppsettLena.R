@@ -20,12 +20,13 @@ library(rygg)
 RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
                                      query='SELECT * FROM allevarnum')
 
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
 
-RegData[which(RegData$TidlOprAntall>10), c('PasientID', 'OpDato', 'ShNavn', 'TidlOprAntall')]
-RegData$ShNavn
+# trombProfyl, trombProfylLettKI
+RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', erMann='', preprosess = 0)
+
 
 # Aleris Drammen (4211881)
 # Aleris Drammen (107240) V2
