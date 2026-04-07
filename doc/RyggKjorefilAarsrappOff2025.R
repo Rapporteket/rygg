@@ -2,8 +2,7 @@
 library(rygg)
 library(xtable)
 setwd('../Aarsrapp/NKR/')
-Sys.setlocale(locale = 'nb_NO.UTF-8')
-source("dev/sysSetenv.R")
+source("c://Users/lro2402unn/RegistreGIT/rygg/dev/sysSetenv.R")
 
 #Felles parametre:
 startAar <- 2011
@@ -21,46 +20,38 @@ tidlAar <- rappAar-1
 tidlAar2 <- (rappAar-3):(rappAar-2)
 
 RyggData <- RyggRegDataV2V3(datoFra = '2007-01-01')
-#ReshSh <- unique(RyggData[,c('SykehusNavn', 'AvdRESH')])
-#ReshSh <- unique(ReshSh[order(ReshSh$SykehusNavn), ])
-#Lagt til i preprosseser:
-#RyggData$SykehusNavn[which(RyggData$AvdRESH %in% c(999975, 107511))] <- 'Aleris Oslo'
-
 RegData <- RyggPreprosess(RegData=RyggData)
-RegData <- RyggUtvalgEnh(RegData=RegData, datoTil=datoTil)$RegData
-Ntot07 <- dim(RegData)[1]
-# table(RegData[,c('Aar', "Status12mnd")])
-# table(RegData[,c('Aar', "Status3mnd")])
 
 #Datasjekk
-SykehusNavnResh <- unique(RegData[ ,c('SykehusNavn', 'ReshId')])
-ShNavnResh <- unique(RegData[ ,c('ShNavn', 'ReshId')])
-write.csv2(ShNavnResh[order(ShNavnResh$ShNavn), ], file = 'RyggSykehusNavnAVDResh.csv', row.names = F, fileEncoding = 'latin1')
+# ReshSh <- unique(RegData[,c('SykehusNavn', 'ReshId')])
+# table(table(ReshSh$ReshId))
 
+RegData <- RyggUtvalgEnh(RegData=RegData, datoTil=datoTil)$RegData
+Ntot07 <- dim(RegData)[1]
 
 #Gjør utvalg/tilrettelegge årsfiler
 RegData <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra, datoTil=datoTil)$RegData
 RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1aar, datoTil=datoTil)$RegData
-#write.table(RegData, file = 'RyggAarsrapp2023.csv', sep = ';', row.names = F, fileEncoding = 'latin1', na = '')
+#write.table(RegData, file = 'RyggAarsrapp2025.csv', sep = ';', row.names = F, fileEncoding = 'latin1', na = '')
 
 Ntot <- dim(RegData)[1]
 Ntot1aar <- dim(RegData1aar)[1]
 AntAvd <- length(unique(RegData$ShNavn))
 
 #-------------------Nye figurer------------------------
-source("dev/sysSetenv.R")
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
-RegData <- RyggPreprosess(RegData =RegDataRaa)
+# source("dev/sysSetenv.R")
+# RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
+# RegData <- RyggPreprosess(RegData =RegDataRaa)
 
 #Ant dager fra Operasjonsdato til utfyllingsdato 3 og 12 mnd.
 valgtVar <- 'diffUtf12mnd'       # 'diffUtf3mnd' # 'diffUtf12mnd' (Bare V3)
-RyggFigAndeler(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, outfile = paste0(valgtVar, '_ford.pdf') )
+RyggFigAndeler(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
 RyggFigGjsnGrVar(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, outfile = paste0(valgtVar, '_gjsnSh.pdf') )
 RyggFigGjsnBox(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, tidsenhet = 'Aar', outfile = paste0(valgtVar, '_gjsnTid.pdf') )
 
 #Pasientutfyllingsdato på skjema vs. Operasjonsdato. Andel gamle sjema, dvs. >14 dager.
 valgtVar <- 'diffPasUtfOp'
-RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_ford.pdf') )
+RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
 RyggFigAndelerGrVar(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
 RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
 
@@ -71,7 +62,7 @@ RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVa
 
 # Antall tidligere ryggoperasjoner - > Fordelingsfig, andel, per hendelse (ikke max per pas)
 valgtVar <- 'antTidlOp'
-RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_ford.pdf') )
+RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
 
 # Tidsutvikling for 30-dagers mortalitet. Dvs. 30-dagers mort. per år. AndelGrVar og -Tid? ja
 valgtVar <- 'dod30' # dod30 dod365
@@ -154,8 +145,6 @@ RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=5, outfile='
 RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4, outfile='PeropKompDuraSSTid.pdf')
 
 
-
-
 #Andel oppfølgingsskjema som er besvart,  tidstrend
 RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
 
@@ -230,9 +219,8 @@ RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='trombProfylLettKI',
 #---- R Y G G
 RyggData <- RegData
 RyggData1aar <- RegData1aar
-RyggData <- RyggPreprosess(
-  RegData=RyggRegDataV2V3())
-RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
+# RyggData <- RyggPreprosess(RegData=RyggRegDataV2V3())
+#RyggData1aar <- RyggUtvalgEnh(RegData = RyggData, aar=rappAar)$RegData
 
 FornoydData <- RyggVarTilrettelegg(RegData = RyggData1aar,
                                    valgtVar = 'fornoydhet', ktr = 1, figurtype = 'andelGrVar')$RegData
@@ -243,6 +231,7 @@ VerreData <- RyggVarTilrettelegg(RegData = RyggData1aar,
 VentetidKirData <- RyggVarTilrettelegg(RegData = RyggData1aar,
                                  valgtVar = 'ventetidSpesOp', ktr = 1, figurtype = 'andelGrVar')$RegData
 
+#NB: Tror ikke denne stemmer lenger:
 svarpst <- 100*mean(RyggData1aar$Status3mnd==1, na.rm=T)
 paste(sprintf('%.1f', svarpst), '%')
 
@@ -308,7 +297,7 @@ tabAvdN5 <- tabAvdN[,(antKol-5):antKol]
 rownames(tabAvdN5)[dim(tabAvdN5)[1] ]<- 'TOTALT, alle avd.:'
 colnames(tabAvdN5)[dim(tabAvdN5)[2] ]<- paste0(min(RegData$Aar),'-',rappAar)
 
-xtable(tabAvdN5, digits=0, align=c('l', rep('r', 6)),
+xtable::xtable(tabAvdN5, digits=0, align=c('l', rep('r', 6)),
        caption=paste0('Antall registreringer ved hver avdeling siste 5 år, samt totalt siden ', min(RegData$Aar, na.rm=T),'.'),
        label = 'tab:AntReg')
 
@@ -338,25 +327,30 @@ Andel70
   #UtdanningAar <- sprintf('%.1f', UtdanningTid$AggVerdier$Hoved)
 
 
-#Andel i fullt arbeid når de blir ryggoperert:
-ArbNum <- round(table(RegData1aar$ArbstatusPreV3)*100/sum(table(RegData1aar$ArbstatusPreV3)), 1)
+#Andel i fullt arbeid når de blir ryggoperert: 26.9%
+ArbNum <- round(table(RegData1aar$ArbstatusPreV2V3)*100/sum(table(RegData1aar$ArbstatusPreV2V3)), 1)
 ArbNum[1]
 
-#Andel pasienter svart på spørsmål om arbeidsstatus, årsrapportåret: \% 22: 94,1
-  NsvarArb <- sum(RegData1aar$ArbstatusPreV3 %in% 1:9)
+#Andel pasienter svart på spørsmål om arbeidsstatus, årsrapportåret: \% 2025: 94,7
+  NsvarArb <- sum(RegData1aar$ArbstatusPreV2V3 %in% 1:9)
   round(NsvarArb/Ntot1aar*100, 1)
 
-Arb <- paste0(ArbNum, '%')
-names(Arb) <- c("Fulltidsjobb","Deltidsjobb","Student/skoleelev",
-           "Alderspensjonist", "Arbeidsledig","Sykemeldt","Delvis sykemeldt",
-           "Arbeidsavklaringspenger", "Uførepensjonert","Ikke utfylt")
+  #Mottok sykepenger (sykemeldte, uføretrygdede eller attføring):
+  sum(ArbNum[c( "6", "7", "8", "9")])
 
-xtable(cbind('Andeler'=Arb),  align=c('l','r'),
+grtxt <- c("I arbeid", "Student/skoleelev",
+           "Alderspensjonist", "Arbeidsledig","Sykemeldt","Delvis sykemeldt",
+           "Arbeidsavklaring", "Uførepensjonert","Ikke utfylt")
+RegData1aar$ArbstatusPreV2V3[is.na(RegData1aar$ArbstatusPreV2V3)] <- 99
+RegData1aar$Arbstatus <- factor(RegData1aar$ArbstatusPreV2V3, levels = c(1,3:9,99), labels = grtxt)
+
+Arb <- round(table(RegData1aar$Arbstatus)/dim(RegData1aar)[1]*100,1)
+Arb <- paste0(Arb, '%')
+
+xtable(cbind('Andeler (%)'= Arb),  align=c('l','r'),
        caption=paste0('Arbeidsstatus, pasienter operert i ', rappAar,'.'),
        label="tab:Arb")
 
-#Mottok sykepenger (sykemeldte, uføretrygdede eller attføring):
-sum(ArbNum[6:9])
 
 
 #Har søkt eller planlegger å søke uføretrygd:
@@ -376,6 +370,7 @@ ASA <- cbind('Antall' = ASAant,
 rownames(ASA) <- c('I','II','III','IV', 'V', 'Ikke besvart')
 xtable(ASA, caption=paste0('Fordeling av ASA-grad, operasjoner utført i ', rappAar),
        label="tab:ASA", align=c('c','r','r'))
+
 
 #Andelen pasienter med ASA grad I-II:
 round(sum(table(RegData1aar$ASA)[1:2])/Ntot1aar*100, 1)
@@ -408,15 +403,258 @@ xtable(HovedInngrepTab, align=c('l','r','r'), caption=paste0('Fordeling av hoved
 
 #Andelen operert med dagkirurgi for  prolaps
 ProDagTid <- table(RegDataPro[ ,c('Dagkirurgi', 'Aar')], useNA = 'a')
-round(prop.table(ProDagTid[1:2,],2)*100,1)
+#round(prop.table(ProDagTid[1:2,],2)*100,1)
+round(prop.table(ProDagTid,2)*100,1)
 
 #Andelen operert med dagkirurgi for spinal stenose
 SSDagTid <- table(RegDataSS[ ,c('Dagkirurgi', 'Aar')], useNA = 'a')
 round(prop.table(SSDagTid[1:2,],2)*100,1)
+round(prop.table(SSDagTid,2)*100,1)
 
 #Andel operert for spinal stenose som også hadde Degenerativ spondylolistese,
 AntDegenSpondSS <-  dim(RyggUtvalgEnh(RegDataSS, hovedkat = 10, aar = rappAar)$RegData)[1]
 round(AntDegenSpondSS/sum(RegDataSS$Aar==rappAar)*100,1)
+
+
+
+
+
+
+
+\textbf {Symptomvarighet før operasjon}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+\hline
+& Andeler \\
+\hline
+Ingen utstrålende smerter & 3.4 \% \\
+$<$ 3 mnd & 13.4 \% \\
+3 - 12 mnd & 35.1 \% \\
+1 - 2 år & 19.4 \% \\
+$>$ 2 år & 24.4 \% \\
+Ikke besvart & 4.4 \% \\
+\hline
+\end{tabular}
+\caption{Varighet av nåværende utstrålende smerter, pasienter operert (alle typer kirurgi) i 2024}
+\label{tab:Utstr}
+\end{table}
+
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+\hline
+& Andel \\
+\hline
+Helt restituert & 19.0 \% \\
+Mye bedre & 42.4 \% \\
+Litt bedre & 21.4 \%  \\
+Uendret & 7.7 \% \\
+Litt verre & 4.7 \%\\
+Mye verre & 3.3\%\\
+Verre enn noensinne & 1.6 \%\\
+\hline
+\end{tabular}
+\caption{Pasientrapportert nytte %av alle ryggoperasjoner
+  12 måneder etter alle ryggoperasjoner, rapportert i 2024}
+\label{tab:NytteOperajonAlle12Mnd}
+\end{table}
+
+
+% latex table generated in R 4.1.2 by xtable 1.8-4 package
+% Tue Apr 26 14:54:27 2022
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+\hline
+& Andel \\
+\hline
+Fornøyd & 78.9 \% \\
+Litt fornøyd & 9.8 \% \\
+Verken eller & 5.8 \%  \\
+Litt misfornøyd & 3.3 \% \\
+Misfornøyd & 2.3 \%\\
+\hline
+\end{tabular}
+\caption{Pasientrapportert tilfredshet %etter alle operasjoner
+  12 måneder etter alle ryggoperasjoner, rapportert i 2024}
+\label{tab:PasienttilfredshetAlle12Mnd}
+\end{table}
+
+
+
+
+
+% latex table generated in R 4.4.2 by xtable 1.8-8 package
+% Tue Apr  7 16:16:58 2026
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+\hline
+& Andeler (\%) \\
+\hline
+I arbeid & 25.50 \\
+Student/skoleelev & 1.00 \\
+Alderspensjonist & 30.40 \\
+Arbeidsledig & 0.70 \\
+Sykemeldt & 16.50 \\
+Delvis sykemeldt & 5.20 \\
+Arbeidsavklaring & 5.20 \\
+Uførepensjonert & 10.20 \\
+Ikke utfylt & 5.30 \\
+\hline
+\end{tabular}
+\caption{Arbeidsstatus, pasienter operert i 2025.}
+\label{tab:Arb}
+\end{table}
+
+
+Tabell \ref{Radiologisk vurdering} viser hvor stor andel av pasientene som har vært til ulike radiologiske undersøkelser. En pasient kan ha vært til flere undersøkelser før operasjon. %De vanligste radiologiske diagnosene var skiveprolaps og spinal stenose.
+
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrr}
+\hline
+& Antall & Andeler \\
+\hline
+CT & 497 & 7.2 \% \\
+MR & 6726 & 97.6 \% \\
+Røntgen LS-columna & 917 & 15.8 \% \\
+Funksjonsopptak & 24 & 2.6 \% \\
+Diagnostisk blokade & 89 &   1.3\% \\
+\hline
+\end{tabular}
+\caption{Radiologisk vurdering for 2024}
+\label{Radiologisk vurdering}
+\end{table}
+
+
+De ulike operasjonsteknikkene er vist i tabell \ref{tab:Instrumentell fusjonskirurgi}. Revisjon/fjerning av implantater, deformitetskirurgi (kyfose) og kombinerte inngrep som inkluderer skiveprotese er ikke medregnet. %i tabell \ref{tab:Instrumentell fusjonskirurgi}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrr}
+\hline
+& Antall & Andeler \\
+\hline
+TLIF & 352 & 58.7 \% \\
+Posterolateral fusjon (PLF) & 119 & 19.8 \% \\
+ALIF  & 73 & 12.2 \% \\
+XLIF & 26 & 4.3 \% \\
+PLIF & 15 & 2.5 \% \\
+Ikke-instrumentell fusjon & 15 & 2.5 \% \\
+Totalt & 600 & 100.0 \% \\
+\hline
+Tilleggsprosedyrer:\\
+Computernavigasjon & 100 & 17.9 \% \\
+Ileumskruer & 4 & 0.8\% \\
+Sementerte skruer & 24 & 4.8 \% \\
+\hline
+\end{tabular}
+\caption{Typer instrumentell fusjonskirurgi, 2024}
+\label{tab:Instrumentell fusjonskirurgi}
+\end{table}
+
+
+#--------Nakke:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+\hline
+& Andel \\
+\hline
+Helt restituert & 17.2 \% \\
+Mye bedre & 45.6 \% \\
+Litt bedre & 22.8 \%  \\
+Uendret & 5.1 \% \\
+Litt verre & 5.5 \%\\
+Mye verre & 2.7\%\\
+Verre enn noensinne & 1.1 \%\\
+\hline
+\end{tabular}
+\caption{Pasientrapportert nytte, alle nakkeoperasjoner 12 måneder etter kirurgi, rapportert i 2024.}
+\label{tab:NytteOperajonAlleN12Mnd}
+\end{table}
+
+
+
+\ref{tab:PasienttilfredshetAlle1N2Mnd} viser hvordan pasientene svarte i 2023, ett år etter nakkekirurgi.
+
+% latex table generated in R 4.1.2 by xtable 1.8-4 package
+% Tue Apr 26 14:54:27 2022
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+\hline
+& Andel \\
+\hline
+Fornøyd & 78.7 \% \\
+Litt fornøyd & 10.6 \% \\
+Verken eller & 4.5 \%  \\
+Litt misfornøyd & 4.0 \% \\
+Misfornøyd & 2.1 \%\\
+\hline
+\end{tabular}
+\caption{Pasienttilfredshet, alle operasjoner 12 måneder etter all nakkekirurgi, rapportert i 2024}
+\label{tab:PasienttilfredshetAlle1N2Mnd}
+\end{table}
+
+
+
+Tabell \ref{tab:ArbNakke} viser fordeling av arbeidsstatus før operasjonen. 4,7 \% av pasientene hadde søkt eller hadde planer om å søke uføretrygd.
+
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+\hline
+& Andeler \\
+\hline
+Fulltidsjobb & 37.1\% \\
+Hjemmeværende & 0.3\% \\
+Student/skoleelev & 0.1\% \\
+Alderspensjonist & 9.2\% \\
+Arbeidsledig & 0.4\% \\
+Sykemeldt & 31.1\% \\
+Delvis sykemeldt & 2.0\% \\
+Arbeidsavklaringspenger & 8.2\% \\
+Uførepensjonert & 10.3\% \\
+Ikke utfylt & 0.4\% \\
+
+\hline
+\end{tabular}
+\caption{Arbeidsstatus hos pasienter før nakkekirurgi i 2024.}
+\label{tab:ArbNakke}
+
+
+ASA angir pasientens fysiske ”sårbarhet” ved anestesi og operasjon på en skala fra 1 til 5.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{crr}
+\hline
+& Antall & Prosent \\
+\hline
+I & 327 & 26.3 \% \\
+II & 877 & 63.4\% \\
+III & 167 & 12.1\% \\
+IV & 3 & 0.2\% \\
+V & 0 & 0\% \\
+Ikke besvart & 10 & 0.7\% \\
+\hline
+\end{tabular}
+\caption{Fordeling av ASA-grad, nakkeoperasjoner utført i 2024.}
+\label{tab:ASANakke}
+\end{table}
+
+
+
 
 
 #------------------------------------------------------------------------------------
