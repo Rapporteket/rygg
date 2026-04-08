@@ -8,9 +8,9 @@ devtools::install("../rapbase/.")
 setwd('../data')
 setwd('C:/Users/lro2402unn/RegistreGIT/rygg')
 
-sship::dec("c://Users/lro2402unn/RegistreGIT/data/rygg1588bc19a.sql.gz__20260407_111127.tar.gz",
+sship::dec("c://Users/lro2402unn/RegistreGIT/data/deformitet127f0b350.sql__20260408_102041.tar.gz",
 keyfile = "c://Users/lro2402unn/.ssh/id_rsa", target_dir = "c://Users/lro2402unn/RegistreGIT/data/.")
-# source c://Users/lro2402unn/RegistreGIT/data/rygg1588bc19a.sql;
+# source c://Users/lro2402unn/RegistreGIT/data/deformitet127f0b350.sql;
 
 
 source("dev/sysSetenv.R")

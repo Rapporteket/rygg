@@ -981,7 +981,7 @@ valgtVarTest <- valgtVar
             sortAvtagende <- F}
       }
       if (valgtVar %in% c('symptVarighRyggHof','sympVarighUtstr')) { #fordeling, andelGrVar/Tid
-            grtxt <- c('Ingen', '<3 mnd', '3-12 mnd', '1-2 år', '> 2 år', 'Ikke utfylt')
+            grtxt <- c('Ingen', '<3 mnd', '3-12 mnd', '1-2 år', '> 2 år', 'Ikke besvart')
             RegData$VariabelGr <- factor(switch(valgtVar,
                              symptVarighRyggHof = RegData$SymptVarighRyggHof,
                              sympVarighUtstr = RegData$SympVarighUtstr),

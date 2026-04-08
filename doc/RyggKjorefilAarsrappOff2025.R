@@ -45,32 +45,34 @@ AntAvd <- length(unique(RegData$ShNavn))
 
 #Ant dager fra Operasjonsdato til utfyllingsdato 3 og 12 mnd.
 valgtVar <- 'diffUtf12mnd'       # 'diffUtf3mnd' # 'diffUtf12mnd' (Bare V3)
-RyggFigAndeler(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
-RyggFigGjsnGrVar(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, outfile = paste0(valgtVar, '_gjsnSh.pdf') )
-RyggFigGjsnBox(RegData = RegData, datoFra = '2020-01-01', valgtVar = valgtVar, tidsenhet = 'Aar', outfile = paste0(valgtVar, '_gjsnTid.pdf') )
+RyggFigAndeler(RegData = RegData, aar = tidlAar, valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
+RyggFigGjsnGrVar(RegData = RegData, aar = tidlAar, valgtVar = valgtVar, outfile = paste0(valgtVar, '_gjsnSh.pdf') )
+RyggFigGjsnBox(RegData = RegData, valgtVar = valgtVar, tidsenhet = 'Aar', outfile = paste0(valgtVar, '_gjsnTid.pdf') )
 
 #Pasientutfyllingsdato på skjema vs. Operasjonsdato. Andel gamle sjema, dvs. >14 dager.
 valgtVar <- 'diffPasUtfOp'
-RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
-RyggFigAndelerGrVar(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
+RyggFigAndeler(RegData = RegData1aar, valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
+RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
 RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
 
 # Andel fusjonskirurgi der det er brukt navigasjon til skrueplassering -.> Hvilke variabler? OpComputerNav
 valgtVar <- 'computerNav'
-RyggFigAndelerGrVar(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
+RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
 RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
 
 # Antall tidligere ryggoperasjoner - > Fordelingsfig, andel, per hendelse (ikke max per pas)
 valgtVar <- 'antTidlOp'
-RyggFigAndeler(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
+RyggFigAndeler(RegData = RegData1aar, valgtVar = valgtVar, outfile = paste0(valgtVar, 'Ford.pdf') )
 
 # Tidsutvikling for 30-dagers mortalitet. Dvs. 30-dagers mort. per år. AndelGrVar og -Tid? ja
 valgtVar <- 'dod30' # dod30 dod365
 RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
+valgtVar <- 'dod365' # dod30 dod365
+RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
 
 # Andel bruk OpAndreEndosk= 1 hos hhv. «LSSopr»= 1 og «ProlapsDekr»=1, per sykehus (siste 2 år?) Andel over tid (hele Norge).
 valgtVar <- 'opAndreEndoskopi'
-RyggFigAndelerGrVar(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
+RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Sh.pdf') )
 RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVar, '_Tid.pdf') )
 
 # Vurder om “V3” kan fjernes fra EQ-variabler
@@ -91,7 +93,7 @@ RyggFigAndelTid(RegData = RegData, valgtVar = 'opAndreEndoskopi', hovedkat = 9,
 RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar = 'computerNav', outfile = 'computerNav_Sh.pdf')
 RyggFigAndelTid(RegData = RegData, valgtVar = 'computerNav', outfile = 'computerNav_Tid.pdf')
 
-dum <- RyggFigAndeler(RegData = RegData1aar, valgtVar = 'antTidlOp', outfile = 'AntTidlOpFord.pdf')
+dum <- RyggFigAndeler(RegData = RegData1aar, valgtVar = 'tidlOprAntall', outfile = 'AntTidlOpFord.pdf') # 'antTidlOp'
 
 #Registreringsforsinkelse
 dum <- RyggFigAndeler(RegData=RegData1aar, valgtVar='regForsinkelse', datoFra=datoFra1aar,
@@ -416,149 +418,51 @@ AntDegenSpondSS <-  dim(RyggUtvalgEnh(RegDataSS, hovedkat = 10, aar = rappAar)$R
 round(AntDegenSpondSS/sum(RegDataSS$Aar==rappAar)*100,1)
 
 
+# Symptomvarighet før operasjon
+SympVarighUtstrData <- RyggFigAndeler(RegData = RyggData1aar, lagFig=0,
+                                      valgtVar = 'sympVarighUtstr')
+Andeler <- paste(format(SympVarighUtstrData$AggVerdier$Hoved, digits = 2), '%')
+Andeler <- as.data.frame(Andeler, row.names = SympVarighUtstrData$grtxt )
+xtable(Andeler, label = 'tab:Utstr',
+       caption = paste0('Varighet av nåværende utstrålende smerter,
+                        pasienter operert (alle typer kirurgi) i ', rappAar))
+
+
+
+Nytte <- RyggFigAndeler(RegData = RyggData, aar = tidlAar, #RyggVarTilrettelegg(RegData = RyggData1aar,
+                        valgtVar = 'nytte12mnd', lagFig=0)
+Andeler <- paste(format(Nytte$AggVerdier$Hoved, digits = 1), '%')
+Andeler <- as.data.frame(Andeler, row.names = Nytte$grtxt )
+xtable(Andeler, label = 'tab:NytteOperajonAlle12Mnd',
+       caption = paste0('Pasientrapportert nytte
+  12 måneder etter. Alle ryggoperasjoner i ', tidlAar))
+
+
+# Andeler <- table(Nytte$RegData$VariabelGr)
+# Andeler <- paste(format(100*Andeler/sum(Andeler), digits = 2), '%')
+# Andeler <- as.data.frame(Andeler, row.names = Nytte$grtxt )
+
+Fornoyd <- RyggFigAndeler(RegData = RyggData, aar = tidlAar, #RyggVarTilrettelegg(RegData = RyggData1aar,
+                        valgtVar = 'fornoydhet12mnd', lagFig=0)
+Andeler <- paste(format(Fornoyd$AggVerdier$Hoved, digits = 2), '%')
+Andeler <- as.data.frame(Andeler, row.names = Fornoyd$grtxt )
+xtable(Andeler, label = 'tab:PasienttilfredshetAlle12Mnd',
+       caption = paste0('Pasientrapportert tilfredshet
+  12 måneder etter. Alle ryggoperasjoner i ', tidlAar))
 
 
 
 
+#Tabell \ref{Radiologisk vurdering} viser hvor stor andel av pasientene som har vært til ulike radiologiske undersøkelser. En pasient kan ha vært til flere undersøkelser før operasjon. %De vanligste radiologiske diagnosene var skiveprolaps og spinal stenose.
+radUnders <- RyggFigAndeler(RegData = RyggData1aar,
+                          valgtVar = 'radUnders', lagFig=0)
+Andeler <- paste(format(radUnders$AggVerdier$Hoved, digits = 2), '%')
+tab <- cbind(Antall = radUnders$Nvar$Hoved,
+      Andeler = Andeler)
+row.names(tab) <- radUnders$grtxt
+xtable(tab, label = 'tab:Radiologisk_vurdering',
+       caption = paste0('Radiologisk vurdering for ', rappAar))
 
-\textbf {Symptomvarighet før operasjon}
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-\hline
-& Andeler \\
-\hline
-Ingen utstrålende smerter & 3.4 \% \\
-$<$ 3 mnd & 13.4 \% \\
-3 - 12 mnd & 35.1 \% \\
-1 - 2 år & 19.4 \% \\
-$>$ 2 år & 24.4 \% \\
-Ikke besvart & 4.4 \% \\
-\hline
-\end{tabular}
-\caption{Varighet av nåværende utstrålende smerter, pasienter operert (alle typer kirurgi) i 2024}
-\label{tab:Utstr}
-\end{table}
-
-
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-\hline
-& Andel \\
-\hline
-Helt restituert & 19.0 \% \\
-Mye bedre & 42.4 \% \\
-Litt bedre & 21.4 \%  \\
-Uendret & 7.7 \% \\
-Litt verre & 4.7 \%\\
-Mye verre & 3.3\%\\
-Verre enn noensinne & 1.6 \%\\
-\hline
-\end{tabular}
-\caption{Pasientrapportert nytte %av alle ryggoperasjoner
-  12 måneder etter alle ryggoperasjoner, rapportert i 2024}
-\label{tab:NytteOperajonAlle12Mnd}
-\end{table}
-
-
-% latex table generated in R 4.1.2 by xtable 1.8-4 package
-% Tue Apr 26 14:54:27 2022
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-\hline
-& Andel \\
-\hline
-Fornøyd & 78.9 \% \\
-Litt fornøyd & 9.8 \% \\
-Verken eller & 5.8 \%  \\
-Litt misfornøyd & 3.3 \% \\
-Misfornøyd & 2.3 \%\\
-\hline
-\end{tabular}
-\caption{Pasientrapportert tilfredshet %etter alle operasjoner
-  12 måneder etter alle ryggoperasjoner, rapportert i 2024}
-\label{tab:PasienttilfredshetAlle12Mnd}
-\end{table}
-
-
-
-
-
-% latex table generated in R 4.4.2 by xtable 1.8-8 package
-% Tue Apr  7 16:16:58 2026
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-\hline
-& Andeler (\%) \\
-\hline
-I arbeid & 25.50 \\
-Student/skoleelev & 1.00 \\
-Alderspensjonist & 30.40 \\
-Arbeidsledig & 0.70 \\
-Sykemeldt & 16.50 \\
-Delvis sykemeldt & 5.20 \\
-Arbeidsavklaring & 5.20 \\
-Uførepensjonert & 10.20 \\
-Ikke utfylt & 5.30 \\
-\hline
-\end{tabular}
-\caption{Arbeidsstatus, pasienter operert i 2025.}
-\label{tab:Arb}
-\end{table}
-
-
-Tabell \ref{Radiologisk vurdering} viser hvor stor andel av pasientene som har vært til ulike radiologiske undersøkelser. En pasient kan ha vært til flere undersøkelser før operasjon. %De vanligste radiologiske diagnosene var skiveprolaps og spinal stenose.
-
-
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lrr}
-\hline
-& Antall & Andeler \\
-\hline
-CT & 497 & 7.2 \% \\
-MR & 6726 & 97.6 \% \\
-Røntgen LS-columna & 917 & 15.8 \% \\
-Funksjonsopptak & 24 & 2.6 \% \\
-Diagnostisk blokade & 89 &   1.3\% \\
-\hline
-\end{tabular}
-\caption{Radiologisk vurdering for 2024}
-\label{Radiologisk vurdering}
-\end{table}
-
-
-De ulike operasjonsteknikkene er vist i tabell \ref{tab:Instrumentell fusjonskirurgi}. Revisjon/fjerning av implantater, deformitetskirurgi (kyfose) og kombinerte inngrep som inkluderer skiveprotese er ikke medregnet. %i tabell \ref{tab:Instrumentell fusjonskirurgi}.
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lrr}
-\hline
-& Antall & Andeler \\
-\hline
-TLIF & 352 & 58.7 \% \\
-Posterolateral fusjon (PLF) & 119 & 19.8 \% \\
-ALIF  & 73 & 12.2 \% \\
-XLIF & 26 & 4.3 \% \\
-PLIF & 15 & 2.5 \% \\
-Ikke-instrumentell fusjon & 15 & 2.5 \% \\
-Totalt & 600 & 100.0 \% \\
-\hline
-Tilleggsprosedyrer:\\
-Computernavigasjon & 100 & 17.9 \% \\
-Ileumskruer & 4 & 0.8\% \\
-Sementerte skruer & 24 & 4.8 \% \\
-\hline
-\end{tabular}
-\caption{Typer instrumentell fusjonskirurgi, 2024}
-\label{tab:Instrumentell fusjonskirurgi}
-\end{table}
 
 
 #--------Nakke:
