@@ -19,24 +19,20 @@
 #'
 #' @export
 RyggFigGrupperLinjelTid <- function(RegData, valgtVar = 'gruppeAndel' , gr1='', gr2='', gr3 = '',
-                            datoFra='2011-01-01', datoTil=Sys.Date(), aar=0,
-                            tidsenhet='Aar', hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1,
+                            datoFra='2011-01-01', datoTil=Sys.Date(), aar=0, Ngrense=10,
+                            tidsenhet='Aar', hovedkat = 99, tidlOp = 99,
                             minald=0, maxald=130, erMann=99, reshID=0, outfile='', hastegrad=99,
-                            enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, ... ) {
-  valgtVar='OswEndr30pst12mnd'
-  gr1 <- 2 # gr kun tilpasset hovedkategorier
-  gr2 <- 5
-  tidsenhet <- 'Aar'
-
-  if ("session" %in% names(list(...))) {
-    rapbase::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrTidsenhet: ',valgtVar))
-  }
+                            preprosess=1, hentData=0, lagFig=1, ... ) {
+  # valgtVar <- 'gruppeAndel' # 'OswEndr30pst12mnd'
+  # gr1 <- 2 # gr kun tilpasset hovedkategorier
+  # gr2 <- 5
+  # tidsenhet <- 'Aar'
 
   if (hentData == 1) {
     RegData <- RyggRegDataV2V3()
   }
 
-  # Preprosessering av data. I samledokument gjøre dette i samledokumentet.
+  # Preprosessering av data.
   if (preprosess==1){
     RegData <- RyggPreprosess(RegData=RegData)	#, reshID=reshID)
   }
@@ -50,13 +46,13 @@ RyggFigGrupperLinjelTid <- function(RegData, valgtVar = 'gruppeAndel' , gr1='', 
     tittel <- RyggVarSpes$tittel
 
   #------- Gjøre utvalg
-  if (reshID==0) {enhetsUtvalg <- 0}
-
+  # if (reshID==0) {enhetsUtvalg <- 0}
+    enhetsUtvalg <- ifelse(reshID==0, 0, 2)
   RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                                hastegrad=hastegrad, tidlOp=tidlOp, hovedkat = hovedkat,
                               enhetsUtvalg=enhetsUtvalg) #, grType=grType
-  RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, datoFra = '2010-01-01', datoTil='2023-12-31', hovedkat = 10)
+  # RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, datoFra = '2011-01-01', datoTil='2025-12-31', hovedkat = 10)
   utvalgTxt <- RyggUtvalg$utvalgTxt
   RegData <- RyggUtvalg$RegData
 
@@ -120,7 +116,7 @@ RyggFigGrupperLinjelTid <- function(RegData, valgtVar = 'gruppeAndel' , gr1='', 
     if (lagFig == 1) {
 
       #Plottspesifikke parametre:
-      outfile <- 'ODI30vsOptypeAar.pdf'
+      outfile <- 'AndelOperasjontype.pdf' # 'ODI30vsOptypeAar.pdf'
 
       FigTypUt <- rapFigurer::figtype(outfile, fargepalett=RyggUtvalg$fargepalett)
       farger <- FigTypUt$farger
@@ -175,7 +171,7 @@ RyggFigGrupperLinjelTid <- function(RegData, valgtVar = 'gruppeAndel' , gr1='', 
 
 
   #                  }
-  return(invisible(FigDataParam))
+ # return(invisible(FigDataParam))
 
 }	#end function
 

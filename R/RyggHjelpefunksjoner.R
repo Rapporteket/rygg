@@ -257,14 +257,16 @@ if (ktr==2) {
   #Legge på orgID ("Sykehusviser") 943545634
   #ReshId	orgnr	RapporteketNavn	SKDEnavn
   nyID <- c('999976' = '974706490',	#Ahus	Ahus
+            '4211878' = '943545634', # "Aleris Agder"
             '4211883' = '943545634', #Aleris Bodø
-            '107508' = '943545634',	#Aleris Bergen	Aleris Bergen
-            '107240' = '943545634',	#Aleris Drammen	Aleris Drammen
+            '107508' = '943545634',	#Aleris Bergen
+            '107240' = '943545634',	#Aleris Drammen
             '4211881' = '943545634', #Aleris Drammen
             '4211880' = '943545634', #Aleris Helse AS / Aleris Nesttun (ny 2023)
             '107511' = '943545634',  #Aleris Oslo
             '999975' = '943545634',	#Aleris Oslo	Aleris Colosseum Nobel
             '999994' = '943545634',	#Aleris Stavanger	Aleris Colosseum Stavanger
+            '4209812' = '943545634',  # Aleris Tromsø
             '100133' = '974631091',	#Arendal	Arendal
             '100968' = '974795361',	#Bodø	Bodø
             '103094' = '974705788',	#Bærum	Bærum

@@ -1,0 +1,260 @@
+---
+title: "Funnel plot in R"
+author: "Henrik Hedevik, adapted for NORspine by Bjørnar Berg"
+date: "`r Sys.Date()`"
+output: html_document
+note: Requires prepared NORspine data restricted to time-period and surgical cases of interest (long format)
+variables needed: success (dep.var), clinic (shnavn), covariates: alder, kjonn, asa, prevsurg(binar), oswtotpre
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Installation of packages
+
+```{r packages, echo=FALSE}
+#if(!require(foreign)) { install.packages("foreign"); require(foreign)}
+#library(foreign)
+if(!require(ggplot2)) { install.packages("ggplot2"); require(ggplot2)}
+library(ggplot2)
+if(!require(dplyr)) { install.packages("dplyr"); require(dplyr)}
+library(dplyr)
+if(!require(broom)) { install.packages("broom"); require(broom)}
+library(broom)
+if(!require(data.table)) { install.packages("data.table"); require(data.table)}
+library(data.table)
+if(!require(emmeans)) { install.packages("emmeans"); require(emmeans)}
+library(emmeans)
+library(haven) 
+library(dplyr)
+library(ggrepel)
+```
+### Loading data LR
+
+```{r data, echo=FALSE}
+LR <- read_dta("M:/p2124-bjbe/NORspine/Rygg/funnel/funnel_hd2223.dta") # Imports Stata .dta file
+setDT(LR)
+LR <- LR %>%
+  mutate(
+    kjonn = recode(as.numeric(kjonn), `1` = 0, `2` = 1), # Recode kjonn
+    prevsurg = as.numeric(prevsurg), # Ensure binary as numeric
+    success = as.numeric(success),  # Ensure binary as numeric
+    asa = as.numeric(asa),          # Convert labelled numeric
+    alder = as.numeric(alder),      # Already numeric, but ensures consistency
+    oswtotpre = as.numeric(oswtotpre), # Already numeric
+  )
+View(LR)
+
+```
+
+### Data Table LPHD
+
+```{r LPHD_LogReg, echo=FALSE}
+
+# Selecting HD
+LPHD <- LR
+
+# Calculate Clinic Volume and Satisfied patients
+LPHD <- copy(LPHD) 
+LPHD[, ClinicVolume := .N, by = clinic]
+LPHD[, Success := sum(success), by = clinic]
+
+# Include Clinics with >20 surgeries
+LPHD <- LPHD[ClinicVolume > 20]
+
+LPHD[, MeanAge := mean(alder)]
+LPHD[, MeanSex := mean(kjonn)]
+LPHD[, meanPrevsurg := mean(prevsurg)]
+LPHD[, MeanAsa := mean(asa)]
+LPHD[, meanOswTotPre := mean(oswtotpre)]
+LPHD
+
+# Logistic Regression model on Success
+LPHD_Model <- glm(success ~ clinic + alder + kjonn + prevsurg + asa + oswtotpre, family = binomial, data = LPHD)
+summary(LPHD_Model)
+
+# Calculate EMMs for Clinic on the response scale
+LPHD_EMMs <- emmeans(LPHD_Model, ~ clinic, type = "response")
+
+# View the EMMs on the response scale
+summary(LPHD_EMMs)
+
+# Extract EMMs as a data.table
+LPHD_Prob <- as.data.table(summary(LPHD_EMMs))
+
+# Merge EMMs with the original data table
+LPHD <- merge(LPHD, LPHD_Prob, by = "clinic", all.x = TRUE)
+LPHD[, SuccessAdj := ClinicVolume*prob]
+
+# Exclude duplicate cases in Clinic
+LPHD_Clinic <- LPHD[, .(clinic, ClinicVolume, Success, SuccessAdj)][!duplicated(clinic)]
+
+# Calculate Satisfaction Rates
+LPHD_Clinic <- LPHD_Clinic %>%
+  dplyr::mutate(Rate = Success/ClinicVolume,
+                OverallRate = sum(Success)/sum(ClinicVolume),
+                se = sqrt(OverallRate * ((1 - OverallRate)/ClinicVolume)),
+                lcl95 =  OverallRate - (1.96 * se),
+                ucl95 =  OverallRate + (1.96 * se),
+                RateAdj = SuccessAdj/ClinicVolume,
+                OverallRateAdj = sum(SuccessAdj)/sum(ClinicVolume),
+                seAdj = sqrt(OverallRateAdj * ((1 - OverallRateAdj)/ClinicVolume)),
+                lcl95Adj =  OverallRateAdj - (1.96 * seAdj),
+                ucl95Adj =  OverallRateAdj + (1.96 * seAdj))
+View(LPHD_Clinic)
+
+```
+
+### Funnel plot Satisfaction (%) LPHD
+
+```{r LPHD_Plot, echo=FALSE}
+# Funnel plot on satisfaction (%) with improved label placement
+PlotRate <- ggplot(data = LPHD_Clinic, aes(x = ClinicVolume, group = OverallRate)) +
+  geom_smooth(aes(y = ucl95), se = FALSE, linetype = "solid", color = "red", size = 0.8) +
+  geom_smooth(aes(y = lcl95), se = FALSE, linetype = "solid", color = "red", size = 0.8) +
+  geom_smooth(aes(y = OverallRate), se = FALSE, color = "darkgray", size = 0.8) +
+  geom_point(aes(y = Rate), color = "black", size = 2) +
+  geom_text_repel(aes(y = Rate, label = clinic), 
+                  size = 2.5, color = "black", 
+                  box.padding = 0.4, # Adds padding between labels and points
+                  point.padding = 0.2, # Adds padding between points and lines
+                  max.overlaps = 10, # Adjusts the number of overlapping labels allowed
+                  min.segment.length = 0.2, # Avoids long connecting lines
+                  segment.color = "gray") + # Sets line color
+  theme_classic() +
+  scale_x_continuous(breaks = seq(0, 400, by = 50), limits = c(0, 410)) +
+  scale_y_continuous(breaks = seq(0.20, 1, by = 0.05), labels = scales::percent) +
+  labs(x = "Patient volume during surgery period 2022-2023",
+       y = "Success (%)")
+
+# Display the plot
+PlotRate
+
+# Save the plot to a PDF file
+ggsave("Funnel_plot_success(HD).pdf", plot = PlotRate, width = 10, height = 6)
+
+# Funnel plot on satisfaction adjusted (%)
+PlotRateAdj <- ggplot(data = LPHD_Clinic, aes(x = ClinicVolume, group = OverallRateAdj)) +
+     geom_smooth(aes(y=lcl95Adj), se=FALSE, linetype="solid", color="red", size=0.8) +
+     geom_smooth(aes(y=ucl95Adj), se=FALSE, linetype="solid", color="red", size=0.8) +
+     geom_smooth(aes(y=OverallRateAdj), se=FALSE, color="darkgray", size=0.8) +
+     geom_point(aes(y = Rate), color = "black", size = 2) +
+     geom_text_repel(aes(y = Rate, label = clinic), 
+                size = 2.5, color = "black", 
+                box.padding = 0.4, # Adds padding between labels and points
+                point.padding = 0.2, # Adds padding between points and lines
+                max.overlaps = 10, # Adjusts the number of overlapping labels allowed
+                min.segment.length = 0.2, # Avoids long connecting lines
+                segment.color = "gray") + # Sets line color
+  theme_classic() +
+  scale_x_continuous(breaks = seq(0, 400, by = 50), limits = c(0, 410)) +
+  scale_y_continuous(breaks=seq(0.20, 1, by=0.05), labels=scales::percent) +
+  labs(x = "Patient volume during surgery period 2022-2023",
+       y = "Success, adjusted (%)")
+PlotRateAdj
+
+# Save the plot to a PDF file
+ggsave("Funnel_plot_success_adjusted(HD).pdf", plot = PlotRateAdj, width = 10, height = 6)
+
+```
+### Data Table LLSS
+# From Henrik, NOT adapted
+```{r LLSS_LogReg, echo=FALSE}
+
+# Selecting LLSS
+LLSS <- LR[LR$Diagnosis == "3 – Lateral spinal stenos/recess stenos (M48.8K)",]
+
+# Calculate Clinic Volume and Satisfied patients
+LLSS[, ClinicVolume := .N, by = Clinic]
+LLSS[, Satisfaction := sum(SatisfactionSurgery), by = Clinic]
+
+# Include Clinics with >10 LLSS surgeries
+LLSS <- LLSS[ClinicVolume > 10]
+
+LLSS[, MeanAge := mean(Age)]
+LLSS[, MeanSex := mean(Sex)]
+
+# Logistic Regression model on Satisfaction
+LLSS_Model <- glm(SatisfactionSurgery ~ Clinic + Age + Sex, family = binomial, data = LLSS)
+summary(LLSS_Model)
+
+
+# R kode er brukt.
+
+
+# Calculate EMMs for Clinic on the response scale
+LLSS_EMMs <- emmeans(LLSS_Model, ~ Clinic, type = "response")
+
+# View the EMMs on the response scale
+summary(LLSS_EMMs)
+
+# Extract EMMs as a data.table
+LLSS_Prob <- as.data.table(summary(LLSS_EMMs))
+
+# Merge EMMs with the original data table
+LLSS <- merge(LLSS, LLSS_Prob, by = "Clinic", all.x = TRUE)
+LLSS[, SatisfactionAdj := ClinicVolume*prob]
+
+# Exclude duplicate cases in Clinic
+LLSS_Clinic <- LLSS[, .(Clinic, ClinicVolume, Satisfaction, SatisfactionAdj)][!duplicated(Clinic)]
+
+# Calculate Satisfaction Rates
+LLSS_Clinic <- LLSS_Clinic %>%
+  dplyr::mutate(Rate = Satisfaction/ClinicVolume,
+                OverallRate = sum(Satisfaction)/sum(ClinicVolume),
+                se = sqrt(OverallRate * ((1 - OverallRate)/ClinicVolume)),
+                lcl95 =  OverallRate - (1.96 * se),
+                ucl95 =  OverallRate + (1.96 * se),
+                RateAdj = SatisfactionAdj/ClinicVolume,
+                OverallRateAdj = sum(SatisfactionAdj)/sum(ClinicVolume),
+                seAdj = sqrt(OverallRateAdj * ((1 - OverallRateAdj)/ClinicVolume)),
+                lcl95Adj =  OverallRateAdj - (1.96 * seAdj),
+                ucl95Adj =  OverallRateAdj + (1.96 * seAdj))
+View(LLSS_Clinic)
+
+```
+
+### Funnel plot Satisfaction (%) LLSS
+
+```{r LLSS_Plot, echo=FALSE}
+
+# Funnel plot on satisfaction (%)
+PlotRate <- ggplot(data = LLSS_Clinic, aes(x = ClinicVolume, group = OverallRate)) +
+     geom_smooth(aes(y=lcl95), se=FALSE, linetype="solid", color="red", linewidth=0.8) +
+     geom_smooth(aes(y=ucl95), se=FALSE, linetype="solid", color="red", linewidth=0.8) +
+     geom_smooth(aes(y=OverallRate), se=FALSE, color="darkgray", linewidth=0.8) +
+     geom_point(aes(y=Rate), color="black") +
+     geom_text(aes(y=Rate, label=Clinic), color="black", size=2.5, hjust=-0.3, vjust=-0.3) +
+     geom_label(aes(x=150, y=0.95, label="Red line indicate 95% CI")) +
+     theme_classic() +
+     scale_x_continuous(breaks=seq(0,300, by=50)) +
+     scale_y_continuous(breaks=seq(0.20,1, by=0.05), labels=scales::percent) +
+     labs(title="Lumbal Lateral Spinal Stenosis") +
+     labs(x="Patient volume during surgery period 2021-2022") +
+     labs(y="Satisfaction (%)")
+PlotRate
+
+# Save the plot to a PDF file
+ggsave("Funnel plot satisfaction (LLSS).pdf", plot = PlotRate, width = 10, height = 6)
+
+# Funnel plot on satisfaction adjusted (%)
+PlotRateAdj <- ggplot(data = LLSS_Clinic, aes(x = ClinicVolume, group = OverallRateAdj)) +
+     geom_smooth(aes(y=lcl95Adj), se=FALSE, linetype="solid", color="red", linewidth=0.8) +
+     geom_smooth(aes(y=ucl95Adj), se=FALSE, linetype="solid", color="red", linewidth=0.8) +
+     geom_smooth(aes(y=OverallRateAdj), se=FALSE, color="darkgray", linewidth=0.8) +
+     geom_point(aes(y=RateAdj), color="black") +
+     geom_text(aes(y=RateAdj, label=Clinic), color="black", size=2.5, hjust=-0.3, vjust=-0.3) +
+     geom_label(aes(x=150, y=0.95, label="Red line indicate 95% CI")) +
+     theme_classic() +
+     scale_x_continuous(breaks=seq(0,300, by=50)) +
+     scale_y_continuous(breaks=seq(0.20,1, by=0.05), labels=scales::percent) +
+     labs(title="Lumbal Lateral Spinal Stenosis") +
+     labs(x="Patient volume during surgery period 2021-2022") +
+     labs(y="Satisfaction, adjusted (%)")
+PlotRateAdj
+
+# Save the plot to a PDF file
+ggsave("Funnel plot satisfaction adjusted (LLSS).pdf", plot = PlotRateAdj, width = 10, height = 6)
+
+```

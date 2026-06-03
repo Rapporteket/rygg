@@ -17,10 +17,7 @@ source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
 library(rygg)
 
-RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
-                                     query='SELECT * FROM allevarnum')
-
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
 

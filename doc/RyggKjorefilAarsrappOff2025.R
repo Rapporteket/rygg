@@ -39,9 +39,23 @@ Ntot1aar <- dim(RegData1aar)[1]
 AntAvd <- length(unique(RegData$ShNavn))
 
 #-------------------Nye figurer------------------------
-# source("dev/sysSetenv.R")
-# RegDataRaa <- RyggRegDataV2V3(datoFra = '2007-01-01')
-# RegData <- RyggPreprosess(RegData =RegDataRaa)
+#Andel operasjon gjort på pasienter som er operert tidligere.
+RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar = 'tidlOpr',
+                    outfile ='tidlOpr_Sh.pdf')
+
+RyggFigAndelerGrVar(RegData = RegData1aar, valgtVar = 'tidlOpr',
+                    outfile ='tidlOpr3_Sh.pdf')
+
+#-----------Sammenligne to grupper over tid------------------
+
+#RyggUtvalgEnh(RegData=RegData, datoFra = '2011-01-01', datoTil='2025-12-31', hovedkat = 10)
+RyggFigGrupperLinjelTid(RegData=RegData, valgtVar = 'gruppeAndel' , gr1=2, gr2=5, gr3 = '',
+                        datoFra='2011-01-01', datoTil=datoTil,
+                        hovedkat = 10,  Ngrense=10,
+                       reshID=0, outfile='',
+                        preprosess=0)
+
+
 
 #Ant dager fra Operasjonsdato til utfyllingsdato 3 og 12 mnd.
 valgtVar <- 'diffUtf12mnd'       # 'diffUtf3mnd' # 'diffUtf12mnd' (Bare V3)
@@ -78,6 +92,7 @@ RyggFigAndelTid(RegData = RegData, valgtVar = valgtVar, outfile = paste0(valgtVa
 # Vurder om “V3” kan fjernes fra EQ-variabler
 
 #---------FIGURER, årsrapport --------------
+
 
 # Andel bruk OpAndreEndosk= 1 hos hhv. «LSSopr»= 1 og «ProlapsDekr»=1, per sykehus (siste 2 år?) Andel over tid (hele Norge).
 RyggFigAndelerGrVar(RegData = RegData, valgtVar = 'opAndreEndoskopi', hovedkat = 1,
@@ -126,6 +141,11 @@ RyggFigGjsnGrVar(RegData=RegData1aar, outfile='LiggetidAvdSS.pdf',
                  valgtVar='liggedogn', hovedkat=9, valgtMaal = 'Gjsn')
 
 
+RyggFigGjsnGrVar(RegData=RegData1aar, outfile='liggetidPostOpShPro_gjsn.pdf',
+                 valgtVar='liggetidPostOp', hovedkat = 1, valgtMaal = 'Gjsn')
+RyggFigGjsnGrVar(RegData=RegData1aar, outfile='liggetidPostOpShSS_gjsn.pdf',
+                 valgtVar='liggetidPostOp', hovedkat=9, valgtMaal = 'Gjsn')
+
 RyggFigAndelerGrVarAar(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, preprosess = 0,
                        Ngrense=20, aar=rappAar, tidlAar=tidlAar, hastegrad=1, outfile='SympVarighUtstrAarPro.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='sympVarighUtstr', hovedkat=1, hastegrad=1, outfile='SympVarighUtstrTidPro.pdf')
@@ -151,7 +171,6 @@ RyggFigAndelTid(RegData=RegData, valgtVar='peropKompDura', hovedkat=9, tidlOp=4,
 RyggFigAndelTid(RegData=RegData, valgtVar='oppf3mnd', outfile='Oppf3mndTid.pdf')
 
 
-
 #------ KVALITETSINDIKATORER------------
 # Sett 70 % på KI 3 og 4 (ODI) og la det ligge fast.
 # KI 5, fusjonskirurgi: fast på 10 % 'degSponFusj1op' - vises bare i andelgrvar
@@ -169,7 +188,7 @@ RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='ventetidSpesOp', Ngrense = 20
                     hastegrad=1, outfile='VentetidSpesOp_Sh.pdf')
 
 #K2 Lite beinsmerter/utstrålende smerter før prolapskirurgi
-BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData, valgtVar='smBePreLav', aar=aar2,
+BeinsmLavPre <- RyggFigAndelerGrVar(RegData=RegData1aar, valgtVar='smBePreLav', #aar=aar2,
                                     Ngrense = 20, preprosess = 0, hovedkat=1,   outfile='BeinsmLavPrePro.pdf')
 RyggFigAndelTid(RegData=RegData, valgtVar='smBePreLav', hovedkat=1, outfile='BeinsmLavPreProTid.pdf')
 
@@ -465,102 +484,6 @@ xtable(tab, label = 'tab:Radiologisk_vurdering',
 
 
 
-#--------Nakke:
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-\hline
-& Andel \\
-\hline
-Helt restituert & 17.2 \% \\
-Mye bedre & 45.6 \% \\
-Litt bedre & 22.8 \%  \\
-Uendret & 5.1 \% \\
-Litt verre & 5.5 \%\\
-Mye verre & 2.7\%\\
-Verre enn noensinne & 1.1 \%\\
-\hline
-\end{tabular}
-\caption{Pasientrapportert nytte, alle nakkeoperasjoner 12 måneder etter kirurgi, rapportert i 2024.}
-\label{tab:NytteOperajonAlleN12Mnd}
-\end{table}
-
-
-
-\ref{tab:PasienttilfredshetAlle1N2Mnd} viser hvordan pasientene svarte i 2023, ett år etter nakkekirurgi.
-
-% latex table generated in R 4.1.2 by xtable 1.8-4 package
-% Tue Apr 26 14:54:27 2022
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-\hline
-& Andel \\
-\hline
-Fornøyd & 78.7 \% \\
-Litt fornøyd & 10.6 \% \\
-Verken eller & 4.5 \%  \\
-Litt misfornøyd & 4.0 \% \\
-Misfornøyd & 2.1 \%\\
-\hline
-\end{tabular}
-\caption{Pasienttilfredshet, alle operasjoner 12 måneder etter all nakkekirurgi, rapportert i 2024}
-\label{tab:PasienttilfredshetAlle1N2Mnd}
-\end{table}
-
-
-
-Tabell \ref{tab:ArbNakke} viser fordeling av arbeidsstatus før operasjonen. 4,7 \% av pasientene hadde søkt eller hadde planer om å søke uføretrygd.
-
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lr}
-\hline
-& Andeler \\
-\hline
-Fulltidsjobb & 37.1\% \\
-Hjemmeværende & 0.3\% \\
-Student/skoleelev & 0.1\% \\
-Alderspensjonist & 9.2\% \\
-Arbeidsledig & 0.4\% \\
-Sykemeldt & 31.1\% \\
-Delvis sykemeldt & 2.0\% \\
-Arbeidsavklaringspenger & 8.2\% \\
-Uførepensjonert & 10.3\% \\
-Ikke utfylt & 0.4\% \\
-
-\hline
-\end{tabular}
-\caption{Arbeidsstatus hos pasienter før nakkekirurgi i 2024.}
-\label{tab:ArbNakke}
-
-
-ASA angir pasientens fysiske ”sårbarhet” ved anestesi og operasjon på en skala fra 1 til 5.
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{crr}
-\hline
-& Antall & Prosent \\
-\hline
-I & 327 & 26.3 \% \\
-II & 877 & 63.4\% \\
-III & 167 & 12.1\% \\
-IV & 3 & 0.2\% \\
-V & 0 & 0\% \\
-Ikke besvart & 10 & 0.7\% \\
-\hline
-\end{tabular}
-\caption{Fordeling av ASA-grad, nakkeoperasjoner utført i 2024.}
-\label{tab:ASANakke}
-\end{table}
-
-
-
-
-
 #------------------------------------------------------------------------------------
 #-----------Filer til Interaktive nettsider -----------------------
 #------------------------------------------------------------------------------------
@@ -572,10 +495,7 @@ library(rygg)
 library(magrittr)
 setwd('../../rygg')
 source("dev/sysSetenv.R")
-RyggData <- RyggPreprosess(RegData = RyggRegDataV2V3(datoFra = '2019-01-01'))
-valgteAar <- 2011:2025
-#Ønsker å vise alle data
-RyggData <- RyggUtvalgEnh(RegData=RyggData, datoFra = '2011-01-01')$RegData
+RyggData <- RyggPreprosess(RegData = RyggRegDataV2V3(datoFra = '2011-01-01'))
 
 #Sjekk om nye resh:
 nyresh <- setdiff(sort(unique(RyggData$ReshId)), sort(names(nyID)))
@@ -588,7 +508,7 @@ setwd('../Aarsrapp/NKR/')
 # Ventetid < 3 måneder fra ryggkirurgi ble bestemt (ved spesialist poliklinikk) til operasjonen ble utført.
 # ØNSKET MÅLNIVÅ: ≥ 80 %
 ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp',
-                          aar = valgteAar,
+                         # aar = valgteAar,
                           slaaSmToAar=0,
                           hastegrad=1,
                           indID = 'nkr_rygg_ventetid_kirurgi', filUt = 'ind1_VentetidOperasjon')
@@ -599,7 +519,7 @@ ind1 <- dataTilOffVisning(RegData = RyggData, valgtVar='ventetidSpesOp',
 # ØNSKET MÅLNIVÅ: ≤ 3,0 %
 ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
                           hovedkat=1,
-                          aar = valgteAar,
+                         # aar = valgteAar,
                           slaaSmToAar=0,
                           indID = 'nkr_rygg_lav_bensmerte_prolaps',
                           filUt = 'ind2_lav_bensmerte_prolaps')
@@ -611,7 +531,7 @@ ind2 <- dataTilOffVisning(RegData = RyggData, valgtVar='smBePreLav',
 #! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
                           hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
-                          aar = valgteAar,
+                         # aar = valgteAar,
                           slaaSmToAar=0,
                           indID = 'nkr_rygg_odi20p12mnd_prolaps', filUt = 'ind3_OswEndr20poengPro')
 # Forbedring av fysisk funksjon i dagliglivet, spinal stenose kirurgi
@@ -620,7 +540,7 @@ ind3 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr20',
 #! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
 ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
                           hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2, #Skal være utvalg både på elektiv og ikke tidl.op
-                          aar = valgteAar,
+                         # aar = valgteAar,
                           slaaSmToAar=0,
                           indID = 'nkr_rygg_odi30pst12mnd_stenose', filUt = 'ind4_OswEndr30pstSS')
 
@@ -630,7 +550,7 @@ ind4 <- dataTilOffVisning(RegData = RyggData, valgtVar='OswEndr30pst',
 #                     Ngrense=20, aar=(rappAar-1):rappAar, outfile='degSponFusj1opKISh.pdf')
 
 ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
-                          aar = valgteAar,
+                         # aar = valgteAar,
                           slaaSmToAar=0,
                           indID = 'nkr_rygg_degSponFusj1op', filUt = 'ind5_degSponFusj1op')
 
@@ -646,7 +566,7 @@ ind5 <- dataTilOffVisning(RegData = RyggData, valgtVar='degSponFusj1op',
 #                     Ngrense=20, aar=rappAar, outfile='trombProfylLettKISh.pdf')
 
 ind6 <- dataTilOffVisning(RegData = RyggData, valgtVar='trombProfylLettKI',
-                          aar = valgteAar,
+                        #  aar = valgteAar,
                           slaaSmToAar=0,
                           indID = 'nkr_rygg_trombProfylLettKI', filUt = 'ind6_trombProfylLettKI')
 

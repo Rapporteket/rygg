@@ -1003,12 +1003,26 @@ valgtVarTest <- valgtVar
       }
 
 
-      if (valgtVar == 'tidlOpr') {
+      if (valgtVar == 'tidlOpr') { #fordeling,AndelTid, AndelGrVar
             tittel <- 'Tidligere ryggoperert?'
             retn <- 'H'
             grtxt <- c('Samme nivå', 'Annet nivå', 'Annet og sm. nivå', 'Primæroperasjon') #, 'Ukjent')
             RegData$VariabelGr <- factor(RegData$TidlOpr, levels = c(1:4))
+              if (figurtype %in% c('andelGrVar', 'andelTid')) {
+                RegData$Variabel[RegData$TidlOpr %in% 1:3] <- 1
+                varTxt <- 'med tidl. operasjoner'
+                tittel <- 'Operasjoner hvor pasienten er tidligere operert'
+                sortAvtagende <- F
+            }
       }
+
+      if (valgtVar == 'tidlOp3'){ #AndelTid, AndelGrVar
+        RegData$Variabel[RegData$TidlOprAntall>2] <- 1
+        varTxt <- 'med >2 tidl. operasjoner'
+        tittel <- 'Tre eller flere tidligere operasjoner'
+        sortAvtagende <- F
+      }
+
       if (valgtVar=='tidlOprAntall') {
             tittel <- 'Antall tidligere operasjoner'
             gr <- c(-1:5, 1000)
@@ -1020,17 +1034,9 @@ valgtVarTest <- valgtVar
             grtxt <- c('Ukjent', 0:4,paste0('5-', max(RegData$TidlOprAntall, na.rm=T)))
       }
 
-      if (valgtVar == 'tidlOp3'){ #AndelTid, AndelGrVar
-            RegData$Variabel[RegData$TidlOprAntall>2] <- 1
-            varTxt <- 'med >2 tidl. operasjoner'
-            tittel <- 'Flere enn to tidligere operasjoner'
-            sortAvtagende <- F
-      }
-
       if (valgtVar == 'trombProfyl') { #AndelGrVar, AndelTid
          #Legeskjema
          tittel <- 'Tromboseprofylakse gitt ifm. operasjon'
-         #if (figurtype %in% c('andelGrVar', 'andelTid')){
             RegData <- RegData[which(RegData$PostopTrombProfyl %in% 0:1), ]
             RegData$Variabel <- RegData$PostopTrombProfyl
             varTxt <- 'fått tromboseprofylakse'
