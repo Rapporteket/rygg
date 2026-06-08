@@ -600,31 +600,31 @@ write.csv2(ReshShNavn, file = 'data-raw/RyggReshSh.csv', row.names = F)
 #write.csv2(ReshShNavnNakke, file = '~/nakke/data-raw/NakkeReshSh.csv', row.names = F)
 
 #Rygg:
-ReshSh <- read.csv2('data-raw/RyggReshSh.csv', encoding = 'UTF-8')
-RyggDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderRygg2023.xlsx', sheet = 'RyggFig')
+#ReshSh <- read.csv2('data-raw/RyggReshSh.csv', encoding = 'UTF-8')
+RyggDg <- readxl::read_excel('C:/Users/lro2402unn/RegistreGIT/Aarsrapp/NKR/DGA/RyggDG2025.xlsx', sheet = 'RyggFig')
+
 RyggDgSh <- aggregate(RyggDg[ ,c("RegRygg", 'Total')], by = list(RyggDg$ReshId), FUN = 'sum')
 RyggDgSh$ShNavn <- ReshSh$ShNavn[match(RyggDgSh$Group.1, ReshSh$ReshId)]
-#RyggDgSh$DG_nkr <- 100*RyggDgSh$RegRygg/RyggDgSh$Total
 
 RyggFigAndelerGrVar(RegData=RyggDgSh, valgtVar='dekn23Rygg', outfile='DGrygg.pdf')
 
 #Nakke:
-ReshSh <- read.csv2('../nakke/data-raw/NakkeReshSh.csv', encoding = 'UTF-8')
-NakkeDg <- readxl::read_excel('C:/Registerinfo/DeknGrad/NKR2023/DekningsgraderNakke2023.xlsx', sheet = 'NakkeFig')
+#ReshSh <- read.csv2('../nakke/data-raw/NakkeReshSh.csv', encoding = 'UTF-8')
+NakkeDg <- readxl::read_excel('C:/Users/lro2402unn/RegistreGIT/Aarsrapp/NKR/DGA/NakkeDG2025.xlsx', sheet = 'NakkeFig')
+
 NakkeDg$ShNavn <- ReshSh$ShNavn[match(NakkeDg$ReshId, ReshSh$ReshId)]
-#table(NakkeDg$ShNavn)
 rygg::RyggFigAndelerGrVar(RegData=NakkeDg, valgtVar='dekn23Nakke', outfile='DGnakke.pdf') #
 
 #Data til nettsider (legge på orgnr: nyID)
 DataDgOrg <- RyggDg
 DataDgOrg$orgnr <- as.character(nyID[as.character(DataDgOrg$ReshId)])
-DataDgOrg$ind_id <- 'nkr_rygg_dg' #'nakke_dg'
+DataDgOrg$ind_id <- 'nkr_rygg_dg' # 'nakke_dg' #
 #Variabler: year, orgnr, var, denominator, ind_id
 DataDgOrg <- dplyr::rename(DataDgOrg, var=RegNKR, denominator=Total, )
 DataDgOrg$context <- 'caregiver'
-DataDgOrg$year <- 2023
+DataDgOrg$year <- 2025
 DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus"))]
-write.csv2(DataDgOrg, file = 'RyggDg2023.csv')
+write.csv2(DataDgOrg, file = 'RyggDg2025.csv', fileEncoding = 'UTF-8')
 
 
 #---------------Data til dekningsgradsanalyser-----------------

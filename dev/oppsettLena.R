@@ -19,7 +19,8 @@ library(rygg)
 
 RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
-
+RegData <- RyggUtvalgEnh(RegData=RegData, datoTil='2025-12-31')$RegData
+table(RegData$SykehusNavn)
 
 RegData[which(RegData$TidlOprAntall>10), c('PasientID', 'OpDato', 'ShNavn', 'TidlOprAntall')]
 RegData$ShNavn

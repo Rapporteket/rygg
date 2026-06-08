@@ -46,9 +46,9 @@ hovedkatValg <- c('Alle'=99,
 ui <- navbarPage(
   id = "hovedark",
 
-  title = rapbase::title(regTitle),
+  title = rapbase::regTitle(regTitle),
   windowTitle = regTitle,
-  theme = rapbase::theme(),
+  theme = rapbase::rapTheme(),
 
 
   #------------ Startside -----------------
