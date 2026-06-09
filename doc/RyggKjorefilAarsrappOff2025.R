@@ -696,3 +696,109 @@ KoblNakke_CCI <- KoblNakke[which(KoblNakke$PID %in% NakkeCCI$PasientID), ]
 KoblNakke_CCI$SSN <- stringr::str_pad(KoblNakke_CCI$SSN, width = 11, pad = "0", side = "left")
 write.csv2(KoblNakke_CCI[ ,c('SSN', 'PID')], file = '../data/KoblNakke_CCI.csv', row.names = F)
 
+
+#-----------Kompletthet, kvalitetsindikatorer
+
+source("c://Users/lro2402unn/RegistreGIT/rygg/dev/sysSetenv.R")
+library(rygg)
+#Felles parametre:
+RyggData <- RyggRegDataV2V3(datoFra = '2024-01-01')
+RegData <- RyggPreprosess(RegData=RyggData)
+RegData12mnd <- RyggUtvalgEnh(RegData = RegData, datoFra = '2024-01-01', datoTil = '2024-12-31')$RegData
+RegData1aar <- RyggUtvalgEnh(RegData = RegData, datoFra = '2025-01-01', datoTil = '2025-12-31')$RegData
+
+#hovedkat - HovedInngrepV2V3 ==0 er "udefinerbar". Velger å ikke betrakte disse som manglende
+#tidlOp - TidlOpr 100%, alle er klassifisert
+
+#hastegrad - OpKat. OpKat==9 er "Ikke utfylt", dvs. manglende
+100*prop.table(table(RegData1aar$HovedInngrepV2V3, useNA = 'a'))
+#Ved filtrering kunne disse vært tatt med i nevner. Velger konservativt estimat.
+#Hvis variabelen vi ser på, har manglende for de med manglende klassifisering, er det aktuelt å ta de med
+
+
+#ind1 Ventetid, operasjon bestemt til utført
+# Ventetid < 3 måneder fra ryggkirurgi ble bestemt (ved spesialist poliklinikk) til operasjonen ble utført.
+# 'ventetidSpesOp', hastegrad=1,
+
+table(RegData1aar[ ,c('VentetidSpesialistTilOpr', 'OpKat')], useNA = 'a')
+
+Kompletthet_ind1 <- with(RegData1aar,
+                    1-sum(VentetidSpesialistTilOpr==9 & (OpKat %in% c(1,3)))/sum(OpKat %in% c(1,3)))
+
+#ind2: Andel pasienter med lite beinsmerter (≤ 3) operert for lumbale prolaps siste to år
+# 'smBePreLav', hovedkat=1, SmBePre og OpIndParese 100%
+table(RegData1aar[RegData$HovedInngrepV2V3==1, c('SmBePre', 'OpIndParese')], useNA = 'a')
+table(RegData1aar[RegData$HovedInngrepV2V3==1, 'SmBePre'], useNA = 'a')
+
+Kompletthet_ind2 <- 1-sum(is.na(RegData1aar$SmBePre) & RegData1aar$HovedInngrepV2V3==1)/sum(RegData$HovedInngrepV2V3==1)
+
+#-----Oswestry---
+# ind3: Forbedring av fysisk funksjon i dagliglivet, prolapskirurgi
+#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
+# valgtVar='OswEndr20', hovedkat=1, hastegrad = 1, tidlOp = 4, ktr=2,
+ind3 <- which(RegData12mnd$TidlOpr==4 & RegData12mnd$HovedInngrepV2V3==1 & (RegData12mnd$OpKat %in% c(1,3)))
+RegData_ind3 <- RyggUtvalgEnh(RegData = RegData12mnd, tidlOp = 4, hovedkat=1 , hastegrad = 1)$RegData
+RegData_ind3$Variabel <- RegData_ind3$OswTotPre - RegData_ind3$OswTot12mnd
+  #RyggVarTilrettelegg(RegData = RegData_ind3, valgtVar = 'OswEndr20', ktr = 2)$RegData
+
+100*prop.table(table(RegData_ind3$Variabel, useNA = 'a'))
+Kompletthet_ind3 <- 1-sum(is.na(RegData_ind3$Variabel))/dim(RegData_ind3)[1]
+
+# ind4: 30 % forbedring av Oswestry Disabiliy Index (ODI) 12 måneder etter kirurgi for spinal stenose
+#! Skal vise de som svarte i rapporteringsåret. Dette er tatt hånd om i funksjonen når velger ktr=2
+  #  'OswEndr30pst', hovedkat=9, hastegrad = 1, tidlOp = 4, ktr=2,
+
+RegData_ind4 <- RyggUtvalgEnh(RegData = RegData12mnd, tidlOp = 4, hovedkat=9 , hastegrad = 1)$RegData
+RegData_ind4$Variabel <- (RegData_ind4$OswTotPre - RegData_ind4$OswTot12mnd)
+100*prop.table(table(RegData_ind4$Variabel, useNA = 'a'))
+Kompletthet_ind4 <- 1-sum(is.na(RegData_ind4$Variabel))/dim(RegData_ind4)[1]
+
+# ind5: Pasienter med degenerativ spondylolistese operert med fusjonskirurgi ved første operasjon
+# 'degSponFusj1op',
+#hovedkat=10:  which(RegData$LSSopr==1 & RegData$RfSpondtypeDegen==1) #Alle fylt ut
+#TidlOpr - alle klassifisert
+#HovedInngrepV2V3: 5,1% IKKE klassifisert
+#HovedInngrepV2V3 ==5 angir de som operert med fusjon
+prop.table(table(RegData1aar$HovedInngrepV2V3))*100
+ind <- which(RegData1aar$LSSopr==1 & RegData1aar$RfSpondtypeDegen==1 & RegData1aar$TidlOpr==4)
+RegData_ind5 <- RyggUtvalgEnh(RegData1aar, hovedkat=10, tidlOp = 4)$RegData
+
+Kompletthet_ind5 <- 1-sum(RegData_ind5$HovedInngrepV2V3==0)/dim(RegData_ind5)[1]
+#Litt usikker på denne, men tror det må bli sånn.
+
+# ind6: Får tromboseprofylakse i forbindelse med lett ryggkirurgi.
+# Spesifisering: (BlodfortynnendeFast = 0 &  ASA grad< 3 & Kjønn = 1 (mann)) & (HovedInngrepV2V3=1 eller HovedInngrepV2V3=2)
+# valgtVar='trombProfylLettKI',
+table(RegData$ErMann, useNA = 'a') #Alle kodet
+100*prop.table(table(RegData1aar$ASA)) #9 ukjent
+table(RegData$HovedInngrepV2V3) #0 ukjent
+100*prop.table(table(RegData1aar$BlodfortynnendeFast)) #9 ukjent
+100*prop.table(table(RegData$PostopTrombProfyl)) #9 ukjent
+
+indUtv <- which((RegData1aar$ASA<3) & (RegData1aar$ErMann==1) &
+                  (RegData1aar$HovedInngrepV2V3 %in% 1:2) & (RegData1aar$BlodfortynnendeFast==0))
+RegData_ind6 <- RegData1aar[indUtv,]
+Kompletthet_ind6 <- 1-sum(RegData_ind6$PostopTrombProfyl==9)/dim(RegData_ind6)[1]
+
+#Filtreringsvariabler:
+#tidlOp - TidlOpr 100%, alle er klassifisert
+#hovedkat - HovedInngrepV2V3 ==0 er "udefinerbar".
+#hovedkat=10:  LSSopr=1 & RfSpondtypeDegen=1, alle er fylt ut
+#hastegrad - OpKat. OpKat==9 er "Ikke utfylt", dvs. manglende
+#Tar ikke hensyn til at disse kan inneholde operasjoner som skulle vært med i utvalget.
+# Filtreringa påvirker i hovedsak nevneren så det gir bare et mer konservativt estimat.
+
+tabKompl <- rbind(
+  'VentetidSpesialistTilOpr (ind1)' = Kompletthet_ind1,
+  'SmBePre (ind2)' = Kompletthet_ind2,
+  'Diff ODI, prolaps (ind3)' = Kompletthet_ind3,
+  'Diff ODI, spinal stenose (ind4)' = Kompletthet_ind4,
+  'Hovedkategori, fusj.op (ind5)' = Kompletthet_ind5,
+  'PostopTrombProfyl (ind6)' = Kompletthet_ind6
+)
+tab <- as.data.frame(100*tabKompl)
+xtable::xtable(100*tabKompl,
+               digits = 1,
+               label = 'tab:komplRygg',
+               caption = 'Kompletthet for kvalitetsindikatorvariabler, Rygg')
+
