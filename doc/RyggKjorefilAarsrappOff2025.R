@@ -592,28 +592,30 @@ ShResh <- unique(RyggData[c('ReshId', 'ShNavn')])
 write.table(ShResh, file = 'RyggShResh.csv', sep = ';', row.names = F)
 
 #-------Dekningsgrad-------------------
+source("c://Users/lro2402unn/RegistreGIT/rygg/dev/sysSetenv.R")
+RyggData <- RyggRegDataV2V3(datoFra = '2020-01-01')
+RegData <- RyggPreprosess(RegData=RyggData)
 ReshShNavn <- unique(RegData[ , c("ReshId", "ShNavn")])
-write.csv2(ReshShNavn, file = 'data-raw/RyggReshSh.csv', row.names = F)
+#write.csv2(ReshShNavn, file = 'data-raw/RyggReshSh.csv', row.names = F)
 
-#NakkeData <- nakke::NakkePreprosess(RegData = nakke::NakkeRegDataSQL())
-#ReshShNavnNakke <- unique(NakkeData[ , c("ReshId", "ShNavn")])
+source("c://Users/lro2402unn/RegistreGIT/nakke/dev/sysSetenv.R")
+NakkeData <- nakke::NakkePreprosess(RegData = nakke::NakkeHentRegData())
+ReshShNavnNakke <- unique(NakkeData[ , c("ReshId", "SykehusNavn")])
 #write.csv2(ReshShNavnNakke, file = '~/nakke/data-raw/NakkeReshSh.csv', row.names = F)
 
 #Rygg:
 #ReshSh <- read.csv2('data-raw/RyggReshSh.csv', encoding = 'UTF-8')
-RyggDg <- readxl::read_excel('C:/Users/lro2402unn/RegistreGIT/Aarsrapp/NKR/DGA/RyggDG2025.xlsx', sheet = 'RyggFig')
-
-RyggDgSh <- aggregate(RyggDg[ ,c("RegRygg", 'Total')], by = list(RyggDg$ReshId), FUN = 'sum')
-RyggDgSh$ShNavn <- ReshSh$ShNavn[match(RyggDgSh$Group.1, ReshSh$ReshId)]
-
-RyggFigAndelerGrVar(RegData=RyggDgSh, valgtVar='dekn23Rygg', outfile='DGrygg.pdf')
+RyggDg <- readxl::read_excel('C:/Users/lro2402unn/RegistreGIT/Aarsrapp/NKR/DGA/RyggDG2025.xlsx', sheet = 'RyggBearb')
+RyggDgSh <- aggregate(RyggDg[ ,c("RegNKR", 'Total')], by = list(RyggDg$ReshId), FUN = 'sum')
+RyggDgSh$ShNavn <- ReshShNavn$ShNavn[match(RyggDgSh$Group.1, ReshShNavn$ReshId)]
+RyggFigAndelerGrVar(RegData=RyggDgSh, valgtVar='dekn25Rygg', outfile='DGrygg.pdf')
 
 #Nakke:
 #ReshSh <- read.csv2('../nakke/data-raw/NakkeReshSh.csv', encoding = 'UTF-8')
 NakkeDg <- readxl::read_excel('C:/Users/lro2402unn/RegistreGIT/Aarsrapp/NKR/DGA/NakkeDG2025.xlsx', sheet = 'NakkeFig')
-
-NakkeDg$ShNavn <- ReshSh$ShNavn[match(NakkeDg$ReshId, ReshSh$ReshId)]
-rygg::RyggFigAndelerGrVar(RegData=NakkeDg, valgtVar='dekn23Nakke', outfile='DGnakke.pdf') #
+NakkeDgSh <- aggregate(NakkeDg[ ,c("RegNKR", 'Total')], by = list(NakkeDg$ReshId), FUN = 'sum')
+NakkeDgSh$ShNavn <- ReshShNavnNakke$SykehusNavn[match(NakkeDgSh$Group.1, ReshShNavnNakke$ReshId)]
+rygg::RyggFigAndelerGrVar(RegData=NakkeDgSh, valgtVar='dekn25Nakke', outfile='DGnakke.pdf') #
 
 #Data til nettsider (legge på orgnr: nyID)
 DataDgOrg <- RyggDg
@@ -623,9 +625,18 @@ DataDgOrg$ind_id <- 'nkr_rygg_dg' # 'nakke_dg' #
 DataDgOrg <- dplyr::rename(DataDgOrg, var=RegNKR, denominator=Total, )
 DataDgOrg$context <- 'caregiver'
 DataDgOrg$year <- 2025
-DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus"))]
-write.csv2(DataDgOrg, file = 'RyggDg2025.csv', fileEncoding = 'UTF-8')
+DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus", "DG_nkr", "AvdNavn"))]
+write.csv2(DataDgOrg, file = 'RyggDg2025.csv', fileEncoding = 'UTF-8', row.names = FALSE)
 
+DataDgOrg <- NakkeDg
+DataDgOrg$orgnr <- as.character(nyID[as.character(DataDgOrg$ReshId)])
+DataDgOrg$ind_id <- 'nakke_dg' # 'nkr_rygg_dg' #
+#Variabler: year, orgnr, var, denominator, ind_id
+DataDgOrg <- dplyr::rename(DataDgOrg, var=RegNKR, denominator=Total, )
+DataDgOrg$context <- 'caregiver'
+DataDgOrg$year <- 2025
+DataDgOrg <- DataDgOrg[ ,-which(names(DataDgOrg) %in% c('ReshId', "Sykehus", "sh_standard2", "DG_nkr"))]
+write.csv2(DataDgOrg, file = 'NakkeDg2025.csv', fileEncoding = 'UTF-8', row.names = F)
 
 #---------------Data til dekningsgradsanalyser-----------------
 

@@ -146,6 +146,36 @@ dataDumpV2 <- PIDdato <- read.csv2(file = 'C:/Registerdata/rygg/dataDumpV2.csv',
 #Vi har dødsdato kun for V3. Dette er kun V1/V2-data.
 
 
+#-------------- Behandling av Gjentatte reoperasjoner---------------
+#Ønsker å se på om gjentatte reoperasjoner for prolaps behandles med fusjon eller ny prolapskirugi.
+# 01.01.2010- 31.12.2024.
+# Lagre totaldata
+# Legg på operasjonsnummer
 
+library(rygg)
+source("dev/sysSetenv.R")
+#Dato for nedlasting fra Rapporteket: 11.mai 2026
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2010-01-01')
+RegData <- RyggPreprosess(RegData =RegDataRaa)
+RegData <- RyggUtvalgEnh(RegData=RegData, datoTil='2024-12-31')$RegData
+RegDataAlle <- rygg::finnReoperasjoner(RegData)
+write.table(RegDataAlle, file = '../data/NKR/Rygg2010_24_uttr2026-05-11.csv', row.names = F, col.names = T, sep = ';')
 
+# Velg alle pasienter som har minst en prolapsoperasjon (HovedInngrepV2V3 = 1)
+pasMpro <- unique(RegData$PasientID[which(RegData$HovedInngrepV2V3==1)])
+RegData <- RegData[RegData$PasientID %in% pasMpro, ]
+#Lagres som Rygg_utv1 og ekskluderte som RegData_ekskl1
+write.table(RegData, file = '../data/NKR/Rygg_utv1.csv', row.names = F, col.names = T, sep = ';')
 
+# RegData_ekskl1 <- RegDataAlle[!(RegDataAlle$PasientID %in% pasMpro), ]
+# write.table(RegData_ekskl1, file = '../data/NKR/Rygg_ekskl1.csv', row.names = F, col.names = T, sep = ';')
+
+#OpNr som er første prolapsoperasjon HovedInngrepV2V3 = 1 og
+#antall (AntNivOpr = 1 eller DekompAntNivaa= 1 eller summen av OpTh12L10+OpL1L2 +OpL23+ OpL34+ OpL45+ OpL5S1=1).
+#Dvs bare operert i ett nivå
+#summen av OpTh12L10+OpL1L2 +OpL23+ OpL34+ OpL45+ OpL5S1=1) er nå def som AntNivOpr i V3.
+#test <- RegData[ ,c('OpTh12L1', 'OpL1L2', 'OpL23', 'OpL34', 'OpL45', 'OpL5S1', "AntNivOpr", 'DekompAntNivaa')]
+indEttNiv <- unique(which(RegData$AntNivOpr == 1),  which(RegData$DekompAntNivaa== 1))
+pasPro1nivaa <- unique(RegData$PasientID[intersect(which(RegData$HovedInngrepV2V3==1), indEttNiv)])
+
+# Fjern alle OpNr for hver pasient (PID) som kommer før første prolapsoperasjon. Ta vare på disse i egen fil («ekskludert_2»).

@@ -17,11 +17,98 @@ library(qicharts2)
 
 library(rygg)
 source("dev/sysSetenv.R")
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2020-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
-RegData <- RyggUtvalgEnh(RegData=RegData, datoTil='2025-12-31')$RegData
+# Prolapskirurgi hos de tre sykehusene slått sammen
+# Ullevål Nkir, ReshId = 109820 og Bærum, ReshId = 103094  og Martina Hansenes, ReshId = 110633.
+RegData <- RyggUtvalgEnh(RegData=RegData, hovedkat = 1, datoTil='2025-12-31')$RegData
+RegData <- RegData[RegData$ReshId %in% c(109820, 103094, 103094), ]
 RegData <- SorterOgNavngiTidsEnhet(RegData = RegData, tidsenhet = 'Mnd')$RegData
+RegData23 <- RyggUtvalgEnh(RegData=RegData, datoFra = '2023-01-01')$RegData
 
+#Tidsperiode: 2020 tom 2025.
+#Fom. 2020 tom 2022 (stabilt nesten ingen endoskopi) fom 2023 tom 2025 implementering av endoskopi.
+
+
+#Endoskpisk prolapskirurgi: HovedInngrepV2V3 = 1 og  OpAndreEndosk = 1
+#Mikrokirurgi for prolaps def:  HovedInngrepV2V3 = 1 og  OpAndreEndosk = 0
+
+# Respons:
+# Endoskopi (OpAndreEndosk=1)	Mikrokirurgi for prolaps
+# Total operasjonstid (min)	Median eller mean
+# Postoperativ liggetid	Median eller mean
+# ODI differanse 3 mnd	Andel,  ja
+
+#For opphold registrert som dagkirurgi uten at liggedogn er reg., settes liggedogn=0
+dagind <- which( (is.na(RegData$LiggetidPostop) | is.nan(RegData$LiggetidPostop))  & RegData$Dagkirurgi==1)
+RegData$LiggetidPostop[dagind]<-0
+RegData <- RegData[which(RegData$LiggetidPostop>=0),]
+
+RegData$OswEndr <- RegData$OswTotPre - RegData$OswTot3mnd
+
+tapply(RegData23$KnivtidTot, INDEX = RegData23$OpAndreEndosk, 'median', na.rm=T )
+tapply(RegData23$OswEndr, INDEX = RegData23$OpAndreEndosk, 'mean', na.rm=T )
+100*tapply(RegData23$OswEndr>20, INDEX = RegData23$OpAndreEndosk, 'mean', na.rm=T )
+tapply(RegData23$LiggetidPostop, INDEX = RegData23$OpAndreEndosk, 'mean', na.rm=T )
+
+PerMnd <- RegData |>
+  dplyr::filter(OpAndreEndosk==1) |>
+  dplyr::group_by(TidsEnhet)|>
+  dplyr::summarise(
+    N = dplyr::n(),
+    Endo = sum(OpAndreEndosk), # /N, #Ingen NA
+    nODI = sum(!is.na(OswEndr)),
+    ODIendr = sum(OswEndr >=20, na.rm = T), #/nODI,
+    LiggetidPost = sum(LiggetidPostop), #sum(LiggetidPostop),
+    KnivtidTot = sum(KnivtidTot)
+    ) |>
+  dplyr::ungroup()
+
+
+
+# Komplikasjoner: Nerverotskade, Blødning, infeksjon, durarift
+qicharts2::qic(x = TidsEnhet, #as.Date(OpDato), #
+               y = KnivtidTot,
+               n = N,
+              # agg.fun = "sum",
+               data     = PerMnd,
+               chart    = 'p',
+               title    = 'KnivtidTot, OpAndreEndosk=1',
+               # ylab     = 'minutter',
+               xlab     = 'Måned',
+               x.angle = 90,
+               y.percent = FALSE,
+               point.size = 2,
+               show.95 = TRUE,
+               show.labels = TRUE,
+               print.summary = TRUE
+)
+
+ggplot2::ggsave('KnivtidTot_endo.pdf',
+                width = 20,
+                height = 20)
+
+qicharts2::qic(x = TidsEnhet, #as.Date(OpDato), #
+               y = Reop30d,
+               n = n,
+               agg.fun = "mean",
+               #n        = days,
+               data     = PerMndInf, #[RegDataInf$SykehusNavn == 'Gjøvik',],
+               chart    = 'p',
+               title    = 'Infeksjon rapportert 3 mnd etter',
+               #x.period = 'month',
+               point.size = 2,
+               show.95 = TRUE,
+               show.labels = TRUE,
+               print.summary = TRUE
+)
+
+ggplot2::ggsave('testKniv.pdf',
+                width = 20,
+                height = 20)
+
+
+#-----------Div testing---------------------------------------
 DataSh <- RegData[RegData$SykehusNavn == 'Elverum',]
 
 chart_data <- qicharts2::qic(x = as.Date(OpDato), #TidsEnhet, #
@@ -51,8 +138,8 @@ ggplot2::ggsave('KnivtidDato.pdf',
 
 RegDataInf <- RyggVarTilrettelegg(RegData = RegData, valgtVar = 'kpInf3mnd')$RegData
 
-PerMnd <- RegDataInf |>
-  dplyr::group_by(TidsEnhet, SykehusNavn)|>
+PerMndInf <- RegDataInf |>
+  dplyr::group_by(TidsEnhet)|> #, SykehusNavn
   dplyr::summarise(
     Infeksjon = sum(Variabel),
     Reop30d = sum(NyRyggOpr3mnd),
