@@ -8,9 +8,9 @@ devtools::install("../rapbase/.")
 setwd('../data')
 setwd('C:/Users/lro2402unn/RegistreGIT/rygg')
 
-sship::dec("c://Users/lro2402unn/RegistreGIT/data/rygg17fd8d901.sql.gz__20260305_110853.tar.gz",
+sship::dec("c://Users/lro2402unn/RegistreGIT/data/deformitet127f0b350.sql__20260408_102041.tar.gz",
 keyfile = "c://Users/lro2402unn/.ssh/id_rsa", target_dir = "c://Users/lro2402unn/RegistreGIT/data/.")
-# source c://Users/lro2402unn/RegistreGIT/data/rygg17fd8d901.sql;
+# source c://Users/lro2402unn/RegistreGIT/data/deformitet127f0b350.sql;
 
 
 source("dev/sysSetenv.R")
@@ -22,7 +22,8 @@ RegDataV3AVN <- rapbase::loadRegData(registryName = 'data',
 
 RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
-
+RegData <- RyggUtvalgEnh(RegData=RegData, datoTil='2025-12-31')$RegData
+table(RegData$SykehusNavn)
 
 # trombProfyl, trombProfylLettKI
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', erMann='', preprosess = 0)

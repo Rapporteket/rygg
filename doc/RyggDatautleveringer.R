@@ -148,4 +148,3 @@ dataDumpV2 <- PIDdato <- read.csv2(file = 'C:/Registerdata/rygg/dataDumpV2.csv',
 
 
 
-

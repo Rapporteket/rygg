@@ -153,6 +153,8 @@ tilpassV3data <- function(RegDataV3){
   RegDataV3$TidlOpr[RegDataV3$TidlOpAnnetNiv==1] <- 2
   RegDataV3$TidlOpr[RegDataV3$TidlOpsammeNiv==1 & RegDataV3$TidlOpAnnetNiv==1] <- 3
 
+  RegDataV3$AntNivOpr <- rowSums(RegDataV3[ ,c('OpTh12L1', 'OpL1L2', 'OpL23', 'OpL34', 'OpL45', 'OpL5S1')], na.rm = T)
+
   RegDataV3$OpMikro <- dplyr::replace_values(RegDataV3$OpMikroV3,
                                        from = c(0,1,2,3,9), to = c(0,1,1,1,0))
   RegDataV3$OpAndreEndosk <- dplyr::replace_values(RegDataV3$OpMikroV3,

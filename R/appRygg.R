@@ -342,6 +342,7 @@ ui <- navbarPage(
                            'Søkt erstatning før operasjon' = 'erstatningPre',
                            'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
                            'Tid fra utf. av pasientskjema til op. mer enn to uker' = 'diffPasUtfOp',
+                           'Tidligere operert' = 'tidlOpr',
                            'Tromboseprofylakse gitt ifm. operasjon' = 'trombProfyl',
                            'Trygg kirurgi-prosedyre utført' = 'tryggKir',
                            'Varighet av rygg-/hoftesmerter >1 år' = 'symptVarighRyggHof',

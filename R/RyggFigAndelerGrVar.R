@@ -68,8 +68,12 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
   if (length(grep('dekn',valgtVar)) == 1) { #Bruke vedlagte dekningsdata
     #Dekningsgradsfigur
 
-    if (valgtVar == 'dekn23Nakke') {
-      Tittel <- 'Dekningsgrad, NKR Degenerativ Nakke, 2023'
+    if (valgtVar == 'dekn25Rygg') {
+      Tittel <- 'Dekningsgrad, NKR Degenerativ Rygg, 2025'
+      xAkseTxt <- 'dekningsgrad, Rygg'
+    }
+    if (valgtVar == 'dekn25Nakke') {
+      Tittel <- 'Dekningsgrad, NKR Degenerativ Nakke, 2025'
       xAkseTxt <- 'dekningsgrad, Nakke'
     }
     if (valgtVar == 'dekn23Rygg') {

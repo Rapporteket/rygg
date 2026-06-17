@@ -86,8 +86,9 @@ indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1
       ##Spinal stenose:
       if (is.element(9, hovedkat)) {indHovedInngr <- union(indHovedInngr, which(RegData$LSSopr==1))}
       #Degenerativ spondylolistese:
-      if (is.element(10, hovedkat)) {indHovedInngr <- union(indHovedInngr,
-                                                           intersect(which(RegData$LSSopr==1), which(RegData$RfSpondtypeDegen==1)))}
+      if (is.element(10, hovedkat)) {
+        indHovedInngr <- union(indHovedInngr,
+                               intersect(which(RegData$LSSopr==1), which(RegData$RfSpondtypeDegen==1)))}
       #if (!(hovedkat %in% 0:10)) {indHovedInngr <- 1:Ninn}
       if (length(intersect(hovedkat, 0:10))==0) {indHovedInngr <- 1:Ninn}
 
