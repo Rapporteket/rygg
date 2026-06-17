@@ -35,12 +35,11 @@ datoFra6mnd <- paste0(substr(as.character(dato %m-% months(6, abbreviate=FALSE))
 #Ønsker eget datasett for forrige måned
 datoFraMnd <- format(datoTil, "%Y-%m-01")
 
-# if (!exists('RegData')){
-      RegData <- RyggRegDataV2V3(datoFra = datoFra) #, datoTil = datoTil)
-      RegData <- RyggPreprosess(RegData=RegData)
-#}
+RegData <- RyggRegDataV2V3(datoFra = datoFra) #, datoTil = datoTil)
+RegData <- RyggPreprosess(RegData=RegData)
 
-RegData <- RyggUtvalgEnh(RegData = RegData, datoFra = datoFra)$RegData
+shtxt <- RegData$SykehusNavn[match(reshID, RegData$ReshId)]
+#RegData <- RyggUtvalgEnh(RegData = RegData, datoFra = datoFra)$RegData
 
 RegData1aar <- RyggUtvalgEnh(RegData=RegData, datoFra=datoFra1Aar)$RegData
 SortMnd <- SorterOgNavngiTidsEnhet(RegData=RegData, tidsenhet='Mnd')
@@ -52,7 +51,6 @@ RyggUtvalg <- RyggUtvalgEnh(RegData, reshID = reshID, enhetsUtvalg =1,
                           datoFra = datoFra6mnd, datoTil = datoTil)
 #Fra RyggUTvalg: utvalgTxt, ind, medSml, smltxt, hovedgrTxt, grTypeTxt, RegData
 RegData6mnd <- RyggUtvalg$RegData
-shtxt <- RyggUtvalg$hovedgrTxt
 ind <- RyggUtvalg$ind
 N <- dim(RegData6mnd)[1]
 
