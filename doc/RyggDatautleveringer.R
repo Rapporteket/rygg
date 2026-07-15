@@ -48,16 +48,30 @@ hvilkePas <- which(tidlPas>0)
 RyggData$PIDny[hvilkePas] <- RyggData$PIDny[tidlPas[hvilkePas]]
 
 
-# PIDfraV2 <- 'V2PID13054' #c('V2PID16384', 'V2PID13054')
-# RyggData[RyggData$PIDny %in% PIDfraV2,]
-
-
 RyggKobl <- unique(RyggData[,c('PIDny', 'SSN')])
 RyggAkt <- RyggData[,c('PIDny', 'OpDato')]
 write.csv2(RyggKobl, file = 'C:/Registerdata/rygg/TilCharlson/RyggKobl.csv', row.names = F)
 write.csv2(RyggAkt, file = 'C:/Registerdata/rygg/TilCharlson/RyggOpDato.csv', row.names = F)
 
-#sum(table(table(RyggData$PIDny)))
+
+# Rygg - 	CCI filer - gamle PID må konverteres til nye
+#2008-23
+#Gammel koblingsfil for å koble på personnummer
+pers08_23 <- read.csv2(file = 'C:/Users/lro2402unn/RegistreGIT/data/NKR/CCI/RyggKobl.csv')
+CCI08_23 <- read.csv2(file = 'C:/Users/lro2402unn/RegistreGIT/data/NKR/CCI/CCI_NKR2008_2024aug.csv')
+kobl_26 <- read.csv2(file = 'C:/Users/lro2402unn/RegistreGIT/data/NKR/CCI/koblingstabell_PID_fnr_tom2006-06.csv')
+#RyggV3 <- merge(RyggV3, pers08_23, by = 'PIDny', by.y = 'PID', all.x = T)
+ind <- match(CCI08_23$PIDny, pers08_23$PIDny)
+CCI08_23$PersNr <- pers08_23$SSN[ind]
+CCI08_23$PasientID <- kobl_26$PID[match(CCI08_23$PersNr, kobl_26$SSN)]
+CCI08_23$OpDato <- as.Date(CCI08_23$OpDato, format = "%d.%m.%Y")
+CCI08_23 <- CCI08_23[CCI08_23$OpDato < '2024-01-01', ]
+
+CCI24_26 <- read.csv2(file = 'C:/Users/lro2402unn/RegistreGIT/data/NKR/CCI/CCI_NKR2024_2026-03-05.csv')
+CCI24_26$OpDato <- as.Date(CCI24_26$OpDato, format = "%d.%m.%Y")
+
+CCI2008_26 <- rbind(CCI08_23[,c("PasientID", "OpDato", "CharlsonCI")], CCI24_26)
+write.csv2(CCI2008_26, file = 'C:/Users/lro2402unn/RegistreGIT/data/NKR/CCI/CCI2008_26.csv', row.names = F)
 
 
 #------------Omstrukturer til bredt format--------------
