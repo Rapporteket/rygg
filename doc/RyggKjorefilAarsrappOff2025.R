@@ -263,9 +263,9 @@ NokkeltallRygg <- rbind(
   'Andel over 70 år'	= paste(sprintf('%.1f', 100*mean(RyggData1aar$Alder>=70, na.rm=T)), '%'),
   'Gjennomsnittsalder' = sprintf('%.1f',mean(RyggData1aar$Alder, na.rm=T)),
   'Andel kvinner' = paste(sprintf('%.1f', 100*(1-mean(RyggData1aar$ErMann, na.rm=T))), '%'),
-  'Fornøyd med behandlingen, 3 mnd. etter' = paste(sprintf('%.1f', 100*mean(FornoydData$Variabel)), '%'),
-  'Helt restituert/mye bedre, 3 mnd. etter' = paste(sprintf('%.1f', 100*mean(BedreData$Variabel)), '%'),
-  'Verre 3 mnd. etter' = paste(sprintf('%.1f', 00*mean(VerreData$Variabel)), '%'),
+  # 'Fornøyd med behandlingen, 3 mnd. etter' = paste(sprintf('%.1f', 100*mean(FornoydData$Variabel)), '%'),
+  # 'Helt restituert/mye bedre, 3 mnd. etter' = paste(sprintf('%.1f', 100*mean(BedreData$Variabel)), '%'),
+  # 'Verre 3 mnd. etter' = paste(sprintf('%.1f', 00*mean(VerreData$Variabel)), '%'),
   'Ventet <3 mnd fra operasjon bestemt til kirurgi utført' = paste(sprintf('%.1f', 100*mean(VentetidKirData$Variabel)), '%')
 )
 
