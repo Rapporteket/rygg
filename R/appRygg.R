@@ -25,6 +25,7 @@ tidlOprValg <-	c('Alle'=99, 'Tidl. operert samme nivå'=1, 'Tidl. operert annet 
                  'Tidl. operert annet og sm. nivå'=3, 'Primæroperasjon'=4)
 hastegradValg <- c('Alle' = 99, 'Elektiv' = 1, 'Akutt' = 2)
 ktrValg <- c('3 mnd oppfølging' = 1, '12 mnd oppfølging' = 2)
+endoskValg <-  c(' ' = 9, 'Ja' = 1, 'Nei' = 0)
 
 
 hovedkatValg <- c('Alle'=99,
@@ -56,8 +57,6 @@ ui <- navbarPage(
            shinyjs::useShinyjs(),
            tags$head(tags$style(".butt{background-color:#6baed6;} .butt{color: white;}")), # background color and font color#fluidRow(
            h2('Velkommen til Rapporteket for NKR, Rygg!', align='center'),
-          #  h6('Versjon 11.aug 2025', col='lightgrey'),
-
 
            sidebarPanel(
              h4(tags$b(tags$u('Innhold i de ulike fanene:'))),
@@ -135,7 +134,6 @@ ui <- navbarPage(
                     choices = rev(c('År'= 'Aar', 'Måned'='Mnd'))),
       br(),
       br(),
-      br(),
       h4('Sjekk egne registreringer'),
       dateRangeInput(inputId = 'datovalgRegKtr', start = startDato, end = idag,
                      label = "Tidsperiode", separator="t.o.m.", language="nb"),
@@ -169,10 +167,7 @@ ui <- navbarPage(
                              tableOutput("tabAntSkjema"),
                              downloadButton(outputId = 'lastNed_tabAntSkjema', label='Last ned tabell')
                            )
-                           # h2("Ferdigstilte skjema ved hver avdeling for valgte 12 måneder"),
-                           # p(em("Velg tidsperiode ved å velge sluttdato i menyen til venstre")),
-                           # tableOutput("tabAvdSkjema12"))
-                  )))
+                   )))
   ), #tab
 
 
@@ -228,7 +223,6 @@ ui <- navbarPage(
                            'Tidligere operasjoner, antall' = 'tidlOprAntall',
                            'Søkt erstatning?' = 'erstatningPre',
                            'Søkt uføretrygd før operasjon' = 'uforetrygdPre',
-                           #Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
                            'Trygg kirurgi-prosedyre utført' = 'tryggKir',
                            'Utdanning (høyeste fullførte)' = 'utd',
                            'Varighet av rygg-/hoftesmerter' = 'symptVarighRyggHof',
@@ -254,6 +248,9 @@ ui <- navbarPage(
              ),
              selectInput(inputId = 'hovedInngrep', label='Hovedinngrepstype',
                          choices = hovedkatValg
+             ),
+             selectInput(inputId = 'endosk', label='Endoskopi?',
+                         choices = endoskValg
              ),
              selectInput(inputId = 'enhetsUtvalg', label='Egen enhet og/eller landet',
                          choices = enhetsUtvalg,
@@ -371,6 +368,10 @@ ui <- navbarPage(
              selectInput(inputId = 'hovedInngrepAndel', label='Hovedinngrepstype',
                          choices = hovedkatValg
              ),
+             selectInput(inputId = 'endoskAndel', label='Endoskopi?',
+                         choices = endoskValg
+             ),
+
              selectInput(inputId = "bildeformatAndel",
                          label = "Velg format for nedlasting av figur",
                          choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
@@ -476,7 +477,7 @@ server_rygg <- function(input, output, session) {
 
   output$egetShTxt <- renderText(paste('Drift og resultater, ',
                                        as.character(RegData$ShNavn[match(user$org(), RegData$ReshId)])))
-  
+
   #-------Registeradministrasjon----------
   observeEvent(user$role(), {
     if (user$role() == 'SC') {
@@ -689,7 +690,7 @@ server_rygg <- function(input, output, session) {
     if (user$role()=='SC') {
     selectInput(inputId = 'velgReshReg', label='Velg sykehus',
                 selected = 0,
-                choices = sykehusValg) 
+                choices = sykehusValg)
     } else {
       NULL
     }
@@ -776,15 +777,8 @@ server_rygg <- function(input, output, session) {
     }
   })
 
-  # output$velgReshReg <- renderUI({
-  #   selectInput(inputId = 'velgReshReg', label='Velg sykehus',
-  #               selected = 0,
-  #               choices = sykehusValg) })
-
 
   output$fordelinger <- renderPlot({
-    #reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
-    #reshIDford <- ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord)
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
                    reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
@@ -795,6 +789,7 @@ server_rygg <- function(input, output, session) {
                    hastegrad = as.numeric(input$hastegrad),
                    tidlOp = as.numeric(input$tidlOp),
                    hovedkat = as.numeric(input$hovedInngrep),
+                   endosk = as.numeric(input$endosk),
                    session = session)
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
@@ -811,6 +806,7 @@ server_rygg <- function(input, output, session) {
                                  hastegrad = as.numeric(input$hastegrad),
                                  tidlOp = as.numeric(input$tidlOp),
                                  hovedkat = as.numeric(input$hovedInngrep),
+                                 endosk = as.numeric(input$endosk),
                                  lagFig = 0, session = session)
 
     tabFord <- lagTabavFig(UtDataFraFig = UtDataFord)
@@ -836,6 +832,7 @@ server_rygg <- function(input, output, session) {
                        hastegrad = as.numeric(input$hastegrad),
                        tidlOp = as.numeric(input$tidlOp),
                        hovedkat = as.numeric(input$hovedInngrep),
+                       endosk = as.numeric(input$endosk),
                        session = session,
                        outfile = file)
       })
@@ -876,6 +873,7 @@ server_rygg <- function(input, output, session) {
                         hastegrad = as.numeric(input$hastegradAndel),
                         tidlOp = as.numeric(input$tidlOpAndel),
                         hovedkat = as.numeric(input$hovedInngrepAndel),
+                        endosk = as.numeric(input$endoskAndel),
                         session=session)
   }, height = 800, width=700 #height = function() {session$clientData$output_andelerGrVarFig_width} #})
   )
@@ -893,6 +891,7 @@ server_rygg <- function(input, output, session) {
                           hastegrad = as.numeric(input$hastegradAndel),
                           tidlOp = as.numeric(input$tidlOpAndel),
                           hovedkat = as.numeric(input$hovedInngrepAndel),
+                          endosk = as.numeric(input$endoskAndel),
                           session=session,
                           outfile = file)
     })
@@ -908,6 +907,7 @@ server_rygg <- function(input, output, session) {
                     hastegrad = as.numeric(input$hastegradAndel),
                     tidlOp = as.numeric(input$tidlOpAndel),
                     hovedkat = as.numeric(input$hovedInngrepAndel),
+                    endosk = as.numeric(input$endoskAndel),
                     tidsenhet = input$tidsenhetAndel,
                     enhetsUtvalg = input$enhetsUtvalgAndel,
                     session=session)
@@ -925,6 +925,7 @@ observe({
                                   hastegrad = as.numeric(input$hastegradAndel),
                                   tidlOp = as.numeric(input$tidlOpAndel),
                                   hovedkat = as.numeric(input$hovedInngrepAndel),
+                                  endosk = as.numeric(input$endoskAndel),
                                   enhetsUtvalg = input$enhetsUtvalgAndel,
                                   tidsenhet = input$tidsenhetAndel,
                                   session=session) #,lagFig=0)
@@ -964,6 +965,7 @@ observe({
                         hastegrad = as.numeric(input$hastegradAndel),
                         tidlOp = as.numeric(input$tidlOpAndel),
                         hovedkat = as.numeric(input$hovedInngrepAndel),
+                        endosk = as.numeric(input$endoskAndel),
                         enhetsUtvalg = input$enhetsUtvalgAndel,
                         tidsenhet = input$tidsenhetAndel,
                         session=session,
@@ -981,6 +983,7 @@ observe({    #AndelGrVar
       hastegrad = as.numeric(input$hastegradAndel),
       tidlOp = as.numeric(input$tidlOpAndel),
       hovedkat = as.numeric(input$hovedInngrepAndel),
+      endosk = as.numeric(input$endoskAndel),
       session=session) #, lagFig = 0))
 
     tabAndelerShus <- cbind('Antall (n)' = round(AndelerShus$Ngr*AndelerShus$AggVerdier/100),
