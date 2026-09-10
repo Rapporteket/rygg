@@ -57,10 +57,13 @@
 #'
 #' @export
 
-RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-01', datoTil='3000-12-31', aar=0,
-                                minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='', hentData=0,
-                                preprosess=1, hastegrad=99, enhetsUtvalg=0, grVar='SykehusNavn', tittel=1, ktr=0,
-                                Ngrense=10, reshID=0, outfile='', ...) {
+RyggFigAndelerGrVar <-
+  function(RegData=0,  hentData=0,preprosess=1, valgtVar='alder70',
+           datoFra='2007-01-01', datoTil='3000-12-31', aar=0,
+           minald=0, maxald=130, erMann='', hovedkat=99, tidlOp='',
+           hastegrad=99, endosk=9,
+           grVar='SykehusNavn', tittel=1, ktr=0,
+           enhetsUtvalg=0, Ngrense=10, reshID=0, outfile='', ...) {
   if ("session" %in% names(list(...))) {
     rapbase::repLogger(session = list(...)[["session"]], msg = paste0('AndelPrShus: ',valgtVar))
   }
@@ -102,7 +105,7 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
     AntGr <- length(AndelerGr)
     GrNavn <- RegData$ShNavn
     hovedgrTxt <- 'Hele landet'
-    N <- sum(RegData$Total) #RegData$N[indLandet]
+    N <- sum(RegData$Total)
     KImaalGrenser <- c(0,60,80,100)
     grVar <- 'ShNavn'
     Ngrense <- 0
@@ -144,9 +147,11 @@ RyggFigAndelerGrVar <- function(RegData=0, valgtVar='alder70', datoFra='2007-01-
       Ngrense <- 50
     }
 
-    RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
-                                minald=minald, maxald=maxald, erMann=erMann, aar=aar,
-                                hovedkat=hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,enhetsUtvalg=enhetsUtvalg)
+    RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+                                datoFra=datoFra, datoTil=datoTil, aar=aar,
+                                minald=minald, maxald=maxald, erMann=erMann,
+                                hovedkat=hovedkat, endosk = endosk,
+                                hastegrad=hastegrad, tidlOp=tidlOp)
     fargepalett <- RyggUtvalg$fargepalett
     hovedgrTxt <- RyggUtvalg$hovedgrTxt
     utvalgTxt <- RyggUtvalg$utvalgTxt

@@ -51,8 +51,9 @@
 #'
 #' @return Returnerer filtrert versjon av RegData
 #' @export
-RyggUtvalgEnh <- function(RegData, datoFra='2007-01-01', datoTil=Sys.Date(), minald=0, maxald=110,
-                          erMann='', hovedkat=99, aar=0, tidlOp=99, hastegrad=99, #hastegrad=99,
+RyggUtvalgEnh <- function(RegData, datoFra='2007-01-01', datoTil=Sys.Date(),
+                          minald=0, maxald=110, erMann='', hovedkat=99, aar=0,
+                          tidlOp=99, hastegrad=99, endosk=9,
                           enhetsUtvalg=0, reshID=0, fargepalett='BlaaOff') {
 
 # Definer intersect-operator
@@ -79,6 +80,7 @@ indAld <- which(RegData$Alder >= minald & RegData$Alder <= maxald)
 indAar <- if (aar[1] > 2000) {which(RegData$Aar %in% as.numeric(aar))} else {indAar <- 1:Ninn}
 indDato <- which(RegData$OpDato >= as.Date(datoFra) & RegData$OpDato <= as.Date(datoTil))
 indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
+indEndo <- if (endosk %in% 0:1) {which(RegData$OpAndreEndosk == endosk)} else {indEndo <- 1:Ninn}
 #Hovedkategori, flervalgsutvalg
       indHovedInngr <- if (hovedkat[1] %in% 0:8) {which(RegData$HovedInngrepV2V3 %in% as.numeric(hovedkat))
             } else {indHovedInngr <- 0}
@@ -96,7 +98,8 @@ indTidlOp <- if (tidlOp %in% 1:4) {which(RegData$TidlOpr==tidlOp)} else {indTidl
 indhastegrad <- if (hastegrad %in% 1:2) {
       RegData$OpKat[RegData$OpKat==3] <- 1
       which(RegData$OpKat == hastegrad)} else {1:Ninn}
-indMed <- indAld %i% indDato %i% indAar  %i% indKj %i% indHovedInngr %i% indTidlOp %i% indhastegrad
+indMed <- indAld %i% indDato %i% indAar  %i% indKj %i% indHovedInngr %i%
+  indTidlOp %i% indhastegrad %i% indEndo
 RegData <- RegData[indMed,]
 
 HovedInngrepV2V3_txt <- c('Udef.', 'Prolaps', 'Dekomp.', 'Laminektomi', 'Eksp. intersp impl.',
@@ -105,20 +108,19 @@ hkatnavn <- c(HovedInngrepV2V3_txt, 'Spinal stenose', 'Degen. spondylolistese og
 
 TidlOprtxt <-	c('Tidl. operert samme nivå', 'Tidl. operert annet nivå', 'Tidl. operert annet og sm. nivå', 'Primæroperasjon')
 hastegradTxt <- paste0('Operasjonskategori: ', c('Elektiv', 'Akutt')) #, '1/2-Akutt'))
+endoskTxt <- paste0('Benyttet endoskopi: ', c('nei', 'ja'))
 
 N <- dim(RegData)[1]
 
 utvalgTxt <- c(paste0('Operasjonsdato: ', if (N>0) {min(RegData$OpDato, na.rm=T)} else {datoFra},
 			' til ', if (N>0) {max(RegData$OpDato, na.rm=T)} else {datoTil}),
-	#År, flervalgsutvalg, ikke ha med egen tekst for dette?
-#	      AarMed <- min(RegData$Aar, na.rm=T):max(RegData$Aar, na.rm=T)
-#	      if (length(AarMed)>1) {paste0('År: ', AarMed[1], ':', max(AarMed))} else {paste0('År: ', AarMed)}
 	if ((minald>0) | (maxald<110)) {paste0('Pasienter fra ', if (N>0) {min(RegData$Alder, na.rm=T)} else {minald},
 						' til ', if (N>0) {max(RegData$Alder, na.rm=T)} else {maxald}, ' år')},
 	if (erMann %in% 0:1) {paste0('Kjønn: ', c('Kvinner', 'Menn')[erMann+1])},
 	if (hovedkat[1] %in% 0:10) {paste0('Hovedinngrep: ', paste(hkatnavn[as.numeric(hovedkat)+1], collapse=','))},
       if (hastegrad %in% 1:2) {hastegradTxt[hastegrad]},
-      if (tidlOp %in% 1:4) {TidlOprtxt[tidlOp]}
+      if (tidlOp %in% 1:4) {TidlOprtxt[tidlOp]},
+	if (endosk %in% 0:1) {endoskTxt[endosk + 1]}
 	)
 
 SykehustypeTxt <- c('univ. sykehus', 'lokalsykehus', 'priv. sykehus')
