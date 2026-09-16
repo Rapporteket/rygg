@@ -18,9 +18,10 @@
 #' @return Figur som viser tidstrend, dvs. andel av valgt variabel for hvert år.
 #'
 #' @export
-RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys.Date(), aar=0,
-                            tidsenhet='Aar', hovedkat = 99, ktr = 0, tidlOp = 99, tittel = 1,
-                            minald=0, maxald=130, erMann=99, reshID=0, outfile='', hastegrad=99,
+RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys.Date(),
+                            aar=0, tidsenhet='Aar', hovedkat = 99, endosk=9,
+                            ktr = 0, tidlOp = 99, tittel = 1, hastegrad=99,
+                            minald=0, maxald=130, erMann=99, reshID=0, outfile='',
                             enhetsUtvalg=0, preprosess=1, hentData=0, lagFig=1, ... ) {
 
   if ("session" %in% names(list(...))) {
@@ -67,7 +68,7 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
   RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID, datoFra=datoFra, datoTil=datoTil,
                               minald=minald, maxald=maxald, erMann=erMann, aar=aar,
                               hovedkat = hovedkat, hastegrad=hastegrad, tidlOp=tidlOp,
-                              enhetsUtvalg=enhetsUtvalg) #, grType=grType
+                              enhetsUtvalg=enhetsUtvalg, endosk = endosk) #, grType=grType
 
   hovedgrTxt <- RyggUtvalg$hovedgrTxt
   smltxt <- RyggUtvalg$smltxt

@@ -45,18 +45,6 @@
 #'     \item Underkat: Fordeling av inngrepstyper. NB: hovedkategori MÅ velges
 #'     \item Utd: Høyeste fullførte utdanning
 #'    }
-#' Argumentet \emph{hovedkat} har følgende valgmuligheter:
-#'    \itemize{
-#'     \item 0: Annet
-#'     \item 1: Prolaps
-#'     \item 2: Foramenotomi
-#'     \item 3: Laminektomi
-#'     \item 4: Eksp. intraspin. impl.
-#'     \item 5: Fusjon
-#'     \item 6: Skiveprotese
-#'     \item 7: Fjerning/revisjon
-#'    }
-#'    Velges ingen av disse, vil alle data vises.
 #' Argumentet \emph{enhetsUtvalg} har følgende valgmuligheter:
 #'    \itemize{
 #'     \item 0: Hele landet
@@ -85,7 +73,7 @@
 
 RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', datoTil = '2999-12-31',
                             aar = 0, hentData = 0, preprosess = 1,minald = 0, maxald = 110, erMann = '',
-                            hovedkat = 99, hastegrad = 99, tidlOp = 99, ktr = 0, tittelMed = 1, outfile = '',
+                            hovedkat = 99, hastegrad = 99, endosk = 9, tidlOp = 99, ktr = 0, tittelMed = 1, outfile = '',
                             reshID = 0, enhetsUtvalg = 0, lagFig=1, ...){
 
 
@@ -120,9 +108,11 @@ RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', d
   antDes <- RyggVarSpes$antDes
 
 #-----Gjør utvalg
-  RyggUtvalg <- RyggUtvalgEnh(RegData = RegData, reshID = reshID, datoFra = datoFra, datoTil = datoTil,
-                              minald = minald, maxald = maxald, erMann = erMann, aar = aar,
-                              hovedkat = hovedkat, hastegrad = hastegrad, tidlOp = tidlOp,enhetsUtvalg = enhetsUtvalg)
+  RyggUtvalg <- RyggUtvalgEnh(RegData = RegData, reshID = reshID,
+                              datoFra = datoFra, datoTil = datoTil,  aar = aar,
+                              minald = minald, maxald = maxald, erMann = erMann,
+                              hovedkat = hovedkat, endosk = endosk, hastegrad = hastegrad,
+                              tidlOp = tidlOp, enhetsUtvalg = enhetsUtvalg)
   RegData <- RyggUtvalg$RegData
   utvalgTxt <- RyggUtvalg$utvalgTxt
   ind <- RyggUtvalg$ind
