@@ -767,7 +767,8 @@ server_rygg <- function(input, output, session) {
 
 
 
-    output$velgReshFord <- renderUI({
+  output$velgReshFord <- renderUI({
+    shiny::req(user$role())
     if (user$role()=='SC') {
     selectInput(inputId = 'velgReshFord', label='Velg sykehus',
                 selected = 0,
@@ -778,10 +779,11 @@ server_rygg <- function(input, output, session) {
   })
 
 
-    output$fordelinger <- renderPlot({
+  output$fordelinger <- renderPlot({
+    shiny::req(input$velgReshFord, input$enhetsUtvalg)
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
-                   reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
+                   reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),
                    enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                    datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                    minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
