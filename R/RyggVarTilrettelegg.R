@@ -290,13 +290,14 @@ valgtVarTest <- valgtVar
           tittel <- switch(valgtVar,
                               diffUtf3mnd = ' ant. dager fra operasjon til utf. av 3mnd-skjema',
                               diffUtf12mnd = 'ant. dager fra operasjon til utf. av 12mnd-skjema')
-          ind <- which(RegData$Variabel > 0 & (RegData$Variabel < ifelse(valgtVar == 'diffUtf3mnd', 360, 700)))
+          ind <- which(RegData$Variabel > 0 &
+                         (RegData$Variabel < ifelse(valgtVar == 'diffUtf3mnd', 360, 700)))
           RegData <- RegData[ind, ]
           sortAvtagende <- F
         }
         if (figurtype == 'andeler') {
           gr <- switch(valgtVar,
-                       diffUtf3mnd = c(-1000, 0, 60, 85, 96, 120, 2000),
+                       diffUtf3mnd = c(-1000, 60, 80, 100, 120, 140, 2000),
                        diffUtf12mnd = c(-1000, 0, 300, 350, 380, 450, 2000))
           RegData$VariabelGr <- cut(RegData$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
           grtxt <- c('<-0', levels(RegData$VariabelGr)[2:(length(gr)-2)],

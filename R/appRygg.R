@@ -688,13 +688,11 @@ server_rygg <- function(input, output, session) {
 
   output$velgReshReg <- renderUI({
     if (user$role()=='SC') {
-    selectInput(inputId = 'velgReshReg', label='Velg sykehus',
-                selected = 0,
-                choices = sykehusValg)
-    } else {
-      NULL
-    }
-    })
+      selectInput(inputId = 'velgReshReg', label='Velg sykehus',
+                  selected = 0,
+                  choices = sykehusValg)
+    } else {NULL}
+  })
 
   # Hente oversikt over registreringer (opdato og fødselsdato), samt datadump
   observe({
@@ -767,7 +765,9 @@ server_rygg <- function(input, output, session) {
     shinyjs::reset("alder")
   })
 
-  output$velgReshFord <- renderUI({
+
+
+    output$velgReshFord <- renderUI({
     if (user$role()=='SC') {
     selectInput(inputId = 'velgReshFord', label='Velg sykehus',
                 selected = 0,
@@ -778,7 +778,7 @@ server_rygg <- function(input, output, session) {
   })
 
 
-  output$fordelinger <- renderPlot({
+    output$fordelinger <- renderPlot({
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                    valgtVar=input$valgtVar,
                    reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
@@ -794,8 +794,11 @@ server_rygg <- function(input, output, session) {
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
 
-  observe({
-    # reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
+    observe({
+    print(is.null(input$velgReshFord))
+    print(user$org())
+    print(ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord))
+    #reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
     UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0,
                                  valgtVar=input$valgtVar,
                                  reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
@@ -824,7 +827,7 @@ server_rygg <- function(input, output, session) {
       content = function(file){
         RyggFigAndeler(RegData=RegData, preprosess = 0,
                        valgtVar=input$valgtVar,
-                       reshID=reshIDford,
+                       reshID= ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
                        enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                        datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                        minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),

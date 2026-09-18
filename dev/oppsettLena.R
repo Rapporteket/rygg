@@ -8,19 +8,35 @@ devtools::install("../rapbase/.")
 setwd('../data')
 setwd('C:/Users/lro2402unn/RegistreGIT/rygg')
 
-sship::dec("c://Users/lro2402unn/RegistreGIT/data/deformitet127f0b350.sql__20260408_102041.tar.gz",
+sship::dec("c://Users/lro2402unn/RegistreGIT/data/nger136b6fd74.sql.gz__20260910_142843.tar.gz",
 keyfile = "c://Users/lro2402unn/.ssh/id_rsa", target_dir = "c://Users/lro2402unn/RegistreGIT/data/.")
-# source c://Users/lro2402unn/RegistreGIT/data/deformitet127f0b350.sql;
+# source c://Users/lro2402unn/RegistreGIT/data/nger136b6fd74.sql;
 
 
 source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
 library(rygg)
 
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2019-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
-RegData <- RyggUtvalgEnh(RegData=RegData, datoTil='2025-12-31')$RegData
-table(RegData$EndoSkopTilg)
+
+plot(RegData$OpDato, RegData$Variabel,
+     xlab = 'Operasjonsdato',
+     ylab = 'Dager',
+     main = 'Dager fra operasjon til besvart 3mnd-skjema',
+     ylim = c(0,1000))
+range(RegData$OpDato, na.rm = T)
+#oversikt over hvordan tidspunkt for besvarelse fordeler seg etter skjemautsending.
+#For både 3 og 12 måneder: scatterplot eller tilsvarende som viser hvor lang tid
+#etter skjemautsending at skjemaet blir besvart?
+
+LegeSkjema <- hentDataTabellV3()
+Skjema3mnd <- hentDataTabellV3(tabellnavn = "patientfollowup3")
+Lege3mnd <- merge(LegeSkjema,
+                  Skjema3mnd, by = "MCEID", all = F, suffixes = c("", "_3mnd"))
+
+test <- Lege3mnd[ ,c("OpDato", 'TSCREATED', 'TSUPDATED', 'TSCREATED_3mnd',
+                     'TSUPDATED_3mnd', 'FIRST_TIME_CLOSED_3mnd', 'UtfyltDato3mnd')]
 
 # trombProfyl, trombProfylLettKI
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', erMann='', preprosess = 0)
