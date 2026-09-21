@@ -20,12 +20,8 @@ library(rygg)
 RegDataRaa <- RyggRegDataV2V3(datoFra = '2019-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
-plot(RegData$OpDato, RegData$Variabel,
-     xlab = 'Operasjonsdato',
-     ylab = 'Dager',
-     main = 'Dager fra operasjon til besvart 3mnd-skjema',
-     ylim = c(0,1000))
-range(RegData$OpDato, na.rm = T)
+Data <- RyggFigAndeler(RegData)
+
 #oversikt over hvordan tidspunkt for besvarelse fordeler seg etter skjemautsending.
 #For både 3 og 12 måneder: scatterplot eller tilsvarende som viser hvor lang tid
 #etter skjemautsending at skjemaet blir besvart?
