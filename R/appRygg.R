@@ -688,13 +688,11 @@ server_rygg <- function(input, output, session) {
 
   output$velgReshReg <- renderUI({
     if (user$role()=='SC') {
-    selectInput(inputId = 'velgReshReg', label='Velg sykehus',
-                selected = 0,
-                choices = sykehusValg)
-    } else {
-      NULL
-    }
-    })
+      selectInput(inputId = 'velgReshReg', label='Velg sykehus',
+                  selected = 0,
+                  choices = sykehusValg)
+    } else {NULL}
+  })
 
   # Hente oversikt over registreringer (opdato og fødselsdato), samt datadump
   observe({
@@ -767,7 +765,10 @@ server_rygg <- function(input, output, session) {
     shinyjs::reset("alder")
   })
 
+
+
   output$velgReshFord <- renderUI({
+    shiny::req(user$role())
     if (user$role()=='SC') {
     selectInput(inputId = 'velgReshFord', label='Velg sykehus',
                 selected = 0,
@@ -777,28 +778,33 @@ server_rygg <- function(input, output, session) {
     }
   })
 
+  figFordeling <- reactive({
+    shiny::req(input$velgReshFord, input$enhetsUtvalg)
+  RyggFigAndeler(RegData=RegData, preprosess = 0,
+                 valgtVar=input$valgtVar,
+                 reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),
+                 enhetsUtvalg=as.numeric(input$enhetsUtvalg),
+                 datoFra=input$datovalg[1], datoTil=input$datovalg[2],
+                 minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
+                 erMann=as.numeric(input$erMann),
+                 hastegrad = as.numeric(input$hastegrad),
+                 tidlOp = as.numeric(input$tidlOp),
+                 hovedkat = as.numeric(input$hovedInngrep),
+                 endosk = as.numeric(input$endosk),
+                 session = session)
+  })
 
   output$fordelinger <- renderPlot({
-    RyggFigAndeler(RegData=RegData, preprosess = 0,
-                   valgtVar=input$valgtVar,
-                   reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
-                   enhetsUtvalg=as.numeric(input$enhetsUtvalg),
-                   datoFra=input$datovalg[1], datoTil=input$datovalg[2],
-                   minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
-                   erMann=as.numeric(input$erMann),
-                   hastegrad = as.numeric(input$hastegrad),
-                   tidlOp = as.numeric(input$tidlOp),
-                   hovedkat = as.numeric(input$hovedInngrep),
-                   endosk = as.numeric(input$endosk),
-                   session = session)
+    figFordeling()$fig
   }, height=800, width=800 #height = function() {session$clientData$output_fordelinger_width}
   )
 
-  observe({
-    # reshIDford <- ifelse(user$role()=='SC', input$velgReshFord, user$org())
-    UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0,
+    observe({
+      shiny::req(input$velgReshFord, input$enhetsUtvalg)
+      UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0,
                                  valgtVar=input$valgtVar,
-                                 reshID = ifelse(is.null(input$velgReshFord), user$org(), input$velgReshFord),
+                                 reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),
+                                                 # is.null(input$velgReshFord), user$org(), input$velgReshFord),
                                  enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                                  datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                                  minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
@@ -822,9 +828,10 @@ server_rygg <- function(input, output, session) {
         paste0('FordelingsFig_', valgtVar=input$valgtVar, '_', Sys.Date(), '.', input$bildeformatFord)
       },
       content = function(file){
+        shiny::req(input$velgReshFord, input$enhetsUtvalg)
         RyggFigAndeler(RegData=RegData, preprosess = 0,
                        valgtVar=input$valgtVar,
-                       reshID=reshIDford,
+                       reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),
                        enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                        datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                        minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
@@ -837,16 +844,17 @@ server_rygg <- function(input, output, session) {
                        outfile = file)
       })
 
+
+
     kolGruppering <- c(1,3,3)
     names(kolGruppering) <- c(' ', UtDataFord$hovedgrTxt, UtDataFord$smltxt)
-    output$fordelingTab <- function() { #gr1=UtDataFord$hovedgrTxt, gr2=UtDataFord$smltxt renderTable(
+    output$fordelingTab <- function() {
       antKol <- ncol(tabFord)
       kableExtra::kable(tabFord, format = 'html'
                         , full_width=F
                         , digits = c(0,0,1,0,0,1)[1:antKol]
       ) %>%
         kableExtra::add_header_above(kolGruppering[1:(2+UtDataFord$medSml)]) %>%
-        #kableExtra::add_header_above(c(" "=1, tittelKolGr[1] = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
         kableExtra::column_spec(column = 1, width='5em') %>% #width_min = '3em', width_max = '10em') %>%
         kableExtra::column_spec(column = 2:(ncol(tabFord)+1), width = '7em') %>%
         kableExtra::row_spec(0, bold = T)
