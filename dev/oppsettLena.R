@@ -37,6 +37,10 @@ Lege3mnd <- merge(LegeSkjema,
 
 test <- Lege3mnd[ ,c("OpDato", 'TSCREATED', 'TSUPDATED', 'TSCREATED_3mnd',
                      'TSUPDATED_3mnd', 'FIRST_TIME_CLOSED_3mnd', 'UtfyltDato3mnd')]
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
+RegData <- RyggPreprosess(RegData =RegDataRaa)
+RegData <- RyggUtvalgEnh(RegData=RegData, datoTil='2025-12-31')$RegData
+table(RegData$EndoSkopTilg)
 
 # trombProfyl, trombProfylLettKI
 RyggFigAndelerGrVar(RegData=RegData, valgtVar='trombProfylLettKI', erMann='', preprosess = 0)
