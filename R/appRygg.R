@@ -452,12 +452,6 @@ server_rygg <- function(input, output, session) {
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 
-  # qEprom <- 'SELECT MCEID, TSSENDT, TSRECEIVED, NOTIFICATION_CHANNEL, STATUS,
-  #                   DISTRIBUTION_RULE, REGISTRATION_TYPE from proms'
-  # ePROMadmTab <- rapbase::loadRegData(registryName='data', query=qEprom)
-  # ind3mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP', 'PATIENTFOLLOWUP_3_PiPP', 'PATIENTFOLLOWUP_3_PiPP_REMINDER'))
-  # ind12mndeprom <- which(ePROMadmTab$REGISTRATION_TYPE %in% c('PATIENTFOLLOWUP12', 'PATIENTFOLLOWUP_12_PiPP', 'PATIENTFOLLOWUP_12_PiPP_REMINDER'))
-
    map_avdeling <- data.frame(
     UnitId = unique(RegData$ReshId),
     orgname = RegData$ShNavn[match(unique(RegData$ReshId),
@@ -773,14 +767,13 @@ server_rygg <- function(input, output, session) {
     selectInput(inputId = 'velgReshFord', label='Velg sykehus',
                 selected = 0,
                 choices = sykehusValg)
-    } else {
-      NULL
-    }
+    } else {NULL}
   })
 
   figFordeling <- reactive({
-    shiny::req(input$velgReshFord, input$enhetsUtvalg)
-  RyggFigAndeler(RegData=RegData, preprosess = 0,
+    shiny::req(input$enhetsUtvalg)
+    if (user$role() == 'SC') {shiny::req(input$velgReshFord)}
+    RyggFigAndeler(RegData=RegData, preprosess = 0,
                  valgtVar=input$valgtVar,
                  reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),
                  enhetsUtvalg=as.numeric(input$enhetsUtvalg),
@@ -800,11 +793,11 @@ server_rygg <- function(input, output, session) {
   )
 
     observe({
-      shiny::req(input$velgReshFord, input$enhetsUtvalg)
+      shiny::req(input$enhetsUtvalg)
+      if(user$role() == 'SC') {req(input$velgReshFord)}
       UtDataFord <- RyggFigAndeler(RegData=RegData, preprosess = 0,
                                  valgtVar=input$valgtVar,
                                  reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),
-                                                 # is.null(input$velgReshFord), user$org(), input$velgReshFord),
                                  enhetsUtvalg=as.numeric(input$enhetsUtvalg),
                                  datoFra=input$datovalg[1], datoTil=input$datovalg[2],
                                  minald=as.numeric(input$alder[1]), maxald=as.numeric(input$alder[2]),
@@ -828,7 +821,8 @@ server_rygg <- function(input, output, session) {
         paste0('FordelingsFig_', valgtVar=input$valgtVar, '_', Sys.Date(), '.', input$bildeformatFord)
       },
       content = function(file){
-        shiny::req(input$velgReshFord, input$enhetsUtvalg)
+        shiny::req(input$enhetsUtvalg)
+        if(user$role() == 'SC') {req(input$velgReshFord)}
         RyggFigAndeler(RegData=RegData, preprosess = 0,
                        valgtVar=input$valgtVar,
                        reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),

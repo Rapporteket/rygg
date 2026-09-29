@@ -13,11 +13,13 @@ keyfile = "c://Users/lro2402unn/.ssh/id_rsa", target_dir = "c://Users/lro2402unn
 # source c://Users/lro2402unn/RegistreGIT/data/nger136b6fd74.sql;
 
 
+library(rygg)
 source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
-library(rygg)
 
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2019-01-01')
+tictoc::tic()
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2018-01-01')
+tictoc::toc()
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
 Data <- RyggFigAndeler(RegData)
@@ -26,14 +28,12 @@ Data <- RyggFigAndeler(RegData)
 #For både 3 og 12 måneder: scatterplot eller tilsvarende som viser hvor lang tid
 #etter skjemautsending at skjemaet blir besvart?
 
-LegeSkjema <- hentDataTabellV3()
-Skjema3mnd <- hentDataTabellV3(tabellnavn = "patientfollowup3")
-Lege3mnd <- merge(LegeSkjema,
-                  Skjema3mnd, by = "MCEID", all = F, suffixes = c("", "_3mnd"))
 
 test <- Lege3mnd[ ,c("OpDato", 'TSCREATED', 'TSUPDATED', 'TSCREATED_3mnd',
                      'TSUPDATED_3mnd', 'FIRST_TIME_CLOSED_3mnd', 'UtfyltDato3mnd')]
+tictoc::tic()
 RegDataRaa <- RyggRegDataV2V3(datoFra = '2025-01-01')
+tictoc::toc()
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 RegData <- RyggUtvalgEnh(RegData=RegData, datoTil='2025-12-31')$RegData
 table(RegData$EndoSkopTilg)
