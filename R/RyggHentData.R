@@ -155,6 +155,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   dbList <- rapbase::rapOpenDbConnection("rygg", "mysql")
   dbconn <- dbList$con
+  on.exit(rapbase::rapCloseDbConnection(dbconn), add = TRUE)
 
   # mce_patient_data # eneste som inneholder kobling mellom mceid og pasientid
   qmce <- 'CENTREID AS ReshId, MCEID, PATIENT_ID AS PasientID'
