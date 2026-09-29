@@ -96,11 +96,15 @@ mappingEgneNavn <- function(tabell, tabType, dbconn = NULL) {
 #' @export
 
 hentDataTabellV3 <- function(tabellnavn = "surgeonform",
-                           qVar = '*',
-                           dbconn,
-                           datoFra = '2019-01-01',
-                           datoTil = Sys.Date(),
-                           egneVarNavn = 1) { #  status = 1
+                              qVar = '*',
+                              datoFra = '2019-01-01',
+                              datoTil = Sys.Date(),
+                              egneVarNavn = 1,
+                              dbconn = NULL) { # status = 1
+  if (is.null(dbconn)) {
+    dbconn <- rapbase::rapOpenDbConnection("rygg", "mysql")$con
+    on.exit(rapbase::rapCloseDbConnection(dbconn), add = TRUE)
+  }
 
   tabType <- toupper(tabellnavn)
   query <- paste0("SELECT ", qVar, " FROM ", tabellnavn)
