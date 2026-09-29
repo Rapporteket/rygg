@@ -7,6 +7,12 @@ hentDataV2 <- function(){
 
   dbList <- rapbase::rapOpenDbConnection("rygg", "mysql")
   dbconn <- dbList$con
+  on.exit(
+    if (DBI::dbIsValid(dbconn)) {
+      rapbase::rapCloseDbConnection(dbconn)
+    },
+    add = TRUE
+  )
 
   V2oper <- DBI::dbGetQuery(conn = dbconn, statement='SELECT * FROM ryggv2_operation')
   #rapbase::loadRegData(registryName = 'data', query=)
