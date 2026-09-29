@@ -772,7 +772,7 @@ server_rygg <- function(input, output, session) {
 
   figFordeling <- reactive({
     shiny::req(input$enhetsUtvalg)
-    if(user$role() == 'SC') {req(input$velgReshFord)}
+    if (user$role() == 'SC') {shiny::req(input$velgReshFord)}
     RyggFigAndeler(RegData=RegData, preprosess = 0,
                  valgtVar=input$valgtVar,
                  reshID = ifelse(user$role()=='SC', input$velgReshFord, user$org()),
