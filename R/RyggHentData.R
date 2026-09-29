@@ -48,8 +48,11 @@ hentDataV2 <- function(){
 #'
 #' @export
 
-mappingEgneNavn <- function(tabell, tabType, dbconn) {
-
+mappingEgneNavn <- function(tabell, tabType, dbconn = NULL) {
+  if (is.null(dbconn)) {
+    dbconn <- rapbase::rapOpenDbConnection("rygg", "mysql")$con
+    on.exit(rapbase::rapCloseDbConnection(dbconn), add = TRUE)
+  }
   friendlyVarTab  <-
     DBI::dbGetQuery(conn = dbconn,
                      statement = "SELECT FIELD_NAME, REGISTRATION_TYPE, USER_SUGGESTION
