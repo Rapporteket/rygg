@@ -4,26 +4,32 @@
 #' @export
 
 hentDataV2 <- function(){
-  V2oper <- rapbase::loadRegData(registryName = 'data',
-                                 query='SELECT * FROM ryggv2_operation')
-  V2pas <- rapbase::loadRegData(registryName = 'data',
-                                query='SELECT * FROM ryggv2_patient_preop')
-  V2oppf <- rapbase::loadRegData(registryName = 'data',
-                                 query='SELECT * FROM ryggv2_followup')
+
+  dbList <- rapbase::rapOpenDbConnection("rygg", "mysql")
+  dbconn <- dbList$con
+
+  V2oper <- DBI::dbGetQuery(conn = dbconn, statement='SELECT * FROM ryggv2_operation')
+  #rapbase::loadRegData(registryName = 'data', query=)
+  V2pas <- DBI::dbGetQuery(conn = dbconn, statement='SELECT * FROM ryggv2_patient_preop')
+  #rapbase::loadRegData(registryName = 'data',query=)
+  V2oppf <- DBI::dbGetQuery(conn = dbconn, statement='SELECT * FROM ryggv2_followup')
 
   V2_operpas <- merge(V2oper, V2pas[-which(names(V2pas)=='OLD_PID')], by = 'MCEID')
   V2 <- merge(V2_operpas, V2oppf[-which(names(V2oppf)=='OLD_PID')], by = 'MCEID')
   V2 <- V2[,-which(names(V2) %in% c('OLD_PID'))]
 
-  MCEtab <- rapbase::loadRegData(registryName = 'data',
-                                 query='SELECT * FROM mce
+  MCEtab <- DBI::dbGetQuery(conn = dbconn, statement='SELECT * FROM mce
                                  WHERE MCETYPE = 9 ')
-  dodsdato <- rapbase::loadRegData(registryName = 'data',
-                                   query='SELECT DECEASED_DATE as DodsDato,
+  dodsdato <-DBI::dbGetQuery(conn = dbconn,
+                             statement='SELECT DECEASED_DATE as DodsDato,
                                    DECEASED as DodPasient,
                                    ID as PATIENT_ID FROM patient')
+  rapbase::rapCloseDbConnection(dbconn)
+  dbList <- NULL
+
   RegDataV2 <- merge(V2, MCEtab[,c("MCEID", "PATIENT_ID", "MCETYPE")], by = 'MCEID' )
   RegDataV2 <- merge(RegDataV2, dodsdato, by = 'PATIENT_ID')
+
 }
 
 
@@ -31,16 +37,18 @@ hentDataV2 <- function(){
 #' Endre variabelnavn/kolonnenavn til selvvalgte navn
 #' @param tabell datatabellnavn i databasen
 #' @param tabType REGISTRATION_TYPE
+#' @param dbconn databasekobling
 #' @return tabell med selvvalgte variabelnavn spesifisert i friendlyvar. Intern funksjon
 #'
 #' @export
 
-mappingEgneNavn <- function(tabell, tabType) {
+mappingEgneNavn <- function(tabell, tabType, dbconn) {
 
   friendlyVarTab  <-
-    rapbase::loadRegData( "data",
-                          query = "SELECT FIELD_NAME, REGISTRATION_TYPE, USER_SUGGESTION
+    DBI::dbGetQuery(conn = dbconn,
+                     statement = "SELECT FIELD_NAME, REGISTRATION_TYPE, USER_SUGGESTION
                            FROM friendly_vars") #
+
 
   indTabType <- which(friendlyVarTab$REGISTRATION_TYPE %in% tabType)
   if (!length(indTabType)==0) {
@@ -80,6 +88,7 @@ mappingEgneNavn <- function(tabell, tabType) {
 
 hentDataTabellV3 <- function(tabellnavn = "surgeonform",
                            qVar = '*',
+                           dbconn,
                            datoFra = '2019-01-01',
                            datoTil = Sys.Date(),
                            egneVarNavn = 1) { #  status = 1
@@ -104,11 +113,12 @@ hentDataTabellV3 <- function(tabellnavn = "surgeonform",
     query <- paste0("SELECT ", qVar, ' FROM patientfollowup
                               WHERE CONTROL_TYPE = 12')}
 
-  tabell <- rapbase::loadRegData(registryName = "data",
-                                 query = query)
+  tabell <- # rapbase::loadRegData(registryName = "data", query = query)
+    DBI::dbGetQuery(conn = dbconn, statement = query)
+
 
   if (egneVarNavn == 1) {
-    tabell <- mappingEgneNavn(tabell, tabType)}
+    tabell <- mappingEgneNavn(tabell, tabType, dbconn = dbconn)}
 
   return(tabell)
 }
@@ -124,18 +134,22 @@ hentDataTabellV3 <- function(tabellnavn = "surgeonform",
 
 
 hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
-                             medOppf = 1,  ...) {
+                          medOppf = 1,  ...) {
   # Få til å fungere med ny sammenkobling av alle data
   # legg på valg av variabler?
   # legg på datofiltrering
 
-  #mce Trenger nok ganske få av disse variablene
+
+  dbList <- rapbase::rapOpenDbConnection("rygg", "mysql")
+  dbconn <- dbList$con
+
   # mce_patient_data # eneste som inneholder kobling mellom mceid og pasientid
   qmce <- 'CENTREID AS ReshId, MCEID, PATIENT_ID AS PasientID'
 
   mceSkjema <- hentDataTabellV3(tabellnavn = "mce",
-                              qVar = qmce,
-                              egneVarNavn = 0) #Ingen selvvalgte navn
+                                dbconn = dbconn, #dbList$con,
+                                qVar = qmce,
+                                egneVarNavn = 0) #Ingen selvvalgte navn
 
   #Pasientskjema:
   qPas <- 'BIRTH_DATE as DatoFodt,
@@ -145,8 +159,9 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
              ID'
 
   PasInfoSkjema <- hentDataTabellV3(tabellnavn = "patient",
-                                  qVar = qPas,
-                                  egneVarNavn = 1)
+                                    dbconn = dbconn,
+                                    qVar = qPas,
+                                    egneVarNavn = 1)
 
   varFjernes <- c('TSCREATED', 'TSUPDATED', 'FIRST_TIME_CLOSED_BY', 'FIRST_TIME_CLOSED',
                   'CENTREID', 'TYPE_UNDERSOEKELSE_UTFYLT', 'CREATED_BY', 'CREATEDBY',
@@ -154,9 +169,10 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   #Legeskjema
   LegeSkjema <- hentDataTabellV3(tabellnavn = "surgeonform",
-                               qVar = '*',
-                               datoFra = datoFra, datoTil = datoTil,
-                               egneVarNavn = 1)
+                                 dbconn = dbconn,
+                                 qVar = '*',
+                                 datoFra = datoFra, datoTil = datoTil,
+                                 egneVarNavn = 1)
   LegeSkjema <- dplyr::rename(LegeSkjema,
                               'ForstLukketLege' = 'FIRST_TIME_CLOSED',
                               'UtfyltDatoLege' = 'TSCREATED')
@@ -164,13 +180,15 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   #Pasientens spørreskjema
   PasSkjema <- hentDataTabellV3(tabellnavn = "patientform",
-                              qVar = '*',
-                              egneVarNavn = 1)
+                                dbconn = dbconn,
+                                qVar = '*',
+                                egneVarNavn = 1)
   PasSkjema <- PasSkjema[ ,-which(names(PasSkjema) %in% varFjernes)]
 
   #Sykehusnavn
   EnhetsNavn <- hentDataTabellV3(tabellnavn = "centreattribute",
-                               qVar = 'ID, ATTRIBUTEVALUE as SykehusNavn')
+                                 dbconn = dbconn,
+                                 qVar = 'ID, ATTRIBUTEVALUE as SykehusNavn')
 
   # SAMMENSTILL SKJEMA:
   RegData <-
@@ -185,8 +203,6 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
 
 
-
-
   if (medOppf == 1) {
     varFjernes <- c(varFjernes, 'CONTROL_TYPE', 'CREATEDBY', 'FOLLOWUP_TYPE',
                     'FORM_COMPLETED_VIA_PROMS', 'HELSETILSTAND_SCALE', 'ID',
@@ -194,14 +210,16 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
                     'KOMPLIKASJONER_ANNEN_VESENTLIG_SYKDOM_SPESIFISER')
     #Oppfølging, 3 mnd
     Oppf3Skjema <- hentDataTabellV3(tabellnavn = "patientfollowup3",
-                                  qVar = '*',
-                                  egneVarNavn = 1)
+                                    dbconn = dbconn,
+                                    qVar = '*',
+                                    egneVarNavn = 1)
     Oppf3Skjema <- Oppf3Skjema[ ,-which(names(Oppf3Skjema) %in% varFjernes)]
 
     #Oppfølging, 12 mnd
     Oppf12Skjema <- hentDataTabellV3(tabellnavn = "patientfollowup12",
-                                   qVar = '*',
-                                   egneVarNavn = 1)
+                                     dbconn = dbconn,
+                                     qVar = '*',
+                                     egneVarNavn = 1)
     Oppf12Skjema <- Oppf12Skjema[ ,-which(names(Oppf12Skjema) %in% varFjernes)]
 
     # SAMMENSTILL SKJEMA:
@@ -211,9 +229,9 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
       merge(Oppf12Skjema,
             suffixes = c("", "_oppf12"), by = "MCEID", all.x = TRUE)
 
- # --------------Justere statusvariabler
-    ePROMadmTab <- rapbase::loadRegData(registryName = 'data',
-                                        query='SELECT * FROM proms')
+    # --------------Justere statusvariabler
+    ePROMadmTab <- DBI::dbGetQuery(conn = dbconn, statement='SELECT * FROM proms')
+    #rapbase::loadRegData(registryName = 'data', query='SELECT * FROM proms')
     ePROMvar <- c("MCEID", "TSSENDT", "TSRECEIVED", "NOTIFICATION_CHANNEL", "DISTRIBUTION_RULE",
                   'REGISTRATION_TYPE')
     # «EpromStatus» er definert av HNIKT, og den som er viktigst med tanke på svarprosent.
@@ -242,7 +260,7 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
     RegData$Status12mnd <- 0
     RegData$Status12mnd[RegData$MCEID %in% ePROM12mnd$MCEID] <- 1
     RegData$Status12mnd[intersect(which(RegData$Status12mndGML ==1), indIkkeEprom12mnd)] <- 1
-     }
+  }
 
   #Evt flytt dette til skjemaet det hører hjemme...
   fjernes <- c(varFjernes, "Bydelskode",	"Bydelsnavn","Fylke", "HelseRegion",
@@ -252,3 +270,77 @@ hentRegDataV3 <- function(datoFra = '2019-01-01', datoTil = Sys.Date(),
 
   return(invisible(RegData))
 }
+
+
+
+#' Henter data registrert for Degenerativ Rygg
+#'
+#' Henter data for Degenerativ Rygg og kobler samme versjon 2 og versjon 3.
+#' Registeret ønsker også en versjon hvor variabler som bare er i versjon 2 er med i det
+#' felles uttrekket. (?Lager en egen versjon for dette.)
+#'
+#' @param alleVarV3 0: IKKE I BRUK fjerner variabler som ikke er i bruk på Rapporteket ,
+#'                  1: har med alle variabler fra V3 (foreløpig er dette standard)
+#' @param alleVarV2 0: Bare variabler som også finnes i V3 med (standard),
+#'                  1: har med alle variabler fra V2
+#' @param datoFra Benyttes kun til å avgjøre om kobling til V2 skal utføres.
+#' @param datoTil P.t ikke i bruk
+#'
+#' @return RegData, dataramme med data f.o.m. 2007.
+#' @export
+
+RyggRegDataV2V3 <- function(datoFra = '2007-01-01') {
+  #, datoTil = '2099-01-01', alleVarV3=1 ){ #alleVarV2=0
+  #NB: datovalg benyttes foreløpig kun til å avgjøre om kobling til V2 skal utføres.
+
+  message('Henter data, RyggRegDataV2V3')
+  kunV3 <- ifelse(datoFra >= '2019-11-01' & !is.na(datoFra), 1, 0)
+
+  if (kunV3 == 0) {
+    RegDataV2 <- hentDataV2()
+
+    RegDataV2 <- tilpassV2data(RegDataV2=RegDataV2)
+  }
+
+  RegDataV3 <- hentRegDataV3(datoFra = datoFra, datoTil = Sys.Date(),
+                             medOppf = 1)
+  RegDataV3 <- tilpassV3data(RegDataV3 = RegDataV3)
+
+  if (kunV3 == 0){
+    RegDataV3$RokerV2 <- dplyr::replace_values(RegDataV3$RokerV3, from = 2, to = 0)
+
+    VarV2 <- names(RegDataV2) #sort
+    VarV3 <- names(RegDataV3) #sort
+
+    V2ogV3 <- intersect(VarV2, VarV3)
+    V3ikkeV2 <- setdiff(VarV3, V2ogV3)
+    V2ikkeV3 <- setdiff(VarV2, V2ogV3)
+    # if (alleVarV2 == 0){
+    #   RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
+    #   RegDataV2V3 <- rbind(RegDataV2[ ,VarV3],
+    #                        RegDataV3[ ,VarV3])
+    # } else {
+    RegDataV2[, V3ikkeV2] <- NA #Fungerer ikke for datoTid-variabler
+    RegDataV3[, V2ikkeV3] <- NA
+    RegDataV2V3 <- rbind(RegDataV2,
+                         RegDataV3)
+    # }
+  }
+
+  if (kunV3 == 1) {RegDataV2V3 <- RegDataV3}
+  #Avvik? PeropKompAnnet
+  #ProsKode1 ProsKode2 - Kode i V2, kode + navn i V3
+
+
+  #En desimal
+  RegDataV2V3$BMI <- round(RegDataV2V3$BMI,1)
+  RegDataV2V3$OswTotPre <- round(RegDataV2V3$OswTotPre,1)
+  RegDataV2V3$OswTot3mnd <- round(RegDataV2V3$OswTot3mnd,1)
+  RegDataV2V3$OswTot12mnd <- round(RegDataV2V3$OswTot12mnd,1)
+
+  message('Ferdig med RegDataV2V3')
+  return(RegDataV2V3)
+}
+
+
+
