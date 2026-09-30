@@ -18,7 +18,7 @@ source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
 
 tictoc::tic()
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2018-01-01')
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2022-01-01')
 tictoc::toc()
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
