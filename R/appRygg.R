@@ -807,7 +807,8 @@ server_rygg <- function(input, output, session) {
                                  hovedkat = as.numeric(input$hovedInngrep),
                                  endosk = as.numeric(input$endosk),
                                  lagFig = 0, session = session)
-
+      print(names(UtDataFord))
+      print(paste('Ford: ', UtDataFord$Nvar))
     tabFord <- lagTabavFig(UtDataFraFig = UtDataFord)
 
     output$tittelFord <- renderUI({
@@ -931,6 +932,9 @@ observe({
                                   enhetsUtvalg = input$enhetsUtvalgAndel,
                                   tidsenhet = input$tidsenhetAndel,
                                   session=session) #,lagFig=0)
+    print(names(AndelerTid))
+    print(paste('AndTid: ', AndelerTid$Nvar))
+
     tabAndelTid <- lagTabavFig(UtDataFraFig = AndelerTid, figurtype = 'andelTid')
 
 

@@ -82,6 +82,8 @@ return(tab)
 lagTabavFig <- function(UtDataFraFig, figurtype='andeler'){ #lagTabavFigAndeler
 
   attach(UtDataFraFig, warn.conflicts = F)
+  test <- UtDataFraFig$Nvar
+  test2 <- Ngr
 
   if (figurtype %in% c('andeler','gjsnGrVar', 'andelTid')){
 
