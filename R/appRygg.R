@@ -405,11 +405,12 @@ ui <- navbarPage(
                                downloadButton(outputId = 'lastNed_tabAndelGrVar', label='Last ned tabell')),
                         column(width = 1),
                         column(width = 6,
-                               h3("Utvikling over tid"),
-                               tableOutput("andelTidTab"),
-                               downloadButton(outputId = 'lastNed_tabAndelTid', label='Last ned tabell'))
+                               h3("Utvikling over tid")
+              #                 tableOutput("andelTidTab"),
+              #                 downloadButton(outputId = 'lastNed_tabAndelTid', label='Last ned tabell'))
                         #DT::DTOutput("andelerGrVarTab")
-               ))
+               )
+              ))
            ) #mainPanel
 
   ), #tab
@@ -807,9 +808,6 @@ server_rygg <- function(input, output, session) {
                                  hovedkat = as.numeric(input$hovedInngrep),
                                  endosk = as.numeric(input$endosk),
                                  lagFig = 0, session = session)
-      # print(names(UtDataFord))
-      # print(paste('Ford: ', UtDataFord$Nvar))
-    tabFord <- lagTabavFig(UtDataFraFig = UtDataFord, figurtype = 'andeler')
 
     output$tittelFord <- renderUI({
       tagList(
@@ -839,7 +837,9 @@ server_rygg <- function(input, output, session) {
                        outfile = file)
       })
 
-
+    # print(names(UtDataFord))
+    # print(paste('Ford: ', UtDataFord$Nvar))
+    tabFord <- lagTabavFig(UtDataFraFig = UtDataFord, figurtype = 'andeler')
 
     kolGruppering <- c(1,3,3)
     names(kolGruppering) <- c(' ', UtDataFord$hovedgrTxt, UtDataFord$smltxt)
@@ -935,27 +935,28 @@ observe({
     # print(names(AndelerTid))
     # print(paste('AndTid: ', AndelerTid$Nvar))
 
-    tabAndelTid <- lagTabavFig(UtDataFraFig = AndelerTid, figurtype = 'andelTid')
+    #tabAndelTid <- lagTabavFig(UtDataFraFig = AndelerTid, figurtype = 'andelTid')
 
 
-    output$andelTidTab <- function() {
-      antKol <- ncol(tabAndelTid)
-      kableExtra::kable(tabAndelTid, format = 'html'
-                        , full_width=F
-                        , digits = c(0,0,1,0,0,1)[1:antKol]
-      ) %>%
-        kableExtra::add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
-        kableExtra::column_spec(column = 1, width_min = '7em') %>%
-        kableExtra::column_spec(column = 2:(antKol+1), width = '7em') %>%
-        kableExtra::row_spec(0, bold = T)
-    }
-    output$lastNed_tabAndelTid <- downloadHandler(
-      filename = function(){
-        paste0(input$valgtVar, '_andelTid.csv')
-      },
-      content = function(file, filename){
-        write.csv2(tabAndelTid, file, row.names = T, fileEncoding = 'latin1', na = '')
-      })
+    # output$andelTidTab <- function() {
+    #   antKol <- ncol(tabAndelTid)
+    #   kableExtra::kable(tabAndelTid, format = 'html'
+    #                     , full_width=F
+    #                     , digits = c(0,0,1,0,0,1)[1:antKol]
+    #   ) %>%
+    #     kableExtra::add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
+    #     kableExtra::column_spec(column = 1, width_min = '7em') %>%
+    #     kableExtra::column_spec(column = 2:(antKol+1), width = '7em') %>%
+    #     kableExtra::row_spec(0, bold = T)
+    # }
+
+    # output$lastNed_tabAndelTid <- downloadHandler(
+    #   filename = function(){
+    #     paste0(input$valgtVar, '_andelTid.csv')
+    #   },
+    #   content = function(file, filename){
+    #     write.csv2(tabAndelTid, file, row.names = T, fileEncoding = 'latin1', na = '')
+    #   })
 
     output$LastNedFigAndelTid <- downloadHandler(
       filename = function(){
