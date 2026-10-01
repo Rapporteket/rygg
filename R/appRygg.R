@@ -405,11 +405,12 @@ ui <- navbarPage(
                                downloadButton(outputId = 'lastNed_tabAndelGrVar', label='Last ned tabell')),
                         column(width = 1),
                         column(width = 6,
-                               h3("Utvikling over tid"),
+                               h3("Utvikling over tid")
               #                 tableOutput("andelTidTab"),
               #                 downloadButton(outputId = 'lastNed_tabAndelTid', label='Last ned tabell'))
                         #DT::DTOutput("andelerGrVarTab")
-               ))
+               )
+              ))
            ) #mainPanel
 
   ), #tab
