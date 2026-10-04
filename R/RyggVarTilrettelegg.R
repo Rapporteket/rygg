@@ -900,12 +900,12 @@ valgtVarTest <- valgtVar
           RegData$Variabel <- RegData$RFKunDegenerasjon
       }
       if (valgtVar == 'opFusjonUtenDekompr') { #andelGrVar/Tid
-        #LegeSkjema. Andel med OpFusjonUtenDekompr=1
+        #LegeSkjema. Andel med FusjonUtenDekompr=1
         #Kode 0,1,tom: Nei, Ja Ukjent
         tittel <- 'Fusjon, ryggsmerter uten utstråling, ingen dekompresjon'
         sortAvtagende <- F
-        RegData <- RegData[which(RegData$OpFusjonUtenDekompr %in% 0:1), ]
-        RegData$Variabel <- RegData$OpFusjonUtenDekompr
+        RegData <- RegData[which(RegData$FusjonUtenDekompr %in% 0:1), ]
+        RegData$Variabel <- RegData$FusjonUtenDekompr
       }
 
 

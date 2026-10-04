@@ -79,30 +79,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
   N <- list(Hoved = length(ind$Hoved), Rest =length(ind$Rest))
 
 
-  #Hvis for få observasjoner..
-  if (N$Hoved < 10 | (medSml ==1 & N$Rest<10)) {
-    FigTypUt <- figtype(outfile)
-    farger <- FigTypUt$farger
-    plot.new()
-    title(main=paste0('variabel: ', valgtVar))	#, line=-6)
-    legend('topleft',utvalgTxt, bty='n', cex=0.9, text.col=farger[1])
-    text(0.5, 0.65, 'Færre enn 10 registreringer i hoved-', cex=1.2)
-    text(0.55, 0.6, 'eller sammenlikningsgruppe', cex=1.2)
-    if ( outfile != '') {dev.off()}
-
-
-    FigDataParam <- list(KImaalGrenser = KImaalGrenser,
-                         grtxt2=grtxt2,
-                         varTxt=varTxt,
-                         tittel=tittel,
-                         retn='V',
-                         yAkseTxt=yAkseTxt,
-                         utvalgTxt=RyggUtvalg$utvalgTxt,
-                         fargepalett=RyggUtvalg$fargepalett,
-                         medSml=medSml,
-                         hovedgrTxt=hovedgrTxt,
-                         smltxt=RyggUtvalg$smltxt)
-  } else {
 
     #------------------------Klargjøre tidsenhet--------------
     RegDataMTidsenh <- SorterOgNavngiTidsEnhet(RegData=RegData, tidsenhet = tidsenhet)
@@ -117,7 +93,6 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
     #--------------- Gjøre beregninger ------------------------------
 
     AggVerdier <- list(Hoved = 0, Rest =0)
-
     NAarHoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'], length) #Tot. ant. per år
     NAarHendHoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'],sum, na.rm=T) #Ant. hendelser per år
     AggVerdier$Hoved <- NAarHendHoved/NAarHoved*100
@@ -131,7 +106,14 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
     xAkseTxt <- paste0(c('Innleggelsesår', 'Innleggelsesår', 'Innleggelseskvartal', 'Innleggelsesmåned')
                        [which(tidsenhet==vektor)])
 
-
+    #Fra NGER
+    # Ngr$Rest <- tapply(RegData$Variabel[ind$Rest], RegData$TidsEnhet[ind$Rest], length)
+    # NTidHendRest <- tapply(RegData$Variabel[ind$Rest], RegData$TidsEnhet[ind$Rest],sum, na.rm=T)
+    # AggVerdier$Rest <- NTidHendRest/Ngr$Rest*100
+    # Ngr$Hoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'], length)
+    # NTidHendHoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'],sum, na.rm=T)
+    # AggVerdier$Hoved <- NTidHendHoved/Ngr$Hoved*100
+    #
     FigDataParam <- list(AggVerdier=AggVerdier, N=N,
                          Ngr=list('Hoved' = NAarHoved, 'Rest'= NAarHendRest),
                          Nvar = Ngr,
@@ -153,6 +135,37 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
 
     #-----------Figur---------------------------------------
     if (lagFig == 1) {
+
+      #Hvis for få observasjoner..
+      if (N$Hoved < 10 | (medSml ==1 & N$Rest<10)) {
+        FigTypUt <- figtype(outfile)
+        farger <- FigTypUt$farger
+        plot.new()
+        title(main=paste0('variabel: ', valgtVar))	#, line=-6)
+        legend('topleft',utvalgTxt, bty='n', cex=0.9, text.col=farger[1])
+        text(0.5, 0.65, 'Færre enn 10 registreringer i hoved-', cex=1.2)
+        text(0.55, 0.6, 'eller sammenlikningsgruppe', cex=1.2)
+        if ( outfile != '') {dev.off()}
+
+
+
+        # FigDataParam <- list(KImaalGrenser = KImaalGrenser,
+        #                      Ngr=list('Hoved' = 0, 'Rest'= 0),
+        #                      Nvar = list('Hoved' = 0, 'Rest'= 0),
+        #                      AggVerdier = list(Hoved = 0, Rest =0),
+        #                      medSml = 0,
+        #                      grtxt2=grtxt2,
+        #                      varTxt=varTxt,
+        #                      tittel=tittel,
+        #                      retn='V',
+        #                      yAkseTxt=yAkseTxt,
+        #                      utvalgTxt=RyggUtvalg$utvalgTxt,
+        #                      fargepalett=RyggUtvalg$fargepalett,
+        #                      medSml=medSml,
+        #                      hovedgrTxt=hovedgrTxt,
+        #                      smltxt=RyggUtvalg$smltxt)
+      } else {
+
 
       #Plottspesifikke parametre:
       FigTypUt <- rapFigurer::figtype(outfile, fargepalett=RyggUtvalg$fargepalett)
@@ -208,11 +221,8 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
       if ( outfile != '') {dev.off()}
       #------------------------------------------------------------------------------
 
-    }	#end else statement
-  }
-
-
-
+    }
+  } #end else statement
   #                  }
   return(invisible(FigDataParam))
 

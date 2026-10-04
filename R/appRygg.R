@@ -405,11 +405,10 @@ ui <- navbarPage(
                                downloadButton(outputId = 'lastNed_tabAndelGrVar', label='Last ned tabell')),
                         column(width = 1),
                         column(width = 6,
-                               h3("Utvikling over tid")
-              #                 tableOutput("andelTidTab"),
-              #                 downloadButton(outputId = 'lastNed_tabAndelTid', label='Last ned tabell'))
+                               h3("Utvikling over tid"),
+                               tableOutput("andelTidTab"),
+                               downloadButton(outputId = 'lastNed_tabAndelTid', label='Last ned tabell'))
                         #DT::DTOutput("andelerGrVarTab")
-               )
               ))
            ) #mainPanel
 
@@ -449,7 +448,9 @@ ui <- navbarPage(
 server_rygg <- function(input, output, session) {
   rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
-  RegData <- RyggRegDataV2V3(datoFra = '2007-01-01')
+  shiny::withProgress(message = "Laster data", value = 0, {
+    RegData <- RyggRegDataV2V3(datoFra = '2007-01-01')
+  })
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 
@@ -918,6 +919,7 @@ server_rygg <- function(input, output, session) {
   )
 
 observe({
+
     AndelerTid <-
       RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
                                   reshID = user$org(),
@@ -935,28 +937,28 @@ observe({
     # print(names(AndelerTid))
     # print(paste('AndTid: ', AndelerTid$Nvar))
 
-    #tabAndelTid <- lagTabavFig(UtDataFraFig = AndelerTid, figurtype = 'andelTid')
+    tabAndelTid <- lagTabavFig(UtDataFraFig = AndelerTid, figurtype = 'andelTid')
 
 
-    # output$andelTidTab <- function() {
-    #   antKol <- ncol(tabAndelTid)
-    #   kableExtra::kable(tabAndelTid, format = 'html'
-    #                     , full_width=F
-    #                     , digits = c(0,0,1,0,0,1)[1:antKol]
-    #   ) %>%
-    #     kableExtra::add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
-    #     kableExtra::column_spec(column = 1, width_min = '7em') %>%
-    #     kableExtra::column_spec(column = 2:(antKol+1), width = '7em') %>%
-    #     kableExtra::row_spec(0, bold = T)
-    # }
+    output$andelTidTab <- function() {
+      antKol <- ncol(tabAndelTid)
+      kableExtra::kable(tabAndelTid, format = 'html'
+                        , full_width=F
+                        , digits = c(0,0,1,0,0,1)[1:antKol]
+      ) %>%
+        kableExtra::add_header_above(c(" "=1, 'Egen enhet/gruppe' = 3, 'Resten' = 3)[1:(antKol/3+1)]) %>%
+        kableExtra::column_spec(column = 1, width_min = '7em') %>%
+        kableExtra::column_spec(column = 2:(antKol+1), width = '7em') %>%
+        kableExtra::row_spec(0, bold = T)
+    }
 
-    # output$lastNed_tabAndelTid <- downloadHandler(
-    #   filename = function(){
-    #     paste0(input$valgtVar, '_andelTid.csv')
-    #   },
-    #   content = function(file, filename){
-    #     write.csv2(tabAndelTid, file, row.names = T, fileEncoding = 'latin1', na = '')
-    #   })
+    output$lastNed_tabAndelTid <- downloadHandler(
+      filename = function(){
+        paste0(input$valgtVar, '_andelTid.csv')
+      },
+      content = function(file, filename){
+        write.csv2(tabAndelTid, file, row.names = T, fileEncoding = 'latin1', na = '')
+      })
 
     output$LastNedFigAndelTid <- downloadHandler(
       filename = function(){

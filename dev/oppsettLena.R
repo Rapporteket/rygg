@@ -17,12 +17,12 @@ library(rygg)
 source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
 
-tictoc::tic()
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2022-01-01')
-tictoc::toc()
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2026-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
-Data <- RyggFigAndeler(RegData)
+RyggFigAndelTid(RegData, valgtVar='opFusjonUtenDekompr', datoFra='2026-01-01', datoTil=Sys.Date(),
+                           tidsenhet='Mnd')
+
 
 #oversikt over hvordan tidspunkt for besvarelse fordeler seg etter skjemautsending.
 #For både 3 og 12 måneder: scatterplot eller tilsvarende som viser hvor lang tid
