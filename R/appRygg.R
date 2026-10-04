@@ -409,7 +409,7 @@ ui <- navbarPage(
                                tableOutput("andelTidTab"),
                                downloadButton(outputId = 'lastNed_tabAndelTid', label='Last ned tabell'))
                         #DT::DTOutput("andelerGrVarTab")
-               ))
+              ))
            ) #mainPanel
 
   ), #tab
@@ -448,7 +448,9 @@ ui <- navbarPage(
 server_rygg <- function(input, output, session) {
   rapbase::appLogger(session, msg = 'Starter Rapporteket-Rygg')
 
-  RegData <- RyggRegDataV2V3(datoFra = '2007-01-01')
+  shiny::withProgress(message = "Laster data", value = 0, {
+    RegData <- RyggRegDataV2V3(datoFra = '2007-01-01')
+  })
   RegData <- RyggPreprosess(RegData = RegData)
   RegData <- RegData[order(RegData$OpDato, decreasing = TRUE), ]
 
@@ -807,9 +809,6 @@ server_rygg <- function(input, output, session) {
                                  hovedkat = as.numeric(input$hovedInngrep),
                                  endosk = as.numeric(input$endosk),
                                  lagFig = 0, session = session)
-      # print(names(UtDataFord))
-      # print(paste('Ford: ', UtDataFord$Nvar))
-    tabFord <- lagTabavFig(UtDataFraFig = UtDataFord, figurtype = 'andeler')
 
     output$tittelFord <- renderUI({
       tagList(
@@ -839,7 +838,9 @@ server_rygg <- function(input, output, session) {
                        outfile = file)
       })
 
-
+    # print(names(UtDataFord))
+    # print(paste('Ford: ', UtDataFord$Nvar))
+    tabFord <- lagTabavFig(UtDataFraFig = UtDataFord, figurtype = 'andeler')
 
     kolGruppering <- c(1,3,3)
     names(kolGruppering) <- c(' ', UtDataFord$hovedgrTxt, UtDataFord$smltxt)
@@ -918,6 +919,7 @@ server_rygg <- function(input, output, session) {
   )
 
 observe({
+
     AndelerTid <-
       RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar=input$valgtVarAndel,
                                   reshID = user$org(),
@@ -949,6 +951,7 @@ observe({
         kableExtra::column_spec(column = 2:(antKol+1), width = '7em') %>%
         kableExtra::row_spec(0, bold = T)
     }
+
     output$lastNed_tabAndelTid <- downloadHandler(
       filename = function(){
         paste0(input$valgtVar, '_andelTid.csv')

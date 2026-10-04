@@ -132,6 +132,7 @@ RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', d
 
   AggVerdier <- list(Hoved = 0, Rest = 0)
   N <- list(Hoved = 0, Rest = 0)
+  Ngr <- list(Hoved = 0, Rest = 0)
   AntHend <- list(Hoved = switch(as.character(flerevar),
                      '0' = table(RegData$VariabelGr[ind$Hoved]),
                      '1' = colSums(sapply(RegData[ind$Hoved ,variable], as.numeric), na.rm = T)),
@@ -154,11 +155,6 @@ RyggFigAndeler  <- function(RegData, valgtVar='alder', datoFra = '2007-01-01', d
   Nfig <- N
 
 
-#   #Denne må håndteres i Shiny:
-#   if (valgtVar=='Underkat' & all(hovedkat != c(1,2,5,7))) {
-#     text(0.5, 0.6, 'Velg Hovedkategori:
-# 			Prolapskirurgi, Foramenotomi, Fusjonskirurgi eller
-# 		Fjerning/rev. av implantat for å se på inngrepstyper', cex = 1.2)}
 
   FigDataParam <- list(AggVerdier=AggVerdier,
                        N=Nfig,

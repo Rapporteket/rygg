@@ -66,6 +66,7 @@ RyggFigGjsnBox <- function(RegData, outfile='', valgtVar, tidlOp='', erMann='', 
   RegData <- RyggUtvalg$RegData
   utvalgTxt <- RyggUtvalg$utvalgTxt
   medSml <- RyggUtvalg$medSml
+  ResData <- round(rbind(Midt=NA, Konf=NA, MidtRest=NA, KonfRest=NA), 1)
 #------------------------Klargjøre tidsenhet--------------
 #  AggVerdier <- list(Hoved = 0, Rest =0)
   ind <- RyggUtvalg$ind
@@ -124,19 +125,17 @@ Ngr$Rest <- tapply(RegData[ind$Rest ,'Variabel'], RegData[ind$Rest, 'TidsEnhet']
 	}
 }
 
-}
-t1 <- switch(valgtMaal,
-             Med = 'Median ',
-             Gjsn = 'Gjennomsnittlig ')
-tittel <- paste0(t1, RyggVarSpes$tittel)
-
 if (valgtMaal=='Med') {maaltxt <- 'Median ' } else {maaltxt <- 'Gjennomsnitt '}
 
 ResData <- round(rbind(Midt, Konf, MidtRest, KonfRest), 1)
 rownames(ResData) <- c(maaltxt, 'KImin', 'KImaks',
                        paste0(maaltxt, 'Resten'), 'KImin, Resten', 'KImaks, Resten')[1:(3*(medSml+1))]
-#UtData <- list(paste0(toString(RyggVarSpes$tittel),'.'), ResData )
-#names(UtData) <- c('tittel', 'Data')
+
+}
+t1 <- switch(valgtMaal,
+             Med = 'Median ',
+             Gjsn = 'Gjennomsnittlig ')
+tittel <- paste0(t1, RyggVarSpes$tittel)
 
 FigDataParam <- list(AggVerdier=ResData,
                      N=N,

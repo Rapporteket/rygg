@@ -17,12 +17,19 @@ library(rygg)
 source("dev/sysSetenv.R")
 rygg::kjorRyggApp(browser = TRUE)
 
-tictoc::tic()
-RegDataRaa <- RyggRegDataV2V3(datoFra = '2022-01-01')
-tictoc::toc()
+RegDataRaa <- RyggRegDataV2V3(datoFra = '2026-01-01')
 RegData <- RyggPreprosess(RegData =RegDataRaa)
 
-Data <- RyggFigAndeler(RegData)
+RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr3mnd',
+               enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
+               hovedkat = 1, outfile='')
+reshID <- 4211881
+
+henteSamlerapporter(filnavn = 'test', rnwFil = 'RyggMndRapp.Rnw', reshID=4211881,
+                                datoFra=Sys.Date()-180, datoTil=Sys.Date())
+
+RyggUtvalg <- RyggUtvalgEnh(RegData=RegData, reshID=reshID,
+                            hovedkat = 1, enhetsUtvalg=1)
 
 #oversikt over hvordan tidspunkt for besvarelse fordeler seg etter skjemautsending.
 #For både 3 og 12 måneder: scatterplot eller tilsvarende som viser hvor lang tid
