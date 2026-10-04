@@ -106,16 +106,8 @@ RyggFigAndelTid <- function(RegData, valgtVar, datoFra='2007-01-01', datoTil=Sys
     xAkseTxt <- paste0(c('Innleggelsesår', 'Innleggelsesår', 'Innleggelseskvartal', 'Innleggelsesmåned')
                        [which(tidsenhet==vektor)])
 
-    #Fra NGER
-    # Ngr$Rest <- tapply(RegData$Variabel[ind$Rest], RegData$TidsEnhet[ind$Rest], length)
-    # NTidHendRest <- tapply(RegData$Variabel[ind$Rest], RegData$TidsEnhet[ind$Rest],sum, na.rm=T)
-    # AggVerdier$Rest <- NTidHendRest/Ngr$Rest*100
-    # Ngr$Hoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'], length)
-    # NTidHendHoved <- tapply(RegData[ind$Hoved, 'Variabel'], RegData[ind$Hoved ,'TidsEnhet'],sum, na.rm=T)
-    # AggVerdier$Hoved <- NTidHendHoved/Ngr$Hoved*100
-    #
     FigDataParam <- list(AggVerdier=AggVerdier, N=N,
-                         Ngr=list('Hoved' = NAarHoved, 'Rest'= NAarHendRest),
+                         Ngr=list('Hoved' = NAarHoved, 'Rest'= NAarRest),
                          Nvar = Ngr,
                          KImaalGrenser = KImaalGrenser,
                          #soyletxt=soyletxt,
