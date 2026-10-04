@@ -135,15 +135,19 @@ For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
 \Sexpr{maxDatoEget}.
 
 <<'TabReg', results='asis', echo=FALSE, eval=T>>=
-tabAntOpph <- tabAntOpphShMnd(RegData=RegDataEget6mnd, datoTil=datoTil, reshID = reshID, antMnd=6)
 
-xtable::xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
-		caption=paste0('Antall registreringer, ', shtxt,'.'), label='tab:RegEget')
+
+tabAntOpph <- if (dim(RegDataEget6mnd)[1]>0) {
+  tabAntOpphShMnd(RegData=RegDataEget6mnd, datoTil=datoTil, reshID = reshID, antMnd=6)
+
+  xtable::xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
+                 caption=paste0('Antall registreringer, ', shtxt,'.'), label='tab:RegEget')
+} else {print('Ingen egne registreringer siste 6mnd')}
 
 RegDataNokkelt <- RyggUtvalgEnh(RegData = RegDataEget, datoFra = datoFraKvart)$RegData
 tabNokkeltall <- tabNokkeltall(RegData=RegDataNokkelt, tidsenhet='Kvartal', datoTil=datoTil, enhetsUtvalg=2, reshID=reshID)
 xtable::xtable(tabNokkeltall, digits=0, align=c('l', rep('r', ncol(tabNokkeltall))),
-		caption=paste0('Kvartalsvise nøkkeltall, ', shtxt,'.'), label='tab:NokkeltallEget')
+               caption=paste0('Kvartalsvise nøkkeltall, ', shtxt,'.'), label='tab:NokkeltallEget')
 @
 \end{frame}
 
@@ -162,10 +166,10 @@ dum <- RyggFigAndelTid(RegData=RegData, preprosess = 0, valgtVar='smBePreLav',
                 enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                 outfile='smBePreLavKITid.pdf')
 
-dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
+dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr3mnd',
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                hovedkat = 1, outfile='OswEndr_pro.pdf')
-dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr',
+dum <- RyggFigGjsnBox(RegData=RegData, preprosess=0, valgtVar='OswEndr3mnd',
                        enhetsUtvalg = 1, reshID = reshID, tidsenhet = 'Kvartal',
                hovedkat = 9, outfile='OswEndr_SS.pdf')
 
