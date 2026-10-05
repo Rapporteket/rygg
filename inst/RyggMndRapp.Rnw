@@ -136,13 +136,13 @@ For \Sexpr{shtxt} er siste ferdigstilte operasjonsdato i denne rapporten
 
 <<'TabReg', results='asis', echo=FALSE, eval=T>>=
 
-
-tabAntOpph <- if (dim(RegDataEget6mnd)[1]>0) {
-  tabAntOpphShMnd(RegData=RegDataEget6mnd, datoTil=datoTil, reshID = reshID, antMnd=6)
-
-  xtable::xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
+if (dim(RegDataEget6mnd)[1]>0) {
+tabAntOpph <- tabAntOpphShMnd(RegData=RegDataEget6mnd, datoTil=datoTil,
+                              reshID = reshID, antMnd=6)
+xtable::xtable(tabAntOpph, digits=0, align=c('l', rep('r', ncol(tabAntOpph))),
                  caption=paste0('Antall registreringer, ', shtxt,'.'), label='tab:RegEget')
-} else {print('Ingen egne registreringer siste 6mnd')}
+} else {
+  print('Ingen egne registreringer siste 6mnd')}
 
 RegDataNokkelt <- RyggUtvalgEnh(RegData = RegDataEget, datoFra = datoFraKvart)$RegData
 tabNokkeltall <- tabNokkeltall(RegData=RegDataNokkelt, tidsenhet='Kvartal', datoTil=datoTil, enhetsUtvalg=2, reshID=reshID)
