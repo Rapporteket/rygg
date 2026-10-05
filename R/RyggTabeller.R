@@ -13,7 +13,7 @@
 tabAntOpphShMnd <- function(RegData, datoTil=Sys.Date(), antMnd=6, reshID=0){
       #RegData må inneholde ..
   if (reshID!=0){RegData <- RegData[which(RegData$ReshId==reshID), ]}
-      datoFra <- lubridate::floor_date(as.Date(datoTil) %m-% lubridate::months(antMnd), unit='month')
+      datoFra <- lubridate::floor_date(as.Date(datoTil) %m-% months(antMnd), unit='month')
       aggVar <-  c('ShNavn', 'OpDato')
       RegDataDum <- RegData[intersect(which(as.Date(RegData$OpDato) <= as.Date(datoTil, tz='UTC')),
                                which(as.Date(RegData$OpDato, tz='uTC') > as.Date(datoFra, tz='UTC'))), aggVar]
