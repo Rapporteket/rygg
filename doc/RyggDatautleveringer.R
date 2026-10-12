@@ -1,5 +1,44 @@
 #Her tenker jeg å samle kode til ulike datautleveringer fra Rygg
 
+
+#Utlevering fra DÅR okt 2026
+#Data: Alle operert f.o.m. 2007 t.o.m. 2024 som er død innen ett år.
+
+library(rygg)
+source("dev/sysSetenv.R")
+RyggDataAlle <- RyggRegDataV2V3()
+RyggDataAlle <- RyggPreprosess(RyggDataAlle)
+RyggDataDod1aar <- RyggDataAlle[RyggDataAlle$Dod365==1, ]
+#RyggDataTilDAR <- RyggDataDod1aar[ , c("MCEID", "PasientID", "OpDato", "DodsDato", 'Alder', 'Dod30')]
+#dblreg <- RyggDataDod1aar[RyggDataDod1aar$PasientID == 2955, ]
+
+setwd('../data/NKR')
+RyggKobl07_24 <- read.csv2(file = 'C:/Users/lro2402unn/RegistreGIT/data/NKR/rygg_kobltab2026-10-07.csv')
+PersTilDAR <- RyggKobl07_24[RyggKobl07_24$PID %in% unique(RyggDataDod1aar$PasientID),]
+write.csv2(PersTilDAR, file = 'RyggDode1aar.csv', row.names = F)
+
+PIDflereOp <- names(table(RyggDataDod1aar$PasientID)[table(RyggDataDod1aar$PasientID)>1])
+MCEok <- RyggDataDod1aar |>
+  dplyr::filter(PasientID %in% PIDflereOp) |>
+  dplyr::group_by(PasientID) |>
+  dplyr::summarise(
+    Ant = dplyr::n(),
+    MCEID = MCEID[order(OpDato)[Ant]],
+    sisteOp = max(OpDato)
+  )
+
+#De med en operasjon:
+PIDenOp <- names(table(RyggDataDod1aar$PasientID)[table(RyggDataDod1aar$PasientID)==1])
+PasMCE <- RyggDataDod1aar[PasientID %in% PIDenOp, c("PasientID", "MCEID")]
+
+
+test <- RyggDataAlle[!is.na(RyggDataAlle$DodsDato), c('OpDato', "DodsDato", "Dod365")]
+
+
+
+
+
+
 #----------------Dekningsgradsanalyse for 2023-----------------
 #samt utlevering til Arendal (egne data)
 #Skal bare begrense koblingnøkkelen til de aktuelle data
